@@ -1,0 +1,132 @@
+{
+  "locale_selector": {
+    "label": "Demo locale",
+    "hint": "Tap a locale to preview the marketing/admin copy."
+  },
+  "sessions": {
+    "eyebrow": "Admin",
+    "title": "Welcome",
+    "intro": "The SourceGrid Labs backend dashboard lets admins manage bookings, payments, automations, and staff workflows in one place so you can demo the full operating system without custom builds.",
+    "demo_email_label": "Demo email",
+    "demo_password_label": "Demo password",
+    "unlock_copy": "Type in the demo email and password to log into the admin console.",
+    "form": {
+      "email": "Email address",
+      "password": "Password",
+      "submit": "Enter admin dashboard"
+    },
+    "info": "These credentials also work for API calls, Expo builds, and any other authenticated demo surfaces.",
+    "loading": "Signing you in…",
+    "session_preview": {
+      "title": "Stored session",
+      "email_label": "Email",
+      "access_label": "Access token",
+      "refresh_label": "Refresh token",
+      "hint": "Tokens are stored on-device so you can reuse the marketing/admin session without logging in again."
+    },
+    "footer_link": "← Back to marketing landing",
+    "home_link": "← Back to homepage",
+    "errors": {
+      "missing_fields": "Email and password are required.",
+      "generic": "Unable to sign in. Double-check the credentials and try again.",
+      "link_open": "Could not open the requested link.",
+      "clipboard": "Unable to copy to clipboard."
+    },
+    "clipboard_success": "Copied to clipboard."
+  },
+  "flash": {
+    "welcome_back": "Welcome back! You're now viewing the admin dashboard.",
+    "invalid_credentials": "Those credentials didn't match. Use the seeded email and password shown."
+  },
+  "messages": {
+    "title": "App messages",
+    "entries": [
+      {
+        "subject": "Field inspection scheduled",
+        "preview": "Team Delta confirmed the roof inspection for Building 4 tomorrow at 09:00.",
+        "status": "Unread",
+        "channel": "Push + Email"
+      },
+      {
+        "subject": "Payment received",
+        "preview": "Maintenance invoice #1846 was paid in full by Northwind Holdings.",
+        "status": "Action needed",
+        "channel": "In-app"
+      }
+    ],
+    "actions": [
+      "Mark read",
+      "Reply",
+      "Archive"
+    ]
+  },
+  "users": {
+    "title": "Manage users",
+    "actions": [
+      "View profile",
+      "Reset password",
+      "Deactivate"
+    ],
+    "entries": [
+      {
+        "name": "Lina Ortega",
+        "role": "Portfolio admin",
+        "status": "Active"
+      },
+      {
+        "name": "Marcus Lee",
+        "role": "Regional manager",
+        "status": "Invited"
+      }
+    ],
+    "last_active_prefix": "Last active"
+  },
+  "custom_features": {
+    "title": "Custom modules",
+    "subtitle": "Design admin tooling tailored to your workflows.",
+    "entries": [
+      {
+        "title": "Workflow Automations",
+        "description": "Route approvals, notify field teams, and sync documents across your existing stack.",
+        "badge": "Tailored playbooks"
+      },
+      {
+        "title": "Executive Insights",
+        "description": "Blend operational KPIs with finance data for a single source of truth dashboard.",
+        "badge": "C-suite ready"
+      },
+      {
+        "title": "Field Ops Toolkit",
+        "description": "Give technicians guided checklists, offline sync, and photo capture in-app.",
+        "badge": "Offline capable"
+      }
+    ],
+    "cta": "Design this module"
+  },
+  "console": {
+    "title": "SourceGrid Labs Demo Console",
+    "subtitle": "Guide prospects through the full operations playbook with live data, ready-made workflows, and zero risk to production.",
+    "carousel_hint": "Swipe or use the arrows to preview each surface.",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "messages": "App messages",
+      "users": "Manage users",
+      "custom": "Custom features"
+    }
+  },
+  "dashboard": {
+    "selected_locale_label": "Selected locale",
+    "selected_locale_fallback": "Not selected",
+    "dev_token_label": "Demo access token",
+    "dev_token_fallback": "Generate from Rails console",
+    "dev_token_purpose_label": "Purpose",
+    "dev_token_purpose_fallback": "Default showcase token",
+    "system_settings_label": "System settings",
+    "system_settings_empty": "No feature toggles yet.",
+    "theme_keys_label": "Theme keys",
+    "theme_keys_fallback": "golden-primary",
+    "loading": "Loading dashboard…",
+    "logout": "Logout",
+    "logging_out": "Signing out…"
+  }
+}

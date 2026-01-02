@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Run on the droplet (with sudo) to copy the live nginx and systemd configs
+# back into the repository so they can be committed. Use this after certbot
+# or manual edits changed files under /etc.
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+OPS_DIR="$ROOT_DIR/ops"
+PROJECT_CONFIG="$ROOT_DIR/shared/app_constants/project.json"
+
+NGINX_OUTPUT_DIR="$OPS_DIR/nginx"
+SYSTEMD_OUTPUT_DIR="$OPS_DIR/systemd"
+
+read_project_slug() {
+  if [[ -f "$PROJECT_CONFIG" ]]; then
+    ruby -rjson -e 'data=JSON.parse(File.read(ARGV[0])); print(data["slug"] || "golden-template")' "$PROJECT_CONFIG"
+  else
+    echo "golden-template"
+  fi
+}
+
+require_root() {
+  if [[ $EUID -ne 0 ]]; then
+    echo "Run this script with sudo so it can read /etc/nginx and /etc/systemd/system." >&2
+    exit 1
+  fi
+}
+
+copy_if_exists() {
+  local source="$1"
+  local destination="$2"
+
+  if [[ ! -f "$source" ]]; then
+    echo "Skipping missing source: $source"
+    return
+  fi
+
+  mkdir -p "$(dirname "$destination")"
+  cp "$source" "$destination"
+  echo "Copied $source → $destination"
+}
+
+main() {
+  if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    cat <<USAGE
+Usage: sudo bin/capture_live_configs
+
+Copies the live nginx/systemd configs from /etc back into the repo under ops/.
+Commit and push those changes so your local clone stays in sync.
+USAGE
+    exit 0
+  fi
+
+  require_root
+  local slug
+  slug="$(read_project_slug)"
+
+  copy_if_exists "/etc/nginx/sites-available/${slug}.conf" "$NGINX_OUTPUT_DIR/${slug}.conf"
+  copy_if_exists "/etc/systemd/system/${slug}-puma.service" "$SYSTEMD_OUTPUT_DIR/${slug}-puma.service"
+  copy_if_exists "/etc/systemd/system/${slug}-sidekiq.service" "$SYSTEMD_OUTPUT_DIR/${slug}-sidekiq.service"
+
+  echo "Captured live configs. Push these files from the droplet, then pull locally."
+}
+
+main "$@"

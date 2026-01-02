@@ -1,0 +1,54 @@
+# System artifacts
+.DS_Store
+Thumbs.db
+tmp/
+
+# Environment & secrets (keep templates)
+/.env*
+!.env*.example
+!.env*.erb
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Vue (marketing) build outputs and node deps
+vue/dist/
+vue/node_modules/
+
+# Expo / mobile artifacts
+expo/.expo/
+expo/.expo-shared/
+expo/node_modules/
+expo/android/
+expo/ios/
+expo/web-build/
+expo/dist/
+mobile/.expo/
+mobile/.expo-shared/
+mobile/node_modules/
+mobile/android/
+mobile/ios/
+mobile/web-build/
+mobile/dist/
+*.apk
+*.aab
+*.ipa
+
+# Rails / Ruby
+rails/.bundle/
+rails/log/*
+!/rails/log/.keep
+rails/tmp/*
+!/rails/tmp/.keep
+rails/tmp/pids/*
+!/rails/tmp/pids/
+!/rails/tmp/pids/.keep
+rails/tmp/storage/*
+!/rails/tmp/storage/
+!/rails/tmp/storage/.keep
+rails/storage/*
+!/rails/storage/.keep
+rails/config/master.key
+rails/public/backend/assets/*.map
+
+# Ops staging

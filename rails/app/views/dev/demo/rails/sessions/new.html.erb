@@ -1,0 +1,78 @@
+<% content_for :suppress_admin_nav, true %>
+
+<style>
+  @media (max-width: 640px) {
+    .login-card .login-grid,
+    .login-secondary {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+
+<section class="card login-card" style="margin-bottom: 2rem;">
+  <header>
+    <p class="eyebrow"><%= t("demo_admin.sessions.eyebrow") %></p>
+    <h1><%= t("demo_admin.sessions.title") %></h1>
+    <p><%= t("demo_admin.sessions.intro") %></p>
+  </header>
+
+  <%= field_row class: "login-grid" do %>
+    <%= field_panel class: "login-credentials" do %>
+      <div class="form-field">
+        <label><%= t("demo_admin.sessions.demo_email_label") %></label>
+        <div class="credential"><%= @dummy_email %></div>
+      </div>
+      <div class="form-field">
+        <label><%= t("demo_admin.sessions.demo_password_label") %></label>
+        <div class="credential"><%= @dummy_password %></div>
+      </div>
+      <p class="muted"><%= t("demo_admin.sessions.unlock_copy") %></p>
+    <% end %>
+
+    <%= field_panel class: "login-actions" do %>
+      <%= form_with url: marketing_admin_sessions_path, scope: :session, local: true, class: "login-form" do |f| %>
+        <div class="form-field">
+          <%= f.label :email, t("demo_admin.sessions.form.email") %>
+          <%= f.email_field :email, required: true, autofocus: true, value: params.dig(:session, :email),
+            placeholder: @dummy_email %>
+        </div>
+        <div class="form-field">
+          <%= f.label :password, t("demo_admin.sessions.form.password") %>
+          <%= f.password_field :password, required: true, placeholder: "••••••••" %>
+        </div>
+        <%= hidden_field_tag :locale, params[:locale] if params[:locale].present? %>
+        <%= hidden_field_tag :theme, params[:theme] if params[:theme].present? %>
+        <%= f.submit t("demo_admin.sessions.form.submit"), class: "btn btn-primary" %>
+      <% end %>
+    <% end %>
+  <% end %>
+</section>
+
+<div class="login-secondary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; margin-top: 2rem;">
+  <div class="login-footer" style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+    <%= link_to t("demo_admin.sessions.footer_link"),
+      AppConstants::Origins.marketing_url(path: "/demo"),
+      class: "btn btn-secondary" %>
+    <% homepage_link = AppConstants::Origins.marketing_url(path: "/") %>
+    <% homepage_link = homepage_link.sub(%r{/marketing/?$}, "/") %>
+    <%= link_to t("demo_admin.sessions.home_link"),
+      homepage_link,
+      class: "btn btn-secondary" %>
+  </div>
+
+  <section class="card login-mobile-demo" style="text-align: center;">
+    <header>
+      <p class="eyebrow"><%= t("demo_admin.sessions.mobile_demo.eyebrow") %></p>
+      <h2><%= t("demo_admin.sessions.mobile_demo.title") %></h2>
+    </header>
+    <p class="muted"><%= t("demo_admin.sessions.mobile_demo.body") %></p>
+    <p>
+      <%= link_to t("demo_admin.sessions.mobile_demo.cta"),
+        "https://sourcegridlabs.com/downloads/sourcegrid-labs-demo.apk",
+        class: "btn btn-secondary",
+        target: "_blank",
+        rel: "noopener" %>
+    </p>
+    <p class="muted"><%= t("demo_admin.sessions.mobile_demo.note") %></p>
+  </section>
+</div>

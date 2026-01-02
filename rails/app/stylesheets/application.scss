@@ -1,0 +1,14 @@
+
+// app/stylesheets/application.scss
+//
+// Main entrypoint stylesheet for Rails views.
+// Imports shared partials that define layout, typography, forms, etc.
+
+@use "shared/tokens";
+@use "shared/variables";
+@use "shared/layout";
+@use "shared/typography";
+@use "shared/forms";
+@use "shared/modal";
+@use "shared/utilities";
+@use "shared/themes";

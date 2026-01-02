@@ -1,0 +1,152 @@
+ja:
+  demo_admin:
+    console:
+      nav:
+        dashboard: "ダッシュボード"
+        app_messages: "アプリ通知"
+        users: "ユーザー管理"
+        playground: "カスタム機能"
+      buttons:
+        sign_out: "サインアウト"
+      alerts:
+        sign_in_required: "管理コンソールを表示するにはサインインしてください。"
+    flash:
+      seed_missing: "%{command} を実行してデモ管理者を作成してください。"
+      welcome_back: "おかえりなさい。いまはデモ用の管理コンソールを表示しています。"
+      invalid_credentials: "入力内容が一致しません。表示されているデモ用の認証情報を利用してください。"
+      signed_out: "デモ管理コンソールからサインアウトしました。"
+    dashboard:
+      welcome:
+        eyebrow: "/marketing/admin"
+        title: "SourceGrid Labs デモコンソール"
+        body: "実データと完成済みのワークフローでオペレーション体験を案内しつつ、本番環境を触らずに商談を進められます。"
+      selected_locale_label: "選択中の言語"
+      system_settings_label: "システム設定"
+      system_settings_entries:
+        - name: "メンテナンスモード"
+          value: "オフ"
+        - name: "稼働中のキャンペーン"
+          value: "3 件"
+        - name: "請求ステータス"
+          value: "最新"
+      theme_keys_label: "テーマキー"
+      theme_keys_list:
+        - "golden-primary"
+        - "platinum-dark"
+        - "slate-neutral"
+    sessions:
+      eyebrow: "Admin"
+      title: "ようこそ"
+      intro: "SourceGrid Labs のバックエンドダッシュボードは予約・決済・自動化・スタッフ業務を 1 つにまとめ、カスタム開発を待たずにフル機能のオペレーティングシステムをデモできます。"
+      demo_email_label: "デモ用メール"
+      demo_password_label: "デモ用パスワード"
+      credentials_hint: "クローン後は %{seed_hint} を編集し、bin/rails db:seed を再実行してください。"
+      unlock_copy: "デモ用メールとパスワードを入力すると管理コンソールにログインできます。"
+      form:
+        email: "メールアドレス"
+        password: "パスワード"
+        submit: "管理画面に入る"
+      info: "この認証情報は API・Expo アプリなど他のデモ面でも利用できます。"
+      footer_link: "← マーケティングランディングへ戻る"
+      home_link: "← ホームへ戻る"
+      mobile_demo:
+        eyebrow: "モバイルデモ"
+        title: "Android で管理画面を体験"
+        body: >
+          この APK をダウンロードして Android 端末にインストールし、上記のデモ用認証情報でログインすれば、モバイルでの操作感を確認できます。
+        cta: "Android APK をダウンロード"
+        note: "最新版が必要な場合は SourceGrid Labs コンシェルジュにご連絡ください。"
+    messages:
+      hero:
+        eyebrow: "アプリ通知"
+        title: "モバイルの受信トレイを再現"
+        body: "以下の内容は Android ビルドと同じです。APK を共有する前に rails/db/seeds/messaging.rb で文面を調整できます。"
+      seeded:
+        title: "サンプル通知"
+        body: "rail/db/seeds/messaging.rb でこのプレビューを更新できます。"
+        empty: "まだシードされていません。bin/rails db:seed を実行してください。"
+      coverage:
+        title: "利用可能なチャネルと言語"
+        body: "契約前に通知のカバレッジを確認する際に便利です。"
+        channels: "チャネル："
+        locales: "言語："
+      entries:
+        - subject: "現場検査の予定"
+          preview: "デルタチームが明日9:00に第4棟の屋根点検を確定しました。"
+          status: "未読"
+          channel: "プッシュ + メール"
+        - subject: "入金を受領"
+          preview: "Northwind Holdings がメンテナンス請求 #1846 の支払いを完了しました。"
+          status: "対応待ち"
+          channel: "アプリ内"
+      actions:
+        - "既読にする"
+        - "返信"
+        - "アーカイブ"
+      coverage_lists:
+        channels:
+          - "プッシュ"
+          - "メール"
+          - "アプリ内"
+        locales:
+          - "English"
+          - "繁體中文"
+          - "日本語"
+    users:
+      hero:
+        eyebrow: "チーム管理"
+        title: "ユーザー管理"
+        body: "rails/db/seeds/admin_controls.rb を編集すると、Android デモと同じメンバーを表示できます。"
+        metric_label: "有効なスタッフ"
+      last_active_prefix: "最終アクティブ"
+      seeded:
+        title: "サンプルメンバー"
+        body: "名前は Android 版と合わせてあり、データを揃えて見せることができます。"
+        empty: "デモユーザーが見つかりません。bin/rails db:seed でサンプルを作成してください。"
+      actions:
+        - "プロフィールを見る"
+        - "パスワードを再設定"
+        - "無効化"
+      entries:
+        - name: "リナ・オルテガ"
+          email: "lina@client-demo.local"
+          role: "ポートフォリオ管理者"
+          status: "稼働中"
+          last_active: "5 分前"
+        - name: "マーカス・リー"
+          email: "marcus@client-demo.local"
+          role: "リージョナルマネージャー"
+          status: "招待済み"
+          last_active: "30 分前"
+    playground:
+      hero:
+        eyebrow: "カスタム機能"
+        title: "顧客専用モジュールのサンドボックス"
+        body: >
+          このページは追加モジュールを試作するためのキャンバスです。案件に応じて
+          React・Stimulus・Hotwire など好きな技術を差し込んでください。
+      card:
+        title: "プロトタイプ案"
+        body: "提供予定の機能をリスト化し、デモ済みの項目にチェックを入れましょう。"
+      ideas:
+        - title: "カスタム KPI ウォール"
+          body: "外部 API のデータを取り込み、Turbo Streams で可視化。"
+        - title: "在庫同期"
+          body: "Shopify サンドボックスと連携するバックグラウンド処理を紹介。"
+        - title: "ワークフロービルダー"
+          body: "ドラッグ&ドロップの自動化フローを試作し、顧客のフィードバックを集める。"
+    contact:
+      demo_auto_reply:
+        subject: "%{brand} へのお問い合わせありがとうございます"
+        greeting: "%{name} 様"
+        intro: "お問い合わせいただきありがとうございます。追って担当者よりご連絡いたします。"
+        closing: "よろしくお願いいたします。"
+        signature: "%{brand} チーム"
+        confirmation: "お問い合わせを受け付けました。コンシェルジュが追ってご連絡いたします。"
+        default_name: "お客様"
+        no_message: "追加のメッセージはありません。"
+        errors:
+          invalid_email: "有効なメールアドレスを入力してください。"
+          missing_brevo: "メール送信設定が未完了です。BREVO_API_KEY を追加してください。"
+          delivery_failed: "メールを送信できませんでした。しばらくしてからもう一度お試しください。"
+          generic: "リクエストを処理できませんでした。"

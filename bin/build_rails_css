@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+RAILS_DIR="$ROOT_DIR/rails"
+
+declare -a builds=(
+  "app/stylesheets/account/account.scss:public/backend/assets/account.css"
+  "app/stylesheets/admin/admin.scss:public/backend/assets/admin.css"
+  "showcase_ui/styles/showcase.scss:public/backend/assets/showcase.css"
+)
+
+cd "$RAILS_DIR"
+
+if ! command -v sass >/dev/null 2>&1; then
+  echo "Error: sass command not found. Install Dart Sass (npm install -g sass) or ensure it's on your PATH." >&2
+  exit 1
+fi
+
+for entry in "${builds[@]}"; do
+  IFS=":" read -r input output <<< "$entry"
+  echo "Building $input -> $output"
+  mkdir -p "$(dirname "$output")"
+  sass --no-source-map "$input" "$output"
+done
+
+echo "CSS bundles rebuilt in rails/public/backend/assets/."

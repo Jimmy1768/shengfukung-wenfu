@@ -1,0 +1,300 @@
+@use "variables" as vars;
+
+.btn {
+  border: none;
+  border-radius: vars.$radius-sm;
+  padding: 0.65rem 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  font-size: 0.95rem;
+}
+
+.btn-primary {
+  background: vars.$color-accent;
+  color: #0f0f11;
+  box-shadow: 0 12px 25px rgba(245, 158, 11, 0.45);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: vars.$color-foreground;
+  border: 1px solid vars.$color-border;
+}
+
+.btn:hover { transform: translateY(-1px); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  background: rgba(148, 163, 184, 0.25);
+  color: vars.$color-foreground;
+}
+
+.badge-accent {
+  background: rgba(245, 158, 11, 0.2);
+  color: vars.$color-accent;
+}
+
+.token-display {
+  background: rgba(2, 6, 23, 0.6);
+  border: 1px dashed vars.$color-border;
+  border-radius: vars.$radius-sm;
+  padding: vars.$space-sm;
+  font-family: vars.$font-family-mono;
+  font-size: 0.85rem;
+  word-break: break-all;
+}
+
+.selector-form {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$space-sm;
+
+  select {
+    background: rgba(2, 6, 23, 0.75);
+    color: vars.$color-foreground;
+    border: 1px solid vars.$color-border;
+    border-radius: vars.$radius-sm;
+    padding: 0.6rem 0.9rem;
+  }
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+
+  th,
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    vertical-align: top;
+  }
+
+  th {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+    color: vars.$color-muted;
+  }
+
+  pre.payload {
+    margin: 0;
+    background: rgba(2, 6, 23, 0.5);
+    padding: 0.75rem;
+    border-radius: vars.$radius-sm;
+    font-size: 0.8rem;
+    max-height: 180px;
+    overflow: auto;
+  }
+}
+
+.chip-row {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  align-items: center;
+}
+
+.idea-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: vars.$space-sm;
+
+  li {
+    border: 1px dashed vars.$color-border;
+    border-radius: vars.$radius-sm;
+    padding: vars.$space-sm;
+    background: rgba(15, 23, 42, 0.35);
+  }
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: vars.$space-md;
+  align-items: stretch;
+}
+
+.field-panel {
+  display: flex;
+  flex-direction: column;
+  padding: vars.$space-sm vars.$space-md;
+  border-radius: vars.$radius-lg;
+  border: 1px solid vars.$color-border;
+  background: rgba(2, 6, 23, 0.45);
+  box-shadow: vars.$shadow-card;
+
+  .panel-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: vars.$space-sm;
+  }
+
+  .panel-footer {
+    margin-top: auto;
+  }
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$space-md;
+
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .login-grid {
+    @extend .field-row;
+    margin-top: vars.$space-md;
+  }
+
+  .login-credentials,
+  .login-actions {
+    @extend .field-panel;
+  }
+
+
+  .login-credentials {
+    display: flex;
+    flex-direction: column;
+    gap: vars.$space-sm;
+
+    label {
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      color: vars.$color-muted;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      width: 100%;
+      max-width: 360px;
+      align-self: flex-start;
+    }
+
+    .credential {
+      width: 100%;
+      background: rgba(2, 6, 23, 0.7);
+      border: 1px solid vars.$color-border;
+      border-radius: vars.$radius-sm;
+      padding: 0.7rem 0.9rem;
+      color: vars.$color-foreground;
+      font-family: vars.$font-family-mono;
+      display: flex;
+      align-items: center;
+      min-height: 2.75rem;
+    }
+
+    .oauth-button-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 0.85rem;
+      align-items: flex-start;
+    }
+
+    .oauth-btn {
+      width: auto;
+      min-width: 230px;
+      max-width: 100%;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 1rem;
+      border-radius: vars.$radius-sm;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(15, 23, 42, 0.5);
+      color: vars.$color-foreground;
+      font-weight: 600;
+      text-align: left;
+      transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+
+      &:hover {
+        border-color: rgba(148, 163, 184, 0.5);
+        background: rgba(15, 23, 42, 0.7);
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  .login-actions {
+    display: flex;
+    flex-direction: column;
+    gap: vars.$space-sm;
+  }
+
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: vars.$space-sm;
+    width: min(100%, 360px);
+  }
+
+  .login-form .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .login-form label {
+    font-size: 0.8rem;
+    color: vars.$color-muted;
+    letter-spacing: 0.02em;
+  }
+
+  .login-form input[type="email"],
+  .login-form input[type="password"] {
+    width: 100%;
+    background: rgba(2, 6, 23, 0.7);
+    border: 1px solid vars.$color-border;
+    border-radius: vars.$radius-sm;
+    padding: 0.7rem 0.95rem;
+    color: vars.$color-foreground;
+    min-height: 2.75rem;
+  }
+
+  .login-form input:focus {
+    outline: 2px solid rgba(59, 130, 246, 0.4);
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+
+  .login-form .btn {
+    margin-top: 0.5rem;
+  }
+}
+
+.flash {
+  border-radius: vars.$radius-sm;
+  padding: 0.75rem 1rem;
+  margin-bottom: vars.$space-sm;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(2, 6, 23, 0.75);
+  font-weight: 500;
+
+  &.flash-notice {
+    border-color: rgba(34, 197, 94, 0.35);
+    color: #bbf7d0;
+  }
+
+  &.flash-alert {
+    border-color: rgba(248, 113, 113, 0.45);
+    color: #fecaca;
+  }
+}

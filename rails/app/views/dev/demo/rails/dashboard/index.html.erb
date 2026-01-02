@@ -1,0 +1,39 @@
+<section class="card">
+  <header>
+    <p class="eyebrow"><%= t("demo_admin.dashboard.welcome.eyebrow") %></p>
+    <h1><%= t("demo_admin.dashboard.welcome.title") %></h1>
+  </header>
+  <p class="muted"><%= t("demo_admin.dashboard.welcome.body") %></p>
+</section>
+
+<section class="card dashboard-grid">
+  <article class="dashboard-card">
+    <p class="eyebrow"><%= @selected_locale_label %></p>
+    <h3><%= @selected_locale_value %></h3>
+  </article>
+</section>
+
+<section class="card">
+  <header>
+    <h2><%= t("demo_admin.dashboard.system_settings_label") %></h2>
+  </header>
+  <ul class="settings-list">
+    <% @system_settings.each do |setting| %>
+      <li>
+        <strong><%= setting[:name] %></strong>
+        <span class="muted"><%= setting[:value] %></span>
+      </li>
+    <% end %>
+  </ul>
+</section>
+
+<section class="card">
+  <header>
+    <h2><%= @theme_keys_label %></h2>
+  </header>
+  <div class="chip-row">
+    <% @theme_keys.each do |key| %>
+      <span class="badge"><%= key %></span>
+    <% end %>
+  </div>
+</section>

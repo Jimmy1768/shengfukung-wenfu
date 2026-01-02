@@ -1,0 +1,22 @@
+<aside class="admin-sidebar">
+  <div class="sidebar-block">
+    <p class="sidebar-heading">Console menu</p>
+    <div class="sidebar-menu">
+      <% admin_navigation_items.each do |item| %>
+        <% path = admin_navigation_link_path(item) %>
+        <% classes = ["sidebar-link"] %>
+        <% classes << "is-active" if current_page?(path) %>
+        <%= link_to path, class: classes.join(" ") do %>
+          <span class="sidebar-link-title"><%= item[:label] %></span>
+          <span class="sidebar-link-desc"><%= item[:description] %></span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if admin_signed_in? %>
+    <div class="sidebar-footer">
+      <%= button_to "Sign out", admin_logout_path, method: :delete, class: "sidebar-link logout-button" %>
+    </div>
+  <% end %>
+</aside>

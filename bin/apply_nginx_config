@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_CONFIG="$ROOT_DIR/shared/app_constants/project.json"
+NGINX_OUTPUT_DIR="$ROOT_DIR/ops/nginx"
+
+DEFAULT_NGINX_AVAILABLE="/etc/nginx/sites-available"
+DEFAULT_NGINX_ENABLED="/etc/nginx/sites-enabled"
+
+NGINX_AVAILABLE_DIR="${NGINX_AVAILABLE_DIR:-$DEFAULT_NGINX_AVAILABLE}"
+NGINX_ENABLED_DIR="${NGINX_ENABLED_DIR:-$DEFAULT_NGINX_ENABLED}"
+
+require_root() {
+  if [[ $EUID -ne 0 ]]; then
+    echo "Run this script with sudo so it can copy configs into $NGINX_AVAILABLE_DIR." >&2
+    exit 1
+  fi
+}
+
+read_project_slug() {
+  if [[ -f "$PROJECT_CONFIG" ]]; then
+    ruby -rjson -e 'data=JSON.parse(File.read(ARGV[0])); print(data["slug"] || "golden-template")' "$PROJECT_CONFIG"
+  else
+    echo "golden-template"
+  fi
+}
+
+stage_configs() {
+  echo "Rendering latest ops configs…"
+  "$ROOT_DIR/bin/stage_ops_configs" "$@"
+}
+
+deploy_nginx() {
+  local slug="$1"
+  local source="$NGINX_OUTPUT_DIR/${slug}.conf"
+  local available_target="$NGINX_AVAILABLE_DIR/${slug}.conf"
+  local enabled_target="$NGINX_ENABLED_DIR/${slug}.conf"
+
+  if [[ ! -f "$source" ]]; then
+    echo "Missing nginx config at $source. Run bin/stage_ops_configs first." >&2
+    exit 1
+  fi
+
+  echo "Copying nginx config → $available_target"
+  cp "$source" "$available_target"
+  echo "Linking $enabled_target"
+  ln -sf "$available_target" "$enabled_target"
+
+  echo "Testing nginx configuration…"
+  nginx -t
+  echo "Reloading nginx…"
+  nginx -s reload
+}
+
+main() {
+  require_root
+  stage_configs "$@"
+  local slug
+  slug="$(read_project_slug)"
+  deploy_nginx "$slug"
+  echo "Nginx config applied successfully."
+}
+
+main "$@"

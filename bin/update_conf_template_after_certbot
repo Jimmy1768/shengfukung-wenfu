@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Copies the currently rendered nginx configs back into their template directory.
+# Run this only once after certbot (or other manual edits) changes the rendered files,
+# so future bin/stage_ops_configs runs pick up the live configuration.
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+OPS_DIR="$ROOT_DIR/ops"
+NGINX_TEMPLATE_DIR="$OPS_DIR/nginx/template"
+NGINX_RENDERED_DIR="$OPS_DIR/nginx"
+
+usage() {
+  cat <<USAGE
+Usage: bin/update_conf_template_after_certbot
+
+Copies the rendered nginx configs back into the template directory.
+Only run this immediately after certbot or manual server edits changed the rendered file.
+USAGE
+}
+
+copy_back() {
+  local source="$1"
+  local destination="$2"
+
+  if [[ ! -f "$source" ]]; then
+    echo "Skipping missing source: $source"
+    return
+  fi
+
+  mkdir -p "$(dirname "$destination")"
+  cp "$source" "$destination"
+  echo "Updated template copy → $destination"
+}
+
+main() {
+  if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    usage
+    exit 0
+  fi
+
+  # Nginx configs
+  for rendered in "$NGINX_RENDERED_DIR"/*.conf; do
+    [[ -e "$rendered" ]] || continue
+    copy_back "$rendered" "$NGINX_TEMPLATE_DIR/$(basename "$rendered")"
+  done
+
+  echo "Nginx template sync complete. Do not rerun unless the live config changes again."
+}
+
+main "$@"

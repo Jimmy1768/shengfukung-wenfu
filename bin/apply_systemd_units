@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_CONFIG="$ROOT_DIR/shared/app_constants/project.json"
+SYSTEMD_OUTPUT_DIR="$ROOT_DIR/ops/systemd"
+
+DEFAULT_SYSTEMD_DIR="/etc/systemd/system"
+SYSTEMD_DIR="${SYSTEMD_DIR:-$DEFAULT_SYSTEMD_DIR}"
+
+require_root() {
+  if [[ $EUID -ne 0 ]]; then
+    echo "Run this script with sudo so it can copy units into $SYSTEMD_DIR." >&2
+    exit 1
+  fi
+}
+
+read_project_slug() {
+  if [[ -f "$PROJECT_CONFIG" ]]; then
+    ruby -rjson -e 'data=JSON.parse(File.read(ARGV[0])); print(data["slug"] || "golden-template")' "$PROJECT_CONFIG"
+  else
+    echo "golden-template"
+  fi
+}
+
+stage_configs() {
+  echo "Rendering latest ops configs…"
+  "$ROOT_DIR/bin/stage_ops_configs" "$@"
+}
+
+deploy_unit() {
+  local source="$1"
+  if [[ ! -f "$source" ]]; then
+    echo "Systemd unit missing at $source. Run bin/stage_ops_configs first." >&2
+    exit 1
+  fi
+
+  echo "Copying $(basename "$source") → $SYSTEMD_DIR"
+  cp "$source" "$SYSTEMD_DIR/"
+}
+
+restart_services() {
+  local slug="$1"
+  echo "Reloading systemd daemon…"
+  systemctl daemon-reload
+
+  echo "Restarting ${slug}-puma.service"
+  systemctl restart "${slug}-puma.service"
+
+  echo "Restarting ${slug}-sidekiq.service"
+  systemctl restart "${slug}-sidekiq.service"
+}
+
+main() {
+  require_root
+  stage_configs "$@"
+
+  local slug
+  slug="$(read_project_slug)"
+
+  deploy_unit "$SYSTEMD_OUTPUT_DIR/${slug}-puma.service"
+  deploy_unit "$SYSTEMD_OUTPUT_DIR/${slug}-sidekiq.service"
+  restart_services "$slug"
+
+  echo "Systemd units applied successfully."
+}
+
+main "$@"

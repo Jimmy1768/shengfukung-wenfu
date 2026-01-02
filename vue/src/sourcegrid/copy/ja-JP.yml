@@ -1,0 +1,225 @@
+brands:
+  hotel:
+    name: Emberlight ブティックホテル
+    tagline: 都会派トラベラーのためのルミナスステイ。
+    description: スパと中庭、季節のテイスティングを備えたラグジュアリーな都市型リトリート。
+    settings:
+      lobby:
+        label: ロビーラウンジ
+        description: 琥珀色の照明に包まれた到着ラウンジ。沈み込むベルベットソファとセレクトのレコード、香ばしいシダーのお茶で迎えます。
+      pool:
+        label: インフィニティプール
+        description: スカイラインを映すガラス縁の屋上レーン。夕暮れにはプライベートカバナで静かなラップを。
+      courtyard:
+        label: コートヤード
+        description: シトラスの木とランタン、低いテーブルを配した石畳の中庭でアペリティーボを。
+      suite:
+        label: スカイラインスイート
+        description: プラスターのアーチとフロア一面の開口、バーカートに並ぶバイナルで構成されたコーナーレジデンス。
+    elements:
+      chefs-salon:
+        label: シェフズサロン
+        description: テーブルサイドのインフュージョンと季節のパティスリーを供する朝のテイスティング。
+      garden-spa:
+        label: ガーデンスパリチュアル
+        description: 中庭の上に浮かぶシダーのハマムで蒸し・浸し・深呼吸を。
+      wellness-towels:
+        label: ウェルネスアトリエ
+        description: 淹れたてのホットタオルとアロマブレンド、オンコールのスパソムリエが整える空間。
+      atelier:
+        label: ハンドクラフトディテール
+        description: 石膏のアーチや陶器のインレイ、ローカル職人のテキスタイルが響き合います。
+    highlights:
+      curated-suites:
+        title: キュレーテッドスイート
+        body: 彫刻的なアーチと特注リネンに包まれる日差し豊かなレジデンス。
+      garden-spa-rituals:
+        title: ガーデンスパリチュアル
+        body: ルーフトップ温浴、プライベートハマム、インルームのウェルネスソムリエ。
+      chef-salon:
+        title: シェフズサロン
+        body: 季節のテイスティングをブティック生産者と儀式的なお茶で締めくくります。
+    press:
+      - quote: 「週末だけ相続したペントハウスのような滞在感。」
+        source: シティ・レジャー
+      - quote: 「スパの儀式がスローバーンの映画音楽みたいに構成されている。」
+        source: ソルスティス・ジャーナル
+      - quote: 「中庭の晩餐はプライベートな灯籠祭の光。」
+        source: メゾン・レビュー
+  ramen:
+    name: 琴壽ラーメン
+    tagline: ナイトマーケットの魂に捧げる出汁の儀式。
+    description: スモークされたスープ、レコードが灯す店内、クラフトセラミックで彩るラーメン体験。
+    settings:
+      chef-counter:
+        label: シェフカウンター
+        description: バイナルの光に包まれた 12 席のカウンターで、仕上げの一振りを間近に。
+      broth-lab:
+        label: ブロスラボ
+        description: スモーク塩や柚子醤油、炙り担々が同時進行する蒸気ゆらめく実験室。
+      ceramic:
+        label: セラミックアトリエ
+        description: マットな丼や真鍮レードルが整然と並ぶスタジオシェルフ。
+      lounge:
+        label: ミッドナイトラウンジ
+        description: 低い照明と香の煙、遅いプレイリストが席の余韻を延ばします。
+    elements:
+      umami-flight:
+        label: 旨味フライト
+        description: スモーク塩・柚子醤油・炙り担々を巡るプログレッシブなテイスティング。
+      chashu-atelier:
+        label: チャーシューアトリエ
+        description: 黒糖たれと山椒灰で仕上げる炙り肩ロースを卓上で。
+      finishing-school:
+        label: フィニッシングスクール
+        description: シェフがシダーライトの下でマイクロハーブを散らし、最後の一滴まで整えます。
+      mise-rituals:
+        label: ミゼリチュアル
+        description: タレやオイル、ボタニカルを静物画のように並べる座席ごとの儀式。
+    ctaButtons:
+      ajitama-flight:
+        label: 味玉トーチ
+        description: 黒糖タレをまとわせ卓上で炙る半熟味玉。
+      midnight-toppings:
+        label: ミッドナイトトッピング
+        description: 刻みネギ、ふりかけ、唐辛子糸を各席で仕上げます。
+      mise-tray:
+        label: ミゼリチュアル
+        description: ハーブやソース、香味油を小さな静物のように並べる演出。
+    ritualScenes:
+      chef-counter:
+        label: シェフズカウンター
+        description: バイナルライトに包まれた 12 席で仕上げの一振りを目の前で。
+      broth-lab:
+        label: ブロスラボ
+        description: スモーク塩、柚子醤油、炙り担々を順に注ぐ蒸気のラボ。
+      ceramic-atelier:
+        label: セラミックアトリエ
+        description: 窯出しの丼、マットな箸、真鍮レードルが整然と並ぶ。
+      lounge:
+        label: アフターグローラウンジ
+        description: 低い照明と蒸気、レイトナイトのプレイリストで余韻を引き延ばします。
+    highlights:
+      broth-ceremony:
+        title: ブロスセレモニー
+        body: 昆布だしを 12 時間燻し、順番に注ぎ分ける煙の儀式。
+      ceramic-studio:
+        title: セラミックスタジオ
+        body: 京都の窯で焼いたストーンウェアと、指跡の残るチョップスティックレスト。
+      vinyl-service:
+        title: バイナルサービス
+        body: 各回のシーティングに合わせたダウンテンポセットで、琥珀色の空気を演出。
+    press:
+      - quote: 「低い琥珀色の灯りで黒膠スリーブのように輝くスープ。」
+        source: ミッドナイト・フードラボ
+      - quote: 「カウンターの一席がまるで自分専用に感じられる。」
+        source: ノクターン・ダイニング
+      - quote: 「煙と柑橘と余熱が一杯に封じ込められている。」
+        source: スチーム・アトラス
+  clothing:
+    name: Loom & Light アトリエ
+    tagline: スロウラグジュアリーのためのモジュールワードローブ。
+    description: ソウルのテーラリングから着想を得たプライベートフィッティングとカプセル編集のスタジオ。
+    settings:
+      fittings:
+        label: プライベートフィッティング
+        description: ミラーに囲まれたサロンで、仕立て職人とティーサービスが寄り添います。
+      flatlay:
+        label: カプセルフラットレイ
+        description: カプセルコレクションやファブリックスウォッチを並べるギャラリーテーブル。
+      atelier:
+        label: アクセサリーアトリエ
+        description: ジュエリートレイやフレグランスストーリー、重ねたシルクスカーフが並ぶ空間。
+      tailoring:
+        label: テーラリングベンチ
+        description: チョークの型紙、スチームプレス、仕掛かりのガーメントが広がる作業台。
+    elements:
+      capsule:
+        label: カプセルビルド
+        description: 15 ピースのモジュラーウェアを無段階に組み合わせるケアルーチン。
+      casting:
+        label: キャスティングスイート
+        description: ルックブックやローンチ用に映画的なドレーピングを施す陽光スタジオ。
+      textile-lab:
+        label: テキスタイルラボ
+        description: 手織りリネンやマットストーン、織柄ジャカードを収めたマテリアルライブラリ。
+      mannequin:
+        label: スカルプテッドフォーム
+        description: ジュエリー、香り、レイヤードテクスチャーをまとったマネキン演出。
+    highlights:
+      private-atelier:
+        title: プライベートアトリエ
+        body: ワードローブアーキテクトとの 1 対 1 フィッティング、ティーサービス、ライブテイラリング。
+      capsule-mapping:
+        title: カプセルマッピング
+        body: 週次ローテーションを導くルックブック級のプランニングセッション。
+      tactile-rituals:
+        title: タクタイルリチュアル
+        body: シダースチーム、シルクストーン、ミニマルな香りで布のケア儀式を。
+    press:
+      - quote: 「ワードローブ設計が茶会の静けさで進んでいく。」
+        source: フォーム＆フォールド
+      - quote: 「毎回のフィッティングがプライベートな初日公演。」
+        source: ランウェイ・ノース
+      - quote: 「テクスチャーが建築写真のように写り込む。」
+        source: スタジオ・フィールド
+  nocturne-vale:
+    name: ノクターン・ヴェイル
+    tagline: 真夜中の客人を招くキャンドルライトのテイスティングパーラー。
+    description: ソムリエの演出と煙を纏ったフライト、ベルベットの動線が交差する影深いサパークラブ。
+    settings:
+      corner-booth:
+        label: ベルベットコーナーブース
+        description: キャンドルタワーと黒曜石テーブル、ささやくプレイリストに包まれた曲線シート。
+      table-setting:
+        label: サロンテーブルセッティング
+        description: リネンに重ねたポーセリンとオニキスストーン、グラファイトメニューが扇状に広がります。
+      wine-sculpt:
+        label: ワインサービス
+        description: ソムリエチームが紫の光と柔らかな煙の下でデキャンタージュを演出。
+      bar-surface:
+        label: オブシディアンバー
+        description: マーブルの天板にクープグラスの影と香のトレイ、燻したスピリッツが並ぶ舞台。
+    elements:
+      shadow-menu:
+        label: シャドウメニューアトリエ
+        description: 手書きのテイスティングメニューをテクスチャー紙と真鍮クリップで仕立てた一枚。
+      cutlery:
+        label: チャコールカトラリーセット
+        description: 各コースの脇で黒曜石のレストに置かれるマットなカトラリー。
+      linen-lab:
+        label: リネンラボ
+        description: トーンオントーンのパイピングと刺繍モノグラムで仕上げた嵐色のリネン。
+      candle-smoke:
+        label: キャンドルスモークリチュアル
+        description: コースとコースの間を漂い、室内を香らせる囁きの煙柱。
+    ritualScenes:
+      wine-service:
+        label: ソムリエリチュアル
+        description: 火入れした香りとクリスタルサービスが紫の光を漂います。
+      kitchen-pass:
+        label: キッチンパス
+        description: 蒸気と低照度の中でシェフがキャンドル席へ皿を送り出す瞬間。
+      bar-ritual:
+        label: バーリチュアル
+        description: マーブルのバーがアメジストのグラデーションと香煙で輝きます。
+      salon-table:
+        label: サロントーブル
+        description: ベルベットのブース、リネンのドレープ、グラファイトメニューを温かな真鍮が縁取ります。
+    highlights:
+      obsidian-menu:
+        title: オブシディアンメニュー
+        body: 炭火で香らせたシーフードや冷燻の一皿、セラーのペアリングを束ねた 6 品構成。
+      sommelier-theater:
+        title: ソムリエシアター
+        body: シンクロしたデキャンタージュと香煙のポワール、毎時ごとに語られるテーブルサイドストーリー。
+      afterhours-gallery:
+        title: アフターアワーズギャラリー
+        body: ガラスとリネン、揺らめく灯りで構成された回廊をゲストがゆっくり巡ります。
+    press:
+      - quote: 「ベルベットの静寂が真夜中いっぱいに伸びていく。」
+        source: ナイト・レジャー
+      - quote: 「各コースの合間にカリグラフィーのようなキャンドルスモークが漂う。」
+        source: オブシディアン・テーブル
+      - quote: 「舞台にも匹敵するソムリエの所作。」
+        source: アフターアワーズ・レビュー

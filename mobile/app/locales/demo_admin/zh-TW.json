@@ -1,0 +1,39 @@
+{
+  "locale_selector": {
+    "label": "示範語系",
+    "hint": "點選語系即可預覽行銷與後台文案。"
+  },
+  "sessions": {
+    "eyebrow": "Admin",
+    "title": "歡迎",
+    "intro": "SourceGrid Labs 的後台儀表板把訂位、付款、自動化與人員流程集中在同一平台，讓你不必等到客製化品牌完成就能向潛在客戶展示完整的營運系統。",
+    "demo_email_label": "示範 Email",
+    "demo_password_label": "示範密碼",
+    "unlock_copy": "輸入示範 Email 與密碼即可登入管理後台。",
+    "form": {
+      "email": "Email",
+      "password": "密碼",
+      "submit": "進入管理後台"
+    },
+    "info": "這組憑證同樣適用於 API、Expo App 及其他示範介面。",
+    "loading": "登入中…",
+    "session_preview": {
+      "title": "已儲存的 Session",
+      "email_label": "Email",
+      "access_label": "Access Token",
+      "refresh_label": "Refresh Token",
+      "hint": "權杖會保存在裝置上，讓你能重複使用行銷/後台的登入狀態。"
+    },
+    "footer_link": "← 回到行銷著陸頁",
+    "home_link": "← 回到行銷首頁",
+    "errors": {
+      "missing_fields": "Email 與密碼為必填。",
+      "generic": "無法登入，請確認憑證後再試一次。",
+      "link_open": "無法開啟該連結。"
+    }
+  },
+  "flash": {
+    "welcome_back": "歡迎回來！已切換至管理後台。",
+    "invalid_credentials": "憑證不正確，請使用上方示範帳密。"
+  }
+}

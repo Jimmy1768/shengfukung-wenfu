@@ -1,0 +1,47 @@
+
+// app/stylesheets/shared/_forms.scss
+//
+// Baseline form controls and layout.
+
+@use "variables" as *;
+
+label {
+  display: block;
+  margin-bottom: $space-1;
+  font-size: $font-size-sm;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+textarea,
+select {
+  width: 100%;
+  padding: $space-2 $space-3;
+  border-radius: $radius-sm;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  font-family: inherit;
+  font-size: $font-size-md;
+  line-height: $line-height-normal;
+  box-sizing: border-box;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: rgba(0, 0, 0, 0.28);
+  box-shadow: $shadow-subtle;
+}
+
+.form-row {
+  margin-bottom: $space-4;
+}
+
+.form-actions {
+  margin-top: $space-4;
+  display: flex;
+  gap: $space-3;
+  justify-content: flex-end;
+}

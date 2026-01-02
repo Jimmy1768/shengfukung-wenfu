@@ -1,0 +1,225 @@
+brands:
+  hotel:
+    name: Emberlight Boutique Hotel
+    tagline: 為都市品味旅人準備的光影居所。
+    description: 城市奢華度假宅，含水療、庭院與季節品味菜單。
+    settings:
+      lobby:
+        label: 大廳酒廊
+        description: 琥珀燈光的接待酒廊，沉入天鵝絨沙發並以香柏茶迎賓。
+      pool:
+        label: 無邊際泳池
+        description: 玻璃邊界的屋頂泳道，映照天際線並備有私密涼亭。
+      courtyard:
+        label: 中央庭院
+        description: 石板庭院鋪滿柑橘與燈籠，搭配低矮餐桌的開胃時光。
+      suite:
+        label: 天際套房
+        description: 轉角套房擁有石膏拱門、落地窗與滿載黑膠的吧檯。
+    elements:
+      chefs-salon:
+        label: 主廚沙龍
+        description: 清晨品味式料理搭配桌邊注入與季節甜點。
+      garden-spa:
+        label: 花園水療
+        description: 香柏汗蒸、蒸氣、浸泡，讓心神在庭院之上呼吸。
+      wellness-towels:
+        label: 靜謐工坊
+        description: 新鮮熱毛巾、香氛調製，由置身的水療師陪巡。
+      atelier:
+        label: 手作細節
+        description: 石膏拱門、手工陶瓷與本地匠人織品共鳴。
+    highlights:
+      curated-suites:
+        title: 精選套房
+        body: 陽光穿透雕刻拱門，搭配特製織品與縫線細節。
+      garden-spa-rituals:
+        title: 花園水療儀式
+        body: 屋頂溫泉、私人汗蒸與貼身水療師的禮遇。
+      chef-salon:
+        title: 主廚沙龍
+        body: 季節性品味菜配精品生產者與儀式茶。
+    press:
+      - quote: 像是週末接手一座天際頂層。
+        source: 城市帳本
+      - quote: 水療儀式被編排得像慢燃的電影配樂。
+        source: 至日誌
+      - quote: 庭院晚宴彷彿私人燈籠節的光影。
+        source: Maison Review
+  ramen:
+    name: Kintsu Ramen
+    tagline: 夜市魂的湯底儀式。
+    description: 煙燻高湯、黑膠燈光與手作陶瓷，為拉麵信徒打造。
+    settings:
+      chef-counter:
+        label: 主廚吧檯
+        description: 十二席吧檯沉浸在黑膠燈光，主廚在眼前完成每碗湯麵。
+      broth-lab:
+        label: 湯底實驗室
+        description: 蒸汽瀰漫的工作室，煙燻鹽與柚香醬油同時熬煮。
+      ceramic:
+        label: 陶藝教室
+        description: 陳列啞光碗器、銅勺與剛出窯筷子的陶藝層架。
+      lounge:
+        label: 午夜休息室
+        description: 低光、香氣與深夜播放清單延長座席餘溫。
+    elements:
+      umami-flight:
+        label: 鮮味巡禮
+        description: 煙燻鹽、柚香醬油與炙燒擔擔湯的序列品味。
+      chashu-atelier:
+        label: 燒叉燒坊
+        description: 黑糖醬油與山椒灰炙燒嗆香，桌邊完成。
+      finishing-school:
+        label: 完成學堂
+        description: 主廚在香柏光下以微香草點綴每碗拉麵。
+      mise-rituals:
+        label: 擺盤儀式
+        description: 醬汁、油脂與香草在座位上排列成靜物畫。
+    ctaButtons:
+      ajitama-flight:
+        label: 炙燒味玉
+        description: 黑糖醬油炙烤的溫泉蛋在桌邊完成。
+      midnight-toppings:
+        label: 午夜配料
+        description: 蔥花、海苔粉與辣椒絲為每位客人現場撒上。
+      mise-tray:
+        label: 備料儀式
+        description: 迷你香草、醬汁與油脂依座位擺成靜物。
+    ritualScenes:
+      chef-counter:
+        label: 主廚吧檯
+        description: 黑膠燈光下僅十二席，近距離看湯麵完工。
+      broth-lab:
+        label: 湯底實驗室
+        description: 煙燻鹽、柚香醬油與炙燒擔擔依序出場。
+      ceramic-atelier:
+        label: 陶藝工作桌
+        description: 窯燒碗器、霧面筷與黃銅勺整齊待命。
+      lounge:
+        label: 餘暉休息室
+        description: 低光、蒸氣與深夜歌單延續席間餘溫。
+    highlights:
+      broth-ceremony:
+        title: 湯底儀式
+        body: 12 小時昆布熬製，再以備長炭冷燻逐次呈現。
+      ceramic-studio:
+        title: 陶藝工坊
+        body: 京都窯廠定製石器，指痕環繞著心靈慢飲。
+      vinyl-service:
+        title: 黑膠服務
+        body: 慢節奏唱片為每場座位塑造琥珀光。
+    press:
+      - quote: 湯頭在琥珀低光裡像黑膠封套般發光。
+        source: 午夜食研所
+      - quote: 每個吧檯座位都像是為你保留。
+        source: 夜曲食堂
+      - quote: 煙、柑橘與餘燼都封進同一碗裡。
+        source: 蒸汽圖鑑
+  clothing:
+    name: Loom & Light Atelier
+    tagline: 慢奢模組化衣櫥。
+    description: 受到首爾裁縫啟發的私密體驗室，提供膠囊衣與觸感造型。
+    settings:
+      fittings:
+        label: 私人訂製
+        description: 私密試衣間，鏡面折射、裁縫師與茶點同時伺候。
+      flatlay:
+        label: 膠囊平鋪
+        description: 平鋪桌展示布料樣本、色票與造型路徑。
+      atelier:
+        label: 配件工坊
+        description: 配件工坊陳列珠寶盤、香氛故事與層疊絲巾。
+      tailoring:
+        label: 裁縫台
+        description: 粉筆版型、蒸汽熨斗與待修衣著遍佈裁縫台。
+    elements:
+      capsule:
+        label: 膠囊構築
+        description: 15 件模組化衣件的無縫搭配與調理儀式。
+      casting:
+        label: 拍攝套房
+        description: 充滿陽光的攝影棚，搭配電影級披風。
+      textile-lab:
+        label: 紡織實驗室
+        description: 收錄手工亞麻、霧面石與織花的材質圖書館。
+      mannequin:
+        label: 雕塑模特
+        description: 精緻模特展示珠寶、香氛與層次質感。
+    highlights:
+      private-atelier:
+        title: 私密工坊
+        body: 一對一配對、茶禮與即時修改。
+      capsule-mapping:
+        title: 膠囊對照
+        body: 款式規劃助力每週輪替的展示藍圖。
+      tactile-rituals:
+        title: 觸感儀式
+        body: 香柏蒸氣、絲石與極簡香氛守護織物照護流程。
+    press:
+      - quote: 衣櫥規畫帶著茶席般的沉穩節奏。
+        source: 形構誌
+      - quote: 每一次試衣都像專屬的首演之夜。
+        source: 北緯伸展台
+      - quote: 紋理拍起來宛如建築研究的樣張。
+        source: 影室誌
+  nocturne-vale:
+    name: Nocturne Vale
+    tagline: 為午夜賓客準備的燭光品味沙龍。
+    description: 影調濃郁的晚餐俱樂部，融合侍酒劇場、煙霧層次的品味航程與天鵝絨式動線。
+    settings:
+      corner-booth:
+        label: 天鵝絨轉角座
+        description: 曲線沙發搭配燭塔、黑曜石桌與低語播放清單。
+      table-setting:
+        label: 沙龍餐桌
+        description: 多層瓷器、縞瑪瑙石與石墨紙菜單鋪疊在亞麻上。
+      wine-sculpt:
+        label: 侍酒服務
+        description: 侍酒團隊在紫色光暈與柔霧下演繹同步醒酒。
+      bar-surface:
+        label: 黑曜石吧檯
+        description: 大理石檯面映出高腳杯剪影、香儀托盤與煙燻烈酒。
+    elements:
+      shadow-menu:
+        label: 暗影菜單工作桌
+        description: 手寫品味菜單夾在紋理紙與黃銅號碼夾之間。
+      cutlery:
+        label: 炭黑餐具
+        description: 霧面餐具放置於黑曜石托座，伴隨每一道菜。
+      linen-lab:
+        label: 亞麻實驗室
+        description: 風暴灰亞麻以同色滾邊與刺繡字母壓襯。
+      candle-smoke:
+        label: 燭煙儀式
+        description: 細語般的煙柱在菜序之間繚繞並添香整個房間。
+    ritualScenes:
+      wine-service:
+        label: 侍酒儀式
+        description: 火焰收尾的倒酒與水晶服務穿梭於紫羅蘭燈光。
+      kitchen-pass:
+        label: 廚房傳菜口
+        description: 蒸氣切過低光，主廚把盤飾交給燭光侍者。
+      bar-ritual:
+        label: 吧檯儀式
+        description: 大理石吧檯映出紫晶漸層、香煙與酒杯剪影。
+      salon-table:
+        label: 沙龍餐桌
+        description: 天鵝絨座位、亞麻垂簾與石墨菜單配上暖色黃銅。
+    highlights:
+      obsidian-menu:
+        title: 黑曜菜單
+        body: 六道炭黑劇本，結合碳火海鮮、冷燻氣息與酒窖配對。
+      sommelier-theater:
+        title: 侍酒劇院
+        body: 同步醒酒、香霧澆淋與桌邊敘事為每小時定調。
+      afterhours-gallery:
+        title: 深夜藝廊
+        body: 玻璃、亞麻與搖曳光影構成的回廊，邀客人慢行。
+    press:
+      - quote: 天鵝絨般的靜謐一路延伸過整個午夜。
+        source: 夜帳
+      - quote: 每道菜之間都以手寫般的燭煙串接。
+        source: 黑曜餐桌
+      - quote: 侍酒的編排足以登上舞台。
+        source: 余暉評論

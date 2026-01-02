@@ -1,0 +1,49 @@
+// app/stylesheets/shared/_themes.scss
+//
+// Utility classes + documentation for runtime themes powered by
+// shared/design-system/themes.json. Tokens are compiled into CSS custom
+// properties (see shared/_tokens.scss) and mirrored across Vue + Expo.
+
+.body-bg {
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+.surface {
+  background-color: var(--surface-raised);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+}
+
+.surface-muted {
+  background-color: var(--surface-muted);
+}
+
+.text-default {
+  color: var(--text);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+.badge-accent {
+  background-color: var(--surface-muted);
+  color: var(--accent-foreground);
+}
+
+.text-danger {
+  color: var(--danger);
+}
+
+.text-warning {
+  color: var(--warning);
+}
+
+.text-success {
+  color: var(--success);
+}

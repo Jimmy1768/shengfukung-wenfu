@@ -1,0 +1,11 @@
+{
+  "name": "golden-template-monorepo",
+  "private": true,
+  "scripts": {
+    "sync:favicons": "node ops/scripts/sync-favicons.mjs",
+    "generate:app-icon": "node ops/scripts/generate-app-icon.mjs"
+  },
+  "devDependencies": {
+    "sharp": "^0.33.4"
+  }
+}

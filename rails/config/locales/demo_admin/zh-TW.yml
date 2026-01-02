@@ -1,0 +1,152 @@
+"zh-TW":
+  demo_admin:
+    console:
+      nav:
+        dashboard: "儀表板"
+        app_messages: "應用訊息"
+        users: "使用者管理"
+        playground: "自訂功能"
+      buttons:
+        sign_out: "登出"
+      alerts:
+        sign_in_required: "請先登入才能瀏覽後台示範。"
+    flash:
+      seed_missing: "找不到示範管理者，請執行 %{command} 以建立預設帳號。"
+      welcome_back: "歡迎回來！您現在看到的是示範管理後台。"
+      invalid_credentials: "帳號或密碼不正確，請使用頁面上提供的示範憑證。"
+      signed_out: "已登出示範後台。"
+    dashboard:
+      welcome:
+        eyebrow: "/marketing/admin"
+        title: "SourceGrid Labs 示範主控台"
+        body: "以真實資料和預先打造的流程帶領客戶完整體驗營運作業，同時避免動到正式系統。"
+      selected_locale_label: "目前語系"
+      system_settings_label: "系統設定"
+      system_settings_entries:
+        - name: "維護模式"
+          value: "關閉"
+        - name: "行銷活動"
+          value: "3 個啟用中"
+        - name: "帳單狀態"
+          value: "已繳清"
+      theme_keys_label: "佈景主題鍵值"
+      theme_keys_list:
+        - "golden-primary"
+        - "platinum-dark"
+        - "slate-neutral"
+    sessions:
+      eyebrow: "Admin"
+      title: "歡迎"
+      intro: >
+        SourceGrid Labs 後台讓管理者在同一處處理預訂、付款、自動化與內部流程。
+      demo_email_label: "示範 Email"
+      demo_password_label: "示範密碼"
+      credentials_hint: "複製後可在 %{seed_hint} 調整再執行 bin/rails db:seed。"
+      unlock_copy: "輸入示範 Email 與密碼即可登入管理主控台。"
+      form:
+        email: "Email"
+        password: "密碼"
+        submit: "進入管理後台"
+      info: "這組憑證同樣適用於 API、Expo App 及其他示範介面。"
+      footer_link: "← 回到行銷著陸頁"
+      home_link: "← 回到行銷首頁"
+      mobile_demo:
+        eyebrow: "行動示範"
+        title: "用 Android 體驗後台"
+        body: >
+          下載此 APK 並安裝在 Android 裝置上，輸入上方示範帳密即可在手機上預覽管理體驗。
+        cta: "下載 Android APK"
+        note: "若需要更新版本，請通知 SourceGrid Labs 禮賓團隊。"
+    messages:
+      hero:
+        eyebrow: "應用訊息"
+        title: "同步行動端訊息"
+        body: "下列表格與 Android 版本顯示的訊息一致，可在交付 APK 前先調整文字。"
+      seeded:
+        title: "示範訊息"
+        body: ""
+        empty: "尚未載入訊息，請執行 bin/rails db:seed。"
+      coverage:
+        title: "可用頻道與語系"
+        body: "方便客戶確認通知涵蓋範圍後再簽約。"
+        channels: "頻道："
+        locales: "語系："
+      entries:
+        - subject: "現場稽核排程"
+          preview: "Delta 小組確認明日上午 09:00 針對第 4 棟進行屋頂檢查。"
+          status: "未讀"
+          channel: "推播 + Email"
+        - subject: "付款完成"
+          preview: "Northwind Holdings 已完成維護費用第 1846 號發票的付款。"
+          status: "待處理"
+          channel: "App 內"
+      actions:
+        - "標記為已讀"
+        - "回覆"
+        - "封存"
+      coverage_lists:
+        channels:
+          - "推播"
+          - "Email"
+          - "App 內"
+        locales:
+          - "English"
+          - "繁體中文"
+          - "日本語"
+    users:
+      hero:
+        eyebrow: "團隊管理"
+        title: "使用者管理"
+        body: "這裡的資料與 Android 示範一致，可透過 rails/db/seeds/admin_controls.rb 自訂成員。"
+        metric_label: "啟用員工"
+      last_active_prefix: "最近活動"
+      seeded:
+        title: "示範成員"
+        body: "姓名與 Android 版本相同，方便客戶看到一致的資料。"
+        empty: "找不到示範使用者，請執行 bin/rails db:seed 以建立樣本。"
+      actions:
+        - "檢視檔案"
+        - "重設密碼"
+        - "停用帳號"
+      entries:
+        - name: "Lina Ortega"
+          email: "lina@client-demo.local"
+          role: "資產管理員"
+          status: "啟用中"
+          last_active: "5 分鐘前"
+        - name: "Marcus Lee"
+          email: "marcus@client-demo.local"
+          role: "區域經理"
+          status: "已邀請"
+          last_active: "30 分鐘前"
+    custom_features:
+      hero:
+        eyebrow: "自訂功能"
+        title: "自訂模組"
+        body: "依據流程打造專屬管理工具，並向客戶展示他們的客製化儀表板。"
+      entries:
+        - title: "流程自動化"
+          description: "自動派送審核、通知外勤團隊，並與既有系統資料同步。"
+          badge: "自訂流程"
+        - title: "營運洞察"
+          description: "整合營運指標與財務資料，打造一站式儀表板。"
+          badge: "高階決策"
+        - title: "外勤工具箱"
+          description: "提供技師檢查清單、離線同步與照片紀錄。"
+          badge: "支援離線"
+      cta: "客製此模組"
+    contact:
+      demo_auto_reply:
+        subject: "感謝您探索 %{brand}"
+        greeting: "%{name} 您好，"
+        intro: "感謝您的訊息，我們會盡快與您聯繫。"
+        closing: "敬上，"
+        signature: "%{brand} 團隊"
+        confirmation: "我們已收到您的訊息，禮賓團隊會盡快回覆您。"
+        default_name: "朋友"
+        no_message: "未提供其他資訊。"
+        errors:
+          invalid_email: "請輸入有效的 Email。"
+          missing_brevo: "尚未設定 Brevo API，請加入 BREVO_API_KEY 後再試一次。"
+          delivery_failed: "目前無法寄出郵件，請稍後再試。"
+          generic: "無法處理您的請求。"

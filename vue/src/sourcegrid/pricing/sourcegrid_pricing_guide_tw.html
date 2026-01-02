@@ -1,0 +1,452 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>SourceGrid Labs — 價格方案說明（繁體中文）</title>
+  <style>
+    :root {
+      --blue: #2D70FB;
+      --gold: #C8A357;
+      --text-main: #222222;
+      --text-muted: #666666;
+      --bg-light: #F7F8FA;
+      --border-soft: #E0E3EA;
+      --row-alt: #F3F5FB;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 40px 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      color: var(--text-main);
+      background: #ffffff;
+    }
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 40px 40px;
+      border: 1px solid #DDD;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+      border-radius: 8px;
+    }
+    header {
+      border-bottom: 2px solid var(--blue);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      color: var(--blue);
+    }
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      max-width: 460px;
+    }
+    .meta {
+      text-align: right;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    h2.section-title {
+      font-size: 16px;
+      margin: 24px 0 10px;
+      color: var(--gold);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    p {
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 0 0 6px;
+    }
+    .muted { color: var(--text-muted); }
+    .card {
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      padding: 14px 16px;
+      background: #fff;
+      margin-bottom: 12px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-price {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blue);
+      white-space: nowrap;
+    }
+    .pill {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: var(--bg-light);
+      color: var(--text-muted);
+      font-size: 10px;
+      margin-left: 4px;
+    }
+    ul.compact {
+      padding-left: 18px;
+      margin: 4px 0 2px;
+    }
+    ul.compact li {
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 8px 0 12px;
+    }
+    thead th {
+      background: var(--blue);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      text-align: left;
+      padding: 6px 8px;
+      border-right: 1px solid rgba(255,255,255,0.2);
+    }
+    thead th:last-child { border-right: none; }
+    tbody td {
+      font-size: 11px;
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    tbody tr:nth-child(even) td { background: var(--row-alt); }
+    tbody td.price {
+      text-align: right;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+    .table-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .section-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr);
+      gap: 14px 20px;
+    }
+    .footer-note {
+      border-top: 1px solid var(--border-soft);
+      margin-top: 18px;
+      padding-top: 10px;
+      font-size: 10px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    @media print {
+      body {
+        padding: 0;
+        background: #ffffff;
+      }
+      .page {
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+        margin: 0;
+        width: auto;
+      }
+      a[href]:after { content: ""; }
+      header,
+      section,
+      .card,
+      table,
+      .section-grid,
+      .footer-note {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <div class="brand">SourceGrid Labs</div>
+        <div class="subtitle">
+          提供網站、線上營運系統與行動 App 的固定專案方案，
+          適合希望交付內容清楚、沒有隱藏成本的中小型企業。
+        </div>
+      </div>
+      <div class="meta">
+        價格方案說明（繁體中文／新台幣）<br>
+        <span class="muted">作為簡報與會談後的參考文件</span>
+      </div>
+    </header>
+
+    <section>
+      <h2 class="section-title">1. 方案總覽</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>方案</th>
+            <th>內容摘要</th>
+            <th style="text-align:right;">價格（TWD）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>小型官網</td>
+            <td>6–8 頁、RWD 響應式版型、聯絡表單、簡易後台。</td>
+            <td class="price">NT$126,000</td>
+          </tr>
+          <tr>
+            <td>商務系統</td>
+            <td>官網加上登入、後台，以及一個核心模組（預約或租借）。</td>
+            <td class="price">NT$472,000</td>
+          </tr>
+          <tr>
+            <td>行動 App 全套</td>
+            <td>iOS / Android App，加上後端系統與官網。</td>
+            <td class="price">NT$944,000</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-note">
+        以上均為專案固定價格。若開發過程中技術工時增加，不會另外加收費用。
+      </p>
+    </section>
+
+    <section>
+      <h2 class="section-title">2. 方案說明</h2>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🌐 小型官網方案</span>
+            <span class="pill">適合需要穩定門面的商家</span>
+          </div>
+          <div class="card-price">NT$126,000</div>
+        </div>
+        <p class="muted">
+          給需要專業門面的店家或個人品牌：重點是資訊清楚、好找、好聯絡，
+          而不是複雜功能。
+        </p>
+        <div class="section-grid">
+          <div>
+            <p><strong>包含內容</strong></p>
+            <ul class="compact">
+              <li>約 6–8 頁官網（首頁、關於、服務／課程、價格、聯絡我們、可選部落格／最新消息）。</li>
+              <li>RWD 響應式版型，支援手機與桌機瀏覽。</li>
+              <li>聯絡表單，訪客填寫後直接寄到指定信箱。</li>
+              <li>基本 SEO 設定（標題、描述、乾淨網址）。</li>
+              <li>簡易後台，可自行編輯文字與圖片。</li>
+              <li>伺服器與部署設定。</li>
+            </ul>
+          </div>
+          <div>
+            <p><strong>適用對象</strong></p>
+            <ul class="compact">
+              <li>咖啡廳、餐廳、小型零售店。</li>
+              <li>顧問、教練、家教、講師。</li>
+              <li>各類在地服務（維修、清潔、美容等）。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>⚙️ 商務系統方案</span>
+            <span class="pill">官網 + 核心營運功能</span>
+          </div>
+          <div class="card-price">NT$472,000</div>
+        </div>
+        <p class="muted">
+          給已經有穩定業務、希望把「預約、登記、租借或申請流程」搬到線上的店家或機構，
+          讓客戶與員工可以在同一套系統處理常用工作。
+        </p>
+        <div class="section-grid">
+          <div>
+            <p><strong>包含內容</strong></p>
+            <ul class="compact">
+              <li>小型官網方案的所有項目。</li>
+              <li>會員登入區（客戶帳號）。</li>
+              <li>後台管理介面，讓工作人員檢視與處理資料。</li>
+              <li>一個核心系統模組，例如：
+                <ul class="compact">
+                  <li>線上預約系統（房型、時段、服務項目），或</li>
+                  <li>設備／器材租借管理系統，或</li>
+                  <li>簡單的內部申請／流程管理工具。</li>
+                </ul>
+              </li>
+              <li>金流整合，支援主要信用卡與部分在地支付方式。</li>
+              <li>自動寄信（預約確認、通知信等）。</li>
+              <li>資料匯出（CSV／Excel）。</li>
+            </ul>
+          </div>
+          <div>
+            <p><strong>適用對象</strong></p>
+            <ul class="compact">
+              <li>小型旅館、民宿、青年旅館。</li>
+              <li>車輛、自行車或器材租借店。</li>
+              <li>診所、美髮／美容、需要預約的服務業。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📱 行動 App 全套方案</span>
+            <span class="pill">App + 後端 + 官網</span>
+          </div>
+          <div class="card-price">NT$944,000</div>
+        </div>
+        <p class="muted">
+          給希望客戶「主要透過手機 App 使用服務」的團隊。例如會員制服務、
+          配送／預約平台等。
+        </p>
+        <div class="section-grid">
+          <div>
+            <p><strong>包含內容</strong></p>
+            <ul class="compact">
+              <li>商務系統方案的所有項目。</li>
+              <li>iOS 與 Android 原生安裝的 App（單一程式碼庫維護）。</li>
+              <li>App 內登入與個人資料管理。</li>
+              <li>推播通知（預約狀態、重要提醒等）。</li>
+              <li>App 內預約、下單或其他核心操作。</li>
+              <li>協助送審到 App Store 與 Google Play。</li>
+            </ul>
+          </div>
+          <div>
+            <p><strong>適用對象</strong></p>
+            <ul class="compact">
+              <li>外送／物流服務平台。</li>
+              <li>會員制或集點、月費型服務。</li>
+              <li>希望客戶主要透過 App 互動的品牌或機構。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">3. 加購模組（Add-on Modules）</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>模組</th>
+            <th>說明</th>
+            <th style="text-align:right;">價格（TWD）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>線上預約系統</td>
+            <td>行事曆、可預約時段、預約流程與通知信。</td>
+            <td class="price">NT$189,000</td>
+          </tr>
+          <tr>
+            <td>租借管理系統</td>
+            <td>庫存管理、租借期間、押金與費率邏輯。</td>
+            <td class="price">NT$157,000</td>
+          </tr>
+          <tr>
+            <td>金流整合</td>
+            <td>信用卡與部分在地支付的串接與測試。</td>
+            <td class="price">NT$31,000</td>
+          </tr>
+          <tr>
+            <td>電子報與自動寄信</td>
+            <td>訂閱表單、名單管理與少量自動寄信流程。</td>
+            <td class="price">NT$25,000</td>
+          </tr>
+          <tr>
+            <td>即時客服聊天室</td>
+            <td>網站上顯示聊天視窗，後台可由工作人員回覆。</td>
+            <td class="price">NT$63,000</td>
+          </tr>
+          <tr>
+            <td>多語系介面</td>
+            <td>語系切換按鈕與主要頁面結構的翻譯支援。</td>
+            <td class="price">NT$31,000</td>
+          </tr>
+          <tr>
+            <td>討論區（Thredded）</td>
+            <td>完整討論區系統，含多個看板、權限角色、版主管理與版面客製化。</td>
+            <td class="price">NT$126,000</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-note">
+        加購模組可以搭配任何一個主方案使用；若未來業務成長，有新的需求，也可以再以「單一模組」方式追加。
+      </p>
+    </section>
+
+    <section>
+      <h2 class="section-title">4. 維護方案（Maintenance Plans）</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>方案</th>
+            <th>服務內容</th>
+            <th style="text-align:right;">價格（TWD／月）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Basic 基本維護</td>
+            <td>安全性更新、備份與基本監控。</td>
+            <td class="price">NT$6,000</td>
+          </tr>
+          <tr>
+            <td>Standard 標準維護</td>
+            <td>包含 Basic，另含每月最多四項小幅內容或設定調整。</td>
+            <td class="price">NT$16,000</td>
+          </tr>
+          <tr>
+            <td>Premium 進階維護</td>
+            <td>包含 Standard，另含每週小幅調整與優先處理小型改善需求。</td>
+            <td class="price">NT$47,000</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-note">
+        維護方案為選配項目；若您有自家技術團隊，也可在專案完成後交接文件與權限，由貴公司自行維護。
+      </p>
+    </section>
+
+    <div class="footer-note">
+      <div>
+        本文件主要用於說明價格結構與大致範圍；實際專案會先確認需求後，再以同一套價格邏輯提供正式報價單。
+      </div>
+      <div>
+        SourceGrid Labs — 數位產品規劃與開發。
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<section class="hero">
+  <div class="hero-text">
+    <p class="eyebrow">Client portal</p>
+    <h1>Hi, <%= current_user&.english_name || current_user&.email %></h1>
+    <p>Replace this screen with the member-facing experience (bookings, orders, support, etc.).</p>
+  </div>
+</section>
+
+<section class="card">
+  <header>
+    <h2>Upcoming items</h2>
+    <p>Placeholder tiles to demonstrate layout and styling.</p>
+  </header>
+  <ul class="idea-list">
+    <% @upcoming_items.each do |item| %>
+      <li>
+        <strong><%= item[:title] %></strong>
+        <p><%= item[:body] %></p>
+      </li>
+    <% end %>
+  </ul>
+</section>

@@ -1,0 +1,74 @@
+<!-- Shared modal shell for admin/account flows. -->
+<%
+  require "securerandom"
+
+  modal_id = local_assigns[:modal_id].presence || "modal-#{SecureRandom.hex(4)}"
+  modal_key = local_assigns[:modal_key].presence || modal_id
+  title = local_assigns[:title]
+  initially_open =
+    if local_assigns.key?(:open)
+      !!local_assigns[:open]
+    else
+      false
+    end
+  show_close = local_assigns.fetch(:show_close, true)
+  close_action = local_assigns[:close_action]
+  close_label = local_assigns[:close_label].presence || "Close modal"
+  footer_slot = local_assigns[:footer]
+
+  wrapper_attrs = (local_assigns[:wrapper_html] || {}).transform_keys(&:to_sym)
+  panel_attrs = (local_assigns[:panel_html] || {}).transform_keys(&:to_sym)
+
+  wrapper_attrs[:class] = [
+    "modal-overlay",
+    wrapper_attrs[:class],
+    (initially_open ? nil : "is-hidden")
+  ].compact.join(" ")
+  wrapper_attrs[:role] ||= "dialog"
+  wrapper_attrs[:aria] = (wrapper_attrs[:aria] || {}).merge(modal: "true")
+  data_attrs = (wrapper_attrs[:data] || {}).transform_keys(&:to_sym)
+  data_attrs[:modal_key] = modal_key if modal_key
+  wrapper_attrs[:data] = data_attrs
+
+  panel_attrs[:class] = ["modal-panel", panel_attrs[:class]].compact.join(" ")
+  panel_attrs[:id] ||= modal_id
+  panel_attrs[:role] ||= "document"
+
+  title_id = local_assigns[:title_id] || (title.present? ? "#{panel_attrs[:id]}-title" : nil)
+  label_target = local_assigns[:labelled_by] || title_id
+  wrapper_attrs[:aria][:labelledby] ||= label_target if label_target.present?
+%>
+
+<%= tag.div(**wrapper_attrs) do %>
+  <%= tag.div(**panel_attrs) do %>
+    <% if show_close %>
+      <button
+        type="button"
+        class="modal-close"
+        data-modal-close="<%= modal_key %>"
+        <%= "data-action=\"#{close_action}\"".html_safe if close_action.present? %>
+      >
+        <span class="sr-only"><%= close_label %></span>
+        ×
+      </button>
+    <% end %>
+
+    <% if title.present? %>
+      <header class="modal-header">
+        <h2 class="modal-title" <%= "id=\"#{title_id}\"".html_safe if title_id.present? %>>
+          <%= title %>
+        </h2>
+      </header>
+    <% end %>
+
+    <div class="modal-body">
+      <%= yield %>
+    </div>
+
+    <% if footer_slot.present? %>
+      <footer class="modal-footer">
+        <%= footer_slot %>
+      </footer>
+    <% end %>
+  <% end %>
+<% end %>

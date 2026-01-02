@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title><%= AppConstants::Project.name %> · Account</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="stylesheet" href="/backend/assets/account.css" />
+  </head>
+  <body class="admin-body">
+    <div class="admin-shell">
+      <header class="admin-nav">
+        <div class="brand">
+          <span class="brand-name"><%= AppConstants::Project.name %></span>
+        </div>
+        <% if user_signed_in? %>
+          <nav class="nav-links">
+            <%= button_to "Sign out", account_logout_path, method: :delete, class: "nav-link logout-button" %>
+          </nav>
+        <% end %>
+      </header>
+      <main class="admin-main">
+        <% flash.each do |type, message| %>
+          <div class="flash flash-<%= type %>"><%= message %></div>
+        <% end %>
+        <%= yield %>
+      </main>
+    </div>
+  </body>
+  <%= render "shared/modal_script" %>
+</html>

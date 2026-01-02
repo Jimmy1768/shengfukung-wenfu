@@ -1,0 +1,21 @@
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+# ActiveStorage expects credentials or ENV variables for third-party adapters.
+# Keep real bucket names/DBs in lib/profile/infrastructure.rb and override the
+# values via per-deployment ENV files (e.g., .env.development, etc/default/client_env).
+amazon:
+  service: S3
+  access_key_id: <%= ENV["AWS_ACCESS_KEY_ID"] %>
+  secret_access_key: <%= ENV["AWS_SECRET_ACCESS_KEY"] %>
+  region: <%= ENV.fetch("AWS_REGION", "us-east-1") %>
+  bucket: <%= Profile::Infrastructure::Storage.s3_bucket(env: Rails.env) %>
+
+# For Postgres-backed storage (if you choose to keep attachments in the database
+# instead of using S3), refer to Profile::Infrastructure::Storage.postgres_url(env: :development)
+# and store the real URLs and passwords in environment files outside the template.

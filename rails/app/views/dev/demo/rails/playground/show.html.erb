@@ -1,0 +1,42 @@
+<section class="hero">
+  <div class="hero-text">
+    <p class="eyebrow"><%= @hero[:eyebrow] %></p>
+    <h1><%= @hero[:title] %></h1>
+    <p><%= @hero[:body] %></p>
+  </div>
+</section>
+
+<section class="card">
+  <div
+    class="feature-grid"
+    style="
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--spacing-lg);
+    "
+  >
+    <% @features.each do |feature| %>
+      <article
+        class="feature-card"
+        style="
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          background: var(--surface-muted);
+          padding: var(--spacing-md);
+          display: flex;
+          flex-direction: column;
+          gap: var(--spacing-sm);
+        "
+      >
+        <div class="badge badge-accent"><%= feature[:badge] %></div>
+        <h2><%= feature[:title] %></h2>
+        <p class="muted"><%= feature[:description] %></p>
+        <% if @cta.present? %>
+          <button class="btn btn-secondary" type="button" style="margin-top: auto; align-self: flex-start;">
+            <%= @cta %>
+          </button>
+        <% end %>
+      </article>
+    <% end %>
+  </div>
+</section>

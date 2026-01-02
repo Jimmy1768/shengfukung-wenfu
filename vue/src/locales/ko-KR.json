@@ -1,0 +1,216 @@
+{
+  "branding": "Golden Template",
+  "heroTitle": "SourceGrid Labs 솔루션",
+  "heroSubtitle": "중소기업이 떠올린 아이디어를 iOS/Android 앱과 온라인 플랫폼으로 실현합니다.",
+  "heroSupport": "모든 앱과 사이트는 SourceGrid Labs 인프라 위에서 운영되므로 별도 서버나 계정 준비가 필요 없습니다.",
+  "localeLabel": "언어",
+  "localeHelp": "선호하는 언어로 전환하세요.",
+  "themeLabel": "테마",
+  "themeHelp": "쇼케이스를 열기 전에 Light 또는 Dark 테마를 선택하세요.",
+  "heroPills": [
+    { "id": "launch-ready", "icon": "🚀", "label": "즉시 공개 가능한 웹사이트" },
+    { "id": "customer-staff", "icon": "🗂️", "label": "고객·스태프 포털" },
+    { "id": "mobile-apps", "icon": "📱", "label": "브랜드 모바일 앱" },
+    { "id": "ops-automations", "icon": "📊", "label": "운영 자동화 & 인사이트" },
+    { "id": "managed-hosting", "icon": "🛡️", "label": "매니지드 호스팅·지원" }
+  ],
+  "offerEyebrow": "What We Offer",
+  "offerTitle": "하나의 플랫폼으로 구축·런칭·운영까지.",
+  "offerIntro": "모든 프로젝트는 SourceGrid Labs 백엔드에서 돌아가며, 마케팅·운영·모바일 경험을 항상 동기화합니다.",
+  "ctas": {
+    "admin": "데모 관리자 콘솔",
+    "preview": "웹사이트 쇼케이스 보기"
+  },
+  "features": [
+    {
+      "id": "launch-ready",
+      "icon": "🚀",
+      "title": "즉시 공개 가능한 웹사이트",
+      "body": "6~8페이지 분량의 마케팅 사이트에 CMS, SEO, 문의 플로우를 포함합니다."
+    },
+    {
+      "id": "customer-staff",
+      "icon": "🗂️",
+      "title": "고객·스태프 포털",
+      "body": "로그인·대시보드·핵심 모듈(예약, 렌탈, 워크플로)을 넣어 하나의 시스템에서 함께 일합니다."
+    },
+    {
+      "id": "mobile-apps",
+      "icon": "📱",
+      "title": "브랜드 모바일 앱",
+      "body": "동일 백엔드와 연결된 iOS/Android 앱. 스토어 심사와 대응까지 전담합니다."
+    },
+    {
+      "id": "ops-automations",
+      "icon": "📊",
+      "title": "운영 자동화 & 인사이트",
+      "body": "예약·결제·재고에 연결된 알림, 리포트, 실시간 대시보드를 기본 제공."
+    },
+    {
+      "id": "managed-hosting",
+      "icon": "🛡️",
+      "title": "매니지드 호스팅·지원",
+      "body": "SourceGrid Labs가 서버, 모니터링, 백업, 보안 업데이트를 담당합니다."
+    }
+  ],
+  "demo": {
+    "nav": {
+      "items": [
+        { "id": "home", "label": "쇼케이스 홈" },
+        { "id": "pricing", "label": "가격 가이드" },
+        { "id": "custom", "label": "커스텀 모듈 (준비중)", "disabled": true }
+      ]
+    },
+    "hero": {
+      "eyebrow": "Golden Template 데모",
+      "title": "SourceGrid Labs 쇼케이스",
+      "description": "다중 브랜드 마케팅 사이트, 라이브 팔레트, 템플릿, 그리고 내장 Rails 관리자를 한 번에 미리보기.",
+      "backToLanding": "⟵ 홈으로",
+      "marketingLanding": "마케팅 페이지로 돌아가기",
+      "adminLogin": "관리자 콘솔",
+      "miniEyebrow": "시그니처 경험",
+      "contactButton": "문의하기"
+    },
+    "selector": {
+      "brandLabel": "브랜드",
+      "templateLabel": "템플릿 스타일",
+      "storyFocusPrefix": "스토리 포커스:"
+    },
+    "cta": {
+      "eyebrow": "상담 예약",
+      "title": "Contact Us",
+      "button": "문의 보내기"
+    },
+    "carousel": {
+      "placeholder": "곧 시그니처 하이라이트를 추가합니다.",
+      "scrollBackwardLabel": "이전 하이라이트",
+      "scrollForwardLabel": "다음 하이라이트"
+    },
+    "home": {
+      "eyebrow": "시그니처 스테이",
+      "headline": "자갈길에서 캔들라이트 스위트까지.",
+      "body": "랜턴이 비추는 입구, 고요한 로비 바, 타운하우스 같은 스위트를 담은 시네마틱한 여정.",
+      "galleryEyebrow": "Salon Notes",
+      "galleryHeadline": "아틀리에의 안쪽",
+      "galleryFallback": "시그니처 장면",
+      "sceneFallback": "빛, 텍스처, 서비스 의식을 가까이에서 보여줍니다.",
+      "tagFallback": "Drop",
+      "gridTitle": "Curated Glass Series",
+      "gridSubtitle": "빛과 재질, 공간감을 드러내는 작품을 엄선했습니다.",
+      "featureEyebrow": "Details in Motion",
+      "featureTitle": "유리·빛·리듬이 교차하는 세 번째 막.",
+      "featureSubtitle": "짧고 날카로운 순간이 그리드를 살아 움직이게 합니다—마우스를 올려 프레임을 확장하세요.",
+      "stepsEyebrow": "Signature flow",
+      "stepsHeadline": "고요한 장면으로 밤을 그립니다.",
+      "offeringEyebrow": "Offering",
+      "offeringHeadline": "방이 숨을 내쉬다",
+      "offeringBody": "정교하게 연출된 한 순간, 곧 다시 그림자 속으로.",
+      "step1Title": "황혼의 웰컴.",
+      "step2Title": "체류 플랜.",
+      "step3Title": "스위트 체험.",
+      "step4Title": "야간 리추얼.",
+      "step1Body": "골든아워에 도착하면 컨시어지가 따뜻한 타월과 차로 맞이합니다.",
+      "step2Body": "퍼스널 호스트가 일정, 이동, 레스토랑을 즉석에서 제안합니다.",
+      "step3Body": "테라스 스위트와 맞춤형 터턴다운으로 시간이 느려집니다.",
+      "step4Body": "캔들 스윔, 아로마 배스, 나이트캡으로 조용히 마무리합니다."
+    },
+    "pricing": {
+      "headline": "SourceGrid Labs 패키지",
+      "subhead": "명확한 납품 범위를 가진 고정가 형태로 웹, 시스템, 모바일 앱을 제공합니다.",
+      "addonsTitle": "추가 모듈",
+      "maintenanceTitle": "유지보수 플랜",
+      "shotFallback": "서비스 장면",
+      "maintenanceSuffix": " / 월",
+      "labels": {
+        "included": "포함 내용",
+        "typicalClients": "주요 고객",
+        "addonsTagline": "추가 모듈",
+        "maintenanceNote": "유지보수 비용은 월 단위입니다."
+      },
+      "packages": {
+        "small-website": {
+          "name": "Small Website",
+          "summary": "6~8페이지, 모바일 대응, 문의 폼, 경량 CMS.",
+          "description": "신뢰도 있는 온라인 거점을 빠르게 갖추고 싶은 소규모 팀을 위한 패키지입니다.",
+          "features": [
+            "6~8페이지 반응형 사이트",
+            "지정 이메일로 연결되는 문의 폼",
+            "기본 SEO 설정",
+            "문구·이미지를 수정할 수 있는 경량 CMS",
+            "호스팅 및 배포 포함"
+          ]
+        },
+        "business-system": {
+          "name": "Business System",
+          "summary": "웹사이트 + 로그인 + 대시보드 + 핵심 모듈",
+          "description": "예약·렌탈·워크플로를 하나의 포털로 묶어 고객과 스태프가 함께 작업할 수 있습니다.",
+          "features": [
+            "Small Website 모든 기능 포함",
+            "회원 로그인 영역",
+            "스태프 대시보드",
+            "핵심 모듈 1개(예약, 렌탈, 워크플로)",
+            "온라인 결제 및 알림",
+            "CSV/Excel 내보내기"
+          ]
+        },
+        "mobile-suite": {
+          "name": "Mobile App Suite",
+          "summary": "iOS·Android 앱 + 백엔드 + 웹사이트",
+          "description": "푸시, 인앱 예약/주문, 동일 백엔드로 동기화된 모바일 경험을 한 번에 제공합니다.",
+          "features": [
+            "Business System 모든 기능 포함",
+            "단일 코드베이스의 iOS/Android 앱",
+            "고객 프로필 & 푸시 알림",
+            "인앱 예약·주문 기능",
+            "스토어 심사/출시 지원"
+          ]
+        }
+      },
+      "addons": {
+        "online-booking": "온라인 예약",
+        "rental-system": "렌탈 시스템",
+        "payment-integration": "결제 연동",
+        "email-automations": "이메일 자동화",
+        "real-time-chat": "실시간 채팅",
+        "multi-language": "다국어 지원",
+        "forum-system": "포럼 시스템 (Thredded)"
+      },
+      "maintenance": {
+        "basic": {
+          "name": "Basic",
+          "scope": "보안 업데이트, 백업, 모니터링."
+        },
+        "standard": {
+          "name": "Standard",
+          "scope": "Basic + 월 4회 이하의 소규모 콘텐츠/설정 업데이트."
+        },
+        "premium": {
+          "name": "Premium",
+          "scope": "Standard + 주간 조정과 우선 대응."
+        }
+      }
+    },
+    "contact": {
+      "heading": "Concierge Inquiry",
+      "description": "정보를 남겨주시면 24시간 내 SourceGrid Labs 팀이 연락드립니다.",
+      "localeLabel": "언어 선택",
+      "autoReplyLabel": "자동 회신 제목",
+      "autoReplySubject": "Golden Template 문의",
+      "autoReplyBody": "안녕하세요 [Name]님,\n문의해 주셔서 감사합니다. 빠르게 답변드리겠습니다.",
+      "nameLabel": "이름",
+      "namePlaceholder": "Ada Lovelace",
+      "emailLabel": "이메일",
+      "emailPlaceholder": "demo@sourcegridlabs.com",
+      "messageLabel": "메시지",
+      "messagePlaceholder": "일정, 목표, 필요한 연동 내용을 알려주세요.",
+      "submit": "메시지 전송",
+      "sending": "전송 중…"
+    },
+    "placeholder": {
+      "heading": "커스텀 모듈 자리",
+      "intro": "전용 대시보드를 이 영역에 구성하세요 (로열티, 예약, 분석 등).",
+      "templatesPrefix": "새 컴포넌트를 추가하려면 ",
+      "registryConnector": "에 등록하세요"
+    }
+  }
+}

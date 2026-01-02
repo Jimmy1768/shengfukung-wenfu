@@ -1,0 +1,18 @@
+slug: shenfukung-wenfu
+name: 竹南鎮聖福宮
+tagline: 清淨・莊嚴・在地信仰
+hero_copy: 用簡潔的段落說明本廟的宗旨、服務與交通資訊。
+primary_image_url:
+about_html:
+contact:
+  addressZh: 苗栗縣竹南鎮公教路 136 號
+  addressEn: No. 136, Gongjiao Rd, Zhunan Township, Miaoli County 350
+  phone: '03-747-2826'
+  plusCode: MVWF+54 聖福里 苗栗縣竹南鎮
+  mapUrl: https://maps.google.com/?q=No.+136,+Gongjiao+Rd,+Zhunan+Township,+Miaoli+County+350
+service_times:
+  weekday: 08:00 – 17:00
+  weekend: 07:30 – 18:00
+  notes: 農曆初一、十五延長開放。
+metadata:
+  seed_profile: shenfukung-wenfu

@@ -1,0 +1,40 @@
+<script>
+  (() => {
+    const hideModal = (modal) => {
+      if (modal && !modal.classList.contains('is-hidden')) {
+        modal.classList.add('is-hidden');
+      }
+    };
+
+    const toggleModal = (key, show) => {
+      if (!key) return;
+      const modal = document.querySelector(`[data-modal-key="${key}"]`);
+      if (!modal) return;
+      if (show) {
+        modal.classList.remove('is-hidden');
+      } else {
+        hideModal(modal);
+      }
+    };
+
+    document.addEventListener('click', (event) => {
+      const openTrigger = event.target.closest('[data-modal-trigger]');
+      if (openTrigger) {
+        event.preventDefault();
+        toggleModal(openTrigger.getAttribute('data-modal-trigger'), true);
+        return;
+      }
+
+      const closeTrigger = event.target.closest('[data-modal-close]');
+      if (closeTrigger) {
+        event.preventDefault();
+        toggleModal(closeTrigger.getAttribute('data-modal-close'), false);
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      document.querySelectorAll('[data-modal-key]').forEach(hideModal);
+    });
+  })();
+</script>

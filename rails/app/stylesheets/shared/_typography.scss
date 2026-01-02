@@ -1,0 +1,37 @@
+
+// app/stylesheets/shared/_typography.scss
+//
+// Basic typography styles for headings, text, and muted content.
+
+@use "variables" as *;
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 $space-3 0;
+  font-weight: 600;
+  line-height: $line-height-tight;
+}
+
+h1 { font-size: $font-size-3xl; }
+h2 { font-size: $font-size-2xl; }
+h3 { font-size: $font-size-xl; }
+h4 { font-size: $font-size-lg; }
+h5 { font-size: $font-size-md; }
+h6 { font-size: $font-size-sm; }
+
+p {
+  margin: 0 0 $space-3 0;
+  font-size: $font-size-md;
+  line-height: $line-height-normal;
+}
+
+.muted {
+  opacity: 0.7;
+}
+
+.text-small {
+  font-size: $font-size-sm;
+}
+
+.text-xs {
+  font-size: $font-size-xs;
+}

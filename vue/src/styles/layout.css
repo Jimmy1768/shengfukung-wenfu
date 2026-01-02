@@ -1,0 +1,75 @@
+:root {
+  --layout-max-width: 1100px;
+}
+
+.section {
+  padding: calc(var(--spacing-lg) * 1.2) 0;
+}
+
+.section.alt,
+.section.section-alt {
+  background: color-mix(in srgb, var(--surface-muted) 75%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+}
+
+.wrap {
+  width: min(var(--layout-max-width), 100%);
+  margin: 0 auto;
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+}
+
+.grid,
+.grid2,
+.stack {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.grid,
+.grid2 {
+  grid-template-columns: 1fr;
+}
+
+.stack {
+  grid-auto-rows: auto;
+}
+
+@media (min-width: 900px) {
+  .grid,
+  .grid2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.more {
+  margin-top: var(--spacing-sm);
+}
+
+.link {
+  text-decoration: none;
+  font-weight: 700;
+  color: var(--text);
+  opacity: 0.85;
+  transition: opacity 120ms ease, text-decoration-color 120ms ease;
+}
+
+.link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.article {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  background: var(--surface-raised);
+  line-height: 1.85;
+  color: color-mix(in srgb, var(--text) 92%, #000000 8%);
+}
+
+.sp {
+  height: var(--spacing-lg);
+}

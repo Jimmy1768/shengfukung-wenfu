@@ -1,0 +1,23 @@
+
+# ops/systemd/shenfukung-wenfu.service
+#
+# Systemd unit template for the Puma web server.
+#
+# NOTE:
+# - Replace the placeholder slug (竹南鎮聖福宮) with `AppConstants::Project::SLUG` if you rename the stack.
+# - Keep `EnvironmentFile=/etc/default/<slug>-env` in sync with the supplied `.env` helpers.
+#
+# [Unit]
+# Description=竹南鎮聖福宮 Puma HTTP Server
+# After=network.target
+#
+# [Service]
+# Type=simple
+# User=deploy
+# WorkingDirectory=/home/jimmy1768_user/Projects/shenfukung-wenfu/rails
+# EnvironmentFile=/etc/default/shenfukung-wenfu-env
+# ExecStart=/usr/bin/bash -lc 'bundle exec puma -C config/puma.rb'
+# Restart=always
+#
+# [Install]
+# WantedBy=multi-user.target

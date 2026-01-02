@@ -1,0 +1,29 @@
+<section class="card login-card">
+  <header>
+    <p class="eyebrow"><%= I18n.t("account.passwords.request.eyebrow") %></p>
+    <h1><%= I18n.t("account.passwords.request.title") %></h1>
+    <p><%= I18n.t("account.passwords.request.subtitle") %></p>
+  </header>
+
+  <div class="login-actions field-panel register-panel register-email">
+    <%= render "shared/form_errors", form: @request_form %>
+
+    <%= form_with model: @request_form, url: password_path, method: :post, local: true, class: "login-form" do |f| %>
+      <div class="form-field">
+        <%= f.label :email, I18n.t("account.passwords.request.email_label") %>
+        <%= f.email_field :email,
+          required: true,
+          autofocus: true,
+          placeholder: "you@example.com" %>
+      </div>
+      <%= f.submit I18n.t("account.passwords.request.submit"), class: "btn btn-primary" %>
+    <% end %>
+
+    <p class="muted">
+      <%= I18n.t(
+        "account.passwords.links.back_to_login_html",
+        link: link_to(I18n.t("account.passwords.links.login_text"), account_login_path)
+      ).html_safe %>
+    </p>
+  </div>
+</section>

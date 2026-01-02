@@ -1,0 +1,297 @@
+{
+  "branding": "ゴールデンテンプレート",
+  "heroTitle": "SourceGrid Labs ソリューションズ",
+  "heroSubtitle": "中小企業のアイデアを iOS/Android アプリからオンラインプラットフォームまで形にします。",
+  "heroSupport": "すべてのアプリとサイトは SourceGrid Labs 上で運用されるため、独自のインフラやアカウントを用意する必要はありません。",
+  "localeLabel": "言語",
+  "localeHelp": "お好みの言語に切り替えてください。",
+  "themeLabel": "テーマ",
+  "themeHelp": "Light または Dark テーマを選んでからショーケースを開きましょう。",
+  "heroPills": [
+    { "id": "launch-ready", "icon": "🚀", "label": "すぐ公開できるサイト" },
+    { "id": "customer-staff", "icon": "🗂️", "label": "顧客・スタッフポータル" },
+    { "id": "mobile-apps", "icon": "📱", "label": "ブランドモバイルアプリ" },
+    { "id": "ops-automations", "icon": "📊", "label": "業務オートメーションと可視化" },
+    { "id": "managed-hosting", "icon": "🛡️", "label": "マネージドホスティング/サポート" }
+  ],
+  "offerEyebrow": "提供内容",
+  "offerTitle": "構築・ローンチ・運用をひとつのプラットフォームで。",
+  "offerIntro": "すべてのプロジェクトが SourceGrid Labs のバックエンドで動くため、マーケ、業務、モバイル体験が常に同期します。",
+  "ctas": {
+    "admin": "デモ管理コンソール",
+    "preview": "ウェブサイトショーケースを見る"
+  },
+  "features": [
+    {
+      "id": "launch-ready",
+      "icon": "🚀",
+      "title": "すぐ公開できるサイト",
+      "body": "6〜8 ページ構成のマーケサイト。CMS、SEO 設定、問い合わせ導線まで一気通貫で用意します。"
+    },
+    {
+      "id": "customer-staff",
+      "icon": "🗂️",
+      "title": "顧客・スタッフポータル",
+      "body": "ログイン、ダッシュボード、主要モジュール（予約・レンタル・ワークフロー）で顧客とスタッフが同じシステム上で動けます。"
+    },
+    {
+      "id": "mobile-apps",
+      "icon": "📱",
+      "title": "ブランドモバイルアプリ",
+      "body": "同じバックエンドと同期した iOS/Android アプリ。App Store / Google Play への申請と審査対応まで代行します。"
+    },
+    {
+      "id": "ops-automations",
+      "icon": "📊",
+      "title": "業務オートメーションと可視化",
+      "body": "予約や決済、在庫に連動したアラート、定期レポート、ライブダッシュボードを標準で装備。"
+    },
+    {
+      "id": "managed-hosting",
+      "icon": "🛡️",
+      "title": "マネージドホスティング/サポート",
+      "body": "SourceGrid Labs がサーバ、監視、バックアップ、セキュリティ更新を担当。初期設定費と月額で安心運用。"
+    }
+  ],
+  "demo": {
+    "nav": {
+      "items": [
+        { "id": "home", "label": "ショーケースホーム" },
+        { "id": "pricing", "label": "価格ガイド" },
+        { "id": "custom", "label": "カスタム機能（準備中）", "disabled": true }
+      ]
+    },
+    "hero": {
+      "eyebrow": "Golden Template デモ",
+      "title": "SourceGrid Labs ショーケース",
+      "description": "複数ブランドのマーケティングサイト、パレット切替、SourceGrid Labs テンプレート、そして Rails 管理画面をまとめてプレビュー。",
+      "backToLanding": "⟵ ホームに戻る",
+      "marketingLanding": "マーケティングページへ戻る",
+      "adminLogin": "管理コンソール",
+      "miniEyebrow": "シグネチャー体験",
+      "contactButton": "お問い合わせ CTA"
+    },
+    "selector": {
+      "brandLabel": "ブランド",
+      "templateLabel": "テンプレートスタイル",
+      "storyFocusPrefix": "ストーリーの焦点:"
+    },
+    "cta": {
+      "eyebrow": "デモのご案内",
+      "title": "ミーティングを予約",
+      "button": "ミーティングを予約"
+    },
+    "carousel": {
+      "placeholder": "シグネチャーのハイライト詳細は追って追加されます。",
+      "scrollBackwardLabel": "ハイライトを戻る",
+      "scrollForwardLabel": "ハイライトを進む"
+    },
+    "home": {
+      "eyebrow": "シグネチャーステイの序章",
+      "headline": "石畳のストリートからキャンドルが灯るスイートへ。",
+      "body": "ランタンが導くエントランス、静かなロビーバー、タウンハウスのようなスイート——映画のワンシーンのような到着体験。",
+      "galleryEyebrow": "サロンノート",
+      "galleryHeadline": "アトリエの裏側",
+      "galleryFallback": "シグネチャーシーン",
+      "sceneFallback": "光・テクスチャー・サービス儀式の断片を切り取ります。",
+      "tagFallback": "ドロップ",
+      "gridTitle": "キュレーテッドグラスシリーズ",
+      "gridSubtitle": "光、素材、空間の透明感を映す作品を厳選。",
+      "featureEyebrow": "動きを宿すディテール",
+      "featureTitle": "ガラスと光とリズムが交差する第三幕。",
+      "featureSubtitle": "短く鋭い瞬間がグリッドに息を吹き込みます—ホバーでフレームが広がります。",
+      "stepsEyebrow": "シグネチャーフロー",
+      "stepsHeadline": "静かな情景で夜をなぞる。",
+      "offeringEyebrow": "オファリング",
+      "offeringHeadline": "部屋がそっと息を吐く",
+      "offeringBody": "仕立てられたひと呼吸、そしてふたたび影の中へ。",
+      "step1Title": "黄昏のウェルカム。",
+      "step2Title": "滞在プラン。",
+      "step3Title": "スイート体験。",
+      "step4Title": "ナイトリチュアル。",
+      "step1Body": "ゴールデンアワーの到着時にコンシェルジュが迎え、温かなタオルとお茶をサーブします。",
+      "step2Body": "パーソナルホストが移動やダイニングを手配し、旅程をその場で仕立てます。",
+      "step3Body": "テラス付きスイート、ターンダウン、香りをまとったバスで時がゆっくり流れます。",
+      "step4Body": "キャンドルナイトスイムやアロマバス、ナイトキャップで静かな余韻を。"
+    },
+    "pricing": {
+      "headline": "SourceGrid Labs パッケージ",
+      "subhead": "納品範囲が明確な固定価格で、ウェブサイト、業務システム、モバイルアプリを中小企業向けに提供。",
+      "addonsTitle": "追加モジュール",
+      "maintenanceTitle": "保守プラン",
+      "shotFallback": "サービスシーン",
+      "maintenanceSuffix": " / 月",
+      "labels": {
+        "included": "含まれる内容",
+        "typicalClients": "想定クライアント",
+        "addonsTagline": "追加モジュール",
+        "maintenanceNote": "保守費用は月額です。"
+      },
+      "valueHighlights": [
+        {
+          "id": "small-website",
+          "title": "スモールサイト",
+          "body": "6〜8 ページ、モバイル最適化、問い合わせフォーム、軽量CMS。",
+          "hover": "カスタムシステムまでは不要で、信頼できるオンラインの玄関口をすぐ欲しい場合に最適です。"
+        },
+        {
+          "id": "business-system",
+          "title": "ビジネスシステム",
+          "body": "サイト + ログイン + ダッシュボード + コアモジュール。",
+          "hover": "予約やレンタルなどを一つのポータルにまとめ、顧客とスタッフどちらも同じ画面で作業できます。"
+        },
+        {
+          "id": "mobile-suite",
+          "title": "モバイルアプリスイート",
+          "body": "iOS / Android アプリ + バックエンド + サイト。",
+          "hover": "顧客との主要タッチポイントをアプリに集約したいブランド向けのフルセットです。"
+        }
+      ],
+      "details": {
+        "small-website": {
+          "title": "スモールサイト",
+          "tagline": "想定スコープ",
+          "summary": "信頼感のあるオンライン玄関口を用意したい小規模ビジネス向け。情報を探しやすく、すぐ問い合わせできることを重視します。",
+          "included": [
+            "6〜8 ページのサイト（ホーム、会社情報、サービス／プラン、料金、問い合わせ、オプションでブログ／ニュース）。",
+            "モバイルフレンドリーなレスポンシブデザイン。",
+            "問い合わせフォーム（送信内容は指定メールに転送）。",
+            "基本的な SEO 設定（タイトル、ディスクリプション、クリーンURL）。",
+            "テキストと画像を更新できる軽量 CMS。",
+            "ホスティング設定とデプロイ。"
+          ],
+          "typicalClients": [
+            "カフェ、レストラン、小規模小売店。",
+            "コンサルタント、コーチ、家庭教師、講師。",
+            "修理、クリーニング、美容などのローカルサービス。"
+          ],
+          "hoverNote": "カスタムシステムなしで信頼できるサイトを公開したい場合に最適です。"
+        },
+        "business-system": {
+          "title": "ビジネスシステム",
+          "tagline": "サイト + オンラインシステム",
+          "summary": "予約、レンタル、簡易な社内ワークフローなどを 1 つのプラットフォームにまとめ、顧客とスタッフを同時にサポートします。",
+          "included": [
+            "スモールサイトの内容をすべて含む。",
+            "顧客向けログインエリア。",
+            "スタッフが状況を把握できる管理ダッシュボード。",
+            "コアモジュールを 1 つ（オンライン予約、レンタル管理、ワークフローツールなど）。",
+            "主要クレジットカードや一部ローカル決済との連携。",
+            "自動メール（予約確認や通知）。",
+            "CSV／Excel へのエクスポート。"
+          ],
+          "typicalClients": [
+            "小規模ホテル、ホステル、ゲストハウス。",
+            "車両・自転車・機材レンタルショップ。",
+            "予約中心のクリニックやサロン。"
+          ],
+          "hoverNote": "ゲストとスタッフが同じポータルで作業でき、ブティック系ビジネスに最適です。"
+        },
+        "mobile-suite": {
+          "title": "モバイルアプリスイート",
+          "tagline": "アプリ + バックエンド + サイト",
+          "summary": "顧客との主要タッチポイントをアプリに集約したいブランド向け。モバイル体験、バックエンド、サイトまで一式提供します。",
+          "included": [
+            "ビジネスシステムの内容をすべて含む。",
+            "iOS と Android アプリ（単一コードベース）。",
+            "アプリ内ログインとプロフィール管理。",
+            "プッシュ通知（予約状況やリマインダーなど）。",
+            "アプリ内での予約・注文などの主要操作。",
+            "App Store / Google Play 申請サポート。"
+          ],
+          "typicalClients": [
+            "デリバリー／ロジスティクスサービス。",
+            "会員制・サブスクリプション型サービス。",
+            "アプリでのエンゲージメントを重視するブランドや団体。"
+          ],
+          "hoverNote": "スマホ中心で顧客とやり取りしたい場合のベストセットです。"
+        }
+      },
+      "packages": {
+        "small-website": {
+          "name": "スモールサイト",
+          "summary": "6〜8 ページ、モバイル最適化、問い合わせフォーム、簡易管理。",
+          "description": "信頼感のあるオンラインプレゼンスと簡単な問い合わせ導線を備えた、プロフェッショナルなウェブサイト。",
+          "features": [
+            "6〜8 ページのレスポンシブサイト",
+            "メールへ転送される問い合わせフォーム",
+            "基本的な SEO 設定",
+            "コピーや画像を編集できる軽量 CMS",
+            "ホスティングとデプロイ込み"
+          ]
+        },
+        "business-system": {
+          "name": "ビジネスシステム",
+          "summary": "サイトにログイン & ダッシュボードを備えたモジュールを追加。",
+          "description": "顧客ログイン、スタッフダッシュボード、予約/レンタル/ワークフローモジュールを追加し、1 つのプラットフォームで業務を回せます。",
+          "features": [
+            "スモールサイトの内容をすべて含む",
+            "顧客向けログインエリア",
+            "スタッフ用ダッシュボード",
+            "中核モジュール 1 つ（予約・レンタル・ワークフロー）",
+            "オンライン決済と通知",
+            "CSV/Excel エクスポート"
+          ]
+        },
+        "mobile-suite": {
+          "name": "モバイルアプリスイート",
+          "summary": "iOS/Android アプリ + バックエンドシステム + ウェブサイト。",
+          "description": "プッシュ通知やアプリ内予約/注文を備えたブランドアプリを、ウェブサイトと同じバックエンドで展開します。",
+          "features": [
+            "ビジネスシステムの内容をすべて含む",
+            "iOS と Android（1 つのコードベース）",
+            "顧客プロファイル & プッシュ通知",
+            "アプリ内予約/注文",
+            "App Store / Play Store 申請支援"
+          ]
+        }
+      },
+      "addons": {
+        "online-booking": "オンライン予約",
+        "rental-system": "レンタルシステム",
+        "payment-integration": "決済連携",
+        "email-automations": "メール自動化",
+        "real-time-chat": "リアルタイムチャット",
+        "multi-language": "多言語",
+        "forum-system": "フォーラムシステム（Thredded）"
+      },
+      "maintenance": {
+        "basic": {
+          "name": "ベーシック",
+          "scope": "セキュリティ更新、バックアップ、モニタリング。"
+        },
+        "standard": {
+          "name": "スタンダード",
+          "scope": "ベーシックに加え、毎月 4 回までの軽微な調整をサポート。"
+        },
+        "premium": {
+          "name": "プレミアム",
+          "scope": "スタンダードに週次調整と優先対応を追加。"
+        }
+      }
+    },
+    "contact": {
+      "heading": "コンシェルジュへのお問い合わせ",
+      "description": "詳細をご入力ください。SourceGrid Labs チームが 24 時間以内にご連絡します。",
+      "localeLabel": "言語セレクター",
+      "autoReplyLabel": "自動返信の件名",
+      "autoReplySubject": "Golden Template お問い合わせ",
+      "autoReplyBody": "[Name] 様\nお問い合わせありがとうございます。追って担当よりご連絡いたします。",
+      "nameLabel": "氏名",
+      "namePlaceholder": "Ada Lovelace",
+      "emailLabel": "メール",
+      "emailPlaceholder": "demo@sourcegridlabs.com",
+      "messageLabel": "メッセージ",
+      "messagePlaceholder": "プロジェクトのタイムラインや目標、必要な機能を教えてください。",
+      "submit": "メッセージを送信",
+      "sending": "送信中…"
+    },
+    "placeholder": {
+      "heading": "カスタムモジュール枠",
+      "intro": "ここにロイヤルティ、予約、アナリティクスなどのダッシュボードを追加できます。",
+      "templatesPrefix": "新しいコンポーネントを ",
+      "registryConnector": " に配置し、 ",
+      "suffix": " に登録しておけば、お客様がレイアウトを切り替えられます。"
+    }
+  }
+}

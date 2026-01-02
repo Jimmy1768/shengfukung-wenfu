@@ -1,0 +1,177 @@
+brands:
+  hotel:
+    name: Emberlight Boutique Hotel
+    tagline: 도시 감각 여행자를 위한 루미너스 스테이.
+    description: 스파·중정·계절 테이스팅을 갖춘 럭셔리 어번 리트릿.
+    settings:
+      lobby:
+        label: 로비 라운지
+        description: 호박빛 조명과 벨벳 소파, 시더 티로 맞이하는 도착 살롱.
+      pool:
+        label: 인피니티 풀
+        description: 스카이라인을 비추는 루프톱 레인과 노을을 위한 프라이빗 카바나.
+      courtyard:
+        label: 중정
+        description: 감귤나무와 랜턴, 낮은 테이블이 어우러진 스톤 코트야드.
+      suite:
+        label: 스카이라인 스위트
+        description: 플라스터 아치와 통유리, 바이널 카트를 갖춘 코너 레지던스.
+    elements:
+      chefs-salon:
+        label: Chef’s Salon
+        description: 테이블사이드 인퓨전과 시즌 페이스트리가 함께하는 새벽 테이스팅.
+      garden-spa:
+        label: Garden Spa Rituals
+        description: 중정 위로 떠 있는 시더 하맘에서 스팀과 딥소크를 즐깁니다.
+      wellness-towels:
+        label: Wellness Atelier
+        description: 방금 우린 타월, 아로마 블렌드, 온콜 스파 소믈리에.
+      atelier:
+        label: Handcrafted Detail
+        description: 플라스터 아치, 세라믹 인레이, 로컬 직물이 어우러진 디테일.
+    highlights:
+      curated-suites:
+        title: Curated Suites
+        body: 조각 같은 아치와 맞춤 리넨으로 둘러싸인 햇살 가득한 레지던스.
+      garden-spa-rituals:
+        title: Garden Spa Rituals
+        body: 루프톱 온천, 프라이빗 하맘, 인룸 웰니스 소믈리에.
+      chef-salon:
+        title: Chef’s Salon
+        body: 시즌 테이스팅을 부티크 생산자와 세리머니 티와 짝지어 제공합니다.
+  ramen:
+    name: Kintsu Ramen
+    tagline: 야시장 감성을 위한 브로스 세리머니.
+    description: 스모크 브로스, 바이널 조명, 세라믹 크래프트로 완성하는 라멘 경험.
+    settings:
+      chef-counter:
+        label: Chef’s Counter
+        description: 12석 전용 카운터에서 완성되는 불빛과 마무리를 가까이에서.
+      broth-lab:
+        label: Broth Lab
+        description: 스모크 시오, 유자 쇼유, 탄탄을 순차적으로 끓여내는 스팀 룸.
+      ceramic:
+        label: Ceramic Atelier
+        description: 매트한 그릇, 황동 국자, 막 나온 젓가락이 줄지어 선 스튜디오.
+      lounge:
+        label: Midnight Lounge
+        description: 낮은 조명과 향, 늦은 플레이리스트가 좌석의 여운을 연장합니다.
+    elements:
+      umami-flight:
+        label: Umami Flight
+        description: 스모크 시오·유자 쇼유·탄탄 브로스를 순서대로 맛보는 코스.
+      chashu-atelier:
+        label: Chashu Atelier
+        description: 흑설탕 타래와 산초로 마무리하는 차슈를 테이블 사이드에서 토치합니다.
+      finishing-school:
+        label: Finishing School
+        description: 시더 조명 아래에서 마이크로 허브로 마지막 터치를 더합니다.
+      mise-rituals:
+        label: Mise Rituals
+        description: 타래·오일·보타니컬을 정물처럼 배치하는 좌석별 의식.
+    ctaButtons:
+      ajitama-flight:
+        label: Ajitama Torch
+        description: 흑설탕 타래로 코팅한 반숙 계란을 자리에서 바로 토치합니다.
+      midnight-toppings:
+        label: Midnight Toppings
+        description: 네기, 후리카케, 고추 실을 각 좌석에 즉석으로 올립니다.
+      mise-tray:
+        label: Mise Rituals
+        description: 미니 허브와 소스를 트레이에 담아 정물처럼 제공합니다.
+    ritualScenes:
+      chef-counter:
+        label: Chef’s Counter
+        description: 바이널 빛이 감도는 12석에서 완성 과정을 눈앞에서 지켜봅니다.
+      broth-lab:
+        label: Broth Lab
+        description: 스모크 시오와 유자 쇼유, 탄탄이 순차적으로 이어집니다.
+      ceramic-atelier:
+        label: Ceramic Atelier
+        description: 가마에서 갓 나온 그릇과 매트 젓가락, 황동 국자가 준비됩니다.
+      lounge:
+        label: Afterglow Lounge
+        description: 낮은 조명과 증기, 레이트나이트 음악으로 여운을 지켜냅니다.
+  clothing:
+    name: Loom & Light Atelier
+    tagline: 슬로 럭셔리를 위한 모듈형 워드로브.
+    description: 서울 테일러링에서 영감을 받은 프라이빗 피팅과 캡슐 스타일링 스튜디오.
+    settings:
+      fittings:
+        label: Private Fittings
+        description: 거울로 둘러싸인 살롱에서 테일러와 티 서비스가 함께합니다.
+      flatlay:
+        label: Capsule Flatlays
+        description: 패브릭 스와치와 룩북 레이아웃을 펼치는 갤러리 테이블.
+      atelier:
+        label: Accessory Atelier
+        description: 주얼리 트레이, 향 스토리, 겹겹의 실크 스카프가 놓인 공간.
+      tailoring:
+        label: Tailor’s Bench
+        description: 초크 패턴, 스팀 프레스, 작업 중인 의상이 가득한 벤치.
+    elements:
+      capsule:
+        label: Capsule Builds
+        description: 15피스 워드로브를 모듈 방식으로 조합하고 케어 루틴까지 설계합니다.
+      casting:
+        label: Casting Suites
+        description: 룩북과 론칭을 위한 영화 같은 드레이핑을 연출하는 채광 스튜디오.
+      textile-lab:
+        label: Textile Lab
+        description: 핸드룸 리넨, 매트 스톤, 우븐 자카드를 모아 둔 라이브러리.
+      mannequin:
+        label: Sculpted Forms
+        description: 주얼리와 향, 레이어드 텍스처로 연출한 시그니처 마네킹.
+    highlights:
+      private-atelier:
+        title: Private Atelier
+        body: 워드로브 아키텍트와 1:1 피팅, 티 서비스, 라이브 테일러링.
+      capsule-mapping:
+        title: Capsule Mapping
+        body: 주간 로테이션으로 이어지는 룩북급 플래닝 세션.
+      tactile-rituals:
+        title: Tactile Rituals
+        body: 시더 스팀, 실크 스톤, 미니멀 향으로 진행하는 패브릭 케어 의식.
+  nocturne-vale:
+    name: Nocturne Vale
+    tagline: 자정을 위한 캔들라이트 테이스팅 살롱.
+    description: 소믈리에 퍼포먼스와 스모크 플라이트, 벨벳 동선이 교차하는 섀도우 클럽.
+    settings:
+      corner-booth:
+        label: Velvet Corner Booths
+        description: 캔들 타워와 흑요석 테이블, 속삭이는 플레이리스트로 완성된 곡선 좌석.
+      table-setting:
+        label: Salon Table Setting
+        description: 리넨 위에 겹겹이 올린 포슬린, 오닉스, 그래파이트 메뉴.
+      wine-sculpt:
+        label: Wine Service
+        description: 자줏빛 조명과 연무 속에서 펼쳐지는 소믈리에의 디캔팅 안무.
+      bar-surface:
+        label: Obsidian Bar
+        description: 마블 상판 위에 쿠페 실루엣과 향 트레이, 스모크 칵테일이 빛납니다.
+    elements:
+      shadow-menu:
+        label: Shadow Menu Atelier
+        description: 텍스처 페이퍼와 황동 넘버링으로 엮은 수제 테이스팅 메뉴.
+      cutlery:
+        label: Charcoal Cutlery Sets
+        description: 각 코스 옆 흑요석 받침 위에 놓이는 커스텀 매트 커틀러리.
+      linen-lab:
+        label: Linen Lab
+        description: 스톰 그레이 리넨에 톤온톤 파이핑과 모노그램을 더했습니다.
+      candle-smoke:
+        label: Candle Smoke Ritual
+        description: 코스 사이를 오가며 공간을 향으로 감싸는 속삭임 같은 연기.
+    ritualScenes:
+      wine-service:
+        label: Sommelier Ritual
+        description: 토치로 마무리한 향과 크리스털 서비스가 보랏빛을 가르며 흐릅니다.
+      kitchen-pass:
+        label: Kitchen Pass
+        description: 스팀과 저조도 속에서 셰프가 캔들 라너에게 플레이트를 전달합니다.
+      bar-ritual:
+        label: Bar Ritual
+        description: 마블 바가 자수정 그라데이션, 쿠페 실루엣, 향연으로 빛납니다.
+      salon-table:
+        label: Salon Table
+        description: 벨벳 부스와 리넨 드레이프, 그래파이트 메뉴를 따뜻한 브래스가 둘러쌉니다.

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html data-theme="<%= @active_theme_key || Themes::DEFAULT_KEY %>">
+  <head>
+    <meta charset="utf-8" />
+    <title><%= AppConstants::Project.name %> · Admin</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="stylesheet" href="/backend/assets/admin.css" />
+  </head>
+  <body class="admin-body">
+    <div class="admin-shell">
+      <header class="admin-nav">
+        <div class="brand">
+          <span class="brand-name"><%= AppConstants::Project.name %></span>
+          <span class="brand-slug"><%= AppConstants::Project.slug %></span>
+        </div>
+        <% if admin_signed_in? %>
+          <div class="nav-links">
+            <span class="nav-user-label">Signed in</span>
+            <span class="nav-user-name"><%= current_admin&.english_name || current_admin&.email %></span>
+          </div>
+        <% end %>
+      </header>
+      <div class="admin-layout">
+        <%= render "admin/shared/nav" %>
+        <main class="admin-main">
+          <% flash.each do |type, message| %>
+            <div class="flash flash-<%= type %>"><%= message %></div>
+          <% end %>
+          <%= yield %>
+        </main>
+      </div>
+    </div>
+  </body>
+  <%= render "shared/modal_script" %>
+</html>

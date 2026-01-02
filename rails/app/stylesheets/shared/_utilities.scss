@@ -1,0 +1,42 @@
+
+// app/stylesheets/shared/_utilities.scss
+//
+// Lightweight utility classes based on the spacing scale.
+// Avoid going overboard; add more only when they prove useful.
+
+@use "variables" as *;
+
+// Margin utilities
+.m-0  { margin: 0 !important; }
+.mt-1 { margin-top: $space-1 !important; }
+.mt-2 { margin-top: $space-2 !important; }
+.mt-3 { margin-top: $space-3 !important; }
+.mt-4 { margin-top: $space-4 !important; }
+.mb-1 { margin-bottom: $space-1 !important; }
+.mb-2 { margin-bottom: $space-2 !important; }
+.mb-3 { margin-bottom: $space-3 !important; }
+.mb-4 { margin-bottom: $space-4 !important; }
+
+// Padding utilities
+.p-0  { padding: 0 !important; }
+.p-2  { padding: $space-2 !important; }
+.p-3  { padding: $space-3 !important; }
+.p-4  { padding: $space-4 !important; }
+
+.rounded-sm  { border-radius: $radius-sm !important; }
+.rounded-md  { border-radius: $radius-md !important; }
+.rounded-lg  { border-radius: $radius-lg !important; }
+.shadow-subtle { box-shadow: $shadow-subtle !important; }
+.shadow-soft   { box-shadow: $shadow-soft !important; }
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}

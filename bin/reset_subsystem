@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+#
+# Manages per-subsystem drop/migrate/seed workflows.
+# Usage: bin/reset_subsystem <name>
+# Example: bin/reset_subsystem admin_controls
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+RAILS_DIR="$PROJECT_ROOT/rails"
+
+declare -a KNOWN_SUBSYSTEMS=(
+  "auth_core"
+  "session_preferences"
+  "messaging"
+  "admin_controls"
+  "cache_control"
+  "record_archives"
+  "config_entries"
+  "background_tasks"
+  "api_protection"
+  "compliance"
+  "analytics_exports"
+)
+
+if [[ $# -ne 1 ]]; then
+  cat <<USAGE
+Usage: bin/reset_subsystem <subsystem>
+Known subsystems:
+  ${KNOWN_SUBSYSTEMS[*]}
+USAGE
+  exit 1
+fi
+
+SUBSYSTEM="$1"
+
+declare -A SUBSYSTEM_CONFIG
+SUBSYSTEM_CONFIG=(
+  [auth_core]="20250101000001 db:seed:auth_core"
+  [session_preferences]="20250101000002 db:seed:session_preferences"
+  [messaging]="20250101000003 db:seed:messaging"
+  [admin_controls]="20250101000004 db:seed:admin_controls"
+  [cache_control]="20250101000005 db:seed:cache_control"
+  [record_archives]="20250101000006 db:seed:record_archives"
+  [config_entries]="20250101000007 db:seed:config_entries"
+  [background_tasks]="20250101000008 db:seed:background_tasks"
+  [api_protection]="20250101000009 db:seed:api_protection"
+  [compliance]="20250101000010 db:seed:compliance"
+  [analytics_exports]="20250101000011 db:seed:analytics_exports"
+)
+
+CONFIG="${SUBSYSTEM_CONFIG[$SUBSYSTEM]:-}"
+
+if [[ -z "$CONFIG" ]]; then
+  echo "Unknown subsystem: $SUBSYSTEM"
+  exit 1
+fi
+
+VERSION="${CONFIG%% *}"
+SEED_TASK="${CONFIG#* }"
+
+run_rails() {
+  (cd "$RAILS_DIR" && bin/rails "$@")
+}
+
+set +e
+run_rails db:migrate:down VERSION="$VERSION"
+DOWN_EXIT=$?
+set -e
+
+if [[ $DOWN_EXIT -ne 0 ]]; then
+  echo "db:migrate:down returned $DOWN_EXIT (migration might not have run yet); continuing."
+fi
+
+run_rails db:migrate:up VERSION="$VERSION"
+run_rails "$SEED_TASK"

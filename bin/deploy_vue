@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_CONFIG="$ROOT_DIR/shared/app_constants/project.json"
+read_project_slug() {
+  if [ -f "$PROJECT_CONFIG" ]; then
+    ruby -rjson -e 'print JSON.parse(File.read(ARGV[0]))["slug"]' "$PROJECT_CONFIG"
+  fi
+}
+
+DEFAULT_SLUG="$(read_project_slug)"
+DEPLOY_SLUG="${1:-${DEPLOY_DOMAIN:-$DEFAULT_SLUG}}"
+
+if [ -z "$DEPLOY_SLUG" ]; then
+  echo "Usage: bin/deploy_vue <client-slug> [# or set DEPLOY_DOMAIN]" >&2
+  exit 1
+fi
+
+DEFAULT_DIR="/var/www/${DEPLOY_SLUG}"
+TARGET_DIR="${DEPLOY_DIR:-$DEFAULT_DIR}"
+
+echo "Deploying Vue build for ${DEPLOY_SLUG}"
+"$ROOT_DIR/ops/scripts/deploy_vue_build.sh" "$TARGET_DIR"
+
+cat <<EOF
+
+Deployment complete.
+- Public site served from: ${TARGET_DIR}
+- Hidden showcase proxied at: /marketing (nginx → Rails)
+- Demo admin proxied at:    /marketing/admin (nginx → Rails)
+EOF

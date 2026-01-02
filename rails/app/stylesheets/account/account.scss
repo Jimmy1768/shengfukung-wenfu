@@ -1,0 +1,6 @@
+// app/stylesheets/account/account.scss
+//
+// Account layouts currently share the admin shell bundle, which already
+// imports the shared tokens/variables/typography primitives.
+
+@use "../admin/admin";

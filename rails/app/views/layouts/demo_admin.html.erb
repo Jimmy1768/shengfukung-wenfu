@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html data-theme="<%= @active_theme_key || Themes::DEFAULT_KEY %>">
+  <head>
+    <meta charset="utf-8" />
+    <title><%= AppConstants::Project.name %> · Admin</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="stylesheet" href="/backend/assets/showcase.css" />
+  </head>
+  <body class="admin-body">
+    <% show_admin_nav = !content_for?(:suppress_admin_nav) %>
+    <div class="admin-shell">
+      <header class="admin-nav">
+        <div class="brand">
+          <span class="brand-name"><%= AppConstants::Project.name %></span>
+        </div>
+        <% if show_admin_nav %>
+          <div
+            class="nav-actions"
+            style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-lg);"
+          >
+            <nav class="nav-links" style="flex: 1; min-width: 250px;">
+              <%= link_to t("demo_admin.console.nav.dashboard"),
+                marketing_admin_dashboard_path(locale: params[:locale], theme: @active_theme_key),
+                class: "nav-link #{'active' if current_page?(marketing_admin_dashboard_path)}" %>
+              <%= link_to t("demo_admin.console.nav.app_messages"),
+                marketing_admin_app_messages_path(locale: params[:locale], theme: @active_theme_key),
+                class: "nav-link #{'active' if current_page?(marketing_admin_app_messages_path)}" %>
+              <%= link_to t("demo_admin.console.nav.users"),
+                marketing_admin_users_path(locale: params[:locale], theme: @active_theme_key),
+                class: "nav-link #{'active' if current_page?(marketing_admin_users_path)}" %>
+              <%= link_to t("demo_admin.console.nav.playground"),
+                marketing_admin_playground_path(locale: params[:locale], theme: @active_theme_key),
+                class: "nav-link #{'active' if current_page?(marketing_admin_playground_path)}" %>
+              <% if admin_signed_in? %>
+                <%= form_tag marketing_admin_logout_path(locale: params[:locale], theme: @active_theme_key),
+                      method: :delete,
+                      class: "logout-form" do %>
+                  <button type="submit" class="nav-link"><%= t("demo_admin.console.buttons.sign_out") %></button>
+                <% end %>
+              <% end %>
+            </nav>
+            <div
+              class="locale-switcher"
+              style="display: flex; flex-direction: column; gap: var(--spacing-xs);"
+            >
+              <span class="muted" style="font-size: 0.8rem;">
+                <%= t("demo_admin.dashboard.selected_locale_label") %>
+              </span>
+              <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-xs);">
+                <% available_locale_entries.each do |entry| %>
+                  <% is_active = entry[:code] == active_locale_entry[:code] %>
+                  <%= link_to entry[:name],
+                    url_for(locale: entry[:code], theme: @active_theme_key),
+                    style: "
+                      padding: 0.35rem 0.9rem;
+                      border-radius: var(--radius-sm);
+                      border: 1px solid #{is_active ? 'var(--accent)' : 'var(--border)'};
+                      color: #{is_active ? 'var(--accent)' : 'var(--text-muted)'};
+                      text-decoration: none;
+                      font-size: 0.85rem;
+                      font-weight: 600;
+                      background: #{is_active ? 'rgba(250,250,250,0.04)' : 'transparent'};
+                    " %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </header>
+      <main class="admin-main">
+        <% flash.each do |type, message| %>
+          <div class="flash flash-<%= type %>"><%= message %></div>
+        <% end %>
+        <%= yield %>
+      </main>
+    </div>
+  </body>
+</html>

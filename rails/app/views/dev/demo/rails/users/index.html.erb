@@ -1,0 +1,84 @@
+<section class="hero">
+  <div class="hero-text">
+    <p class="eyebrow"><%= t("demo_admin.users.hero.eyebrow") %></p>
+    <h1><%= t("demo_admin.users.hero.title") %></h1>
+    <p><%= t("demo_admin.users.hero.body") %></p>
+  </div>
+  <div class="hero-metrics">
+    <div class="metric">
+      <span><%= t("demo_admin.users.hero.metric_label") %></span>
+      <strong><%= @staff_count %></strong>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <header>
+    <h2><%= t("demo_admin.users.seeded.title") %></h2>
+    <p><%= t("demo_admin.users.seeded.body") %></p>
+  </header>
+  <% if @users.any? %>
+    <div
+      class="user-grid"
+      style="
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--spacing-lg);
+      "
+    >
+      <% @users.each do |user| %>
+        <article
+          class="user-card"
+          style="
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--surface-muted);
+            padding: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+          "
+        >
+          <div
+            class="user-meta"
+            style="
+              display: flex;
+              align-items: center;
+              gap: var(--spacing-md);
+            "
+          >
+            <div
+              class="avatar"
+              style="
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+              "
+            >
+              <%= user[:name].to_s.split.map { |part| part.first }.join.first(2).upcase %>
+            </div>
+            <div style="flex: 1;">
+              <strong><%= user[:name] %></strong>
+              <p class="muted"><%= user[:email] %></p>
+            </div>
+            <span class="badge <%= user[:status].to_s.downcase == 'active' ? 'badge-accent' : '' %>"><%= user[:status] %></span>
+          </div>
+          <p class="muted"><%= @last_active_prefix %> <%= user[:last_active] %></p>
+          <div class="user-actions" style="display: flex; flex-wrap: wrap; gap: var(--spacing-sm);">
+            <% @user_actions.each do |action| %>
+              <button class="btn btn-ghost" type="button"><%= action %></button>
+            <% end %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p><%= t("demo_admin.users.seeded.empty") %></p>
+  <% end %>
+</section>

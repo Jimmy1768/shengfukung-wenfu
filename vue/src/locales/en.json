@@ -1,0 +1,217 @@
+{
+  "branding": "Golden Template",
+  "heroTitle": "SourceGrid Labs Solutions",
+  "heroSubtitle": "We help small businesses bring ideas to life — from iOS/Android apps to online platforms.",
+  "heroSupport": "All apps and sites run under SourceGrid Labs, so there's no need to maintain infrastructure or accounts.",
+  "localeLabel": "Locale",
+  "localeHelp": "Switch to your preferred language.",
+  "themeLabel": "Theme",
+  "themeHelp": "Select Light or Dark theme before opening the showcase.",
+  "heroPills": [
+    { "id": "launch-ready", "icon": "🚀", "label": "Launch-Ready Website" },
+    { "id": "customer-staff", "icon": "🗂️", "label": "Customer & Staff Portals" },
+    { "id": "mobile-apps", "icon": "📱", "label": "Branded Mobile Apps" },
+    { "id": "ops-automations", "icon": "📊", "label": "Ops Automations & Insight" },
+    { "id": "managed-hosting", "icon": "🛡️", "label": "Managed Hosting & Support" }
+  ],
+  "offerEyebrow": "What We Offer",
+  "offerTitle": "Build, launch, and operate under one platform.",
+  "offerIntro": "Every project rides on the SourceGrid Labs backend, so marketing, operations, and mobile experiences stay in sync.",
+  "ctas": {
+    "admin": "Demo admin console",
+    "preview": "View website showcase"
+  },
+  "features": [
+    {
+      "id": "launch-ready",
+      "icon": "🚀",
+      "title": "Launch-Ready Website",
+      "body": "6–8 page marketing site with CMS, SEO setup, and contact flows handled end-to-end."
+    },
+    {
+      "id": "customer-staff",
+      "icon": "🗂️",
+      "title": "Customer & Staff Portals",
+      "body": "Logins, dashboards, and one core module (bookings, rentals, workflows) so customers and staff operate in one system."
+    },
+    {
+      "id": "mobile-apps",
+      "icon": "📱",
+      "title": "Branded Mobile Apps",
+      "body": "iOS + Android app synced to the same backend — we handle App Store / Google Play submissions for a fast launch."
+    },
+    {
+      "id": "ops-automations",
+      "icon": "📊",
+      "title": "Ops Automations & Insight",
+      "body": "Built-in alerts, scheduled reports, and live health dashboards tied to bookings, payments, or inventory."
+    },
+    {
+      "id": "managed-hosting",
+      "icon": "🛡️",
+      "title": "Managed Hosting & Support",
+      "body": "SourceGrid Labs runs servers, monitoring, backups, and security updates with a fixed setup fee and predictable hosting."
+    }
+  ],
+  "demo": {
+    "nav": {
+      "items": [
+        { "id": "home", "label": "Showcase Home" },
+        { "id": "pricing", "label": "Pricing Guide" },
+        { "id": "custom", "label": "Custom Feature Placeholder", "disabled": true }
+      ]
+    },
+    "hero": {
+      "eyebrow": "Golden Template Demo",
+      "title": "SourceGrid Labs Showcase",
+      "description": "Preview multi-brand marketing sites with live palettes, SourceGrid Labs templates, and a built-in Rails admin.",
+      "backToLanding": "⟵ Back to homepage",
+      "marketingLanding": "Back to marketing page",
+      "adminLogin": "Admin console",
+      "miniEyebrow": "Signature experience",
+      "contactButton": "Contact CTA"
+    },
+    "selector": {
+      "brandLabel": "Brand",
+      "templateLabel": "Template style",
+      "storyFocusPrefix": "Story focus:"
+    },
+    "cta": {
+      "eyebrow": "Schedule a walkthrough",
+      "title": "Contact Us",
+      "button": "Contact Us"
+    },
+    "carousel": {
+      "placeholder": "Signature highlight detail coming soon.",
+      "scrollBackwardLabel": "Scroll highlights backward",
+      "scrollForwardLabel": "Scroll highlights forward"
+    },
+    "home": {
+      "eyebrow": "Signature stay sequence",
+      "headline": "From cobblestone street to candlelit suites.",
+      "body": "A cinematic arrival: lantern-lit entry, quiet lobby bar, and suites that feel like a private townhouse.",
+      "galleryEyebrow": "Salon notes",
+      "galleryHeadline": "Inside the atelier",
+      "galleryFallback": "Signature vignette",
+      "sceneFallback": "A closer look at light, texture, and service rituals.",
+      "tagFallback": "Drop",
+      "gridTitle": "Curated Glass Series",
+      "gridSubtitle": "A refined selection of pieces showcasing light, texture, and spatial clarity.",
+      "featureEyebrow": "Details in Motion",
+      "featureTitle": "A third act of glass, light, and cadence.",
+      "featureSubtitle": "Short, sharp moments that make the grid feel alive—hover to widen the frame.",
+      "stepsEyebrow": "Signature flow",
+      "stepsHeadline": "A night traced in quiet scenes.",
+      "offeringEyebrow": "Offering",
+      "offeringHeadline": "The room exhales",
+      "offeringBody": "One composed moment — then back into shadow.",
+      "step1Title": "Queue at dusk.",
+      "step2Title": "Broth flights.",
+      "step3Title": "Heatwave service.",
+      "step4Title": "Neon afterglow at the counter.",
+      "step1Body": "Doors up at golden hour, counter-only, paced seatings so the line thins as the steam rises.",
+      "step2Body": "Smoked, clarified, and poured in sequence while guests settle into the glow of the counter.",
+      "step3Body": "Signature bowls land in waves, toppings torched and finished to order so each seat gets its own heatwave moment.",
+      "step4Body": "Guests linger over last sips, late-night playlists, and quiet second rounds while steam hangs in the air above the counter."
+    },
+    "pricing": {
+      "headline": "SourceGrid Labs Packages",
+      "subhead": "Fixed-price websites, business systems, and mobile apps built for small companies that want clear deliverables.",
+      "addonsTitle": "Add-on modules",
+      "maintenanceTitle": "Maintenance plans",
+      "shotFallback": "Service angle",
+      "maintenanceSuffix": " / month",
+      "labels": {
+        "included": "Included",
+        "typicalClients": "Typical clients",
+        "addonsTagline": "Add-on modules",
+        "maintenanceNote": "Billing is monthly."
+      },
+      "packages": {
+        "small-website": {
+          "name": "Small Website",
+          "summary": "6–8 pages, mobile-friendly, contact form, basic admin.",
+          "description": "A clean, professional website for small businesses needing a credible online presence and simple enquiry flow.",
+          "features": [
+            "6–8 page responsive site",
+            "Contact form routed to email",
+            "Basic SEO setup",
+            "Lightweight admin to edit copy/images",
+            "Hosting + deployment included"
+          ]
+        },
+        "business-system": {
+          "name": "Business System",
+          "summary": "Website plus one online system module with login + dashboard.",
+          "description": "Add customer logins, staff dashboards, and a booking/rental/workflow module so teams can operate in one platform.",
+          "features": [
+            "Everything in Small Website",
+            "Customer login area",
+            "Staff dashboard",
+            "One core module (booking, rental, workflow)",
+            "Online payments + notifications",
+            "CSV/Excel export"
+          ]
+        },
+        "mobile-suite": {
+          "name": "Mobile App Suite",
+          "summary": "iOS and Android app plus backend system and website.",
+          "description": "Branded mobile apps with push notifications, in-app booking/ordering, and the same backend powering the website.",
+          "features": [
+            "Everything in Business System",
+            "iOS + Android app (single codebase)",
+            "Customer profiles + push notifications",
+            "In-app booking/ordering",
+            "App Store + Play Store submission"
+          ]
+        }
+      },
+      "addons": {
+        "online-booking": "Online Booking",
+        "rental-system": "Rental System",
+        "payment-integration": "Payment Integration",
+        "email-automations": "Email Automations",
+        "real-time-chat": "Real-Time Chat",
+        "multi-language": "Multi-Language",
+        "forum-system": "Forum System (Thredded)"
+      },
+      "maintenance": {
+        "basic": {
+          "name": "Basic",
+          "scope": "Security updates, backups, monitoring."
+        },
+        "standard": {
+          "name": "Standard",
+          "scope": "Basic plus up to four small content/config updates monthly."
+        },
+        "premium": {
+          "name": "Premium",
+          "scope": "Standard plus weekly adjustments and priority handling."
+        }
+      }
+    },
+    "contact": {
+      "heading": "Concierge inquiry",
+      "description": "Leave your details and the SourceGrid Labs team will reach out within 24 hours.",
+      "localeLabel": "Locale selector",
+      "autoReplyLabel": "Auto-reply subject",
+      "autoReplySubject": "Golden Template inquiry",
+      "autoReplyBody": "Dear [Name], Thank you for your message. We will respond as soon as possible.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Ada Lovelace",
+      "emailLabel": "Email",
+      "emailPlaceholder": "demo@sourcegridlabs.com",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Tell us about your timeline, goals, and any required integrations.",
+      "submit": "Send message",
+      "sending": "Sending…"
+    },
+    "placeholder": {
+      "heading": "Custom module placeholder",
+      "intro": "Build bespoke dashboards here (loyalty, booking, analytics).",
+      "templatesPrefix": "Add a new component under ",
+      "registryConnector": "and register it in ",
+      "suffix": " so clients can toggle layouts."
+    }
+  }
+}

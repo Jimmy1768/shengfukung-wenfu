@@ -1,0 +1,23 @@
+// rails/showcase_ui/styles/_variables.scss
+//
+// Shared design tokens for the showcase marketing demo. Compile with:
+//   sass showcase_ui/styles/showcase.scss public/backend/assets/showcase.css
+
+$font-family-base: var(--font-family-sans);
+$font-family-mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, monospace;
+
+$color-foreground: var(--text);
+$color-muted: var(--text-muted);
+$color-border: var(--border);
+$color-background: var(--surface);
+$color-panel: var(--surface-raised);
+$color-accent: var(--accent);
+$color-accent-soft: var(--surface-muted);
+
+$space-xs: var(--spacing-xs);
+$space-sm: var(--spacing-sm);
+$space-md: var(--spacing-md);
+$space-lg: var(--spacing-lg);
+$radius-sm: var(--radius-sm);
+$radius-lg: var(--radius-lg);
+$shadow-card: var(--shadow-soft);

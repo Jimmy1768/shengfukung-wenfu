@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+RAILS_DIR="$ROOT_DIR/rails"
+
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+  cat <<EOF
+Usage: bin/reset_backend
+Drops and recreates the Rails database, runs migrations, then seeds demo data.
+Use bin/reset_subsystem <name> for targeted resets.
+EOF
+  exit 0
+fi
+
+if [ ! -d "$RAILS_DIR" ]; then
+  echo "Rails workspace not found at $RAILS_DIR" >&2
+  exit 1
+fi
+
+cd "$RAILS_DIR"
+echo "Dropping database…"
+bin/rails db:drop || true
+echo "Creating database…"
+bin/rails db:create
+echo "Running migrations…"
+bin/rails db:migrate
+echo "Seeding demo data…"
+bin/rails db:seed
+echo "Backend reset complete."

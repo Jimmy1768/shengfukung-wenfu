@@ -1,0 +1,453 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SourceGrid Labs — Pricing Guide (EN)</title>
+  <style>
+    :root {
+      --blue: #2D70FB;
+      --gold: #C8A357;
+      --text-main: #222222;
+      --text-muted: #666666;
+      --bg-light: #F7F8FA;
+      --border-soft: #E0E3EA;
+      --row-alt: #F3F5FB;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 40px 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      color: var(--text-main);
+      background: #ffffff;
+    }
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 40px 40px;
+      border: 1px solid #DDD;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+      border-radius: 8px;
+    }
+    header {
+      border-bottom: 2px solid var(--blue);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      color: var(--blue);
+    }
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      max-width: 420px;
+    }
+    .meta {
+      text-align: right;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    h2.section-title {
+      font-size: 16px;
+      margin: 24px 0 10px;
+      color: var(--gold);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    p {
+      font-size: 12px;
+      line-height: 1.5;
+      margin: 0 0 6px;
+    }
+    .muted { color: var(--text-muted); }
+    .card {
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      padding: 14px 16px;
+      background: #fff;
+      margin-bottom: 12px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-price {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blue);
+      white-space: nowrap;
+    }
+    .pill {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: var(--bg-light);
+      color: var(--text-muted);
+      font-size: 10px;
+      margin-left: 4px;
+    }
+    ul.compact {
+      padding-left: 18px;
+      margin: 4px 0 2px;
+    }
+    ul.compact li {
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 8px 0 12px;
+    }
+    thead th {
+      background: var(--blue);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      text-align: left;
+      padding: 6px 8px;
+      border-right: 1px solid rgba(255,255,255,0.2);
+    }
+    thead th:last-child { border-right: none; }
+    tbody td {
+      font-size: 11px;
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    tbody tr:nth-child(even) td { background: var(--row-alt); }
+    tbody td.price {
+      text-align: right;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+    .table-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .section-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr);
+      gap: 14px 20px;
+    }
+    .footer-note {
+      border-top: 1px solid var(--border-soft);
+      margin-top: 18px;
+      padding-top: 10px;
+      font-size: 10px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    @media print {
+      body {
+        padding: 0;
+        background: #ffffff;
+      }
+      .page {
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+        margin: 0;
+        width: auto;
+      }
+      a[href]:after { content: ""; }
+      header,
+      section,
+      .card,
+      table,
+      .section-grid,
+      .footer-note {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <div class="brand">SourceGrid Labs</div>
+        <div class="subtitle">
+          Fixed-price packages for websites, online business systems, and mobile apps —
+          designed for small companies that want clear deliverables and no surprises.
+        </div>
+      </div>
+      <div class="meta">
+        Pricing Guide (EN)<br>
+        <span class="muted">Reference document for client discussions</span>
+      </div>
+    </header>
+
+    <section>
+      <h2 class="section-title">1. Package Overview</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Package</th>
+            <th>Includes</th>
+            <th style="text-align:right;">Price (USD)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Small Website</td>
+            <td>6–8 pages, mobile-friendly, contact form, basic admin.</td>
+            <td class="price">4,000</td>
+          </tr>
+          <tr>
+            <td>Business System</td>
+            <td>Website plus online system (login, dashboard, one core module).</td>
+            <td class="price">15,000</td>
+          </tr>
+          <tr>
+            <td>Mobile App Suite</td>
+            <td>iOS and Android app, backend system, and website.</td>
+            <td class="price">30,000</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-note">
+        All packages are fixed-price. Your cost does not increase if implementation requires extra technical work on our side.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="section-title">2. Package Details</h2>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🌐 Small Website</span>
+            <span class="pill">Typical scope</span>
+          </div>
+          <div class="card-price">US$4,000</div>
+        </div>
+        <p class="muted">
+          A clean, professional website for small businesses that want a credible online presence and a simple way
+          for customers to get in touch.
+        </p>
+        <div class="section-grid">
+          <div>
+            <p><strong>Included</strong></p>
+            <ul class="compact">
+              <li>6–8 page website (home, about, services, pricing, contact, optional blog/news).</li>
+              <li>Mobile-friendly design.</li>
+              <li>Contact form that sends enquiries to your email.</li>
+              <li>Basic SEO setup (titles, descriptions, clean URLs).</li>
+              <li>Admin login to edit text and images.</li>
+              <li>Hosting setup and deployment.</li>
+            </ul>
+          </div>
+          <div>
+            <p><strong>Typical clients</strong></p>
+            <ul class="compact">
+              <li>Cafés, restaurants, and retail shops.</li>
+              <li>Consultants, coaches, and tutors.</li>
+              <li>Local services such as repair, cleaning, or personal care.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>⚙️ Business System</span>
+            <span class="pill">Website + online system</span>
+          </div>
+          <div class="card-price">US$15,000</div>
+        </div>
+        <p class="muted">
+          For businesses that need more than a website — an online system that supports bookings, rentals,
+          or simple internal workflows so staff and customers can work through one platform.
+        </p>
+        <div class="section-grid">
+          <div>
+            <p><strong>Included</strong></p>
+            <ul class="compact">
+              <li>Everything in the Small Website package.</li>
+              <li>Customer login area.</li>
+              <li>Staff dashboard to review and manage activity.</li>
+              <li>One core system module, for example:
+                <ul class="compact">
+                  <li>Online booking system (rooms, appointments, services), or</li>
+                  <li>Equipment or asset rental system, or</li>
+                  <li>Simple internal request / workflow tool.</li>
+                </ul>
+              </li>
+              <li>Online payment handling for major cards and supported local methods.</li>
+              <li>Automatic email confirmations and basic notifications.</li>
+              <li>Simple data export to spreadsheets (CSV/Excel).</li>
+            </ul>
+          </div>
+          <div>
+            <p><strong>Typical clients</strong></p>
+            <ul class="compact">
+              <li>Small hotels and hostels.</li>
+              <li>Rental shops for cars, bikes, or equipment.</li>
+              <li>Clinics, salons, or providers that rely on scheduled appointments.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📱 Mobile App Suite</span>
+            <span class="pill">App + backend + website</span>
+          </div>
+          <div class="card-price">US$30,000</div>
+        </div>
+        <p class="muted">
+          For businesses that want their own branded mobile app on iOS and Android, connected to a reliable backend
+          system and website.
+        </p>
+        <div class="section-grid">
+          <div>
+            <p><strong>Included</strong></p>
+            <ul class="compact">
+              <li>Everything in the Business System package.</li>
+              <li>Branded mobile app for iOS and Android (single codebase).</li>
+              <li>Customer login and profile management in the app.</li>
+              <li>Push notifications for key events (bookings, updates, reminders).</li>
+              <li>In-app booking, ordering, or other selected core actions.</li>
+              <li>App Store and Google Play submission handling.</li>
+            </ul>
+          </div>
+          <div>
+            <p><strong>Typical clients</strong></p>
+            <ul class="compact">
+              <li>Delivery or logistics services.</li>
+              <li>Loyalty or membership-based businesses.</li>
+              <li>Organisations that want customers to interact primarily via mobile.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">3. Optional Add-On Modules</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Module</th>
+            <th>Description</th>
+            <th style="text-align:right;">Price (USD)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Online Booking</td>
+            <td>Calendar, availability, booking flow, and email confirmations.</td>
+            <td class="price">6,000</td>
+          </tr>
+          <tr>
+            <td>Rental System</td>
+            <td>Inventory, rental periods, deposit handling, and fee logic.</td>
+            <td class="price">5,000</td>
+          </tr>
+          <tr>
+            <td>Payment Integration</td>
+            <td>Card and supported local payment setup, with clear handover.</td>
+            <td class="price">1,000</td>
+          </tr>
+          <tr>
+            <td>Email Automations</td>
+            <td>Newsletter signup and a small set of automated flows.</td>
+            <td class="price">800</td>
+          </tr>
+          <tr>
+            <td>Real-Time Chat</td>
+            <td>Website chat widget plus staff inbox for replying.</td>
+            <td class="price">2,000</td>
+          </tr>
+          <tr>
+            <td>Multi-Language</td>
+            <td>Language switch and structured translations for key pages.</td>
+            <td class="price">1,000</td>
+          </tr>
+          <tr>
+            <td>Forum System (Thredded)</td>
+            <td>Fully functional forum with multiple messageboards, roles, moderation, and branding integration.</td>
+            <td class="price">4,000</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-note">
+        Add-on modules can be combined with any package. If you need additional modules in future, they can be added as separate fixed-price items.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="section-title">4. Maintenance Plans</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Plan</th>
+            <th>Scope</th>
+            <th style="text-align:right;">Price (USD / month)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Basic</td>
+            <td>Security updates, backups, and monitoring.</td>
+            <td class="price">200</td>
+          </tr>
+          <tr>
+            <td>Standard</td>
+            <td>Basic plan plus up to four small content or configuration updates each month.</td>
+            <td class="price">500</td>
+          </tr>
+          <tr>
+            <td>Premium</td>
+            <td>Standard plan plus weekly adjustments and prioritised implementation of small improvements.</td>
+            <td class="price">1,500</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-note">
+        Maintenance is optional. If you prefer to handle operations internally, we can hand over documentation and access details at project completion.
+      </p>
+    </section>
+
+    <div class="footer-note">
+      <div>
+        This document is intended as a reference after an initial discussion. Final proposals may include scope refinements,
+        but all changes remain within the same fixed-price structure.
+      </div>
+      <div>
+        SourceGrid Labs — Digital product consulting and development.
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

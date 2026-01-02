@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+RAILS_DIR="$ROOT_DIR/rails"
+MARKER_FILE="$ROOT_DIR/tmp/.backend_initialized"
+FORCE=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --force|-f)
+      FORCE=true
+      shift
+      ;;
+    --help|-h)
+      cat <<EOF
+Usage: bin/setup_backend_once [--force]
+Initializes the Rails backend (bundle install + db:setup) the first time you clone or copy the template.
+Use --force to re-run even if initialization marker exists.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [[ -f "$MARKER_FILE" && "$FORCE" == "false" ]]; then
+  echo "Backend already initialized (marker at $MARKER_FILE). Use --force to re-run."
+  exit 0
+fi
+
+if [ ! -d "$RAILS_DIR" ]; then
+  echo "Rails workspace not found at $RAILS_DIR" >&2
+  exit 1
+fi
+
+echo "Installing bundle dependencies…"
+cd "$RAILS_DIR"
+bundle install
+
+echo "Running bin/rails db:setup…"
+bin/rails db:setup
+
+mkdir -p "$(dirname "$MARKER_FILE")"
+touch "$MARKER_FILE"
+echo "Backend initialized. Marker created at $MARKER_FILE."

@@ -1,0 +1,297 @@
+{
+  "branding": "黃金模板",
+  "heroTitle": "SourceGrid Labs 解決方案",
+  "heroSubtitle": "我們協助中小企業實現點子，從 iOS/Android App 到線上平台。",
+  "heroSupport": "所有應用與網站都由 SourceGrid Labs 維運，你無需自建基礎設施或帳號。",
+  "localeLabel": "語言",
+  "localeHelp": "切換到你偏好的語言。",
+  "themeLabel": "主題",
+  "themeHelp": "進入展示頁前，先在此選擇 Light 或 Dark 主題。",
+  "heroPills": [
+    { "id": "launch-ready", "icon": "🚀", "label": "隨時上線的網站" },
+    { "id": "customer-staff", "icon": "🗂️", "label": "客戶與內部門戶" },
+    { "id": "mobile-apps", "icon": "📱", "label": "專屬品牌行動 App" },
+    { "id": "ops-automations", "icon": "📊", "label": "營運自動化與洞察" },
+    { "id": "managed-hosting", "icon": "🛡️", "label": "託管主機與支援" }
+  ],
+  "offerEyebrow": "我們提供",
+  "offerTitle": "在同一平台完成建置、上線與營運。",
+  "offerIntro": "所有專案都運行在 SourceGrid Labs 後端，讓行銷、營運與行動體驗保持同步。",
+  "ctas": {
+    "admin": "示範管理後台",
+    "preview": "查看網站展示"
+  },
+  "features": [
+    {
+      "id": "launch-ready",
+      "icon": "🚀",
+      "title": "隨時上線的網站",
+      "body": "6-8 頁的行銷網站，內建 CMS、SEO 設定與完整的表單流程。"
+    },
+    {
+      "id": "customer-staff",
+      "icon": "🗂️",
+      "title": "客戶與內部門戶",
+      "body": "登入、儀表板與核心模組（預約、租賃、流程），讓客戶與團隊共享同一套系統。"
+    },
+    {
+      "id": "mobile-apps",
+      "icon": "📱",
+      "title": "專屬品牌行動 App",
+      "body": "iOS/Android App 與同一後端同步，我們代辦 App Store 與 Google Play 的送審、回覆與發布。"
+    },
+    {
+      "id": "ops-automations",
+      "icon": "📊",
+      "title": "營運自動化與洞察",
+      "body": "內建提醒、排程報表與即時健康儀表，串接預約、付款或庫存，免去人工追蹤。"
+    },
+    {
+      "id": "managed-hosting",
+      "icon": "🛡️",
+      "title": "託管主機與支援",
+      "body": "SourceGrid Labs 以一次設定費與可預期月費，負責伺服器、監控、備份與安全更新。"
+    }
+  ],
+  "demo": {
+    "nav": {
+      "items": [
+        { "id": "home", "label": "展示首頁" },
+        { "id": "pricing", "label": "價格指南" },
+        { "id": "custom", "label": "自訂模組占位", "disabled": true }
+      ]
+    },
+    "hero": {
+      "eyebrow": "Golden Template Demo",
+      "title": "SourceGrid Labs 展示",
+      "description": "預覽多品牌行銷站點、即時調整主題與 SourceGrid Labs 範本，並串接內建 Rails 管理後台。",
+      "backToLanding": "⟵ 回到首頁",
+      "marketingLanding": "回到行銷頁面",
+      "adminLogin": "管理控制台",
+      "miniEyebrow": "品牌體驗",
+      "contactButton": "聯絡 CTA"
+    },
+    "selector": {
+      "brandLabel": "品牌",
+      "templateLabel": "範本樣式",
+      "storyFocusPrefix": "故事焦點："
+    },
+    "cta": {
+      "eyebrow": "安排導覽",
+      "title": "預約通話",
+      "button": "預約通話"
+    },
+    "carousel": {
+      "placeholder": "招牌亮點細節即將補齊。",
+      "scrollBackwardLabel": "向上捲動亮點",
+      "scrollForwardLabel": "向下捲動亮點"
+    },
+    "home": {
+      "eyebrow": "招牌旅程序曲",
+      "headline": "從鵝卵石街巷走進燭光套房。",
+      "body": "一場電影般的抵達：燈籠點亮的入口、靜謐大廳酒吧，以及宛如私宅的套房。",
+      "galleryEyebrow": "沙龍筆記",
+      "galleryHeadline": "走進工作室",
+      "galleryFallback": "招牌場景",
+      "sceneFallback": "捕捉光影、材質與服務儀式的瞬間。",
+      "tagFallback": "系列",
+      "gridTitle": "策展玻璃系列",
+      "gridSubtitle": "精選作品展演光線、材質與空間層次。",
+      "featureEyebrow": "流動細節",
+      "featureTitle": "玻璃、光線與節奏交織的第三幕。",
+      "featureSubtitle": "短促而銳利的瞬間讓格面活起來——滑過即可展開畫面。",
+      "stepsEyebrow": "招牌流線",
+      "stepsHeadline": "夜晚被靜謐場景勾勒。",
+      "offeringEyebrow": "獻禮",
+      "offeringHeadline": "房間吐納之間",
+      "offeringBody": "一個經過編排的瞬間，隨即回到暗影裡。",
+      "step1Title": "黃昏迎賓。",
+      "step2Title": "行程策劃。",
+      "step3Title": "套房體驗。",
+      "step4Title": "夜間儀式。",
+      "step1Body": "黃金時刻抵達，禮賓迎接、熱茶與香氛毛巾在大廳等待。",
+      "step2Body": "私人管家安排行程、車輛與在地餐廳建議，打造專屬節奏。",
+      "step3Body": "落地窗套房、露台早餐與晚間備品，讓時間慢下來。",
+      "step4Body": "蠟燭夜泳、香氛泡浴與客製化夜宵，為旅程收尾。"
+    },
+    "pricing": {
+      "headline": "SourceGrid Labs 套餐",
+      "subhead": "為希望透過明確交付成果的中小企業打造的固定價格網站、商務系統與行動應用。",
+      "addonsTitle": "加值模組",
+      "maintenanceTitle": "維運方案",
+      "shotFallback": "服務場景",
+      "maintenanceSuffix": " / 每月",
+      "labels": {
+        "included": "包含內容",
+        "typicalClients": "適用對象",
+        "addonsTagline": "加購模組",
+        "maintenanceNote": "維護費以月計價。"
+      },
+      "valueHighlights": [
+        {
+          "id": "small-website",
+          "title": "小型官網",
+          "body": "6–8 頁、行動優化、聯絡表單、簡易後台。",
+          "hover": "適合只需要穩定門面的商家，包含乾淨的行銷頁面、SEO 設定與輕量後台。"
+        },
+        {
+          "id": "business-system",
+          "title": "商務系統",
+          "body": "官網搭配登入、儀表板與一個核心模組。",
+          "hover": "給有預約、租借或流程需求的團隊，讓客戶與員工都能在同一套系統作業。"
+        },
+        {
+          "id": "mobile-suite",
+          "title": "行動 App 全套",
+          "body": "iOS／Android App + 後端系統 + 官網。",
+          "hover": "當主要互動集中在 App 時，一次交付行動體驗、後台與網站。"
+        }
+      ],
+      "details": {
+        "small-website": {
+          "title": "小型官網",
+          "tagline": "典型範圍",
+          "summary": "給需要專業門面的品牌：資訊清楚、好搜尋、好聯絡，而不是複雜功能。",
+          "included": [
+            "6–8 頁官網（首頁、關於、服務／課程、價格、聯絡我們，可選部落格或最新消息）。",
+            "RWD 響應式版型，支援手機與桌機瀏覽。",
+            "聯絡表單，訪客填寫後直接寄到指定信箱。",
+            "基本 SEO 設定（標題、描述、乾淨網址）。",
+            "簡易後台，可自行編輯文字與圖片。",
+            "伺服器設定與部署。"
+          ],
+          "typicalClients": [
+            "咖啡廳、餐廳、小型零售店。",
+            "顧問、教練、家教或講師。",
+            "維修、清潔、美容等在地服務。"
+          ],
+          "hoverNote": "適合只需要可信門面的品牌，不含自訂系統。"
+        },
+        "business-system": {
+          "title": "商務系統",
+          "tagline": "官網 + 線上系統",
+          "summary": "讓預約、租借或申請流程搬到線上，客戶與員工可以在同一平台處理工作。",
+          "included": [
+            "含小型官網方案的所有項目。",
+            "會員登入區（客戶帳號）。",
+            "後台管理介面供工作人員檢視與處理資料。",
+            "一個核心系統模組（線上預約、設備租借或內部流程管理）。",
+            "金流整合，支援主要信用卡與部分在地支付。",
+            "自動寄信（預約確認、通知等）。",
+            "資料匯出（CSV／Excel）。"
+          ],
+          "typicalClients": [
+            "小型旅館、民宿、青年旅館。",
+            "車輛、自行車或器材租借店。",
+            "診所、美髮／美容與需預約的服務。"
+          ],
+          "hoverNote": "適合需要在同一後台服務顧客與員工的團隊。"
+        },
+        "mobile-suite": {
+          "title": "行動 App 全套",
+          "tagline": "App + 後端 + 官網",
+          "summary": "給希望客戶主要透過手機 App 使用服務的品牌：行動體驗、後台與網站一次交付。",
+          "included": [
+            "含商務系統方案的所有項目。",
+            "iOS 與 Android App（單一程式碼庫維護）。",
+            "App 內登入與個人資料管理。",
+            "推播通知（預約狀態、重要提醒等）。",
+            "App 內預約、下單或其他核心操作。",
+            "協助送審到 App Store 與 Google Play。"
+          ],
+          "typicalClients": [
+            "配送／物流服務平台。",
+            "會員制、集點或月費型服務。",
+            "希望用 App 與客戶互動的品牌或機構。"
+          ],
+          "hoverNote": "當主要互動集中在手機 App 時，這套組合最合適。"
+        }
+      },
+      "packages": {
+        "small-website": {
+          "name": "小型網站",
+          "summary": "6–8 頁響應式網站、行動優化、聯絡表單與簡單管理後台。",
+          "description": "為小型企業打造專業網站，提供可信任的首頁與簡單聯絡流程。",
+          "features": [
+            "6–8 頁響應式網站",
+            "表單訊息轉信 & 後台通知",
+            "基礎 SEO 設定",
+            "輕量化後台編輯文案與圖片",
+            "含部署與主機管理"
+          ]
+        },
+        "business-system": {
+          "name": "商務系統",
+          "summary": "網站加上具登入與儀表板的系統模組。",
+          "description": "新增客戶登入、員工儀表板與訂單/租借/工作流程模組，讓團隊在同一平台作業。",
+          "features": [
+            "包含小型網站內容",
+            "客戶登入專區",
+            "員工儀表板",
+            "一個核心模組（預訂/租借/工作流程）",
+            "線上付款與通知",
+            "CSV/Excel 匯出"
+          ]
+        },
+        "mobile-suite": {
+          "name": "行動應用套件",
+          "summary": "iOS + Android 應用搭配網站與後台系統。",
+          "description": "品牌化行動應用含推播、內建預訂/點餐，與網站共用後端服務。",
+          "features": [
+            "包含商務系統功能",
+            "iOS + Android（單一程式碼庫）",
+            "客戶資料與推播通知",
+            "內建預訂/點餐流程",
+            "協助上架 App Store & Play Store"
+          ]
+        }
+      },
+      "addons": {
+        "online-booking": "線上預訂",
+        "rental-system": "租借系統",
+        "payment-integration": "付款串接",
+        "email-automations": "電子郵件自動化",
+        "real-time-chat": "即時聊天",
+        "multi-language": "多語言",
+        "forum-system": "論壇系統（Thredded）"
+      },
+      "maintenance": {
+        "basic": {
+          "name": "基礎",
+          "scope": "資安更新、備份與監控。"
+        },
+        "standard": {
+          "name": "標準",
+          "scope": "包含基礎，並提供每月最多四次的小型內容/設定更新。"
+        },
+        "premium": {
+          "name": "進階",
+          "scope": "標準方案外加每週調整與優先處理。"
+        }
+      }
+    },
+    "contact": {
+      "heading": "禮賓服務詢問",
+      "description": "留下資料，SourceGrid Labs 團隊會在 24 小時內聯繫您。",
+      "localeLabel": "語言選單",
+      "autoReplyLabel": "自動回覆主旨",
+      "autoReplySubject": "Golden Template 詢問",
+      "autoReplyBody": "親愛的 [Name]，感謝您的聯繫，我們會盡快回覆您。",
+      "nameLabel": "姓名",
+      "namePlaceholder": "Ada Lovelace",
+      "emailLabel": "電子郵件",
+      "emailPlaceholder": "demo@sourcegridlabs.com",
+      "messageLabel": "訊息",
+      "messagePlaceholder": "告訴我們您的時程、目標與需要的整合項目。",
+      "submit": "送出訊息",
+      "sending": "傳送中…"
+    },
+    "placeholder": {
+      "heading": "自訂模組占位",
+      "intro": "在此建立客製化儀表板（忠誠、預訂、分析）。",
+      "templatesPrefix": "新增元件到 ",
+      "registryConnector": "並在 ",
+      "suffix": "登記，方便客戶切換版型。"
+    }
+  }
+}

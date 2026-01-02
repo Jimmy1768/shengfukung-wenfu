@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage: bin/pull_expo_plugins [source-directory] [target-directory]
+
+Copies the shared expo-config-plugins repository into mobile/plugins-local so
+each client project has the config plugins checked into its repo (defaults to
+../expo-config-plugins -> mobile/plugins-local). Provide an explicit target to
+push directly into another repo (e.g., ../SourceGrid-Labs/mobile/plugins-local).
+USAGE
+}
+
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+  usage
+  exit 0
+fi
+
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
+
+DEFAULT_SOURCE=$(cd "$REPO_ROOT/.." && pwd)/expo-config-plugins
+DEFAULT_TARGET="$REPO_ROOT/mobile/plugins-local"
+SOURCE_INPUT=${1:-$DEFAULT_SOURCE}
+TARGET_INPUT=${2:-$DEFAULT_TARGET}
+
+if [[ "$SOURCE_INPUT" = /* ]]; then
+  SOURCE_CANDIDATE="$SOURCE_INPUT"
+else
+  SOURCE_CANDIDATE="$REPO_ROOT/$SOURCE_INPUT"
+fi
+
+if [[ "$TARGET_INPUT" = /* ]]; then
+  TARGET_CANDIDATE="$TARGET_INPUT"
+else
+  TARGET_CANDIDATE="$REPO_ROOT/$TARGET_INPUT"
+fi
+
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+
+mapfile -t RESOLVED_PATHS < <("$PYTHON_BIN" - <<'PY' "$SOURCE_CANDIDATE" "$TARGET_CANDIDATE"
+import os, sys
+print(os.path.abspath(sys.argv[1]))
+print(os.path.abspath(sys.argv[2]))
+PY
+)
+
+SOURCE_DIR="${RESOLVED_PATHS[0]}"
+TARGET_DIR="${RESOLVED_PATHS[1]}"
+
+if [[ ! -d "$SOURCE_DIR" ]]; then
+  echo "Source directory '$SOURCE_DIR' is missing." >&2
+  exit 1
+fi
+
+mkdir -p "$TARGET_DIR"
+
+echo "Pulling Expo config plugins:"
+echo "  Source: $SOURCE_DIR/"
+echo "  Target: $TARGET_DIR/"
+
+rsync -a --delete --exclude '.git/' "$SOURCE_DIR/" "$TARGET_DIR/"
+
+echo "Done. Commit the copied files so EAS/EAS Build has the plugin sources."

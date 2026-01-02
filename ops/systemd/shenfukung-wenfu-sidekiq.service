@@ -1,0 +1,22 @@
+
+# ops/systemd/shenfukung-wenfu-sidekiq.service
+#
+# Systemd unit template for the Sidekiq worker process.
+#
+# NOTE:
+# - Match the slug referenced in `AppConstants::Project` so service names stay predictable.
+#
+# [Unit]
+# Description=竹南鎮聖福宮 Sidekiq
+# After=network.target
+#
+# [Service]
+# Type=simple
+# User=deploy
+# WorkingDirectory=/home/jimmy1768_user/Projects/shenfukung-wenfu/rails
+# EnvironmentFile=/etc/default/shenfukung-wenfu-env
+# ExecStart=/usr/bin/bash -lc 'bundle exec sidekiq -C config/sidekiq.yml'
+# Restart=always
+#
+# [Install]
+# WantedBy=multi-user.target

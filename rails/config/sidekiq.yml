@@ -1,0 +1,10 @@
+
+:require: ./config/environment
+
+:concurrency: <%= Profile::Infrastructure::JOB_CONCURRENCY %>
+:queues:
+<% Profile::Infrastructure::JobQueues.ordered.each do |queue| %>
+  - <%= queue %>
+<% end %>
+
+# Cron / scheduler configuration can be added here if using sidekiq-cron or sidekiq-scheduler.

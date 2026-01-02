@@ -1,0 +1,152 @@
+en:
+  demo_admin:
+    console:
+      nav:
+        dashboard: "Dashboard"
+        app_messages: "App messages"
+        users: "Manage users"
+        playground: "Custom feature"
+      buttons:
+        sign_out: "Sign out"
+      alerts:
+        sign_in_required: "Please sign in to access the admin console."
+    flash:
+      seed_missing: "No admin seed user found. Run %{command} to provision demo access."
+      welcome_back: "Welcome back! You're now viewing the admin dashboard."
+      invalid_credentials: "Those credentials didn't match. Use the seeded email and password shown."
+      signed_out: "Signed out of the admin console."
+    dashboard:
+      welcome:
+        eyebrow: "/marketing/admin"
+        title: "SourceGrid Labs Demo Console"
+        body: "Guide prospects through the full operations playbook with live data, ready-made workflows, and zero risk to production."
+      selected_locale_label: "Selected locale"
+      system_settings_label: "System settings"
+      system_settings_entries:
+        - name: "Maintenance mode"
+          value: "Off"
+        - name: "Live campaigns"
+          value: "3 active"
+        - name: "Billing status"
+          value: "Current"
+      theme_keys_label: "Theme keys"
+      theme_keys_list:
+        - "golden-primary"
+        - "platinum-dark"
+        - "slate-neutral"
+    sessions:
+      eyebrow: "Admin"
+      title: "Welcome"
+      intro: "The SourceGrid Labs backend dashboard lets admins manage bookings, payments, automations, and staff workflows in one place so you can demo the full operating system without custom builds."
+      demo_email_label: "Demo email"
+      demo_password_label: "Demo password"
+      credentials_hint: "Update these values in %{seed_hint} after cloning, then re-run bin/rails db:seed."
+      unlock_copy: "Type in the demo email and password to log into the admin console."
+      form:
+        email: "Email address"
+        password: "Password"
+        submit: "Enter admin dashboard"
+      info: "These credentials also work for API calls, Expo builds, and any other authenticated demo surfaces."
+      footer_link: "← Back to marketing landing"
+      home_link: "← Back to homepage"
+      mobile_demo:
+        eyebrow: "Mobile demo"
+        title: "Try the console on Android"
+        body: >
+          Install this APK on any Android device and sign in with the demo credentials above
+          to preview the admin experience on mobile.
+        cta: "Download Android APK"
+        note: "Need a fresh build? Ping the SourceGrid Labs concierge desk."
+    messages:
+      hero:
+        eyebrow: "App messages"
+        title: "Mirror the mobile inbox"
+        body: "Each entry below matches what the Android build displays, so you can keep the copy in sync before handing the APK to clients."
+      seeded:
+        title: "Sample messages"
+        body: "Update rails/db/seeds/messaging.rb to change these previews."
+        empty: "No messages have been seeded yet. Run bin/rails db:seed."
+      coverage:
+        title: "Channels & locales"
+        body: "Use this matrix to confirm notification coverage before a hand-off."
+        channels: "Channels:"
+        locales: "Locales:"
+      entries:
+        - subject: "Field inspection scheduled"
+          preview: "Team Delta confirmed the roof inspection for Building 4 tomorrow at 09:00."
+          status: "Unread"
+          channel: "Push + Email"
+        - subject: "Payment received"
+          preview: "Maintenance invoice #1846 was paid in full by Northwind Holdings."
+          status: "Action needed"
+          channel: "In-app"
+      actions:
+        - "Mark read"
+        - "Reply"
+        - "Archive"
+      coverage_lists:
+        channels:
+          - "Push"
+          - "Email"
+          - "In-app"
+        locales:
+          - "English"
+          - "繁體中文"
+          - "日本語"
+    users:
+      hero:
+        eyebrow: "Team management"
+        title: "Manage users"
+        body: "Mirror the mobile roster: update rails/db/seeds/admin_controls.rb and reuse the same people in the Android build."
+        metric_label: "Active staff"
+      last_active_prefix: "Last active"
+      seeded:
+        title: "Sample users"
+        body: "These names match the Android demo so prospects see consistent data."
+        empty: "No demo users found. Run bin/rails db:seed to generate sample accounts."
+      actions:
+        - "View profile"
+        - "Reset password"
+        - "Deactivate"
+      entries:
+        - name: "Lina Ortega"
+          email: "lina@client-demo.local"
+          role: "Portfolio admin"
+          status: "Active"
+          last_active: "5 minutes ago"
+        - name: "Marcus Lee"
+          email: "marcus@client-demo.local"
+          role: "Regional manager"
+          status: "Invited"
+          last_active: "30 minutes ago"
+    custom_features:
+      hero:
+        eyebrow: "Custom feature"
+        title: "Custom modules"
+        body: "Design admin tooling tailored to your workflows and show prospects what their bespoke dashboards can look like."
+      entries:
+        - title: "Workflow Automations"
+          description: "Route approvals, notify field teams, and sync documents across your existing stack."
+          badge: "Tailored playbooks"
+        - title: "Executive Insights"
+          description: "Blend operational KPIs with finance data for a single source of truth dashboard."
+          badge: "C-suite ready"
+        - title: "Field Ops Toolkit"
+          description: "Give technicians guided checklists, offline sync, and photo capture in-app."
+          badge: "Offline capable"
+      cta: "Design this module"
+    contact:
+      demo_auto_reply:
+        subject: "Thank you for exploring %{brand}"
+        greeting: "Dear %{name},"
+        intro: "Thank you for your message. We will respond as soon as possible."
+        closing: "Best regards,"
+        signature: "%{brand} Team"
+        confirmation: "We received your message. Our concierge desk will follow up shortly."
+        default_name: "there"
+        no_message: "No additional details were provided."
+        errors:
+          invalid_email: "Please enter a valid email address."
+          missing_brevo: "Email delivery is not configured. Add BREVO_API_KEY to continue."
+          delivery_failed: "We were unable to send your message. Please try again."
+          generic: "Could not process your request."

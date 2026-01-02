@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+REPO_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
+PROJECT_JSON="$REPO_ROOT/shared/app_constants/project.json"
+MOBILE_DIR="$REPO_ROOT/mobile"
+
+if [[ ! -d "$MOBILE_DIR" ]]; then
+  echo "Could not find mobile directory at $MOBILE_DIR" >&2
+  exit 1
+fi
+
+if [[ ! -f "$PROJECT_JSON" ]]; then
+  echo "Could not find project config at $PROJECT_JSON" >&2
+  exit 1
+fi
+
+CURRENT_ID=$(node - <<'NODE' "$PROJECT_JSON"
+const fs = require('fs');
+const data = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));
+console.log(data.easProjectId || '');
+NODE
+)
+
+if [[ -n "$CURRENT_ID" ]]; then
+  echo "EAS project ID already set to $CURRENT_ID. Nothing to do." >&2
+  exit 0
+fi
+
+TMP_LOG=$(mktemp)
+trap 'rm -f "$TMP_LOG"' EXIT
+
+echo "Running 'npx eas init' inside $MOBILE_DIR..."
+set +e
+(
+  cd "$MOBILE_DIR"
+  npx eas init | tee "$TMP_LOG"
+)
+INIT_STATUS=$?
+set -e
+
+if [[ $INIT_STATUS -ne 0 ]]; then
+  echo "'npx eas init' exited with status $INIT_STATUS (expected when using dynamic config). Continuing if project ID was printed..." >&2
+fi
+
+PROJECT_ID=$(python3 - <<'PY' "$TMP_LOG"
+import re, sys
+text = open(sys.argv[1], 'r', encoding='utf-8').read()
+match = re.search(r'projectId"\s*:\s*"([0-9a-fA-F-]{36})"', text)
+if not match:
+    match = re.search(r'([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})', text)
+if not match:
+    sys.exit(1)
+print(match.group(1))
+PY
+) || {
+  echo "Could not detect a projectId in the eas init output. Please run 'npx eas init' manually and copy the ID into shared/app_constants/project.json." >&2
+  exit 1
+}
+
+node - <<'NODE' "$PROJECT_JSON" "$PROJECT_ID"
+const fs = require('fs');
+const path = process.argv[1];
+const id = process.argv[2];
+const data = JSON.parse(fs.readFileSync(path, 'utf8'));
+data.easProjectId = id;
+fs.writeFileSync(path, JSON.stringify(data, null, 2) + '\n');
+console.log(`Updated ${path} with easProjectId=${id}`);
+NODE
+
+echo "All set. Re-run your EAS command now that the project ID is recorded."

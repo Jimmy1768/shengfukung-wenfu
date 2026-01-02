@@ -1,0 +1,14 @@
+{
+  "contact": {
+    "addressZh": "尚未設定地址（請至後台「Temple Profile」更新）",
+    "addressEn": "Address pending — update Temple Profile to publish directions.",
+    "phone": "尚未設定電話",
+    "plusCode": "Plus Code 尚未設定",
+    "mapUrl": null
+  },
+  "service_times": {
+    "weekday": "尚未設定（請更新開放時間）",
+    "weekend": "尚未設定（請更新開放時間）",
+    "notes": "提示：在 Temple Profile → Service schedule 填寫詳細說明。"
+  }
+}

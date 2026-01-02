@@ -1,0 +1,38 @@
+<section class="hero">
+  <div class="hero-text">
+    <p class="eyebrow">Admin console</p>
+    <h1>Welcome back, <%= current_admin&.english_name || current_admin&.email %></h1>
+    <p>
+      This placeholder mirrors the structure of the production admin. Replace these cards with the
+      real KPIs, resource tables, and workflows your client needs.
+    </p>
+  </div>
+</section>
+
+<section class="card">
+  <header>
+    <h2>Starter metrics</h2>
+    <p>Swap these for live KPIs once the backend endpoints are wired.</p>
+  </header>
+  <div class="metric-row">
+    <% @metrics.each do |metric| %>
+      <div class="metric">
+        <span><%= metric[:label] %></span>
+        <strong><%= metric[:value] %></strong>
+      </div>
+    <% end %>
+  </div>
+</section>
+
+<section class="card">
+  <header>
+    <h2>Next steps</h2>
+    <p>Use this section to outline the backend work for your client engagement.</p>
+  </header>
+  <ul class="idea-list">
+    <li><%= link_to "Fill out the temple profile →", admin_temple_profile_path, class: "link" %></li>
+    <li>Connect real-world data sources to the KPIs above.</li>
+    <li>Replace this placeholder with the first CRUD workflow (users, orders, bookings, etc.).</li>
+    <li>Document the admin scope inside `docs/` for each new client.</li>
+  </ul>
+</section>

@@ -1,0 +1,31 @@
+<section class="card login-card">
+  <header>
+    <p class="eyebrow"><%= I18n.t("account.passwords.reset.eyebrow") %></p>
+    <h1><%= I18n.t("account.passwords.reset.title") %></h1>
+    <p><%= I18n.t("account.passwords.reset.subtitle") %></p>
+  </header>
+
+  <div class="login-actions field-panel register-panel register-email">
+    <%= render "shared/form_errors", form: @reset_form %>
+
+    <%= form_with model: @reset_form, as: :passwords_update_form, url: password_update_path, method: :post, local: true, class: "login-form" do |f| %>
+      <%= f.hidden_field :token %>
+      <div class="form-field">
+        <%= f.label :password, I18n.t("account.passwords.reset.password_label") %>
+        <%= f.password_field :password, required: true, placeholder: "••••••••" %>
+      </div>
+      <div class="form-field">
+        <%= f.label :password_confirmation, I18n.t("account.passwords.reset.password_confirmation_label") %>
+        <%= f.password_field :password_confirmation, required: true, placeholder: "••••••••" %>
+      </div>
+      <%= f.submit I18n.t("account.passwords.reset.submit"), class: "btn btn-primary" %>
+    <% end %>
+
+    <p class="muted">
+      <%= I18n.t(
+        "account.passwords.links.start_over_html",
+        link: link_to(I18n.t("account.passwords.links.request_new"), new_password_path)
+      ).html_safe %>
+    </p>
+  </div>
+</section>

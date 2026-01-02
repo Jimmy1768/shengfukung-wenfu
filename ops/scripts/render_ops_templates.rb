@@ -1,0 +1,148 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "fileutils"
+require "optparse"
+require "pathname"
+
+ROOT_DIR = File.expand_path("../..", __dir__)
+
+unless defined?(Rails)
+  module Rails
+    def self.root
+      @root ||= Pathname.new(File.join(ROOT_DIR, "rails"))
+    end
+  end
+end
+
+PROJECT_CONSTANTS = File.join(
+  ROOT_DIR,
+  "rails",
+  "app",
+  "lib",
+  "app_constants",
+  "project.rb"
+)
+
+raise "AppConstants::Project not found" unless File.exist?(PROJECT_CONSTANTS)
+
+require PROJECT_CONSTANTS
+
+def render_placeholders(content, slug, human_name)
+  content
+    .gsub("{{project_slug}}", slug)
+    .gsub("{{project_name}}", human_name)
+    .gsub("Golden Template", human_name)
+    .gsub("Golden-Template", human_name)
+    .gsub("golden-template", slug)
+end
+
+def activate_nginx_template(content)
+  directive_pattern =
+    /\A(?:upstream|server|listen|server_name|root|location|expires|add_header|try_files|proxy_pass|proxy_set_header|\{|\}|#)/i
+
+  active_lines = []
+
+  content.each_line do |line|
+    if line.start_with?("#")
+      candidate = line.sub(/\A#\s?/, "")
+      trimmed = candidate.lstrip
+
+      if trimmed.empty?
+        active_lines << "\n"
+        next
+      end
+
+      next unless trimmed.match?(directive_pattern)
+
+      active_lines << candidate
+    else
+      active_lines << line
+    end
+  end
+
+  active_lines.join
+end
+
+options = {
+  slug: nil,
+  output: nil
+}
+
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: render_ops_templates.rb [options]"
+
+  opts.on("-s", "--slug SLUG", "Project slug (defaults to AppConstants::Project::SLUG)") do |value|
+    options[:slug] = value
+  end
+
+  opts.on("-o", "--output DIR", "Base output directory (defaults to ops/)") do |value|
+    options[:output] = value
+  end
+
+  opts.on("-h", "--help", "Prints this help") do
+    puts opts
+    exit
+  end
+end
+
+parser.parse!
+
+slug = options[:slug] || ARGV.shift || AppConstants::Project::SLUG
+human_name = AppConstants::Project::NAME
+output_root =
+  if options[:output]
+    File.expand_path(options[:output])
+  else
+    File.join(ROOT_DIR, "ops")
+  end
+systemd_output_dir = File.join(output_root, "systemd")
+nginx_output_dir = File.join(output_root, "nginx")
+
+templates = {
+  File.join(ROOT_DIR, "ops", "systemd", "template", "golden-template-puma.service") => File.join(systemd_output_dir, "#{slug}-puma.service"),
+  File.join(ROOT_DIR, "ops", "systemd", "template", "golden-template-sidekiq.service") => File.join(systemd_output_dir, "#{slug}-sidekiq.service")
+}
+
+templates.each do |source, destination|
+  next unless File.exist?(source)
+
+  content = File.read(source)
+  rendered = render_placeholders(content, slug, human_name)
+
+  FileUtils.mkdir_p(File.dirname(destination))
+  File.write(destination, rendered)
+  puts "Rendered #{source} → #{destination}"
+end
+
+nginx_template = File.join(ROOT_DIR, "ops", "nginx", "template", "golden-template.conf")
+nginx_destination = File.join(nginx_output_dir, "#{slug}.conf")
+if File.exist?(nginx_template)
+  nginx_content = File.read(nginx_template)
+  rendered = render_placeholders(nginx_content, slug, human_name)
+  activated = activate_nginx_template(rendered)
+
+  FileUtils.mkdir_p(File.dirname(nginx_destination))
+  File.write(nginx_destination, activated)
+  puts "Rendered #{nginx_template} → #{nginx_destination}"
+else
+  warn "Nginx template missing at #{nginx_template}. Skipping client config render."
+end
+
+puts <<~INSTRUCTIONS
+  Systemd unit files rendered to:
+    #{systemd_output_dir}
+
+  Client nginx config is available at:
+    #{nginx_destination}
+
+  Copy them to the droplet (e.g. `/etc/systemd/system` and `/etc/nginx/sites-available/`) and reload the services:
+    sudo cp #{systemd_output_dir}/#{slug}-puma.service /etc/systemd/system/#{slug}-puma.service
+    sudo cp #{systemd_output_dir}/#{slug}-sidekiq.service /etc/systemd/system/#{slug}-sidekiq.service
+    sudo cp #{nginx_destination} /etc/nginx/sites-available/#{slug}.conf
+    sudo ln -sf /etc/nginx/sites-available/#{slug}.conf /etc/nginx/sites-enabled/#{slug}.conf
+    sudo systemctl daemon-reload
+    sudo systemctl restart #{slug}-puma
+    sudo systemctl restart #{slug}-sidekiq
+    sudo nginx -s reload
+INSTRUCTIONS

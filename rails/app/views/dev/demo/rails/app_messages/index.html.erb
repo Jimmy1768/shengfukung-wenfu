@@ -1,0 +1,72 @@
+<section class="hero">
+  <div class="hero-text">
+    <p class="eyebrow"><%= t("demo_admin.messages.hero.eyebrow") %></p>
+    <h1><%= t("demo_admin.messages.hero.title") %></h1>
+    <p><%= t("demo_admin.messages.hero.body") %></p>
+  </div>
+</section>
+
+<section class="card">
+  <header>
+    <h2><%= t("demo_admin.messages.seeded.title") %></h2>
+    <p><%= t("demo_admin.messages.seeded.body") %></p>
+  </header>
+  <% if @messages.any? %>
+    <div
+      class="message-grid"
+      style="
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--spacing-lg);
+      "
+    >
+      <% @messages.each do |message| %>
+        <article
+          class="message-card"
+          style="
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--surface-muted);
+            padding: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+          "
+        >
+          <div class="message-meta" style="display: flex; gap: var(--spacing-sm); flex-wrap: wrap;">
+            <span class="badge badge-accent"><%= message[:status] %></span>
+            <span class="badge"><%= message[:channel] %></span>
+          </div>
+          <h3><%= message[:subject] %></h3>
+          <p class="muted"><%= message[:preview] %></p>
+          <div class="message-actions" style="display: flex; flex-wrap: wrap; gap: var(--spacing-sm);">
+            <% @actions.each do |action| %>
+              <button class="btn btn-ghost" type="button"><%= action %></button>
+            <% end %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p><%= t("demo_admin.messages.seeded.empty") %></p>
+  <% end %>
+</section>
+
+<section class="card">
+  <header>
+    <h2><%= t("demo_admin.messages.coverage.title") %></h2>
+    <p><%= t("demo_admin.messages.coverage.body") %></p>
+  </header>
+  <div class="chip-row">
+    <strong><%= t("demo_admin.messages.coverage.channels") %></strong>
+    <% @channels.each do |channel| %>
+      <span class="badge"><%= channel %></span>
+    <% end %>
+  </div>
+  <div class="chip-row">
+    <strong><%= t("demo_admin.messages.coverage.locales") %></strong>
+    <% @locales.each do |locale| %>
+      <span class="badge"><%= locale %></span>
+    <% end %>
+  </div>
+</section>

@@ -1,0 +1,40 @@
+source "https://rubygems.org"
+
+ruby "3.2.3"
+
+# ==== Core framework =========================================================
+gem "rails", "~> 7.1.5", ">= 7.1.5.1"
+gem "puma", ">= 5.0"
+gem "pg", "~> 1.5"
+gem "bootsnap", require: false
+gem "tzinfo-data", platforms: %i[ windows jruby ]
+gem "rack-cors"
+
+# ==== Authentication / identity =============================================
+gem "omniauth"
+gem "omniauth-rails_csrf_protection"
+gem "omniauth-google-oauth2"
+gem "omniauth-facebook"
+gem "omniauth-apple"
+
+# ==== Storage & external services ===========================================
+gem "aws-sdk-s3", "~> 1.147"
+gem "httparty"
+gem "googleauth"
+
+# ==== Background jobs / caching =============================================
+gem "redis", ">= 5.0"
+gem "sidekiq", "~> 7.2"
+
+group :development, :test do
+  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
+  gem "debug", platforms: %i[ mri windows ]
+end
+
+group :development do
+  # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
+  # gem "spring"
+
+  # Load .env files (e.g., .env.development) into ENV for local development.
+  gem "dotenv-rails"
+end

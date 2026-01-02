@@ -1,0 +1,137 @@
+@use "variables" as vars;
+
+body {
+  font-family: vars.$font-family-base;
+  background: vars.$color-background;
+  color: vars.$color-foreground;
+  margin: 0;
+}
+
+.admin-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at top, rgba(79, 70, 229, 0.4), transparent 55%);
+}
+
+.admin-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: vars.$space-sm vars.$space-lg;
+  border-bottom: 1px solid vars.$color-border;
+  background: rgba(2, 6, 23, 0.75);
+  backdrop-filter: blur(16px);
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .brand-name {
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+
+  .brand-slug {
+    font-size: 0.85rem;
+    color: vars.$color-muted;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: vars.$space-sm;
+
+    a {
+      color: vars.$color-muted;
+      text-decoration: none;
+      &.active { color: vars.$color-accent; }
+    }
+  }
+}
+
+.admin-main {
+  flex: 1;
+  padding: vars.$space-lg;
+}
+
+.card-grid {
+  display: grid;
+  gap: vars.$space-md;
+
+  &.two-column {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+.card {
+  background: vars.$color-panel;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-lg;
+  padding: vars.$space-md;
+  box-shadow: vars.$shadow-card;
+}
+
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 2rem;
+  border-radius: 32px;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.65), rgba(14, 165, 233, 0.35));
+  box-shadow: vars.$shadow-card;
+  margin-bottom: 2rem;
+}
+
+.hero-text {
+  max-width: 540px;
+}
+
+.hero-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-sm;
+  padding: vars.$space-sm vars.$space-md;
+
+  span {
+    color: vars.$color-muted;
+    font-size: 0.8rem;
+  }
+
+  strong {
+    font-size: 1.4rem;
+  }
+}
+
+.setting-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+  }
+}
+
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: vars.$space-sm;
+
+  .swatch {
+    border-radius: vars.$radius-sm;
+    padding: vars.$space-sm;
+    font-weight: 600;
+  }
+}

@@ -1,0 +1,189 @@
+brands:
+  hotel:
+    name: Emberlight Boutique Hotel
+    tagline: Luminous stays for urban tastemakers.
+    description: Luxury urban retreat with spa, courtyard, and seasonal tasting menu.
+    settings:
+      lobby:
+        label: Lobby Lounge
+        description: Amber-lit arrival parlor with sunken velvet seating, curated vinyl, and cedar tea service.
+      pool:
+        label: Infinity Pool
+        description: Glass-edged rooftop lane reflecting the skyline with private cabanas for dusk laps.
+      courtyard:
+        label: Courtyard
+        description: Stone courtyard layered with citrus trees, lantern glow, and low tables for aperitivo hour.
+      suite:
+        label: Skyline Suite
+        description: Corner residence wrapped in plaster arches, floor-to-ceiling glazing, and a stocked vinyl bar cart.
+    elements:
+      chefs-salon:
+        label: Chef’s Salon
+        description: Sunrise tasting menus with tableside infusions and seasonal patisserie.
+      garden-spa:
+        label: Garden Spa Rituals
+        description: Steam, soak, and breathe in the cedar hammam perched above the courtyard.
+      wellness-towels:
+        label: Wellness Atelier
+        description: Freshly steeped towels, aromatherapy blends, and on-call spa sommeliers.
+      atelier:
+        label: Handcrafted Detail
+        description: Plaster arches, ceramic inlays, and bespoke textiles from local artisans.
+    highlights:
+      curated-suites:
+        title: Curated Suites
+        body: Sun-flooded residences framed by sculpted plaster arches and bespoke linens.
+      garden-spa-rituals:
+        title: Garden Spa Rituals
+        body: Rooftop onsen, private hammam sessions, and in-room wellness sommeliers.
+      chef-salon:
+        title: Chef’s Salon
+        body: Seasonal tasting menus paired with boutique producers and ceremonial tea.
+    press:
+      - quote: Feels like inheriting a skyline penthouse for the weekend.
+        source: City Ledger
+      - quote: Spa rituals are choreographed like a slow-burn film score.
+        source: Solstice Journal
+      - quote: Courtyard dinners glow like a private lantern festival.
+        source: Maison Review
+  ramen:
+    name: Kintsu Ramen
+    tagline: Broth ceremonies for the night market soul.
+    description: Smoke-fired broths, vinyl-lit dining rooms, and ceramic craft for ramen devotees.
+    settings:
+      chef-counter:
+        label: Chef’s Counter
+        description: Twelve-seat counter washed in vinyl glow where chefs finish every bowl in view.
+      broth-lab:
+        label: Broth Lab
+        description: Steam-drenched prep room for smoked shio, yuzu shoyu, and embered tantan pours.
+      ceramic:
+        label: Ceramic Atelier
+        description: Studio shelves of matte bowls, brass ladles, and kiln-fired chopsticks awaiting service.
+      lounge:
+        label: Midnight Lounge
+        description: Afterglow lounge with low lighting, incense trails, and late playlists between seatings.
+    elements:
+      umami-flight:
+        label: Umami Flight
+        description: Progressive tastings of smoked shio, yuzu shoyu, and embered tantan broths.
+      chashu-atelier:
+        label: Chashu Atelier
+        description: Hand-torched collar finished tableside with black sugar tare and sansho ash.
+      finishing-school:
+        label: Finishing School
+        description: Chefs finish every bowl beneath cedar light with micro-herb garnishes.
+      mise-rituals:
+        label: Mise Rituals
+        description: Still-life arrangements of tare, oils, and botanicals for each seating.
+    highlights:
+      broth-ceremony:
+        title: Broth Ceremony
+        body: 12-hour kombu reductions smoked over binchotan and poured in sequential flights.
+      ceramic-studio:
+        title: Ceramic Studio
+        body: Custom stoneware from Kyoto kilns with hand-pressed thumb rests for mindful sipping.
+      vinyl-service:
+        title: Vinyl Service
+        body: Downtempo sets scored to each seating for calm, amber-lit dining rooms.
+    press:
+      - quote: Broths shimmer like vinyl sleeves in the low, amber light.
+        source: Midnight Food Lab
+      - quote: Every counter seat feels reserved for you alone.
+        source: Nocturne Dining
+      - quote: Smoke, citrus, ember—bottled in a single bowl.
+        source: Steam Atlas
+  clothing:
+    name: Loom & Light Atelier
+    tagline: Modular wardrobes for slow luxury.
+    description: Seoul-inspired tailoring studio with private fittings, capsule edits, and tactile styling.
+    settings:
+      fittings:
+        label: Private Fittings
+        description: Mirror-lined salon with a dedicated tailor, tea service, and on-the-spot adjustments.
+      flatlay:
+        label: Capsule Flatlays
+        description: Gallery tables for capsule layouts, fabric swatches, and lookbook map-outs.
+      atelier:
+        label: Accessory Atelier
+        description: Jewelry trays, scent stories, and silk scarves layered within the accessory atelier.
+      tailoring:
+        label: Tailor’s Bench
+        description: Chalked patterns, steam presses, and in-progress garments across the tailoring bench.
+    elements:
+      capsule:
+        label: Capsule Builds
+        description: Seamless edits of 15-piece wardrobes with modular pairings and care rituals.
+      casting:
+        label: Casting Suites
+        description: Sun-lit studio sessions with cinematic draping for lookbooks and launches.
+      textile-lab:
+        label: Textile Lab
+        description: Material library featuring hand-loomed linen, matte stone, and woven jacquard.
+      mannequin:
+        label: Sculpted Forms
+        description: Signature mannequin styling with jewelry, scent stories, and layered textures.
+    highlights:
+      private-atelier:
+        title: Private Atelier
+        body: One-to-one fittings with wardrobe architects, tea service, and live tailoring.
+      capsule-mapping:
+        title: Capsule Mapping
+        body: Lookbook-grade planning sessions that translate into weekly rotation charts.
+      tactile-rituals:
+        title: Tactile Rituals
+        body: Fabric care ceremonies featuring cedar steam, silk stones, and minimalist scent.
+    press:
+      - quote: Wardrobe mapping carried out with the calm of a tea ceremony.
+        source: Form & Fold
+      - quote: Each fitting reads like a private opening night.
+        source: Runway North
+      - quote: Textures photograph like architectural studies.
+        source: Studio Field
+  nocturne-vale:
+    name: Nocturne Vale
+    tagline: Candlelit tasting parlor for midnight patrons.
+    description: Shadow-drenched supper club with sommelier theatrics, smoke-layered flights, and velvet service corridors.
+    settings:
+      corner-booth:
+        label: Velvet Corner Booths
+        description: Low, curved seating with candle towers, obsidian tables, and hushed playlists.
+      table-setting:
+        label: Salon Table Setting
+        description: Layered porcelain, onyx stones, and graphite menus fanned over linen.
+      wine-sculpt:
+        label: Wine Service
+        description: Sommelier team choreographing decants beneath violet light and soft haze.
+      bar-surface:
+        label: Obsidian Bar
+        description: Marble slab glowing with coupe silhouettes, incense trays, and smoked spirits.
+    elements:
+      shadow-menu:
+        label: Shadow Menu Atelier
+        description: Hand-inked tasting menus clipped to textured paper with brass numbering.
+      cutlery:
+        label: Charcoal Cutlery Sets
+        description: Custom matte cutlery balanced on obsidian rests beside each course.
+      linen-lab:
+        label: Linen Lab
+        description: Storm-grey linens pressed with tonal piping and stitched monograms.
+      candle-smoke:
+        label: Candle Smoke Ritual
+        description: Whispered smoke columns scenting the room between plated sequences.
+    highlights:
+      obsidian-menu:
+        title: Obsidian Menu
+        body: Six-course charcoal scripts pairing embered seafood, chilled smoke, and cellar pairings.
+      sommelier-theater:
+        title: Sommelier Theater
+        body: Synchronized decanting, perfumed plume pours, and tableside story cues each hour.
+      afterhours-gallery:
+        title: After Hours Gallery
+        body: Guests drift through a rotating corridor of glass, linen, and flicker-lit installations.
+    press:
+      - quote: A velvet hush stretched across the entire midnight.
+        source: Night Ledger
+      - quote: Candle smoke writes cursive between every course.
+        source: Obsidian Table
+      - quote: Sommelier choreography worthy of the stage.
+        source: After Hours Review
