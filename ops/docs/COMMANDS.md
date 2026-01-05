@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "11 subsystems, seed files done"
+git commit -m "building temple management system v1"
 git push
 
 git reset --hard HEAD

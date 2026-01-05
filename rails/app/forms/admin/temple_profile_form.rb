@@ -50,8 +50,6 @@ module Admin
       false
     end
 
-    private
-
     def contact
       super || {}
     end
@@ -59,6 +57,8 @@ module Admin
     def service_times
       super || {}
     end
+
+    private
 
     def extracted_attributes(record)
       {

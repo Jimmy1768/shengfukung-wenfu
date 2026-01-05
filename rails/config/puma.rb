@@ -32,7 +32,9 @@ default_port =
     3000
   end
 
-port ENV.fetch("PUMA_PORT", default_port).to_i
+port ENV.fetch("PORT") {
+  ENV.fetch("PUMA_PORT", default_port)
+}.to_i
 
 rails_env = ENV.fetch("RAILS_ENV", "development")
 environment rails_env

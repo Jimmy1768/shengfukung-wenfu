@@ -34,7 +34,7 @@ namespace :marketing_admin, path: "/marketing/admin", module: "dev/demo/rails" d
 
     get "/dashboard", to: "dashboard#index", as: :dashboard
     get "/temple/profile", to: "temples#edit", as: :temple_profile
-    patch "/temple/profile", to: "temples#update"
+    match "/temple/profile", to: "temples#update", via: %i[patch post]
   end
 
   # --- User account console --------------------------------------------------
