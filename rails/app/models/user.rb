@@ -10,6 +10,8 @@ class User < ApplicationRecord
   has_many :user_dependents, dependent: :destroy
   has_many :dependents, through: :user_dependents
   has_many :oauth_identities, dependent: :destroy
+  has_many :temple_event_registrations, dependent: :nullify
+  has_many :temple_payments, dependent: :nullify
 
   validates :email, presence: true, uniqueness: true
   validates :english_name, presence: true

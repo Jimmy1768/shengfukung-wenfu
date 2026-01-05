@@ -35,6 +35,14 @@ namespace :marketing_admin, path: "/marketing/admin", module: "dev/demo/rails" d
     get "/dashboard", to: "dashboard#index", as: :dashboard
     get "/temple/profile", to: "temples#edit", as: :temple_profile
     match "/temple/profile", to: "temples#update", via: %i[patch post]
+
+    resources :offerings do
+      resources :offering_orders,
+        path: "orders",
+        controller: "offering_orders",
+        only: %i[index new create show]
+    end
+    resources :payments, only: %i[new create]
   end
 
   # --- User account console --------------------------------------------------

@@ -3,22 +3,17 @@ module Admin
     skip_before_action :authenticate_admin!, only: %i[new create destroy]
     skip_before_action :verify_authenticity_token, only: %i[create destroy]
 
-    def new
-    end
+    def new; end
 
     def create
-      user = User.includes(:admin_account).find_by(email: default_admin_email)
-      unless user&.admin_account&.active?
-        flash.now[:alert] = "No admin account found. Run `bin/rails db:seed` to provision access."
-        render :new, status: :unprocessable_entity
-        return
-      end
+      credentials = session_params
+      user = User.includes(:admin_account).find_by(email: credentials[:email]&.downcase)
 
-      if valid_credentials?
+      if can_sign_in?(user, credentials[:password])
         establish_admin_session!(user)
         redirect_to admin_dashboard_path, notice: "Signed in to the admin console."
       else
-        flash.now[:alert] = "Those credentials did not match. Use the seeded email/password."
+        flash.now[:alert] = "Those credentials did not match. Use an active admin account."
         render :new, status: :unprocessable_entity
       end
     end
@@ -30,14 +25,10 @@ module Admin
 
     private
 
-    def valid_credentials?
-      creds = session_params
-      email = creds[:email].to_s.downcase.strip
-      password = creds[:password].to_s
-      return false if email.blank? || password.blank?
+    def can_sign_in?(user, password)
+      return false unless user&.admin_account&.active?
 
-      secure_compare(email, default_admin_email.downcase) &&
-        secure_compare(password, default_admin_password)
+      secure_compare(user.encrypted_password, User.password_hash(password.to_s))
     end
 
     def session_params
@@ -49,16 +40,6 @@ module Admin
       return false unless value.bytesize == other.bytesize
 
       ActiveSupport::SecurityUtils.secure_compare(value, other)
-    end
-
-    def default_admin_email
-      ENV.fetch("PROJECT_DEFAULT_ADMIN_EMAIL") do
-        "admin@#{AppConstants::Project.slug}.local"
-      end
-    end
-
-    def default_admin_password
-      ENV.fetch("PROJECT_DEFAULT_ADMIN_PASSWORD", "Password123!")
     end
   end
 end

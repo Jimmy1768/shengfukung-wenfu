@@ -1,0 +1,36 @@
+<h1>Record Cash Payment</h1>
+
+<p>
+  Registration: <%= @registration.reference_code %> —
+  Total due: <%= number_to_currency(@registration.total_price_cents / 100.0, unit: @registration.currency) %>
+</p>
+
+<%= form_with model: [:admin, @payment], url: admin_payments_path(registration_id: @registration.id) do |form| %>
+  <% if @payment.errors.any? %>
+    <div class="alert alert-danger">
+      <ul>
+        <% @payment.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :amount_cents, "Amount (cents)" %>
+    <%= form.number_field :amount_cents %>
+  </div>
+
+  <div class="field">
+    <%= form.label :currency %>
+    <%= form.text_field :currency %>
+  </div>
+
+  <div class="field">
+    <%= form.label :notes %>
+    <%= text_area_tag "temple_payment[notes]", nil %>
+    <p class="hint">Optional – note who provided the cash or any receipt details.</p>
+  </div>
+
+  <%= form.submit "Record cash payment", class: "button" %>
+<% end %>

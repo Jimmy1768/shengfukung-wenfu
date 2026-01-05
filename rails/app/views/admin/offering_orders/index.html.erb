@@ -1,0 +1,30 @@
+<h1>Registrations for <%= @offering.title %></h1>
+
+<p>
+  <%= link_to "New Registration", new_admin_offering_offering_order_path(@offering), class: "button" %>
+</p>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Reference</th>
+      <th>User</th>
+      <th>Status</th>
+      <th>Quantity</th>
+      <th>Total</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @registrations.each do |registration| %>
+      <tr>
+        <td><%= registration.reference_code %></td>
+        <td><%= registration.user&.english_name || registration.contact_payload["contact_name"] %></td>
+        <td><%= registration.payment_status %></td>
+        <td><%= registration.quantity %></td>
+        <td><%= number_to_currency(registration.total_price_cents / 100.0, unit: registration.currency) %></td>
+        <td><%= link_to "View", admin_offering_offering_order_path(@offering, registration) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

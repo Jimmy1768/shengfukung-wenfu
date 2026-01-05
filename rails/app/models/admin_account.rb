@@ -12,6 +12,10 @@ class AdminAccount < ApplicationRecord
     dependent: :destroy
   has_many :temples,
     through: :admin_temple_memberships
+  has_many :admin_permissions,
+    dependent: :destroy
+  has_many :temple_payments,
+    dependent: :nullify
 
   enum role: {
     staff: "staff",
@@ -25,5 +29,21 @@ class AdminAccount < ApplicationRecord
       seeded_at: Time.current.iso8601,
       seeded_by: "db:seed:admin_controls"
     }
+  end
+
+  def permissions_for(temple)
+    admin_permissions.find_by(temple:) || default_permissions_for(temple)
+  end
+
+  private
+
+  def default_permissions_for(temple)
+    record = admin_permissions.build(temple:)
+    if owner_role?
+      AdminPermission::CAPABILITIES.each do |capability|
+        record[capability] = true
+      end
+    end
+    record
   end
 end

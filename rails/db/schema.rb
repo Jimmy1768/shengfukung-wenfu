@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_01_01_000012) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_15_000014) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -26,6 +26,24 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_01_000012) do
     t.index ["occurred_at"], name: "index_account_lifecycle_events_on_occurred_at"
     t.index ["user_id", "event_type"], name: "index_account_lifecycle_on_user_and_type"
     t.index ["user_id"], name: "index_account_lifecycle_events_on_user_id"
+  end
+
+  create_table "admin_permissions", force: :cascade do |t|
+    t.bigint "admin_account_id", null: false
+    t.bigint "temple_id", null: false
+    t.boolean "manage_offerings", default: false, null: false
+    t.boolean "manage_registrations", default: false, null: false
+    t.boolean "record_cash_payments", default: false, null: false
+    t.boolean "view_financials", default: false, null: false
+    t.boolean "export_financials", default: false, null: false
+    t.boolean "view_guest_lists", default: false, null: false
+    t.boolean "manage_permissions", default: false, null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admin_account_id", "temple_id"], name: "index_admin_permissions_on_admin_and_temple", unique: true
+    t.index ["admin_account_id"], name: "index_admin_permissions_on_admin_account_id"
+    t.index ["temple_id"], name: "index_admin_permissions_on_temple_id"
   end
 
   create_table "admin_temple_memberships", force: :cascade do |t|
@@ -364,6 +382,19 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_01_000012) do
     t.index ["user_id"], name: "index_financial_ledger_entries_on_user_id"
   end
 
+  create_table "line_pay_callbacks", force: :cascade do |t|
+    t.bigint "temple_id", null: false
+    t.string "line_pay_transaction_id", null: false
+    t.string "event_type"
+    t.jsonb "payload", default: {}, null: false
+    t.boolean "processed", default: false, null: false
+    t.datetime "processed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["temple_id", "line_pay_transaction_id"], name: "idx_line_pay_callbacks_on_transaction"
+    t.index ["temple_id"], name: "index_line_pay_callbacks_on_temple_id"
+  end
+
   create_table "media_assets", force: :cascade do |t|
     t.bigint "temple_id", null: false
     t.string "role", null: false
@@ -523,6 +554,56 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_01_000012) do
     t.index ["user_id"], name: "index_system_audit_logs_on_user_id"
   end
 
+  create_table "temple_event_registrations", force: :cascade do |t|
+    t.bigint "temple_id", null: false
+    t.bigint "temple_offering_id"
+    t.bigint "user_id"
+    t.string "event_slug"
+    t.string "reference_code", null: false
+    t.integer "quantity", default: 1, null: false
+    t.integer "unit_price_cents", default: 0, null: false
+    t.integer "total_price_cents", default: 0, null: false
+    t.string "currency", default: "TWD", null: false
+    t.jsonb "contact_payload", default: {}, null: false
+    t.string "payment_status", default: "pending", null: false
+    t.string "fulfillment_status", default: "open", null: false
+    t.string "line_pay_transaction_id"
+    t.string "certificate_number"
+    t.jsonb "logistics_payload", default: {}, null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "fulfilled_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["line_pay_transaction_id"], name: "index_temple_event_registrations_on_line_pay_transaction_id"
+    t.index ["temple_id", "event_slug"], name: "index_temple_event_registrations_on_temple_id_and_event_slug"
+    t.index ["temple_id", "payment_status"], name: "idx_event_registrations_on_payment_status"
+    t.index ["temple_id", "reference_code"], name: "idx_event_registrations_on_code", unique: true
+    t.index ["temple_id"], name: "index_temple_event_registrations_on_temple_id"
+    t.index ["temple_offering_id"], name: "index_temple_event_registrations_on_temple_offering_id"
+    t.index ["user_id"], name: "index_temple_event_registrations_on_user_id"
+  end
+
+  create_table "temple_offerings", force: :cascade do |t|
+    t.bigint "temple_id", null: false
+    t.string "slug", null: false
+    t.string "offering_type", default: "general", null: false
+    t.string "title", null: false
+    t.text "description"
+    t.integer "price_cents", default: 0, null: false
+    t.string "currency", default: "TWD", null: false
+    t.string "period"
+    t.date "starts_on"
+    t.date "ends_on"
+    t.integer "available_slots"
+    t.boolean "active", default: true, null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_temple_offerings_on_slug"
+    t.index ["temple_id", "slug"], name: "index_temple_offerings_on_temple_id_and_slug", unique: true
+    t.index ["temple_id"], name: "index_temple_offerings_on_temple_id"
+  end
+
   create_table "temple_pages", force: :cascade do |t|
     t.bigint "temple_id", null: false
     t.string "kind", null: false
@@ -535,6 +616,34 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_01_000012) do
     t.index ["temple_id", "kind"], name: "index_temple_pages_on_temple_id_and_kind", unique: true
     t.index ["temple_id", "slug"], name: "index_temple_pages_on_temple_id_and_slug"
     t.index ["temple_id"], name: "index_temple_pages_on_temple_id"
+  end
+
+  create_table "temple_payments", force: :cascade do |t|
+    t.bigint "temple_id", null: false
+    t.bigint "temple_event_registration_id", null: false
+    t.bigint "user_id"
+    t.bigint "financial_ledger_entry_id"
+    t.bigint "admin_account_id"
+    t.string "external_reference"
+    t.string "payment_method", null: false
+    t.string "status", default: "pending", null: false
+    t.integer "amount_cents", default: 0, null: false
+    t.string "currency", default: "TWD", null: false
+    t.string "line_pay_transaction_id"
+    t.jsonb "payment_payload", default: {}, null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "processed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admin_account_id"], name: "index_temple_payments_on_admin_account_id"
+    t.index ["external_reference"], name: "index_temple_payments_on_external_reference", unique: true
+    t.index ["financial_ledger_entry_id"], name: "index_temple_payments_on_financial_ledger_entry_id"
+    t.index ["line_pay_transaction_id"], name: "index_temple_payments_on_line_pay_transaction_id"
+    t.index ["payment_method"], name: "index_temple_payments_on_payment_method"
+    t.index ["temple_event_registration_id"], name: "idx_temple_payments_on_registration"
+    t.index ["temple_id", "status"], name: "index_temple_payments_on_temple_id_and_status"
+    t.index ["temple_id"], name: "index_temple_payments_on_temple_id"
+    t.index ["user_id"], name: "index_temple_payments_on_user_id"
   end
 
   create_table "temple_sections", force: :cascade do |t|
@@ -624,6 +733,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_01_000012) do
   end
 
   add_foreign_key "account_lifecycle_events", "users"
+  add_foreign_key "admin_permissions", "admins", column: "admin_account_id"
+  add_foreign_key "admin_permissions", "temples"
   add_foreign_key "admin_temple_memberships", "admins", column: "admin_account_id"
   add_foreign_key "admin_temple_memberships", "temples"
   add_foreign_key "admins", "users"
@@ -643,6 +754,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_01_000012) do
   add_foreign_key "dev_mode_tokens", "admins"
   add_foreign_key "feature_flag_rollouts", "config_entries"
   add_foreign_key "financial_ledger_entries", "users"
+  add_foreign_key "line_pay_callbacks", "temples"
   add_foreign_key "media_assets", "temples"
   add_foreign_key "message_delivery_archives", "users"
   add_foreign_key "notification_preferences", "users"
@@ -655,7 +767,16 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_01_000012) do
   add_foreign_key "system_audit_logs", "admins"
   add_foreign_key "system_audit_logs", "temples"
   add_foreign_key "system_audit_logs", "users"
+  add_foreign_key "temple_event_registrations", "temple_offerings"
+  add_foreign_key "temple_event_registrations", "temples"
+  add_foreign_key "temple_event_registrations", "users"
+  add_foreign_key "temple_offerings", "temples"
   add_foreign_key "temple_pages", "temples"
+  add_foreign_key "temple_payments", "admins", column: "admin_account_id"
+  add_foreign_key "temple_payments", "financial_ledger_entries"
+  add_foreign_key "temple_payments", "temple_event_registrations"
+  add_foreign_key "temple_payments", "temples"
+  add_foreign_key "temple_payments", "users"
   add_foreign_key "temple_sections", "temple_pages"
   add_foreign_key "usage_billing_snapshots", "users"
   add_foreign_key "user_dependents", "dependents"

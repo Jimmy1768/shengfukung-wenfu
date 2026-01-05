@@ -1,0 +1,24 @@
+<h1><%= @offering.title %></h1>
+
+<dl>
+  <dt>Type</dt>
+  <dd><%= @offering.offering_type.humanize %></dd>
+
+  <dt>Price</dt>
+  <dd><%= number_to_currency(@offering.price_cents / 100.0, unit: @offering.currency) %></dd>
+
+  <dt>Period</dt>
+  <dd><%= @offering.period.presence || "N/A" %></dd>
+
+  <dt>Schedule</dt>
+  <dd><%= [@offering.starts_on, @offering.ends_on].compact.join(" - ").presence || "Flexible" %></dd>
+</dl>
+
+<p>
+  <%= link_to "Manage registrations", admin_offering_offering_orders_path(@offering), class: "button" %>
+  <% if current_admin_permissions&.allow?(:manage_offerings) %>
+    <%= link_to "Edit Offering", edit_admin_offering_path(@offering), class: "button" %>
+  <% end %>
+</p>
+
+<p class="hint"># TODO: Display certificate/logistics metadata once onsite interviews conclude.</p>

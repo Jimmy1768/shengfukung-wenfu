@@ -1,6 +1,7 @@
 module Admin
   class BaseController < ActionController::Base
     include TempleContext
+    include AdminPermissionEnforcer
 
     layout "admin"
     protect_from_forgery with: :exception

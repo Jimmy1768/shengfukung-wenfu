@@ -1,0 +1,26 @@
+<h1>Registration <%= @registration.reference_code %></h1>
+
+<dl>
+  <dt>User</dt>
+  <dd><%= @registration.user&.english_name || "Guest" %></dd>
+
+  <dt>Payment status</dt>
+  <dd><%= @registration.payment_status.humanize %></dd>
+
+  <dt>Total</dt>
+  <dd><%= number_to_currency(@registration.total_price_cents / 100.0, unit: @registration.currency) %></dd>
+</dl>
+
+<p>
+  <% if current_admin_permissions&.allow?(:record_cash_payments) %>
+    <%= link_to "Record cash payment", new_admin_payment_path(registration_id: @registration.id), class: "button" %>
+  <% end %>
+</p>
+
+<h2>Contact details</h2>
+<pre><%= JSON.pretty_generate(@registration.contact_payload || {}) %></pre>
+
+<h2>Logistics</h2>
+<pre><%= JSON.pretty_generate(@registration.logistics_payload || {}) %></pre>
+
+<p class="hint"># TODO: expand contact/logistics structure per temple research.</p>

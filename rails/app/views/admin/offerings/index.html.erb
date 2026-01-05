@@ -1,0 +1,28 @@
+<h1>Temple Offerings</h1>
+
+<p>
+  <%= link_to "New Offering", new_admin_offering_path, class: "button" if current_admin_permissions&.allow?(:manage_offerings) %>
+</p>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Type</th>
+      <th>Price</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @offerings.each do |offering| %>
+      <tr>
+        <td><%= offering.title %></td>
+        <td><%= offering.offering_type.humanize %></td>
+        <td><%= number_to_currency(offering.price_cents / 100.0, unit: offering.currency) %></td>
+        <td><%= offering.active? ? "Active" : "Archived" %></td>
+        <td><%= link_to "View", admin_offering_path(offering) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

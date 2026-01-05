@@ -14,6 +14,14 @@ class Temple < ApplicationRecord
     through: :admin_temple_memberships
   has_many :system_audit_logs,
     dependent: :nullify
+  has_many :temple_offerings,
+    dependent: :destroy
+  has_many :temple_event_registrations,
+    dependent: :destroy
+  has_many :temple_payments,
+    through: :temple_event_registrations
+  has_many :admin_permissions,
+    dependent: :destroy
 
   scope :published, -> { where(published: true) }
   scope :for_admin, lambda { |admin_account|

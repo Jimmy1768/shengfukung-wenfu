@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "building temple management system v1"
+git commit -m "building inital users section"
 git push
 
 git reset --hard HEAD
@@ -110,7 +110,8 @@ bin/rails db:migrate
 ## Temple content API + seeds
 
 - `bin/rails db:seed` now provisions a `Temple` record keyed by `AppConstants::Project.slug`, default pages/sections, and links the seeded owner admin to that temple. The temple-specific copy lives in `rails/db/temples/<slug>.yml`; add a file per client and run `bin/rails temples:seed[slug]` whenever you need to upsert another profile. Run that same command on the production droplet the first time you deploy a temple so the live DB matches the YAML baseline.
-- Default admin credentials (for local dev) come from `PROJECT_DEFAULT_ADMIN_*` env vars; fallback email is `admin@<project-slug>.local`, password `GoldenTemplate!123`.
+- Marketing/demo console (`/marketing/admin`) still uses the `PROJECT_DEFAULT_ADMIN_*` env vars (`admin@<project-slug>.local` / `GoldenTemplate!123` by default).
+- The real temple admin console (`/admin`) now authenticates against the actual `User` records you seed (e.g., `bin/rails "admin_controls:seed_owner[shenfukung-wenfu,email@example.com,Password]"`). Use those seeded credentials when signing in.
 - Admin console → “Profile” lets you edit the copy/contact info surfaced on the Vue site. Form submissions append a `SystemAuditLog`.
 - The Vue app reads `http://localhost:3001/api/v1/temples/:slug` (set via `VITE_API_BASE_URL` + `VITE_TEMPLE_SLUG`). Copy `/vue/.env.example` into the repo root as `.env.development` (or merge into your existing `.env.development`) and adjust those keys when targeting another Rails host.
 - Expo builds now read `EXPO_PROJECT_SLUG`, `EXPO_PROJECT_SCHEME`, `EXPO_ANDROID_PACKAGE`, and `EXPO_IOS_BUNDLE_IDENTIFIER` (falling back to the shared keys when absent), so add those to `.env.*` alongside `MOBILE_API_BASE_URL`, `MOBILE_JWT_LOGIN_PATH`, and `MOBILE_JWT_REFRESH_PATH`.

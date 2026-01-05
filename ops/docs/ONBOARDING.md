@@ -20,13 +20,28 @@ Use this when you need representative data locally or on staging:
    - Run `bin/rails temples:seed[slug]`.
    - The task creates/updates the `Temple`, `TemplePage`, and `TempleSection` records.
 3. **Seed the owner admin (dev helper)**
-   - Run `bin/rails admin_controls:seed_owner[slug,email]`.
-   - Command creates a `User` with deterministic credentials, an `AdminAccount (role: owner)`, and an `AdminTempleMembership` linking the admin to the temple.
+   - Run the Rake task with shell quoting so zsh doesn’t glob the brackets:
+     ```bash
+     bin/rails "admin_controls:seed_owner[shenfukung-wenfu,admin@shenfukung-wenfu.local]"
+     ```
+   - The task creates a `User` with deterministic credentials, an `AdminAccount (role: owner)`, and an `AdminTempleMembership` linking the admin to the temple.
    - Credentials default to `admin@<slug>.local` / `GoldenTemplate!123` unless you pass overrides.
 4. **Smoke test**
    - Sign in at `/admin`.
+   - Use the email/password you passed to `admin_controls:seed_owner` (these accounts are stored in the `users` table; the marketing demo credentials no longer apply here).
    - Verify the temple profile shows the placeholder QR and owner-only panels.
    - Ensure audit logs are written when editing basic fields.
+5. **Seed financial offerings + permissions (new subsystem)**
+   - Preload the five legacy offerings (incense donation, family peace, lantern, ancestor ritual, pudu tables):
+     ```bash
+     bin/rails "temple_financial:seed_offerings[shenfukung-wenfu]"
+     ```
+   - Grant the owner or staffer financial permissions (repeat per admin):
+     ```bash
+     bin/rails "temple_financial:grant_permissions[shenfukung-wenfu,admin@shenfukung-wenfu.local]"
+     ```
+   - Cash-only pipeline: use `/admin/offerings/<id>/orders` to create registrations, then “Record cash payment” to log receipts + ledger entries. LINE Pay arrives after onsite validation.
+   - Cash-only pipeline: use `/admin/offerings/<id>/orders` to create registrations, then “Record cash payment” to log receipts + ledger entries. LINE Pay arrives after onsite validation.
 
 ## Production Flow
 
@@ -37,7 +52,7 @@ Production onboarding avoids creating real user passwords in seeds—only the te
 3. **Owner self-signup**
    - Have the temple contact sign in via OAuth/password on `/account` to create their `User` row.
 4. **Promote owner**
-   - Run `bin/rails admin_controls:promote_owner[slug,email]` or use `rails console`:
+   - Run `bin/rails "admin_controls:promote_owner[slug,email]"` or use `rails console`:
      ```ruby
      temple = Temple.find_by!(slug: "slug")
      user = User.find_by!(email: "owner@example.com")
@@ -45,8 +60,13 @@ Production onboarding avoids creating real user passwords in seeds—only the te
      AdminTempleMembership.find_or_create_by!(temple: temple, admin_account: admin) { |m| m.role = :owner }
      ```
    - Email the owner once `/admin` access is ready.
+   - Remind them to sign in with that email/password; the marketing demo credentials are only for `/marketing/admin`.
 5. **Owner invites staff**
    - Inside the admin console (feature pending), the owner can invite additional admins scoped to their temple.
+6. **Financial onboarding**
+   - Gather LINE Pay channel ID/secret but keep them out of Git; store temporarily in `etc/default/<slug>.env` until vaulting is ready.
+   - Decide which staff get financial permissions and run `bin/rails "temple_financial:grant_permissions[slug,email]"`.
+   - Cash entries live under `/admin/offerings/...` while we finish LINE Pay.
 
 ## Owner Privileges
 

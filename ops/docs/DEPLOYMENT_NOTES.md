@@ -36,7 +36,7 @@
 
 ### 1. Rails (core backend + admin)
 - Source lives under `rails/`; the Rails process serves HTML, Turbo/Stimulus interactions, admin tooling, and JSON APIs from `public/` and controllers.
-- `/admin` hosts the real admin console scaffold (login + dashboard). `/marketing/admin` stays mapped to the `Dev::Demo::Rails` showcase. Both share the seeded credentials (`PROJECT_DEFAULT_ADMIN_EMAIL/PASSWORD`) but store different session keys so you can demo safely.
+- `/admin` hosts the real admin console scaffold (login + dashboard). `/marketing/admin` stays mapped to the `Dev::Demo::Rails` showcase. The showcase continues to use the `PROJECT_DEFAULT_ADMIN_*` credentials, while `/admin` now authenticates against the real users you provision via `admin_controls:seed_owner` / `admin_controls:promote_owner`.
 - Temple-facing CRUD lives in the new `Temple`, `TemplePage`, `TempleSection`, `MediaAsset`, and `AdminTempleMembership` models. `db/seeds/temples.rb` provisions a baseline profile + sections using the YAML under `rails/db/temples/<slug>.yml` (defaults to `AppConstants::Project.slug`), and the admin seed links the default owner account to that temple so `/admin/temple/profile` is usable immediately after `bin/rails db:seed`. Use `bin/rails temples:seed[other-slug]` whenever you need to upsert an additional temple. The API surface exposes `/api/v1/temples/:slug` for Vue/mobile clients; keep those tables migrated whenever you promote the template to a client.
 - `/account` exposes the user-facing placeholder portal. Override `PROJECT_DEFAULT_USER_EMAIL` / `_PASSWORD` when cloning for a new client.
 - Assets stay in `rails/public/backend/assets`, `packs`, and `uploads`. Do not mix Vue builds here—Rails owns `/` routes for admin dashboards.
