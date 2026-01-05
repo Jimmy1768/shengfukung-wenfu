@@ -17,7 +17,6 @@ module Seeds
       temple = ensure_temple(config)
       ensure_pages(temple)
       ensure_sections(temple)
-      ensure_placeholder_qr(temple)
       puts "Temple profile ready (#{temple.slug})." # rubocop:disable Rails/Output
     end
 
@@ -33,20 +32,6 @@ module Seeds
       config = raw.deep_stringify_keys
       config["slug"] ||= slug
       config
-    end
-
-    def ensure_placeholder_qr(temple)
-      placeholder = Rails.root.join("public", PLACEHOLDER_QR_PATH)
-      return unless File.exist?(placeholder)
-
-      temple.media_assets.find_or_create_by!(role: :line_pay_qr) do |asset|
-        asset.file_uid = "line-pay-qr-placeholder"
-        asset.alt_text = "LINE Pay QR placeholder"
-        asset.metadata = {
-          "url" => "/#{PLACEHOLDER_QR_PATH}",
-          "source" => "placeholder"
-        }
-      end
     end
 
     def ensure_temple(config)

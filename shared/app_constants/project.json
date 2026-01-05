@@ -1,7 +1,7 @@
 {
   "name": "竹南鎮聖福宮",
-  "englishName": "Shenfukung Wenfu",
   "slug": "shenfukung-wenfu",
+  "defaultThemeKey": "temple-1",
   "scheme": "shenfukungwenfu",
   "easProjectId": "9bb5082f-2b35-4168-bcf7-5a09c61bd2e1",
   "bundlePrefix": "com.shenfukungwenfu.console",

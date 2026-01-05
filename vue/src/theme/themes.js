@@ -8,7 +8,7 @@ export const defaultThemeId = 'temple-1';
 export const themes = {
   "temple-1": {
     "id": "temple-1",
-    "label": "Temple 1",
+    "label": "Temple Red",
     "mode": "light",
     "description": "Warm ivory surfaces, temple reds, and brass accents for the public site.",
     "tokens": {

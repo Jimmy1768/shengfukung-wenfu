@@ -18,7 +18,7 @@ Use this when you need representative data locally or on staging:
    - Commit the file.
 2. **Seed the temple**
    - Run `bin/rails temples:seed[slug]`.
-   - The task creates/updates the `Temple`, `TemplePage`, `TempleSection`, and placeholder QR `MediaAsset`.
+   - The task creates/updates the `Temple`, `TemplePage`, and `TempleSection` records.
 3. **Seed the owner admin (dev helper)**
    - Run `bin/rails admin_controls:seed_owner[slug,email]`.
    - Command creates a `User` with deterministic credentials, an `AdminAccount (role: owner)`, and an `AdminTempleMembership` linking the admin to the temple.
@@ -48,12 +48,6 @@ Production onboarding avoids creating real user passwords in seeds—only the te
 5. **Owner invites staff**
    - Inside the admin console (feature pending), the owner can invite additional admins scoped to their temple.
 
-## Placeholder QR Policy
-
-- Seeds now drop `rails/public/system/placeholders/line-pay-qr.png` (copied from the favicon pack) and create a `MediaAsset` with `role: line_pay_qr` for every temple.
-- Until real uploads ship, the admin profile shows this asset with explanatory text.
-- When LINE Pay credentials arrive, the owner admin can swap the QR via the upcoming upload flow; the API will continue to return the `media_assets` array so Vue/Expo clients stay stable.
-
 ## Owner Privileges
 
 | Capability                 | Owner | Staff |
@@ -70,7 +64,7 @@ Keep this matrix in sync with UI checks (`current_admin.admin_account.owner?` / 
 
 - [ ] YAML authored + committed.
 - [ ] `bin/rails temples:seed[slug]` run (dev + prod).
-- [ ] Placeholder QR present (`temple.media_assets.line_pay_qr`).
+- [ ] Payment onboarding planned (LINE Pay credentials collected, offerings TBD).
 - [ ] Owner admin provisioned (dev task or manual promote).
 - [ ] Admin UI tested (profile edit, audit log, QR display).
 - [ ] Deployment notes updated only for template-level changes; keep temple-specific updates here.

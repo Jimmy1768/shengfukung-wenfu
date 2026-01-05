@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "json"
+require Rails.root.join("app", "lib", "themes", "palettes")
 
 module AppConstants
   module Project
@@ -11,6 +12,7 @@ module AppConstants
     DEFAULT_NAME = RAW_CONFIG.fetch("name", "Golden Template").freeze
     DEFAULT_MARKETING_ROOT = RAW_CONFIG.fetch("marketingRoot", "/var/www/#{DEFAULT_SLUG}")
     DEFAULT_SYSTEMD_ENV_DIR = RAW_CONFIG.fetch("systemdEnvDir", "/etc/default")
+    DEFAULT_THEME_KEY = RAW_CONFIG.fetch("defaultThemeKey", Themes::DEFAULT_KEY)
 
     SLUG = ENV.fetch("PROJECT_SLUG", DEFAULT_SLUG).freeze
     NAME = ENV.fetch("PROJECT_NAME", DEFAULT_NAME).freeze
@@ -45,6 +47,10 @@ module AppConstants
 
     def self.nginx_config_filename
       "#{SLUG}.conf"
+    end
+
+    def self.default_theme_key
+      ENV.fetch("PROJECT_DEFAULT_THEME_KEY", DEFAULT_THEME_KEY)
     end
   end
 end

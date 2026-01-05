@@ -26,6 +26,12 @@ function loadProjectConfig(env = process.env) {
     env.PROJECT_SYSTEMD_ENV_FILE ||
     path.join(systemdEnvDir, `${slug}-env`);
 
+  const defaultThemeKey =
+    env.PROJECT_DEFAULT_THEME_KEY ||
+    raw.defaultThemeKey ||
+    raw.defaultTheme ||
+    "temple-1";
+
   return {
     ...raw,
     name,
@@ -33,6 +39,7 @@ function loadProjectConfig(env = process.env) {
     marketingRoot,
     systemdEnvDir,
     systemdEnvFile,
+    defaultThemeKey,
     scheme: raw.scheme || slug,
     bundlePrefix: raw.bundlePrefix || `com.${slug.replace(/-/g, "")}`,
     pumaServiceName: `${slug}.service`,

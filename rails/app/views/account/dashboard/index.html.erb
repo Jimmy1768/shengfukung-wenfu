@@ -1,22 +1,37 @@
-<section class="hero">
-  <div class="hero-text">
-    <p class="eyebrow">Client portal</p>
-    <h1>Hi, <%= current_user&.english_name || current_user&.email %></h1>
-    <p>Replace this screen with the member-facing experience (bookings, orders, support, etc.).</p>
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow">會員專區</p>
+      <h2>Hi, <%= current_user.english_name.presence || current_user.email %></h2>
+      <p>Replace 這段描述 with real instructions for members once the flows are wired。</p>
+    </div>
+  </header>
+
+  <div class="quick-links">
+    <% @quick_actions.each do |action| %>
+      <%= link_to action[:label], action[:url], class: "quick-link-card" %>
+    <% end %>
   </div>
 </section>
 
-<section class="card">
-  <header>
-    <h2>Upcoming items</h2>
-    <p>Placeholder tiles to demonstrate layout and styling.</p>
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow">Upcoming</p>
+      <h2>近期活動</h2>
+      <p>示範資料，接上活動/點燈 API 後會自動更新。</p>
+    </div>
+    <%= link_to "全部活動", account_events_path, class: "pill-link secondary" %>
   </header>
-  <ul class="idea-list">
+
+  <div class="event-grid">
     <% @upcoming_items.each do |item| %>
-      <li>
-        <strong><%= item[:title] %></strong>
-        <p><%= item[:body] %></p>
-      </li>
+      <article class="event-card">
+        <p class="event-date"><%= item[:date] %></p>
+        <h3><%= item[:title] %></h3>
+        <p class="event-meta"><%= item[:status] %></p>
+        <p class="event-notes"><%= item[:description] %></p>
+      </article>
     <% end %>
-  </ul>
+  </div>
 </section>

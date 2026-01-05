@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="<%= @active_theme_key %>">
   <head>
     <meta charset="utf-8" />
     <title><%= AppConstants::Project.name %> · Account</title>
@@ -7,19 +7,31 @@
     <%= csp_meta_tag %>
     <link rel="stylesheet" href="/backend/assets/account.css" />
   </head>
-  <body class="admin-body">
-    <div class="admin-shell">
-      <header class="admin-nav">
-        <div class="brand">
-          <span class="brand-name"><%= AppConstants::Project.name %></span>
+  <body class="account-body account-theme-<%= @active_theme_key %>">
+    <% if Rails.env.development? %>
+      <%= render "account/themes/dev_toggle" %>
+    <% end %>
+    <div class="account-shell">
+      <header class="account-hero">
+        <div class="account-hero-inner">
+          <div class="account-brand">
+            <p class="account-eyebrow">Dev preview</p>
+            <h1><%= AppConstants::Project.name %></h1>
+            <p class="account-blurb">會員專區：查看活動、付款記錄，更新個人資料。</p>
+          </div>
+          <% if user_signed_in? %>
+            <nav class="account-hero-actions">
+              <%= link_to "儀表板", account_dashboard_path, class: "pill-link #{active_nav?(account_dashboard_path) ? "active" : ""}" %>
+              <%= link_to "個人資料", account_profile_path, class: "pill-link #{active_nav?(account_profile_path) ? "active" : ""}" %>
+              <%= link_to "活動", account_events_path, class: "pill-link #{active_nav?(account_events_path) ? "active" : ""}" %>
+              <%= link_to "付款紀錄", account_payments_path, class: "pill-link #{active_nav?(account_payments_path) ? "active" : ""}" %>
+              <%= button_to "登出", account_logout_path, method: :delete, class: "pill-link danger" %>
+            </nav>
+          <% end %>
         </div>
-        <% if user_signed_in? %>
-          <nav class="nav-links">
-            <%= button_to "Sign out", account_logout_path, method: :delete, class: "nav-link logout-button" %>
-          </nav>
-        <% end %>
       </header>
-      <main class="admin-main">
+
+      <main class="account-main">
         <% flash.each do |type, message| %>
           <div class="flash flash-<%= type %>"><%= message %></div>
         <% end %>

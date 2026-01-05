@@ -96,27 +96,3 @@
     </div>
   <% end %>
 </section>
-
-<section class="card">
-  <header>
-    <h2>Payment QR (LINE Pay)</h2>
-    <p>Placeholder preview until the upload flow is live.</p>
-  </header>
-
-  <% qr_url = @line_pay_asset&.url || @line_pay_asset&.file_uid %>
-
-  <% if qr_url.present? %>
-    <div class="qr-preview">
-      <%= image_tag qr_url, alt: (@line_pay_asset&.alt_text || "LINE Pay QR"), style: "width: 180px; height: 180px; object-fit: contain; border: 1px solid var(--border-muted); border-radius: 12px; padding: 12px; background: #fff;" %>
-    </div>
-  <% else %>
-    <p class="muted">No QR placeholder available. Rerun <code>bin/rails temples:seed</code> to generate one.</p>
-  <% end %>
-
-  <% if owner_of_current_temple? %>
-    <p class="note">You are the owner admin. Real uploads will land here soon; keep this placeholder until the LINE Pay QR is ready.</p>
-    <%= button_tag "Upload LINE Pay QR (coming soon)", class: "btn secondary", type: "button", disabled: true %>
-  <% else %>
-    <p class="note">Only the owner admin can update the QR. Contact them if you need to replace this placeholder.</p>
-  <% end %>
-</section>

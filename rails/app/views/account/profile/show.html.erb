@@ -1,0 +1,34 @@
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow">會員資料</p>
+      <h2>個人資料</h2>
+      <p>更新聯絡方式、服務備註，方便寺廟聯繫。</p>
+    </div>
+    <%= link_to "編輯資料", edit_account_profile_path, class: "pill-link primary" %>
+  </header>
+
+  <div class="profile-summary">
+    <div>
+      <span class="label">姓名</span>
+      <p><%= current_user.english_name.presence || "尚未填寫" %></p>
+    </div>
+    <div>
+      <span class="label">中文姓名</span>
+      <p><%= current_user.native_name.presence || "尚未填寫" %></p>
+    </div>
+    <div>
+      <span class="label">電話</span>
+      <p><%= current_user.metadata&.dig("phone") || "尚未填寫" %></p>
+    </div>
+    <div>
+      <span class="label">居住區</span>
+      <p><%= current_user.metadata&.dig("city") || "尚未填寫" %></p>
+    </div>
+  </div>
+
+  <div class="profile-notes">
+    <span class="label">備註</span>
+    <p><%= current_user.metadata&.dig("notes").presence || "尚無備註。" %></p>
+  </div>
+</section>

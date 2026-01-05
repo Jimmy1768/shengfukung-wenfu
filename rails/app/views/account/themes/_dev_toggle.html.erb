@@ -1,0 +1,11 @@
+<aside class="dev-theme-toggle">
+  <p class="dev-theme-label">Theme preview</p>
+  <div class="dev-theme-options">
+    <% account_theme_options.each do |theme| %>
+      <%= button_to theme[:label],
+        dev_theme_path(theme_key: theme[:id]),
+        method: :post,
+        class: ["dev-theme-button", ("active" if theme[:id] == @active_theme_key)] %>
+    <% end %>
+  </div>
+</aside>

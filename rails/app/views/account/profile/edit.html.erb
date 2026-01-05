@@ -1,0 +1,40 @@
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow">會員資料</p>
+      <h2>編輯個人資料</h2>
+      <p>這些資訊僅提供寺廟工作人員聯繫之用，不會對外公開。</p>
+    </div>
+  </header>
+
+  <%= form_with model: @form, url: account_profile_path, method: :put, class: "profile-form" do |f| %>
+    <div class="form-grid">
+      <div class="field">
+        <%= f.label :english_name, "姓名" %>
+        <%= f.text_field :english_name, required: true %>
+      </div>
+      <div class="field">
+        <%= f.label :native_name, "中文姓名" %>
+        <%= f.text_field :native_name %>
+      </div>
+      <div class="field">
+        <%= f.label :phone, "電話" %>
+        <%= f.text_field :phone %>
+      </div>
+      <div class="field">
+        <%= f.label :city, "居住區" %>
+        <%= f.text_field :city %>
+      </div>
+    </div>
+
+    <div class="field">
+      <%= f.label :notes, "備註" %>
+      <%= f.text_area :notes, rows: 3 %>
+    </div>
+
+    <div class="form-actions">
+      <%= f.submit "儲存", class: "pill-link primary" %>
+      <%= link_to "取消", account_profile_path, class: "pill-link" %>
+    </div>
+  <% end %>
+</section>

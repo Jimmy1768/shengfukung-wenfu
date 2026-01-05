@@ -1,0 +1,47 @@
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow">活動與法會</p>
+      <h2>即將到來</h2>
+      <p>查看已報名的服務與法會，掌握集合時間與注意事項。</p>
+    </div>
+  </header>
+
+  <div class="event-grid">
+    <% @upcoming_events.each do |event| %>
+      <article class="event-card">
+        <p class="event-date"><%= event[:date] %></p>
+        <h3><%= event[:title] %></h3>
+        <p class="event-meta"><%= event[:location] %> · <%= event[:status] %></p>
+        <p class="event-notes"><%= event[:description] || event[:notes] %></p>
+      </article>
+    <% end %>
+  </div>
+</section>
+
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow">活動與法會</p>
+      <h2>活動回顧</h2>
+      <p>查看過往參與紀錄，若有相簿可直接開啟。</p>
+    </div>
+  </header>
+
+  <div class="timeline">
+    <% @past_events.each do |event| %>
+      <div class="timeline-entry">
+        <div class="timeline-dot"></div>
+        <div>
+          <p class="timeline-date"><%= event[:date] %></p>
+          <h3><%= event[:title] %></h3>
+          <% if event[:gallery] %>
+            <%= link_to "查看相簿", "#", class: "pill-link secondary" %>
+          <% else %>
+            <p class="muted">相簿整理中。</p>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>

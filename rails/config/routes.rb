@@ -47,6 +47,9 @@ namespace :marketing_admin, path: "/marketing/admin", module: "dev/demo/rails" d
     post "/register", to: "registrations#create"
 
     get "/dashboard", to: "dashboard#index", as: :dashboard
+    resource :profile, only: %i[show edit update], controller: "profile"
+    resources :events, only: :index
+    resources :payments, only: :index
   end
 
   resource :password, controller: "utils/passwords", only: %i[new create edit]
@@ -55,4 +58,10 @@ namespace :marketing_admin, path: "/marketing/admin", module: "dev/demo/rails" d
   # --- OmniAuth callbacks -----------------------------------------------------
   match "/auth/:provider/callback", to: "auth/omniauth#callback", via: %i[get post]
   match "/auth/failure", to: "auth/omniauth#failure", via: %i[get post]
+
+  if Rails.env.development?
+    namespace :dev do
+      resource :theme, only: :create, controller: "theme_previews"
+    end
+  end
 end
