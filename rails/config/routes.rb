@@ -42,7 +42,14 @@ namespace :marketing_admin, path: "/marketing/admin", module: "dev/demo/rails" d
         controller: "offering_orders",
         only: %i[index new create show]
     end
-    resources :payments, only: %i[new create]
+    resources :orders, only: :index
+    resources :payments, only: %i[index new create] do
+      collection do
+        get :export
+      end
+    end
+    resources :permissions, only: %i[index update], param: :admin_account_id
+    resources :patrons, only: %i[index create]
   end
 
   # --- User account console --------------------------------------------------
@@ -51,11 +58,12 @@ namespace :marketing_admin, path: "/marketing/admin", module: "dev/demo/rails" d
     get "/login", to: "sessions#new", as: :login
     post "/login", to: "sessions#create", as: :sessions
     match "/logout", to: "sessions#destroy", via: %i[delete post], as: :logout
-    get "/register", to: "registrations#new", as: :register
-    post "/register", to: "registrations#create"
+    get "/register", to: "signups#new", as: :register
+    post "/register", to: "signups#create"
 
     get "/dashboard", to: "dashboard#index", as: :dashboard
     resource :profile, only: %i[show edit update], controller: "profile"
+    resources :registrations, only: %i[index show edit update]
     resources :events, only: :index
     resources :payments, only: :index
   end

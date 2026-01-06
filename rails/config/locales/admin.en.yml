@@ -1,0 +1,101 @@
+en:
+  admin:
+    registration_form:
+      title: "New onsite registration"
+      subtitle: "Connect a patron and capture interview notes for %{offering}."
+      errors_heading: "%{count} issues prevented saving"
+      sections:
+        patron: "Patron"
+        order: "Order"
+        contact: "Contact"
+        logistics: "Logistics"
+        ritual_metadata: "Ritual metadata"
+      headings:
+        patron: "Select or create patron"
+        order: "Order details"
+        contact: "Primary contact"
+        logistics: "Service logistics"
+        ritual_metadata: "Ceremony notes"
+        new_patron: "Create patron"
+      hints:
+        patron: "Search by name/email, preview dependents, or create a patron inline."
+        patron_search: "Type at least two characters to find existing patrons."
+        results_placeholder: "Search to load existing patrons."
+        no_results_placeholder: "No patrons found – adjust the search or create a new one."
+        new_patron: "Inline creates capture just the basics; refine their profile later."
+        order: "Adjust price/quantity for onsite bundles or negotiated offerings."
+        contact: "Capture the onsite delegate verifying household details."
+        logistics: "Track preferred schedule windows shared during the interview."
+        ritual_metadata: "Document plaque wording, incense preferences, and certificate notes."
+        selected_patron: "Selected %{name}."
+        created_patron: "%{name} created and selected."
+        no_patron: "No patron selected yet."
+        dependents: "List household members or relationship context."
+        unit_price: "Defaults to the offering price if left blank."
+        manual_user_id: "If JavaScript is disabled, enter the numeric user ID."
+      fields:
+        quantity: "Quantity"
+        unit_price: "Unit price (cents)"
+        currency: "Currency"
+        certificate_number: "Certificate number"
+        primary_contact: "Primary contact"
+        phone: "Phone"
+        email: "Email"
+        dependents: "Household / dependents"
+        contact_notes: "Contact notes"
+        preferred_date: "Preferred date"
+        preferred_slot: "Preferred slot"
+        arrival_window: "Arrival window"
+        ceremony_location: "Ceremony location"
+        ancestor_placard: "Ancestor placard name"
+        dedication_message: "Dedication message"
+        incense_option: "Incense option"
+        certificate_notes: "Certificate notes"
+        search_patron: "Search patrons"
+        manual_user_id: "Patron user ID"
+      placeholders:
+        patron_search: "e.g., Chen or lantern donor"
+        preferred_slot: "Morning / Afternoon"
+      actions:
+        submit: "Create registration"
+        select_patron: "Select"
+        create_patron: "Create patron"
+      labels:
+        dependents: "Dependents:"
+      errors:
+        search_failed: "Unable to search patrons right now."
+        create_failed: "Unable to create patron."
+    registration_show:
+      sections:
+        summary: "Registration"
+        contact: "Contact"
+        logistics: "Logistics"
+        ritual: "Ritual metadata"
+      headings:
+        contact: "Primary contact"
+        logistics: "Schedule & logistics"
+        ritual: "Ceremony notes"
+      labels:
+        patron: "Patron"
+        guest: "Guest"
+        quantity: "Quantity"
+        payment_status: "Payment status"
+        total: "Total"
+        certificate_number: "Certificate number"
+      hints:
+        summary: "Details for %{offering}."
+      actions:
+        record_cash: "Record cash payment"
+    offering_form:
+      sections:
+        basics: "Basics"
+        certificate: "Certificate settings"
+        logistics: "Logistics metadata"
+      fields:
+        certificate_prefix: "Certificate prefix"
+        certificate_hint: "Certificate instructions"
+        ancestor_placard_hint: "Ancestor placard hint"
+        logistics_notes: "Default logistics notes"
+      hints:
+        certificate: "Define how certificates should be numbered/labeled."
+        logistics: "Guidance that appears on registration forms for staff."

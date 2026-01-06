@@ -1,24 +1,68 @@
-<h1><%= @offering.title %></h1>
+<section class="card">
+  <header>
+    <p class="eyebrow"><%= t("admin.offering_form.sections.basics") %></p>
+    <h1><%= @offering.title %></h1>
+    <p class="muted"><%= @offering.description %></p>
+  </header>
+  <dl class="detail-grid">
+    <div>
+      <dt>Type</dt>
+      <dd><%= @offering.offering_type.humanize %></dd>
+    </div>
+    <div>
+      <dt><%= t("admin.registration_form.fields.unit_price") %></dt>
+      <dd><%= number_to_currency(@offering.price_cents / 100.0, unit: @offering.currency) %></dd>
+    </div>
+    <div>
+      <dt>Period</dt>
+      <dd><%= @offering.period.presence || "N/A" %></dd>
+    </div>
+    <div>
+      <dt>Schedule</dt>
+      <dd><%= [@offering.starts_on, @offering.ends_on].compact.join(" - ").presence || "Flexible" %></dd>
+    </div>
+  </dl>
+  <div class="actions">
+    <%= link_to "Manage registrations", admin_offering_offering_orders_path(@offering), class: "button" %>
+    <% if current_admin_permissions&.allow?(:manage_offerings) %>
+      <%= link_to "Edit offering", edit_admin_offering_path(@offering), class: "button secondary" %>
+    <% end %>
+  </div>
+</section>
 
-<dl>
-  <dt>Type</dt>
-  <dd><%= @offering.offering_type.humanize %></dd>
+<% metadata = @offering.metadata.with_indifferent_access %>
+<section class="card">
+  <header>
+    <p class="eyebrow"><%= t("admin.offering_form.sections.certificate") %></p>
+    <h2><%= t("admin.offering_form.sections.certificate") %></h2>
+    <p class="muted"><%= t("admin.offering_form.hints.certificate") %></p>
+  </header>
+  <dl class="detail-grid">
+    <div>
+      <dt><%= t("admin.offering_form.fields.certificate_prefix") %></dt>
+      <dd><%= metadata[:certificate_prefix].presence || "—" %></dd>
+    </div>
+    <div>
+      <dt><%= t("admin.offering_form.fields.certificate_hint") %></dt>
+      <dd><%= metadata[:certificate_hint].presence || "—" %></dd>
+    </div>
+  </dl>
+</section>
 
-  <dt>Price</dt>
-  <dd><%= number_to_currency(@offering.price_cents / 100.0, unit: @offering.currency) %></dd>
-
-  <dt>Period</dt>
-  <dd><%= @offering.period.presence || "N/A" %></dd>
-
-  <dt>Schedule</dt>
-  <dd><%= [@offering.starts_on, @offering.ends_on].compact.join(" - ").presence || "Flexible" %></dd>
-</dl>
-
-<p>
-  <%= link_to "Manage registrations", admin_offering_offering_orders_path(@offering), class: "button" %>
-  <% if current_admin_permissions&.allow?(:manage_offerings) %>
-    <%= link_to "Edit Offering", edit_admin_offering_path(@offering), class: "button" %>
-  <% end %>
-</p>
-
-<p class="hint"># TODO: Display certificate/logistics metadata once onsite interviews conclude.</p>
+<section class="card">
+  <header>
+    <p class="eyebrow"><%= t("admin.offering_form.sections.logistics") %></p>
+    <h2><%= t("admin.offering_form.sections.logistics") %></h2>
+    <p class="muted"><%= t("admin.offering_form.hints.logistics") %></p>
+  </header>
+  <dl class="detail-grid">
+    <div>
+      <dt><%= t("admin.offering_form.fields.ancestor_placard_hint") %></dt>
+      <dd><%= metadata[:ancestor_placard_hint].presence || "—" %></dd>
+    </div>
+    <div>
+      <dt><%= t("admin.offering_form.fields.logistics_notes") %></dt>
+      <dd><%= metadata[:logistics_notes].presence || "—" %></dd>
+    </div>
+  </dl>
+</section>

@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "building inital users section"
+git commit -m "building temple offerings system v1"
 git push
 
 git reset --hard HEAD
@@ -30,8 +30,6 @@ bin/build_rails_css
 # Inspect resolved project constants (slug, roots, service names)
 bin/project_info
 
-# Create a new client repo from Golden Template (local-only script)
-bin/local-only/new_client_from_template.sh "Client Name" client-slug
 ```
 
 ---
@@ -103,6 +101,11 @@ bundle exec rails server -p 3001 -b 0.0.0.0
 
 # Run any pending migrations
 bin/rails db:migrate
+
+# Targeted integration tests for new admin/user flows
+bundle exec rails test test/integration/admin/offerings_audit_test.rb
+bundle exec rails test test/integration/admin/patron_picker_test.rb
+bundle exec rails test test/integration/account/account_portal_flow_test.rb
 ```
 
 ---

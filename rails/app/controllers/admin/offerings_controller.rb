@@ -19,6 +19,7 @@ module Admin
       @offering = current_temple.temple_offerings.new(offering_params)
 
       if @offering.save
+        log_offering_event("admin.offerings.create")
         redirect_to admin_offering_path(@offering), notice: "Offering created successfully."
       else
         render :new, status: :unprocessable_entity
@@ -29,6 +30,7 @@ module Admin
 
     def update
       if @offering.update(offering_params)
+        log_offering_event("admin.offerings.update")
         redirect_to admin_offering_path(@offering), notice: "Offering updated successfully."
       else
         render :edit, status: :unprocessable_entity
@@ -46,7 +48,7 @@ module Admin
     end
 
     def offering_params
-      params.require(:temple_offering).permit(
+      permitted = params.require(:temple_offering).permit(
         :slug,
         :offering_type,
         :title,
@@ -58,7 +60,28 @@ module Admin
         :ends_on,
         :available_slots,
         :active,
-        metadata: {}
+        metadata_settings: %i[certificate_prefix certificate_hint ancestor_placard_hint logistics_notes]
+      )
+      permitted[:metadata] = sanitize_metadata_settings(permitted.delete(:metadata_settings))
+      permitted
+    end
+
+    def sanitize_metadata_settings(raw)
+      return {} if raw.blank?
+
+      raw.to_h.transform_values { |value| value.is_a?(String) ? value.strip : value }.compact_blank
+    end
+
+    def log_offering_event(action)
+      SystemAuditLogger.log!(
+        action:,
+        admin: current_admin,
+        target: @offering,
+        metadata: {
+          offering_id: @offering.id,
+          changes: @offering.previous_changes.except("updated_at", "created_at")
+        },
+        temple: current_temple
       )
     end
   end

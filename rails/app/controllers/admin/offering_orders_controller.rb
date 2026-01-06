@@ -12,6 +12,7 @@ module Admin
 
     def new
       @registration = @offering.temple_event_registrations.new(quantity: 1)
+      prepare_registration_payloads
     end
 
     def create
@@ -26,6 +27,7 @@ module Admin
       redirect_to admin_offering_offering_order_path(@offering, @registration), notice: "Registration created."
     rescue ActiveRecord::RecordInvalid => e
       @registration = e.record
+      prepare_registration_payloads
       render :new, status: :unprocessable_entity
     end
 
@@ -52,21 +54,28 @@ module Admin
         :unit_price_cents,
         :currency,
         :certificate_number,
-        :event_slug
+        :event_slug,
+        contact_details: %i[primary_contact email phone dependents_notes notes],
+        logistics_details: %i[preferred_date preferred_slot arrival_window ceremony_location],
+        ritual_metadata: %i[ancestor_placard_name dedication_message incense_option certificate_notes]
       )
-      permitted[:contact_payload] = parse_json_field(:contact_payload)
-      permitted[:logistics_payload] = parse_json_field(:logistics_payload)
-      permitted[:metadata] = parse_json_field(:metadata)
+      permitted[:contact_payload] = sanitize_payload(permitted.delete(:contact_details))
+      permitted[:logistics_payload] = sanitize_payload(permitted.delete(:logistics_details))
+      metadata_fields = sanitize_payload(permitted.delete(:ritual_metadata))
+      permitted[:metadata] = metadata_fields
       permitted
     end
 
-    def parse_json_field(field)
-      raw = params[:temple_event_registration][field]
-      return {} if raw.blank?
+    def sanitize_payload(raw_hash)
+      return {} if raw_hash.blank?
 
-      JSON.parse(raw)
-    rescue JSON::ParserError
-      {}
+      raw_hash.to_h.transform_values { |value| value.is_a?(String) ? value.strip : value }.compact_blank
+    end
+
+    def prepare_registration_payloads
+      @registration.contact_payload ||= {}
+      @registration.logistics_payload ||= {}
+      @registration.metadata ||= {}
     end
   end
 end

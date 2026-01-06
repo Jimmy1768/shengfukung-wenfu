@@ -1,0 +1,50 @@
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow">報名資料</p>
+      <h2><%= @registration.temple_offering&.title || @registration.reference_code %></h2>
+      <p>更新聯絡方式或檢視憑證資訊。</p>
+    </div>
+    <%= link_to "編輯資料", edit_account_registration_path(@registration), class: "pill-link" %>
+  </header>
+
+  <dl class="detail-list">
+    <div>
+      <dt>參加人</dt>
+      <dd><%= current_user.english_name %></dd>
+    </div>
+    <div>
+      <dt>證書號碼</dt>
+      <dd><%= @registration.certificate_number.presence || "處理中" %></dd>
+    </div>
+    <div>
+      <dt>報名狀態</dt>
+      <dd><span class="status-pill status-<%= @registration.payment_status %>"><%= @registration.payment_status %></span></dd>
+    </div>
+    <div>
+      <dt>數量/金額</dt>
+      <dd><%= @registration.quantity %> × <%= number_to_currency(@registration.unit_price_cents / 100.0, unit: @registration.currency) %></dd>
+    </div>
+  </dl>
+
+  <article class="card">
+    <h3>聯絡資訊</h3>
+    <% contact = @registration.contact_payload || {} %>
+    <ul class="detail-list">
+      <li><strong>聯絡人：</strong><%= contact["primary_contact"].presence || "—" %></li>
+      <li><strong>電話：</strong><%= contact["phone"].presence || "—" %></li>
+      <li><strong>Email：</strong><%= contact["email"].presence || "—" %></li>
+      <li><strong>家庭/隨行：</strong><%= contact["dependents_notes"].presence || "—" %></li>
+    </ul>
+  </article>
+
+  <article class="card">
+    <h3>行程與儀式備註</h3>
+    <% logistics = @registration.logistics_payload || {} %>
+    <% metadata = @registration.metadata || {} %>
+    <ul class="detail-list">
+      <li><strong>到場時間：</strong><%= logistics["arrival_window"].presence || "—" %></li>
+      <li><strong>儀式備註：</strong><%= metadata["ceremony_notes"].presence || "—" %></li>
+    </ul>
+  </article>
+</section>

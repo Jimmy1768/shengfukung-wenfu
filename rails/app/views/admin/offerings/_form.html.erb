@@ -1,4 +1,4 @@
-<%= form_with model: [:admin, @offering] do |form| %>
+<%= form_with model: [:admin, @offering], local: true, class: "form-stack" do |form| %>
   <% if @offering.errors.any? %>
     <div class="alert alert-danger">
       <h3><%= pluralize(@offering.errors.count, "error") %> prevented saving:</h3>
@@ -10,60 +10,115 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= form.label :title %>
-    <%= form.text_field :title %>
-  </div>
+  <section class="card form-section">
+    <header>
+      <p class="eyebrow"><%= t("admin.offering_form.sections.basics") %></p>
+      <h2><%= @offering.persisted? ? @offering.title : t("admin.offering_form.sections.basics") %></h2>
+    </header>
 
-  <div class="field">
-    <%= form.label :slug %>
-    <%= form.text_field :slug %>
-  </div>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :title %>
+        <%= form.text_field :title %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :slug %>
+        <%= form.text_field :slug %>
+      </div>
+    </div>
 
-  <div class="field">
-    <%= form.label :offering_type %>
-    <%= form.select :offering_type, TempleOffering::OFFERING_TYPES.values.map { |value| [value.titleize, value] } %>
-  </div>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :offering_type %>
+        <%= form.select :offering_type, TempleOffering::OFFERING_TYPES.values.map { |value| [value.titleize, value] } %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :period %>
+        <%= form.text_field :period %>
+      </div>
+    </div>
 
-  <div class="field">
-    <%= form.label :description %>
-    <%= form.text_area :description %>
-  </div>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :price_cents, t("admin.registration_form.fields.unit_price") %>
+        <%= form.number_field :price_cents %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :currency %>
+        <%= form.text_field :currency %>
+      </div>
+    </div>
 
-  <div class="field">
-    <%= form.label :price_cents, "Price (cents)" %>
-    <%= form.number_field :price_cents %>
-  </div>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :starts_on %>
+        <%= form.date_field :starts_on %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :ends_on %>
+        <%= form.date_field :ends_on %>
+      </div>
+    </div>
 
-  <div class="field">
-    <%= form.label :currency %>
-    <%= form.text_field :currency %>
-  </div>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :available_slots %>
+        <%= form.number_field :available_slots %>
+      </div>
+      <div class="field-panel checkbox-field">
+        <label>
+          <%= form.check_box :active %>
+          <span>Active</span>
+        </label>
+      </div>
+    </div>
 
-  <div class="field">
-    <%= form.label :period %>
-    <%= form.text_field :period %>
-  </div>
+    <div class="field">
+      <%= form.label :description %>
+      <%= form.text_area :description, rows: 4 %>
+    </div>
+  </section>
 
-  <div class="field">
-    <%= form.label :starts_on %>
-    <%= form.date_field :starts_on %>
-  </div>
+  <% metadata_settings = @offering.metadata.with_indifferent_access %>
+  <%= form.fields_for :metadata_settings, metadata_settings do |metadata_fields| %>
+    <section class="card form-section">
+      <header>
+        <p class="eyebrow"><%= t("admin.offering_form.sections.certificate") %></p>
+        <h2><%= t("admin.offering_form.sections.certificate") %></h2>
+        <p class="muted"><%= t("admin.offering_form.hints.certificate") %></p>
+      </header>
 
-  <div class="field">
-    <%= form.label :ends_on %>
-    <%= form.date_field :ends_on %>
-  </div>
+      <div class="field-row">
+        <div class="field-panel">
+          <%= metadata_fields.label :certificate_prefix, t("admin.offering_form.fields.certificate_prefix") %>
+          <%= metadata_fields.text_field :certificate_prefix %>
+        </div>
+        <div class="field-panel">
+          <%= metadata_fields.label :certificate_hint, t("admin.offering_form.fields.certificate_hint") %>
+          <%= metadata_fields.text_field :certificate_hint %>
+        </div>
+      </div>
+    </section>
 
-  <div class="field">
-    <%= form.label :available_slots %>
-    <%= form.number_field :available_slots %>
-  </div>
+    <section class="card form-section">
+      <header>
+        <p class="eyebrow"><%= t("admin.offering_form.sections.logistics") %></p>
+        <h2><%= t("admin.offering_form.sections.logistics") %></h2>
+        <p class="muted"><%= t("admin.offering_form.hints.logistics") %></p>
+      </header>
 
-  <div class="field">
-    <%= form.label :active %>
-    <%= form.check_box :active %>
-  </div>
+      <div class="field-row">
+        <div class="field-panel">
+          <%= metadata_fields.label :ancestor_placard_hint, t("admin.offering_form.fields.ancestor_placard_hint") %>
+          <%= metadata_fields.text_field :ancestor_placard_hint %>
+        </div>
+        <div class="field-panel">
+          <%= metadata_fields.label :logistics_notes, t("admin.offering_form.fields.logistics_notes") %>
+          <%= metadata_fields.text_area :logistics_notes, rows: 3 %>
+        </div>
+      </div>
+    </section>
+  <% end %>
 
   <%= form.submit class: "button" %>
 <% end %>

@@ -1,35 +1,52 @@
+# frozen_string_literal: true
+
 module Account
   class RegistrationsController < BaseController
-    skip_before_action :authenticate_user!, only: %i[new create]
-    skip_before_action :verify_authenticity_token, only: :create
+    before_action :set_registration, only: %i[show edit update]
 
-    before_action :redirect_if_signed_in, only: :new
-
-    def new
-      redirect_to account_login_path(register: "email")
+    def index
+      @registrations = registration_scope.order(created_at: :desc)
     end
 
-    def create
-      @registration_form = Account::RegistrationForm.new(registration_params)
-      if @registration_form.save
-        establish_user_session!(@registration_form.user)
-        redirect_to account_dashboard_path, notice: "Account created."
+    def show; end
+
+    def edit
+      @form = Account::RegistrationMetadataForm.new(registration: @registration)
+    end
+
+    def update
+      @form = Account::RegistrationMetadataForm.new(
+        registration: @registration,
+        params: metadata_params
+      )
+
+      if @form.save
+        redirect_to account_registration_path(@registration), notice: "Registration updated."
       else
-        flash.now[:alert] = "We couldn't create your account yet."
-        @show_registration_modal = true
-        render "account/sessions/new", status: :unprocessable_entity
+        flash.now[:alert] = "Please review the errors below."
+        render :edit, status: :unprocessable_content
       end
     end
 
     private
 
-    def registration_params
-      params.fetch(:registration, ActionController::Parameters.new)
-        .permit(:email, :password, :password_confirmation)
+    def registration_scope
+      current_user.temple_event_registrations.includes(:temple_offering)
     end
 
-    def redirect_if_signed_in
-      redirect_to account_dashboard_path if user_signed_in?
+    def set_registration
+      @registration = registration_scope.find(params[:id])
+    end
+
+    def metadata_params
+      params.require(:account_registration_metadata_form).permit(
+        :contact_name,
+        :contact_phone,
+        :contact_email,
+        :household_notes,
+        :arrival_window,
+        :ceremony_notes
+      )
     end
   end
 end

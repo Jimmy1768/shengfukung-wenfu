@@ -1,8 +1,13 @@
-<h1>New Registration</h1>
+<h1><%= t("admin.registration_form.title") %></h1>
+<p class="muted"><%= t("admin.registration_form.subtitle", offering: @offering.title) %></p>
 
-<%= form_with model: [:admin, @offering, @registration], url: admin_offering_offering_orders_path(@offering) do |form| %>
+<%= form_with model: [:admin, @offering, @registration],
+      url: admin_offering_offering_orders_path(@offering),
+      local: true,
+      class: "form-stack" do |form| %>
   <% if @registration.errors.any? %>
     <div class="alert alert-danger">
+      <h3><%= t("admin.registration_form.errors_heading", count: @registration.errors.count) %></h3>
       <ul>
         <% @registration.errors.full_messages.each do |message| %>
           <li><%= message %></li>
@@ -11,47 +16,139 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= form.label :user_id, "Existing User ID" %>
-    <%= form.number_field :user_id %>
-    <p class="hint"># TODO: replace with searchable user picker.</p>
-  </div>
+  <%= render "patron_picker", form:, registration: @registration %>
 
-  <div class="field">
-    <%= form.label :quantity %>
-    <%= form.number_field :quantity %>
-  </div>
+  <section class="card form-section">
+    <header>
+      <p class="eyebrow"><%= t("admin.registration_form.sections.order") %></p>
+      <h2><%= t("admin.registration_form.headings.order") %></h2>
+      <p class="muted"><%= t("admin.registration_form.hints.order") %></p>
+    </header>
 
-  <div class="field">
-    <%= form.label :unit_price_cents, "Unit price (cents)" %>
-    <%= form.number_field :unit_price_cents %>
-  </div>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :quantity, t("admin.registration_form.fields.quantity") %>
+        <%= form.number_field :quantity, min: 1, value: @registration.quantity %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :unit_price_cents, t("admin.registration_form.fields.unit_price") %>
+        <%= form.number_field :unit_price_cents %>
+        <p class="hint"><%= t("admin.registration_form.hints.unit_price") %></p>
+      </div>
+    </div>
 
-  <div class="field">
-    <%= form.label :currency %>
-    <%= form.text_field :currency %>
-  </div>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :currency, t("admin.registration_form.fields.currency") %>
+        <%= form.text_field :currency, value: @registration.currency || @offering.currency %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :certificate_number, t("admin.registration_form.fields.certificate_number") %>
+        <%= form.text_field :certificate_number %>
+      </div>
+    </div>
+  </section>
 
-  <div class="field">
-    <%= form.label :certificate_number %>
-    <%= form.text_field :certificate_number %>
-  </div>
+  <% contact_data = @registration.contact_payload.with_indifferent_access %>
+  <section class="card form-section">
+    <header>
+      <p class="eyebrow"><%= t("admin.registration_form.sections.contact") %></p>
+      <h2><%= t("admin.registration_form.headings.contact") %></h2>
+      <p class="muted"><%= t("admin.registration_form.hints.contact") %></p>
+    </header>
 
-  <div class="field">
-    <%= form.label :contact_payload, "Contact details (JSON)" %>
-    <%= form.text_area :contact_payload, value: JSON.pretty_generate(@registration.contact_payload || {}), rows: 4 %>
-  </div>
+    <%= form.fields_for :contact_details, contact_data do |contact_fields| %>
+      <div class="field-row">
+        <div class="field-panel">
+          <%= contact_fields.label :primary_contact, t("admin.registration_form.fields.primary_contact") %>
+          <%= contact_fields.text_field :primary_contact %>
+        </div>
+        <div class="field-panel">
+          <%= contact_fields.label :phone, t("admin.registration_form.fields.phone") %>
+          <%= contact_fields.telephone_field :phone %>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-panel">
+          <%= contact_fields.label :email, t("admin.registration_form.fields.email") %>
+          <%= contact_fields.email_field :email %>
+        </div>
+        <div class="field-panel">
+          <%= contact_fields.label :dependents_notes, t("admin.registration_form.fields.dependents") %>
+          <%= contact_fields.text_field :dependents_notes %>
+          <p class="hint"><%= t("admin.registration_form.hints.dependents") %></p>
+        </div>
+      </div>
+      <div class="field-panel">
+        <%= contact_fields.label :notes, t("admin.registration_form.fields.contact_notes") %>
+        <%= contact_fields.text_area :notes, rows: 3 %>
+      </div>
+    <% end %>
+  </section>
 
-  <div class="field">
-    <%= form.label :logistics_payload, "Logistics (JSON)" %>
-    <%= form.text_area :logistics_payload, value: JSON.pretty_generate(@registration.logistics_payload || {}), rows: 4 %>
-    <p class="hint"># TODO: capture certificate/award metadata after onsite interview.</p>
-  </div>
+  <% logistics_data = @registration.logistics_payload.with_indifferent_access %>
+  <section class="card form-section">
+    <header>
+      <p class="eyebrow"><%= t("admin.registration_form.sections.logistics") %></p>
+      <h2><%= t("admin.registration_form.headings.logistics") %></h2>
+      <p class="muted"><%= t("admin.registration_form.hints.logistics") %></p>
+    </header>
 
-  <div class="field">
-    <%= form.label :metadata, "Metadata (JSON)" %>
-    <%= form.text_area :metadata, value: JSON.pretty_generate(@registration.metadata || {}), rows: 4 %>
-  </div>
+    <%= form.fields_for :logistics_details, logistics_data do |logistics_fields| %>
+      <div class="field-row">
+        <div class="field-panel">
+          <%= logistics_fields.label :preferred_date, t("admin.registration_form.fields.preferred_date") %>
+          <%= logistics_fields.date_field :preferred_date %>
+        </div>
+        <div class="field-panel">
+          <%= logistics_fields.label :preferred_slot, t("admin.registration_form.fields.preferred_slot") %>
+          <%= logistics_fields.text_field :preferred_slot, placeholder: t("admin.registration_form.placeholders.preferred_slot") %>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-panel">
+          <%= logistics_fields.label :arrival_window, t("admin.registration_form.fields.arrival_window") %>
+          <%= logistics_fields.text_field :arrival_window %>
+        </div>
+        <div class="field-panel">
+          <%= logistics_fields.label :ceremony_location, t("admin.registration_form.fields.ceremony_location") %>
+          <%= logistics_fields.text_field :ceremony_location %>
+        </div>
+      </div>
+    <% end %>
+  </section>
 
-  <%= form.submit "Create registration", class: "button" %>
+  <% ritual_metadata = @registration.metadata.with_indifferent_access %>
+  <section class="card form-section">
+    <header>
+      <p class="eyebrow"><%= t("admin.registration_form.sections.ritual_metadata") %></p>
+      <h2><%= t("admin.registration_form.headings.ritual_metadata") %></h2>
+      <p class="muted"><%= t("admin.registration_form.hints.ritual_metadata") %></p>
+    </header>
+
+    <%= form.fields_for :ritual_metadata, ritual_metadata do |metadata_fields| %>
+      <div class="field-row">
+        <div class="field-panel">
+          <%= metadata_fields.label :ancestor_placard_name, t("admin.registration_form.fields.ancestor_placard") %>
+          <%= metadata_fields.text_field :ancestor_placard_name %>
+        </div>
+        <div class="field-panel">
+          <%= metadata_fields.label :dedication_message, t("admin.registration_form.fields.dedication_message") %>
+          <%= metadata_fields.text_field :dedication_message %>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-panel">
+          <%= metadata_fields.label :incense_option, t("admin.registration_form.fields.incense_option") %>
+          <%= metadata_fields.text_field :incense_option %>
+        </div>
+        <div class="field-panel">
+          <%= metadata_fields.label :certificate_notes, t("admin.registration_form.fields.certificate_notes") %>
+          <%= metadata_fields.text_area :certificate_notes, rows: 3 %>
+        </div>
+      </div>
+    <% end %>
+  </section>
+
+  <%= form.submit t("admin.registration_form.actions.submit"), class: "button" %>
 <% end %>

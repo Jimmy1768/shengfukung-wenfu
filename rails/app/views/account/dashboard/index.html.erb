@@ -3,7 +3,7 @@
     <div>
       <p class="eyebrow">會員專區</p>
       <h2>Hi, <%= current_user.english_name.presence || current_user.email %></h2>
-      <p>Replace 這段描述 with real instructions for members once the flows are wired。</p>
+      <p>檢視最新的報名資訊與付款紀錄，若資料需調整可立即更新。</p>
     </div>
   </header>
 
@@ -17,21 +17,90 @@
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow">Upcoming</p>
-      <h2>近期活動</h2>
-      <p>示範資料，接上活動/點燈 API 後會自動更新。</p>
+      <p class="eyebrow">My registrations</p>
+      <h2>近期報名</h2>
+      <p>追蹤每個供奉的處理進度與證書進度。</p>
     </div>
-    <%= link_to "全部活動", account_events_path, class: "pill-link secondary" %>
+    <%= link_to "全部報名", account_registrations_path, class: "pill-link secondary" %>
   </header>
 
-  <div class="event-grid">
-    <% @upcoming_items.each do |item| %>
-      <article class="event-card">
-        <p class="event-date"><%= item[:date] %></p>
-        <h3><%= item[:title] %></h3>
-        <p class="event-meta"><%= item[:status] %></p>
-        <p class="event-notes"><%= item[:description] %></p>
-      </article>
-    <% end %>
-  </div>
+  <% if @registrations.any? %>
+    <div class="event-grid">
+      <% @registrations.each do |registration| %>
+        <article class="event-card">
+          <p class="event-date"><%= l(registration.created_at, format: :short) rescue registration.created_at.strftime("%Y/%m/%d") %></p>
+          <h3><%= registration.temple_offering&.title || registration.reference_code %></h3>
+          <p class="event-meta"><%= registration.payment_status %></p>
+          <p class="event-notes">證書：<%= registration.certificate_number.presence || "製作中" %></p>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="muted">尚未報名任何活動。</p>
+  <% end %>
+</section>
+
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow">Certificates</p>
+      <h2>憑證與收據</h2>
+      <p>已發放的證書會列在這裡，若需紙本可洽客服。</p>
+    </div>
+  </header>
+
+  <% if @certificates.any? %>
+    <div class="timeline">
+      <% @certificates.each do |registration| %>
+        <div class="timeline-entry">
+          <div class="timeline-dot"></div>
+          <div>
+            <p class="timeline-date"><%= registration.updated_at.strftime("%Y/%m/%d") %></p>
+            <h3><%= registration.temple_offering&.title || "供奉" %></h3>
+            <p class="muted">證書號碼：<%= registration.certificate_number %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="muted">證書尚未發放。</p>
+  <% end %>
+</section>
+
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow">Payments</p>
+      <h2>最近付款</h2>
+      <p>快速確認付款方式與狀態。</p>
+    </div>
+    <%= link_to "更多明細", account_payments_path, class: "pill-link secondary" %>
+  </header>
+
+  <% if @recent_payments.any? %>
+    <div class="table-scroll">
+      <table class="payment-table">
+        <thead>
+          <tr>
+            <th>編號</th>
+            <th>項目</th>
+            <th>金額</th>
+            <th>方式</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent_payments.each do |payment| %>
+            <tr>
+              <td><%= payment.external_reference.presence || payment.temple_event_registration&.reference_code || payment.id %></td>
+              <td><%= payment.temple_event_registration&.temple_offering&.title || "—" %></td>
+              <td><%= number_to_currency(payment.amount_cents / 100.0, unit: payment.currency) %></td>
+              <td><%= payment.payment_method.titleize %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="muted">尚無付款。</p>
+  <% end %>
 </section>

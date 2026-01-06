@@ -1,0 +1,41 @@
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow">我的報名</p>
+      <h2>參與紀錄</h2>
+      <p>檢視每個法會/供奉的狀態與憑證。</p>
+    </div>
+  </header>
+
+  <% if @registrations.any? %>
+    <div class="table-scroll">
+      <table class="payment-table">
+        <thead>
+          <tr>
+            <th>編號</th>
+            <th>項目</th>
+            <th>狀態</th>
+            <th>證書</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @registrations.each do |registration| %>
+            <tr>
+              <td><%= registration.reference_code %></td>
+              <td><%= registration.temple_offering&.title || "—" %></td>
+              <td><span class="status-pill status-<%= registration.payment_status %>"><%= registration.payment_status %></span></td>
+              <td><%= registration.certificate_number.presence || "未出證" %></td>
+              <td>
+                <%= link_to "查看", account_registration_path(registration), class: "pill-link" %>
+                <%= link_to "編輯", edit_account_registration_path(registration), class: "pill-link secondary" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="muted">尚未有報名紀錄。</p>
+  <% end %>
+</section>

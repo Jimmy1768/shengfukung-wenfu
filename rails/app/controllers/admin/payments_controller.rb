@@ -2,8 +2,28 @@
 
 module Admin
   class PaymentsController < BaseController
-    before_action :require_cash_permissions!
-    before_action :set_registration
+    before_action :require_view_financials!, only: :index
+    before_action :require_cash_permissions!, only: %i[new create]
+    before_action :require_export_permissions!, only: :export
+    before_action :set_registration, only: %i[new create]
+
+    def index
+      @payments = base_payment_scope
+        .includes(:temple_event_registration, :user, admin_account: :user)
+        .order(created_at: :desc)
+        .limit(100)
+      @payment_summary = Reporting::PaymentSummary.new(payments: base_payment_scope)
+      @show_export = current_admin_permissions&.allow?(:export_financials)
+    end
+
+    def export
+      exporter = Reporting::PaymentsCsvExporter.new(
+        payments: base_payment_scope.includes({ temple_event_registration: :temple_offering }, :user, admin_account: :user)
+      )
+      send_data exporter.to_csv,
+        filename: "payments-#{Time.current.strftime('%Y%m%d')}.csv",
+        type: "text/csv"
+    end
 
     def new
       @payment = @registration.temple_payments.new(
@@ -36,12 +56,24 @@ module Admin
       require_capability!(:record_cash_payments)
     end
 
+    def require_view_financials!
+      require_capability!(:view_financials)
+    end
+
+    def require_export_permissions!
+      require_capability!(:export_financials)
+    end
+
     def set_registration
       @registration = current_temple.temple_event_registrations.find(params[:registration_id])
     end
 
     def payment_params
       params.require(:temple_payment).permit(:amount_cents, :currency, :notes)
+    end
+
+    def base_payment_scope
+      current_temple.temple_payments
     end
   end
 end

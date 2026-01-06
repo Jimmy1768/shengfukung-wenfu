@@ -2,35 +2,39 @@
   <header class="section-header">
     <div>
       <p class="eyebrow">付款紀錄</p>
-      <h2>LINE Pay 收據</h2>
-      <p>完整交易紀錄會在 LINE Pay 接上後自動同步，此處為示範資料。</p>
+      <h2>交易明細</h2>
+      <p>查看所有線上/現場付款紀錄與狀態。</p>
     </div>
   </header>
 
-  <div class="table-scroll">
-    <table class="payment-table">
-      <thead>
-        <tr>
-          <th>編號</th>
-          <th>項目</th>
-          <th>金額</th>
-          <th>狀態</th>
-          <th>日期</th>
-          <th>方式</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @entries.each do |entry| %>
+  <% if @payments.any? %>
+    <div class="table-scroll">
+      <table class="payment-table">
+        <thead>
           <tr>
-            <td><%= entry[:code] %></td>
-            <td><%= entry[:title] %></td>
-            <td>$<%= entry[:amount] %></td>
-            <td><span class="status-pill status-<%= entry[:status] %>"><%= entry[:status] %></span></td>
-            <td><%= entry[:date] %></td>
-            <td><%= entry[:method] %></td>
+            <th>編號</th>
+            <th>項目</th>
+            <th>金額</th>
+            <th>狀態</th>
+            <th>日期</th>
+            <th>方式</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          <% @payments.each do |payment| %>
+            <tr>
+              <td><%= payment.external_reference.presence || payment.temple_event_registration&.reference_code || payment.id %></td>
+              <td><%= payment.temple_event_registration&.temple_offering&.title || "—" %></td>
+              <td><%= number_to_currency(payment.amount_cents / 100.0, unit: payment.currency) %></td>
+              <td><span class="status-pill status-<%= payment.status %>"><%= payment.status %></span></td>
+              <td><%= (payment.processed_at || payment.created_at).strftime("%Y/%m/%d") %></td>
+              <td><%= payment.payment_method.titleize %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="muted">尚無付款紀錄。</p>
+  <% end %>
 </section>

@@ -1,0 +1,53 @@
+# frozen_string_literal: true
+
+module Admin
+  class PermissionsController < BaseController
+    before_action :require_manage_permissions!
+
+    helper Admin::PermissionsHelper if defined?(Admin::PermissionsHelper)
+
+    def index
+      @permission_forms = build_permission_forms
+    end
+
+    def update
+      admin_account = admin_accounts_scope.find(params[:admin_account_id])
+      @permission_form = Admin::PermissionForm.new(
+        admin_account:,
+        temple: current_temple,
+        params: permission_params
+      )
+
+      if @permission_form.save(current_admin:)
+        redirect_to admin_permissions_path, notice: "Permissions updated for #{admin_account.user.english_name}."
+      else
+        @permission_forms = build_permission_forms(overrides: { admin_account.id => @permission_form })
+        flash.now[:alert] = "Please review the highlighted errors."
+        render :index, status: :unprocessable_entity
+      end
+    end
+
+    private
+
+    def require_manage_permissions!
+      require_capability!(:manage_permissions)
+    end
+
+    def admin_accounts_scope
+      current_temple.admin_accounts
+        .joins(:user)
+        .includes(:user)
+        .order("users.english_name asc")
+    end
+
+    def build_permission_forms(overrides: {})
+      admin_accounts_scope.map do |account|
+        overrides[account.id] || Admin::PermissionForm.new(admin_account: account, temple: current_temple)
+      end
+    end
+
+    def permission_params
+      params.require(:admin_permission).permit(AdminPermission::CAPABILITIES)
+    end
+  end
+end

@@ -45,4 +45,9 @@ class ActionDispatch::IntegrationTest
     post admin_sessions_path, params: { session: { email: user.email, password: } }
     follow_redirect! if response.redirect?
   end
+
+  def sign_in_account(user, password: "Password123!")
+    post account_sessions_path, params: { session: { email: user.email, password: } }
+    follow_redirect! if response.redirect?
+  end
 end

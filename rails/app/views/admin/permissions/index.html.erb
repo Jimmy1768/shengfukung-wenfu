@@ -1,0 +1,62 @@
+<section class="card">
+  <header>
+    <p class="eyebrow">Permissions</p>
+    <h1>Admin capabilities</h1>
+    <p class="muted">
+      Only temple owners can change these flags. Use them to align access between offerings, onsite staff, and finance reviewers.
+    </p>
+  </header>
+
+  <% if @permission_forms.any? %>
+    <div class="permission-grid">
+      <% @permission_forms.each do |permission_form| %>
+        <div class="permission-card">
+          <header class="permission-card-header">
+            <div>
+              <h2><%= permission_form.admin_account.user.english_name %></h2>
+              <p class="muted"><%= permission_form.admin_account.user.email %></p>
+            </div>
+            <p class="badge"><%= permission_form.admin_account.role.titleize %></p>
+          </header>
+
+          <%= form_with model: permission_form,
+                scope: :admin_permission,
+                url: admin_permission_path(permission_form.admin_account),
+                method: :patch,
+                data: { turbo: false },
+                class: "permission-form" do |form| %>
+            <% if permission_form.errors.any? %>
+              <div class="alert alert-danger">
+                <ul>
+                  <% permission_form.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <div class="permission-checklist">
+              <% AdminPermission::CAPABILITIES.each do |capability| %>
+                <label class="checkbox permission-checkbox">
+                  <%= form.check_box capability %>
+                  <div>
+                    <strong><%= capability_label(capability) %></strong>
+                    <% if capability_hint(capability).present? %>
+                      <p class="muted"><%= capability_hint(capability) %></p>
+                    <% end %>
+                  </div>
+                </label>
+              <% end %>
+            </div>
+
+            <div class="permission-actions">
+              <%= form.submit "Save", class: "button" %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="muted">No admin accounts found for this temple.</p>
+  <% end %>
+</section>

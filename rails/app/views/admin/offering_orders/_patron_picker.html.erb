@@ -1,0 +1,214 @@
+<% search_endpoint = admin_patrons_path(format: :json) %>
+<% create_endpoint = admin_patrons_path(format: :json) %>
+<% selected_patron = registration.user %>
+
+<section id="patron-picker" class="card form-section"
+  data-search-endpoint="<%= search_endpoint %>"
+  data-create-endpoint="<%= create_endpoint %>"
+  data-csrf="<%= form_authenticity_token %>"
+  data-select-label="<%= t('admin.registration_form.actions.select_patron') %>"
+  data-selected-hint="<%= t('admin.registration_form.hints.selected_patron') %>"
+  data-created-hint="<%= t('admin.registration_form.hints.created_patron') %>"
+  data-no-results="<%= t('admin.registration_form.hints.no_results_placeholder') %>"
+  data-search-error="<%= t('admin.registration_form.errors.search_failed') %>"
+  data-create-error="<%= t('admin.registration_form.errors.create_failed') %>"
+  data-dependents-label="<%= t('admin.registration_form.labels.dependents') %>">
+  <header>
+    <p class="eyebrow"><%= t("admin.registration_form.sections.patron") %></p>
+    <h2><%= t("admin.registration_form.headings.patron") %></h2>
+    <p class="muted"><%= t("admin.registration_form.hints.patron") %></p>
+  </header>
+
+  <div class="patron-picker-grid">
+    <div class="patron-picker-search">
+      <label for="patron-search-field"><%= t("admin.registration_form.fields.search_patron") %></label>
+      <input id="patron-search-field" type="search" class="input" data-role="patron-search" placeholder="<%= t('admin.registration_form.placeholders.patron_search') %>" />
+      <p class="hint"><%= t("admin.registration_form.hints.patron_search") %></p>
+      <div class="patron-search-results" data-role="results">
+        <p class="muted"><%= t("admin.registration_form.hints.results_placeholder") %></p>
+      </div>
+    </div>
+
+    <div class="patron-picker-create">
+      <h3><%= t("admin.registration_form.headings.new_patron") %></h3>
+      <p class="muted"><%= t("admin.registration_form.hints.new_patron") %></p>
+      <form data-role="create-form">
+        <div class="field">
+          <label><%= t("admin.registration_form.fields.primary_contact") %></label>
+          <input type="text" name="patron[english_name]" required />
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" name="patron[email]" required />
+        </div>
+        <div class="field">
+          <label><%= t("admin.registration_form.fields.phone") %></label>
+          <input type="tel" name="patron[phone]" />
+        </div>
+        <div class="field">
+          <label><%= t("admin.registration_form.fields.contact_notes") %></label>
+          <textarea name="patron[notes]" rows="2"></textarea>
+        </div>
+        <div class="field">
+          <button type="submit" class="button secondary"><%= t("admin.registration_form.actions.create_patron") %></button>
+        </div>
+      </form>
+      <div class="picker-message" data-role="picker-message"></div>
+    </div>
+  </div>
+
+  <input type="hidden" name="temple_event_registration[user_id]" id="temple_event_registration_user_id" value="<%= registration.user_id %>" />
+  <div class="selected-patron" data-role="selection">
+    <% if selected_patron.present? %>
+      <strong><%= selected_patron.english_name %></strong>
+      <p><%= selected_patron.email %></p>
+    <% else %>
+      <p class="muted"><%= t("admin.registration_form.hints.no_patron") %></p>
+    <% end %>
+  </div>
+
+  <noscript>
+    <div class="field">
+      <label><%= t("admin.registration_form.fields.manual_user_id") %></label>
+      <%= form.number_field :user_id %>
+      <p class="hint"><%= t("admin.registration_form.hints.manual_user_id") %></p>
+    </div>
+  </noscript>
+</section>
+
+<script>
+  (function() {
+    const picker = document.getElementById("patron-picker");
+    if (!picker) return;
+
+    const searchInput = picker.querySelector('[data-role="patron-search"]');
+    const resultsNode = picker.querySelector('[data-role="results"]');
+    const hiddenField = document.getElementById("temple_event_registration_user_id");
+    const selectionNode = picker.querySelector('[data-role="selection"]');
+    const createForm = picker.querySelector('[data-role="create-form"]');
+    const messageNode = picker.querySelector('[data-role="picker-message"]');
+    const selectLabel = picker.dataset.selectLabel;
+
+    let debounceTimer;
+
+    function setMessage(text, variant) {
+      if (!messageNode) return;
+      messageNode.textContent = text || "";
+      messageNode.className = variant ? `picker-message ${variant}` : "picker-message";
+    }
+
+    function escapeHTML(str) {
+      return (str || "").replace(/[&<>"']/g, function(tag) {
+        const chars = {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"};
+        return chars[tag] || tag;
+      });
+    }
+
+    function renderResults(patrons) {
+      resultsNode.innerHTML = "";
+      if (!patrons.length) {
+        resultsNode.innerHTML = `<p class="muted">${escapeHTML(picker.dataset.noResults)}</p>`;
+        return;
+      }
+
+      patrons.forEach(function(patron) {
+        const row = document.createElement("div");
+        row.className = "patron-result";
+        const info = document.createElement("div");
+        info.innerHTML = `<strong>${escapeHTML(patron.name)}</strong><p>${escapeHTML(patron.email)}</p>`;
+        if (patron.dependents && patron.dependents.length > 0) {
+          const dep = document.createElement("p");
+          dep.className = "muted";
+          dep.textContent = `${picker.dataset.dependentsLabel} ${patron.dependents.join(", ")}`;
+          info.appendChild(dep);
+        }
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "pill-link";
+        button.textContent = selectLabel;
+        button.addEventListener("click", function() {
+          selectPatron(patron);
+        });
+        row.appendChild(info);
+        row.appendChild(button);
+        resultsNode.appendChild(row);
+      });
+    }
+
+    function performSearch(query) {
+      const endpoint = picker.dataset.searchEndpoint;
+      if (!endpoint) return;
+      const url = new URL(endpoint, window.location.origin);
+      if (query) {
+        url.searchParams.set("q", query);
+      }
+      fetch(url.toString(), { headers: { Accept: "application/json" } })
+        .then(function(response) { return response.json(); })
+        .then(function(payload) {
+          renderResults(payload.patrons || []);
+        })
+        .catch(function() {
+          resultsNode.innerHTML = `<p class="error">${escapeHTML(picker.dataset.searchError)}</p>`;
+        });
+    }
+
+    function selectPatron(patron) {
+      hiddenField.value = patron.id;
+      selectionNode.innerHTML = `<strong>${escapeHTML(patron.name)}</strong><p>${escapeHTML(patron.email)}</p>`;
+      setMessage(picker.dataset.selectedHint.replace("%{name}", patron.name), "success");
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener("input", function() {
+        clearTimeout(debounceTimer);
+        const query = searchInput.value.trim();
+        debounceTimer = setTimeout(function() {
+          performSearch(query);
+        }, 250);
+      });
+    }
+
+    if (createForm) {
+      createForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        const formData = new FormData(createForm);
+        const payload = {};
+        formData.forEach(function(value, key) {
+          const match = key.match(/patron\\[(.+)\\]/);
+          const attribute = match ? match[1] : key;
+          payload[attribute] = value;
+        });
+
+        fetch(picker.dataset.createEndpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-CSRF-Token": picker.dataset.csrf
+          },
+          body: JSON.stringify({ patron: payload })
+        })
+          .then(function(response) {
+            if (!response.ok) { throw response; }
+            return response.json();
+          })
+          .then(function(data) {
+            if (data.patron) {
+              selectPatron(data.patron);
+              createForm.reset();
+              setMessage(picker.dataset.createdHint.replace("%{name}", data.patron.name), "success");
+            }
+          })
+          .catch(function(response) {
+            if (response && response.json) {
+              response.json().then(function(body) {
+                setMessage(body.errors ? body.errors.join(", ") : picker.dataset.createError, "error");
+              });
+            } else {
+              setMessage(picker.dataset.createError, "error");
+            }
+          });
+      });
+    }
+  })();
+</script>

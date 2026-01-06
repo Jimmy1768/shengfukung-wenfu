@@ -1,15 +1,27 @@
-<%= form_with url: account_register_path, scope: :registration, model: form, local: true, class: "login-form" do |f| %>
-  <div class="form-field">
-    <%= f.label :email, "Email" %>
-    <%= f.email_field :email, required: true, autocomplete: "email" %>
+<%= form_with model: @form, url: account_registration_path(@registration), method: :patch, local: true, class: "form-stack" do |f| %>
+  <div class="field-panel">
+    <%= f.label :contact_name, "聯絡人" %>
+    <%= f.text_field :contact_name, required: true %>
   </div>
-  <div class="form-field">
-    <%= f.label :password, "Password" %>
-    <%= f.password_field :password, required: true, autocomplete: "new-password" %>
+  <div class="field-panel">
+    <%= f.label :contact_phone, "電話" %>
+    <%= f.telephone_field :contact_phone %>
   </div>
-  <div class="form-field">
-    <%= f.label :password_confirmation, "Confirm password" %>
-    <%= f.password_field :password_confirmation, required: true, autocomplete: "new-password" %>
+  <div class="field-panel">
+    <%= f.label :contact_email, "Email" %>
+    <%= f.email_field :contact_email %>
   </div>
-  <%= f.submit "Create account", class: "btn btn-primary" %>
+  <div class="field-panel">
+    <%= f.label :household_notes, "家庭/隨行人員" %>
+    <%= f.text_area :household_notes, rows: 3 %>
+  </div>
+  <div class="field-panel">
+    <%= f.label :arrival_window, "到場時間" %>
+    <%= f.text_field :arrival_window, placeholder: "08:30-09:00" %>
+  </div>
+  <div class="field-panel">
+    <%= f.label :ceremony_notes, "儀式備註" %>
+    <%= f.text_area :ceremony_notes, rows: 3 %>
+  </div>
+  <%= f.submit "儲存資料", class: "button" %>
 <% end %>

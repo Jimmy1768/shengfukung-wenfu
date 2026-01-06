@@ -1,14 +1,22 @@
 module Account
   class DashboardController < BaseController
     def index
-      @upcoming_items = [
-        { title: "新春點燈", date: "2026/02/01", status: "已報名", description: "請於 08:30 到主殿報到。" },
-        { title: "祈福法會", date: "2026/03/15", status: "報名中", description: "線上報名截止 3/05。" }
-      ]
-
+      @registrations = current_user.temple_event_registrations
+        .includes(:temple_offering)
+        .order(created_at: :desc)
+        .limit(3)
+      @certificates = current_user.temple_event_registrations
+        .where.not(certificate_number: [nil, ""])
+        .includes(:temple_offering)
+        .order(updated_at: :desc)
+        .limit(3)
+      @recent_payments = current_user.temple_payments
+        .includes(temple_event_registration: :temple_offering)
+        .order(Arel.sql("COALESCE(temple_payments.processed_at, temple_payments.created_at) DESC"))
+        .limit(3)
       @quick_actions = [
         { label: "更新個人資料", url: account_profile_path },
-        { label: "查看活動", url: account_events_path },
+        { label: "查看報名", url: account_registrations_path },
         { label: "付款紀錄", url: account_payments_path }
       ]
     end
