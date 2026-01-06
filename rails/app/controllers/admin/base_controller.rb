@@ -7,12 +7,19 @@ module Admin
     protect_from_forgery with: :exception
 
     helper Forms::LayoutHelper
-    helper_method :current_admin, :admin_signed_in?, :available_admin_temples, :allow_temple_switch?
+    helper_method :current_admin,
+                  :admin_signed_in?,
+                  :available_admin_temples,
+                  :allow_temple_switch?,
+                  :current_admin_locale,
+                  :admin_locale_options
 
     before_action :authenticate_admin!
     before_action :ensure_admin_temple_scope
+    before_action :apply_admin_locale
 
     TEMPLE_SELECTION_SESSION_KEY = AppConstants::Sessions.key(:admin_temple)
+    LOCALE_SESSION_KEY = AppConstants::Sessions.key(:admin_locale)
 
     private
 
@@ -88,6 +95,32 @@ module Admin
       return nil unless admin_account
 
       admin_account.temples.order(:name).limit(1).pluck(:slug).first
+    end
+
+    def current_admin_locale
+      @current_admin_locale ||= begin
+        stored = session[LOCALE_SESSION_KEY]
+        locale = stored.presence || I18n.default_locale
+        normalize_admin_locale(locale)
+      end
+    end
+
+    def admin_locale_options
+      [
+        { label: "English", value: :en },
+        { label: "繁體中文", value: :"zh-TW" }
+      ]
+    end
+
+    def normalize_admin_locale(locale)
+      locale_sym = locale&.to_sym
+      return I18n.default_locale unless I18n.available_locales.include?(locale_sym)
+
+      locale_sym
+    end
+
+    def apply_admin_locale
+      I18n.locale = normalize_admin_locale(session[LOCALE_SESSION_KEY])
     end
   end
 end

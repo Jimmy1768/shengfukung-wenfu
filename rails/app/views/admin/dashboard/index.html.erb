@@ -1,18 +1,15 @@
 <section class="hero">
   <div class="hero-text">
-    <p class="eyebrow">Admin console</p>
-    <h1>Welcome back, <%= current_admin&.english_name || current_admin&.email %></h1>
-    <p>
-      This placeholder mirrors the structure of the production admin. Replace these cards with the
-      real KPIs, resource tables, and workflows your client needs.
-    </p>
+    <p class="eyebrow"><%= t("admin.dashboard.hero.eyebrow") %></p>
+    <h1><%= t("admin.dashboard.hero.title", name: current_admin&.english_name || current_admin&.email) %></h1>
+    <p><%= t("admin.dashboard.hero.body_html") %></p>
   </div>
 </section>
 
 <section class="card">
   <header>
-    <h2>Starter metrics</h2>
-    <p>Swap these for live KPIs once the backend endpoints are wired.</p>
+    <h2><%= t("admin.dashboard.metrics.title") %></h2>
+    <p><%= t("admin.dashboard.metrics.subtitle") %></p>
   </header>
   <div class="metric-row">
     <% @metrics.each do |metric| %>
@@ -26,13 +23,13 @@
 
 <section class="card">
   <header>
-    <h2>Next steps</h2>
-    <p>Use this section to outline the backend work for your client engagement.</p>
+    <h2><%= t("admin.dashboard.next_steps.title") %></h2>
+    <p><%= t("admin.dashboard.next_steps.subtitle") %></p>
   </header>
   <ul class="idea-list">
-    <li><%= link_to "Fill out the temple profile →", admin_temple_profile_path, class: "link" %></li>
-    <li>Connect real-world data sources to the KPIs above.</li>
-    <li>Replace this placeholder with the first CRUD workflow (users, orders, bookings, etc.).</li>
-    <li>Document the admin scope inside `docs/` for each new client.</li>
+    <li><%= link_to t("admin.dashboard.next_steps.fill_profile"), admin_temple_profile_path, class: "link" %></li>
+    <li><%= t("admin.dashboard.next_steps.connect_data") %></li>
+    <li><%= t("admin.dashboard.next_steps.first_workflow") %></li>
+    <li><%= t("admin.dashboard.next_steps.document_scope_html") %></li>
   </ul>
 </section>

@@ -1,10 +1,8 @@
 <section class="card">
   <header>
-    <p class="eyebrow">Orders</p>
-    <h1>Registrations & onsite orders</h1>
-    <p class="muted">
-      Use this list to review recent registrations before refining the reporting filters in the next phase.
-    </p>
+    <p class="eyebrow"><%= t("admin.orders.index.eyebrow") %></p>
+    <h1><%= t("admin.orders.index.title") %></h1>
+    <p class="muted"><%= t("admin.orders.index.body") %></p>
   </header>
 
   <% if @registrations.any? %>
@@ -12,12 +10,12 @@
       <table class="admin-table">
         <thead>
           <tr>
-            <th>編號</th>
-            <th>Offering</th>
-            <th>Applicant</th>
-            <th>Quantity</th>
-            <th>Status</th>
-            <th>Created</th>
+            <th><%= t("admin.orders.index.table.reference") %></th>
+            <th><%= t("admin.orders.index.table.offering") %></th>
+            <th><%= t("admin.orders.index.table.applicant") %></th>
+            <th><%= t("admin.orders.index.table.quantity") %></th>
+            <th><%= t("admin.orders.index.table.status") %></th>
+            <th><%= t("admin.orders.index.table.created") %></th>
             <th></th>
           </tr>
         </thead>
@@ -26,13 +24,17 @@
             <tr>
               <td><%= registration.reference_code %></td>
               <td><%= registration.temple_offering&.title || "—" %></td>
-              <td><%= registration.user&.english_name || registration.user&.email || "Guest" %></td>
+              <td><%= registration.user&.english_name || registration.user&.email || t("admin.orders.index.guest_fallback") %></td>
               <td><%= registration.quantity %></td>
-              <td><span class="status-pill status-<%= registration.payment_status %>"><%= registration.payment_status.humanize %></span></td>
+              <td>
+                <span class="status-pill status-<%= registration.payment_status %>">
+                  <%= t("admin.orders.statuses.#{registration.payment_status}", default: registration.payment_status.humanize) %>
+                </span>
+              </td>
               <td><%= registration.created_at.strftime("%Y/%m/%d %H:%M") %></td>
               <td>
                 <% if registration.temple_offering.present? %>
-                  <%= link_to "View", admin_offering_offering_order_path(registration.temple_offering, registration), class: "pill-link" %>
+                  <%= link_to t("admin.orders.index.table.view"), admin_offering_offering_order_path(registration.temple_offering, registration), class: "pill-link" %>
                 <% end %>
               </td>
             </tr>
@@ -41,6 +43,6 @@
       </table>
     </div>
   <% else %>
-    <p class="muted">No registrations have been recorded for this temple yet.</p>
+    <p class="muted"><%= t("admin.orders.index.empty") %></p>
   <% end %>
 </section>

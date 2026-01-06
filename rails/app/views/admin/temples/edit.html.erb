@@ -1,98 +1,98 @@
 <section class="hero">
   <div class="hero-text">
-    <p class="eyebrow">Temple profile</p>
-    <h1>Update site copy</h1>
-    <p>These fields power the public site hero, footer, and contact sections.</p>
+    <p class="eyebrow"><%= t("admin.temple_profile.hero.eyebrow") %></p>
+    <h1><%= t("admin.temple_profile.hero.title") %></h1>
+    <p><%= t("admin.temple_profile.hero.body") %></p>
   </div>
 </section>
 
 <section class="card">
   <header>
-    <h2>Basic details</h2>
-    <p>Displayed in the Vue header/footer.</p>
+    <h2><%= t("admin.temple_profile.sections.basics.title") %></h2>
+    <p><%= t("admin.temple_profile.sections.basics.subtitle") %></p>
   </header>
 
   <%= form_with model: @form, scope: :temple, url: admin_temple_profile_path, method: :patch, class: "form-stack", authenticity_token: true, local: true, data: { turbo: false } do |form| %>
     <div class="field">
-      <%= form.label :name, "Temple name" %>
-      <%= form.text_field :name, required: true, placeholder: "例：竹南鎮聖福宮" %>
+      <%= form.label :name, t("admin.temple_profile.fields.name") %>
+      <%= form.text_field :name, required: true, placeholder: t("admin.temple_profile.placeholders.name") %>
     </div>
 
     <div class="field">
-      <%= form.label :tagline %>
-      <%= form.text_field :tagline, placeholder: "例：清淨・莊嚴・在地信仰" %>
+      <%= form.label :tagline, t("admin.temple_profile.fields.tagline") %>
+      <%= form.text_field :tagline, placeholder: t("admin.temple_profile.placeholders.tagline") %>
     </div>
 
     <div class="field">
-      <%= form.label :hero_copy, "Homepage hero copy" %>
-      <%= form.text_area :hero_copy, rows: 3, placeholder: "用一句話說明宗旨、服務、交通提示。" %>
+      <%= form.label :hero_copy, t("admin.temple_profile.fields.hero_copy") %>
+      <%= form.text_area :hero_copy, rows: 3, placeholder: t("admin.temple_profile.placeholders.hero_copy") %>
     </div>
 
     <div class="field">
-      <%= form.label :primary_image_url, "Hero image URL" %>
-      <%= form.url_field :primary_image_url, placeholder: "https://…" %>
+      <%= form.label :primary_image_url, t("admin.temple_profile.fields.primary_image_url") %>
+      <%= form.url_field :primary_image_url, placeholder: t("admin.temple_profile.placeholders.primary_image_url") %>
     </div>
 
     <hr />
 
     <header>
-      <h2>Contact information</h2>
-      <p>Shown on the contact page + footer.</p>
+      <h2><%= t("admin.temple_profile.sections.contact.title") %></h2>
+      <p><%= t("admin.temple_profile.sections.contact.subtitle") %></p>
     </header>
 
     <div class="grid-2">
       <div class="field">
-        <%= form.label :contact_addressZh, "Address (ZH)" %>
-        <%= form.text_field :contact_addressZh, name: "temple[contact][addressZh]", value: @form.contact["addressZh"], placeholder: "例：苗栗縣竹南鎮公教路 136 號" %>
+        <%= form.label :contact_addressZh, t("admin.temple_profile.fields.address_zh") %>
+        <%= form.text_field :contact_addressZh, name: "temple[contact][addressZh]", value: @form.contact["addressZh"], placeholder: t("admin.temple_profile.placeholders.address_zh") %>
       </div>
       <div class="field">
-        <%= form.label :contact_addressEn, "Address (EN)" %>
-        <%= form.text_field :contact_addressEn, name: "temple[contact][addressEn]", value: @form.contact["addressEn"], placeholder: "例：No. 136, Gongjiao Rd, Zhunan Township..." %>
+        <%= form.label :contact_addressEn, t("admin.temple_profile.fields.address_en") %>
+        <%= form.text_field :contact_addressEn, name: "temple[contact][addressEn]", value: @form.contact["addressEn"], placeholder: t("admin.temple_profile.placeholders.address_en") %>
       </div>
     </div>
 
     <div class="grid-2">
       <div class="field">
-        <%= form.label :contact_phone, "Phone" %>
-        <%= form.text_field :contact_phone, name: "temple[contact][phone]", value: @form.contact["phone"], placeholder: "例：03-747-2826" %>
+        <%= form.label :contact_phone, t("admin.temple_profile.fields.phone") %>
+        <%= form.text_field :contact_phone, name: "temple[contact][phone]", value: @form.contact["phone"], placeholder: t("admin.temple_profile.placeholders.phone") %>
       </div>
       <div class="field">
-        <%= form.label :contact_plusCode, "Plus Code" %>
-        <%= form.text_field :contact_plusCode, name: "temple[contact][plusCode]", value: @form.contact["plusCode"], placeholder: "例：MVWF+54 竹南鎮" %>
+        <%= form.label :contact_plusCode, t("admin.temple_profile.fields.plus_code") %>
+        <%= form.text_field :contact_plusCode, name: "temple[contact][plusCode]", value: @form.contact["plusCode"], placeholder: t("admin.temple_profile.placeholders.plus_code") %>
       </div>
     </div>
 
     <div class="field">
-      <%= form.label :contact_mapUrl, "Map URL" %>
-      <%= form.url_field :contact_mapUrl, name: "temple[contact][mapUrl]", value: @form.contact["mapUrl"], placeholder: "https://maps.google.com/?q=..." %>
+      <%= form.label :contact_mapUrl, t("admin.temple_profile.fields.map_url") %>
+      <%= form.url_field :contact_mapUrl, name: "temple[contact][mapUrl]", value: @form.contact["mapUrl"], placeholder: t("admin.temple_profile.placeholders.map_url") %>
     </div>
 
     <hr />
 
     <header>
-      <h2>Service schedule</h2>
-      <p>Displayed alongside the contact info on the Vue + Expo clients.</p>
+      <h2><%= t("admin.temple_profile.sections.schedule.title") %></h2>
+      <p><%= t("admin.temple_profile.sections.schedule.subtitle") %></p>
     </header>
 
     <div class="grid-2">
       <div class="field">
-        <%= form.label :service_times_weekday, "Weekday hours" %>
-        <%= form.text_field :service_times_weekday, name: "temple[service_times][weekday]", value: @form.service_times["weekday"], placeholder: "例：08:00 – 17:00" %>
+        <%= form.label :service_times_weekday, t("admin.temple_profile.fields.weekday_hours") %>
+        <%= form.text_field :service_times_weekday, name: "temple[service_times][weekday]", value: @form.service_times["weekday"], placeholder: t("admin.temple_profile.placeholders.weekday_hours") %>
       </div>
       <div class="field">
-        <%= form.label :service_times_weekend, "Weekend hours" %>
-        <%= form.text_field :service_times_weekend, name: "temple[service_times][weekend]", value: @form.service_times["weekend"], placeholder: "例：07:30 – 18:00" %>
+        <%= form.label :service_times_weekend, t("admin.temple_profile.fields.weekend_hours") %>
+        <%= form.text_field :service_times_weekend, name: "temple[service_times][weekend]", value: @form.service_times["weekend"], placeholder: t("admin.temple_profile.placeholders.weekend_hours") %>
       </div>
     </div>
 
     <div class="field">
-      <%= form.label :service_times_notes, "Notes" %>
-      <%= form.text_area :service_times_notes, name: "temple[service_times][notes]", value: @form.service_times["notes"], rows: 2, placeholder: "例：農曆初一、十五延長開放。" %>
+      <%= form.label :service_times_notes, t("admin.temple_profile.fields.notes") %>
+      <%= form.text_area :service_times_notes, name: "temple[service_times][notes]", value: @form.service_times["notes"], rows: 2, placeholder: t("admin.temple_profile.placeholders.notes") %>
     </div>
 
     <div class="actions">
-      <%= form.submit "Save profile", class: "btn primary" %>
-      <%= link_to "Cancel", admin_dashboard_path, class: "btn secondary" %>
+      <%= form.submit t("admin.temple_profile.actions.save"), class: "btn btn-primary" %>
+      <%= link_to t("admin.temple_profile.actions.cancel"), admin_dashboard_path, class: "btn btn-secondary" %>
     </div>
   <% end %>
 </section>

@@ -3,6 +3,7 @@
 module Admin
   class OfferingsController < BaseController
     before_action :set_offering, only: %i[show edit update]
+    before_action :load_template_loader
     before_action :require_manage_offerings!, except: %i[index show]
 
     def index
@@ -13,10 +14,13 @@ module Admin
 
     def new
       @offering = current_temple.temple_offerings.new
+      apply_template_defaults(@offering, selected_template_slug)
     end
 
     def create
       @offering = current_temple.temple_offerings.new(offering_params)
+
+      apply_template_defaults(@offering, selected_template_slug)
 
       if @offering.save
         log_offering_event("admin.offerings.create")
@@ -60,16 +64,16 @@ module Admin
         :ends_on,
         :available_slots,
         :active,
-        metadata_settings: %i[certificate_prefix certificate_hint ancestor_placard_hint logistics_notes]
+        metadata_settings: {}
       )
-      permitted[:metadata] = sanitize_metadata_settings(permitted.delete(:metadata_settings))
+      permitted[:metadata] = merge_metadata_settings(permitted.delete(:metadata_settings))
       permitted
     end
 
-    def sanitize_metadata_settings(raw)
-      return {} if raw.blank?
-
-      raw.to_h.transform_values { |value| value.is_a?(String) ? value.strip : value }.compact_blank
+    def merge_metadata_settings(raw)
+      base = (@offering&.metadata || {}).with_indifferent_access
+      settings = raw.to_h
+      base.merge(settings)
     end
 
     def log_offering_event(action)
@@ -83,6 +87,29 @@ module Admin
         },
         temple: current_temple
       )
+    end
+
+    def selected_template_slug
+      params[:template_slug].presence
+    end
+
+    def apply_template_defaults(offering, template_slug)
+      return unless template_slug
+
+      template = @template_loader.template_for(template_slug)
+      return unless template
+
+      offering.title ||= template[:label]
+      offering.offering_type = template.dig(:defaults, :offering_type)
+      offering.metadata ||= {}
+      offering.metadata["form_fields"] = template[:form_fields]
+      offering.metadata["form_defaults"] = template[:defaults]
+      offering.metadata["form_options"] = template[:options]
+      offering.metadata["form_label"] = template[:label]
+    end
+
+    def load_template_loader
+      @template_loader = Offerings::TemplateLoader.new(current_temple.slug)
     end
   end
 end

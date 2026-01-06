@@ -1,6 +1,6 @@
 <aside class="admin-sidebar">
   <div class="sidebar-block">
-    <p class="sidebar-heading">Console menu</p>
+    <p class="sidebar-heading"><%= t("admin.nav.menu_heading") %></p>
     <div class="sidebar-menu">
       <% admin_navigation_items.each do |item| %>
         <% path = admin_navigation_link_path(item) %>
@@ -16,7 +16,7 @@
 
   <% if admin_signed_in? %>
     <div class="sidebar-footer">
-      <%= button_to "Sign out", admin_logout_path, method: :delete, class: "sidebar-link logout-button" %>
+      <%= button_to t("admin.nav.sign_out"), admin_logout_path, method: :delete, class: "sidebar-link logout-button" %>
     </div>
   <% end %>
 </aside>

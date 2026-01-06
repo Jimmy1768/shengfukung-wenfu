@@ -1,0 +1,384 @@
+zh-TW:
+  admin:
+    registration_form:
+      title: "建立現場報名"
+      subtitle: "連結信眾並為 %{offering} 記錄面談重點。"
+      errors_heading: "%{count} 項問題需要修正"
+      sections:
+        patron: "信眾"
+        order: "訂單"
+        contact: "聯絡資訊"
+        logistics: "服務安排"
+        ritual_metadata: "儀式備註"
+      headings:
+        patron: "選擇或建立信眾"
+        order: "訂單內容"
+        contact: "主要聯絡人"
+        logistics: "時程與場域"
+        ritual_metadata: "儀式細節"
+        new_patron: "新增信眾"
+      hints:
+        patron: "可依姓名／信箱搜尋既有信眾，或於此快速建立。"
+        patron_search: "輸入至少兩個字即可搜尋。"
+        results_placeholder: "輸入關鍵字以載入信眾。"
+        no_results_placeholder: "找不到符合的信眾，請調整搜尋或新增。"
+        new_patron: "此處僅建立基本資料，可於後台再補充。"
+        order: "可依現場協議調整金額或數量。"
+        contact: "記錄現場對口與聯絡方式。"
+        logistics: "標記首選時段與到場安排。"
+        ritual_metadata: "記錄牌位文字、香點選項與證書備註。"
+        selected_patron: "已選 %{name}。"
+        created_patron: "已建立 %{name} 並選取。"
+        no_patron: "尚未選擇信眾。"
+        dependents: "列出同戶成員或關係說明。"
+        unit_price: "若留白即使用供品預設金額。"
+        manual_user_id: "若無法使用搜尋，可輸入信眾 ID。"
+      fields:
+        quantity: "數量"
+        unit_price: "單價（分）"
+        currency: "幣別"
+        certificate_number: "證書號碼"
+        primary_contact: "主要聯絡人"
+        phone: "電話"
+        email: "電子郵件"
+        dependents: "家庭／眷屬"
+        contact_notes: "聯絡備註"
+        preferred_date: "首選日期"
+        preferred_slot: "首選時段"
+        arrival_window: "到場區間"
+        ceremony_location: "法會地點"
+        ancestor_placard: "祖先牌位姓名"
+        dedication_message: "祈福語"
+        incense_option: "香支選項"
+        certificate_notes: "證書備註"
+        search_patron: "搜尋信眾"
+        manual_user_id: "信眾 ID"
+      placeholders:
+        patron_search: "例如：陳 或 燈主"
+        preferred_slot: "上午／下午"
+      actions:
+        submit: "建立報名"
+        select_patron: "選擇"
+        create_patron: "建立信眾"
+      labels:
+        dependents: "眷屬："
+      errors:
+        search_failed: "目前無法搜尋信眾。"
+        create_failed: "建立信眾失敗。"
+    registration_show:
+      sections:
+        summary: "報名資訊"
+        contact: "聯絡資訊"
+        logistics: "服務安排"
+        ritual: "儀式備註"
+      headings:
+        contact: "主要聯絡人"
+        logistics: "時程與場域"
+        ritual: "儀式細節"
+      labels:
+        patron: "信眾"
+        guest: "受祈福者"
+        quantity: "數量"
+        payment_status: "付款狀態"
+        total: "總額"
+        certificate_number: "證書號碼"
+      hints:
+        summary: "%{offering} 的報名詳情。"
+      actions:
+        record_cash: "登記現金繳費"
+    offering_form:
+      sections:
+        basics: "基本資訊"
+        certificate: "證書設定"
+        logistics: "現場備註"
+      fields:
+        title: "名稱"
+        slug: "識別碼"
+        offering_type: "供品類別"
+        period: "檔期"
+        certificate_prefix: "證書字首"
+        certificate_hint: "證書說明"
+        ancestor_placard_hint: "牌位指引"
+        logistics_notes: "預設物流備註"
+        currency: "幣別"
+        starts_on: "開始日期"
+        ends_on: "結束日期"
+        available_slots: "名額"
+        active: "上架"
+        description: "描述"
+      hints:
+        certificate: "設定證書的編碼邏輯與標籤。"
+        logistics: "這些指引會顯示在工作人員的報名表上。"
+      actions:
+        save: "儲存供品"
+    language_selector:
+      label: "介面語言"
+      apply: "套用"
+      options:
+        en: "英文"
+        zh-TW: "繁體中文"
+      flash: "已切換語言。"
+    nav:
+      menu_heading: "管理選單"
+      signed_in_label: "已登入"
+      sign_out: "登出"
+    dashboard:
+      hero:
+        eyebrow: "管理主控台"
+        title: "%{name}，歡迎回來"
+        body_html: "此頁示範正式環境的結構；請依客戶需求填入真實指標、資料表與工作流程。"
+      metrics:
+        title: "起始指標"
+        subtitle: "待後端串接完成後，換成實際 KPI。"
+        entries:
+          active_members: "活躍成員"
+          pending_invites: "待邀請"
+          revenue_placeholder: "營收（示意）"
+      next_steps:
+        title: "下一步"
+        subtitle: "可用此區塊整理合作案的後端工作。"
+        fill_profile: "前往填寫宮廟資料 →"
+        connect_data: "將真實資料源串入上述 KPI。"
+        first_workflow: "把此範例換成第一個 CRUD 流程（信眾、訂單、預約等）。"
+        document_scope_html: "於 <code>docs/</code> 詳列客戶的管理需求。"
+    temple_profile:
+      hero:
+        eyebrow: "宮廟資料"
+        title: "更新官網文案"
+        body: "此處的內容會同步到前台首頁、頁腳與聯絡資訊。"
+      sections:
+        basics:
+          title: "基本資訊"
+          subtitle: "顯示在 Vue 首頁的抬頭與頁尾。"
+        contact:
+          title: "聯絡方式"
+          subtitle: "呈現於聯絡頁與頁尾。"
+        schedule:
+          title: "開放時段"
+          subtitle: "在前台與 Expo App 的聯絡資訊旁顯示。"
+      fields:
+        name: "宮廟名稱"
+        tagline: "標語"
+        hero_copy: "首頁介紹段落"
+        primary_image_url: "首頁主視覺網址"
+        address_zh: "地址（中文）"
+        address_en: "地址（英文）"
+        phone: "電話"
+        plus_code: "Plus Code"
+        map_url: "地圖連結"
+        weekday_hours: "平日時段"
+        weekend_hours: "假日時段"
+        notes: "備註"
+      placeholders:
+        name: "例：竹南鎮聖福宮"
+        tagline: "例：清淨・莊嚴・在地信仰"
+        hero_copy: "用簡潔語句說明宗旨、服務、交通提醒。"
+        primary_image_url: "https://…"
+        address_zh: "例：苗栗縣竹南鎮公教路 136 號"
+        address_en: "例：No. 136, Gongjiao Rd, Zhunan Township..."
+        phone: "例：03-747-2826"
+        plus_code: "例：MVWF+54 竹南鎮"
+        map_url: "https://maps.google.com/?q=..."
+        weekday_hours: "例：08:00 – 17:00"
+        weekend_hours: "例：07:30 – 18:00"
+        notes: "例：農曆初一、十五延長開放。"
+      actions:
+        save: "儲存資料"
+        cancel: "取消"
+    offerings:
+      index:
+        title: "供品管理"
+        new_button: "新增供品"
+        table:
+          title: "名稱"
+          type: "類別"
+          price: "金額"
+          status: "狀態"
+          view: "檢視"
+      statuses:
+        active: "上架"
+        archived: "封存"
+      types:
+        general: "一般"
+        lamp: "點燈"
+        ritual: "法會"
+        donation: "捐獻"
+        table: "供桌"
+      new:
+        title: "新增供品"
+        template_open: "挑選供品模板"
+        template_change: "更換模板"
+        template_modal_title: "選擇供品模板"
+        template_close: "關閉模板清單"
+        template_use: "套用此模板"
+        template_period: "預設檔期：%{period}"
+        template_selected: "目前使用模板：%{name}"
+        template_prompt: "請先選擇模板再填寫供品欄位。"
+      edit:
+        title: "編輯供品"
+      show:
+        type: "類別"
+        period: "檔期"
+        period_empty: "—"
+        schedule: "時程"
+        schedule_flexible: "彈性"
+        manage_registrations: "管理報名"
+        edit_offering: "編輯供品"
+    orders:
+      index:
+        eyebrow: "訂單"
+        title: "報名與現場訂單"
+        body: "在這裡先檢閱近期報名，後續會再加入進階篩選。"
+        empty: "此宮廟尚未建立任何報名。"
+        guest_fallback: "訪客"
+        table:
+          reference: "編號"
+          offering: "供品"
+          applicant: "申請人"
+          quantity: "數量"
+          status: "狀態"
+          created: "建立時間"
+          view: "檢視"
+      statuses:
+        pending: "待付款"
+        paid: "已付款"
+        refunded: "已退款"
+        failed: "失敗"
+    offering_orders:
+      index:
+        title: "%{offering} 的報名紀錄"
+        new_registration: "新增報名"
+        table:
+          reference: "編號"
+          user: "信眾"
+          status: "狀態"
+          quantity: "數量"
+          total: "總額"
+          view: "檢視"
+    payments:
+      index:
+        eyebrow: "收款"
+        title: "付款報表"
+        body: "收款資料會即時更新，可在此下載 CSV 給財務彙整。"
+        export: "下載 CSV 匯出"
+        empty: "尚未有任何付款紀錄。"
+        system_fallback: "系統"
+        metrics:
+          total_received: "已收總額"
+          payments_logged: "紀錄筆數"
+        breakdowns:
+          eyebrow: "分類總覽"
+          title: "依付款方式／供品／日期"
+          by_method: "依付款方式"
+          by_offering: "依供品"
+          by_date: "依日期"
+        recent:
+          eyebrow: "最新紀錄"
+          title: "最近 100 筆付款"
+        table:
+          reference: "編號"
+          method: "付款方式"
+          amount: "金額"
+          status: "狀態"
+          registration: "報名"
+          recorded_by: "紀錄人員"
+          processed: "處理時間"
+          view: "檢視"
+      statuses:
+        pending: "待處理"
+        completed: "已完成"
+        failed: "失敗"
+        refunded: "已退款"
+      methods:
+        cash: "現金"
+        bank_transfer: "匯款"
+        credit_card: "信用卡"
+        line_pay: "LINE Pay"
+    archives:
+      hero:
+        eyebrow: "資料封存 · %{temple}"
+        title: "歷史資料"
+        body: "檢閱年度報名、收款與證書發放。擁有者可下載原始資料以供稽核。"
+      year_filter:
+        title: "年度篩選"
+        body: "選擇年份以查看詳細紀錄，快照則涵蓋全部年度。"
+        label: "年度"
+        apply: "套用"
+      metrics:
+        registrations: "%{year} 報名"
+        paid_registrations: "已繳費報名"
+        payments_total: "收款總額"
+        certificates_issued: "已發證書"
+      snapshots:
+        title: "年度快照"
+        body: "供內部人員快速參考總表，無需查看個資。"
+        registrations: "報名"
+        certificates: "證書"
+        payments: "付款"
+      details:
+        export: "匯出 CSV"
+        registrations:
+          title: "報名 · %{year}"
+          body: "該年度建立的報名紀錄（唯讀）。"
+          empty: "此年度沒有報名紀錄。"
+          table:
+            date: "日期"
+            reference: "編號"
+            offering: "供品"
+            patron: "信眾"
+            status: "狀態"
+            certificate: "證書"
+        payments:
+          title: "付款 · %{year}"
+          body: "唯讀的收款明細，需要財務權限才能匯出。"
+          empty: "此年度沒有收款紀錄。"
+          table:
+            processed: "處理時間"
+            reference: "編號"
+            method: "付款方式"
+            status: "狀態"
+            amount: "金額"
+            recorded_by: "紀錄人員"
+        certificates:
+          title: "證書 · %{year}"
+          body: "列出各證書號碼與對應的報名。"
+          empty: "此年度沒有發放證書。"
+          table:
+            certificate: "證書"
+            issued: "發放日期"
+            reference: "報名編號"
+            offering: "供品"
+            patron: "信眾"
+      guest_fallback: "訪客"
+      limited:
+        title: "權限不足"
+        body_html: "目前僅能檢視年度快照。若需查看完整明細，請向擁有者或具財務權限的管理員申請。"
+    permissions:
+      index:
+        eyebrow: "權限"
+        title: "管理員權限"
+        body: "只有宮廟擁有者可以調整這些權限，請依供品、現場人員與財務審核的需求配置。"
+        save: "儲存"
+        empty: "此宮廟尚未有任何管理帳號。"
+      capabilities:
+        manage_offerings:
+          label: "管理供品"
+          hint: "建立或編輯官網上的供品。"
+        manage_registrations:
+          label: "管理報名"
+          hint: "存取報名紀錄與現場訂單。"
+        record_cash_payments:
+          label: "記錄現金收款"
+          hint: "為訂單登記現金或線下付款。"
+        view_financials:
+          label: "檢視財務摘要"
+          hint: "查看付款紀錄與儀表板統計。"
+        export_financials:
+          label: "匯出財務報表"
+          hint: "下載付款與帳冊的 CSV。"
+        view_guest_lists:
+          label: "查看賓客名單"
+          hint: "檢視現場活動的參與者名冊。"
+        manage_permissions:
+          label: "管理權限"
+          hint: "賦予或移除工作人員權限。"

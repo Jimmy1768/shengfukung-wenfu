@@ -1,0 +1,102 @@
+offerings:
+  - slug: incense-donation
+    label: "香油捐獻"
+    defaults:
+      offering_type: "donation"
+      currency: "TWD"
+    form_fields:
+      basics:
+        fields:
+          - title
+          - price_cents
+          - currency
+      donation:
+        fields:
+          - description
+
+  - slug: family-peace
+    label: "平安戲丁口捐"
+    defaults:
+      offering_type: "ritual"
+      currency: "TWD"
+    form_fields:
+      basics:
+        fields:
+          - title
+          - period
+          - price_cents
+          - currency
+      ritual:
+        fields:
+          - description
+
+  - slug: lantern-lighting
+    label: "點燈作業"
+    defaults:
+      offering_type: "lamp"
+      currency: "TWD"
+    form_fields:
+      basics:
+        fields:
+          - title
+          - period
+          - price_cents
+          - currency
+      schedule:
+        fields:
+          - available_slots
+          - starts_on
+          - ends_on
+          - active
+      description: true
+
+  - slug: ancestor-ritual
+    label: "祖先拔薦"
+    defaults:
+      offering_type: "ritual"
+      currency: "TWD"
+    form_fields:
+      basics:
+        fields:
+          - title
+          - period
+          - price_cents
+          - currency
+      ritual:
+        fields:
+          - description
+      logistics:
+        fields:
+          - logistics_notes
+
+  - slug: pudu-table
+    label: "普渡供桌"
+    defaults:
+      offering_type: "table"
+      currency: "TWD"
+    options:
+      period:
+        - "中元普渡"
+        - "春祭普渡"
+    form_fields:
+      basics:
+        fields:
+          - title
+          - period
+          - price_cents
+          - currency
+      schedule:
+        fields:
+          - starts_on
+          - ends_on
+          - available_slots
+          - active
+      certificate:
+        fields:
+          - certificate_prefix
+          - certificate_hint
+      logistics:
+        fields:
+          - ancestor_placard_hint
+          - logistics_notes
+      description: true

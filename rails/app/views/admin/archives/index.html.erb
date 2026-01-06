@@ -1,39 +1,39 @@
 <section class="hero">
   <div class="hero-text">
-    <p class="eyebrow">Archives · <%= current_temple&.name %></p>
-    <h1>Historical records</h1>
-    <p>Review annual registrations, payments, and certificate issuance. Owners can export the raw datasets for compliance or audits.</p>
+    <p class="eyebrow"><%= t("admin.archives.hero.eyebrow", temple: current_temple&.name) %></p>
+    <h1><%= t("admin.archives.hero.title") %></h1>
+    <p><%= t("admin.archives.hero.body") %></p>
   </div>
 </section>
 
 <section class="card">
   <header class="card-header-with-controls">
     <div>
-      <h2>Year filter</h2>
-      <p class="muted">Pick a year to view the detailed history. Snapshots always include all years.</p>
+      <h2><%= t("admin.archives.year_filter.title") %></h2>
+      <p class="muted"><%= t("admin.archives.year_filter.body") %></p>
     </div>
     <%= form_with url: admin_archives_path, method: :get, local: true, class: "inline-form" do |form| %>
-      <label for="archives-year">Year</label>
+      <label for="archives-year"><%= t("admin.archives.year_filter.label") %></label>
       <%= form.select :year, options_for_select(@available_years, @selected_year), {}, id: "archives-year" %>
-      <%= form.submit "Apply", class: "button" %>
+      <%= form.submit t("admin.archives.year_filter.apply"), class: "btn btn-secondary" %>
     <% end %>
   </header>
 
   <div class="archive-summary">
     <div class="metric">
-      <span>Registrations (<%= @selected_year %>)</span>
+      <span><%= t("admin.archives.metrics.registrations", year: @selected_year) %></span>
       <strong><%= number_with_delimiter(@summary[:registrations_count]) %></strong>
     </div>
     <div class="metric">
-      <span>Paid registrations</span>
+      <span><%= t("admin.archives.metrics.paid_registrations") %></span>
       <strong><%= number_with_delimiter(@summary[:paid_registrations]) %></strong>
     </div>
     <div class="metric">
-      <span>Payments total</span>
+      <span><%= t("admin.archives.metrics.payments_total") %></span>
       <strong><%= number_to_currency(@summary[:payments_total_cents] / 100.0, unit: @lookup.registrations.first&.currency || "NT$", precision: 0) %></strong>
     </div>
     <div class="metric">
-      <span>Certificates issued</span>
+      <span><%= t("admin.archives.metrics.certificates_issued") %></span>
       <strong><%= number_with_delimiter(@summary[:certificates_count]) %></strong>
     </div>
   </div>
@@ -41,16 +41,16 @@
 
 <section class="card">
   <header>
-    <h2>Annual snapshots</h2>
-    <p class="muted">Staff can reference these totals without drilling into personal data.</p>
+    <h2><%= t("admin.archives.snapshots.title") %></h2>
+    <p class="muted"><%= t("admin.archives.snapshots.body") %></p>
   </header>
   <div class="archive-rollups">
     <% @annual_rollups.each do |rollup| %>
       <div class="rollup">
         <p class="eyebrow"><%= rollup[:year] %></p>
-        <p class="rollup-metric">Registrations: <strong><%= number_with_delimiter(rollup[:registrations]) %></strong></p>
-        <p class="rollup-metric">Certificates: <strong><%= number_with_delimiter(rollup[:certificates]) %></strong></p>
-        <p class="rollup-metric">Payments: <strong><%= number_to_currency(rollup[:payment_total_cents] / 100.0, precision: 0) %></strong></p>
+        <p class="rollup-metric"><%= t("admin.archives.snapshots.registrations") %>: <strong><%= number_with_delimiter(rollup[:registrations]) %></strong></p>
+        <p class="rollup-metric"><%= t("admin.archives.snapshots.certificates") %>: <strong><%= number_with_delimiter(rollup[:certificates]) %></strong></p>
+        <p class="rollup-metric"><%= t("admin.archives.snapshots.payments") %>: <strong><%= number_to_currency(rollup[:payment_total_cents] / 100.0, precision: 0) %></strong></p>
       </div>
     <% end %>
   </div>
@@ -60,11 +60,11 @@
   <section class="card archive-detail">
     <header class="card-header-with-controls">
       <div>
-        <h2>Registrations · <%= @selected_year %></h2>
-        <p class="muted">Read-only list of registrations captured in the selected year.</p>
+        <h2><%= t("admin.archives.details.registrations.title", year: @selected_year) %></h2>
+        <p class="muted"><%= t("admin.archives.details.registrations.body") %></p>
       </div>
       <% if allow_archive_exports? %>
-        <%= link_to "Export CSV", admin_archive_registrations_export_path(year: @selected_year), class: "button secondary", data: { turbo: false } %>
+        <%= link_to t("admin.archives.details.export"), admin_archive_registrations_export_path(year: @selected_year), class: "btn btn-secondary", data: { turbo: false } %>
       <% end %>
     </header>
     <% if @registrations.any? %>
@@ -72,12 +72,12 @@
         <table>
           <thead>
             <tr>
-              <th>Date</th>
-              <th>Reference</th>
-              <th>Offering</th>
-              <th>Patron</th>
-              <th>Status</th>
-              <th>Certificate</th>
+              <th><%= t("admin.archives.details.registrations.table.date") %></th>
+              <th><%= t("admin.archives.details.registrations.table.reference") %></th>
+              <th><%= t("admin.archives.details.registrations.table.offering") %></th>
+              <th><%= t("admin.archives.details.registrations.table.patron") %></th>
+              <th><%= t("admin.archives.details.registrations.table.status") %></th>
+              <th><%= t("admin.archives.details.registrations.table.certificate") %></th>
             </tr>
           </thead>
           <tbody>
@@ -86,8 +86,8 @@
                 <td><%= registration.created_at.strftime("%Y-%m-%d") %></td>
                 <td><%= registration.reference_code %></td>
                 <td><%= registration.temple_offering&.title || "—" %></td>
-                <td><%= registration.user&.english_name || registration.user&.email || registration.contact_payload["name"] || "Guest" %></td>
-                <td><%= registration.payment_status %></td>
+                <td><%= registration.user&.english_name || registration.user&.email || registration.contact_payload["name"] || t("admin.archives.guest_fallback") %></td>
+                <td><%= t("admin.orders.statuses.#{registration.payment_status}", default: registration.payment_status) %></td>
                 <td><%= registration.certificate_number.presence || "—" %></td>
               </tr>
             <% end %>
@@ -95,18 +95,18 @@
         </table>
       </div>
     <% else %>
-      <p class="muted">No registrations recorded for this year.</p>
+      <p class="muted"><%= t("admin.archives.details.registrations.empty") %></p>
     <% end %>
   </section>
 
   <section class="card archive-detail">
     <header class="card-header-with-controls">
       <div>
-        <h2>Payments · <%= @selected_year %></h2>
-        <p class="muted">Read-only payment ledger. Export requires the financials capability.</p>
+        <h2><%= t("admin.archives.details.payments.title", year: @selected_year) %></h2>
+        <p class="muted"><%= t("admin.archives.details.payments.body") %></p>
       </div>
       <% if allow_archive_exports? %>
-        <%= link_to "Export CSV", admin_archive_payments_export_path(year: @selected_year), class: "button secondary", data: { turbo: false } %>
+        <%= link_to t("admin.archives.details.export"), admin_archive_payments_export_path(year: @selected_year), class: "btn btn-secondary", data: { turbo: false } %>
       <% end %>
     </header>
     <% if @payments.any? %>
@@ -114,12 +114,12 @@
         <table>
           <thead>
             <tr>
-              <th>Processed</th>
-              <th>Reference</th>
-              <th>Method</th>
-              <th>Status</th>
-              <th>Amount</th>
-              <th>Recorded By</th>
+              <th><%= t("admin.archives.details.payments.table.processed") %></th>
+              <th><%= t("admin.archives.details.payments.table.reference") %></th>
+              <th><%= t("admin.archives.details.payments.table.method") %></th>
+              <th><%= t("admin.archives.details.payments.table.status") %></th>
+              <th><%= t("admin.archives.details.payments.table.amount") %></th>
+              <th><%= t("admin.archives.details.payments.table.recorded_by") %></th>
             </tr>
           </thead>
           <tbody>
@@ -128,28 +128,28 @@
               <tr>
                 <td><%= timestamp.strftime("%Y-%m-%d") %></td>
                 <td><%= payment.temple_event_registration&.reference_code || payment.external_reference || payment.id %></td>
-                <td><%= payment.payment_method %></td>
-                <td><%= payment.status %></td>
+                <td><%= t("admin.payments.methods.#{payment.payment_method}", default: payment.payment_method) %></td>
+                <td><%= t("admin.payments.statuses.#{payment.status}", default: payment.status) %></td>
                 <td><%= number_to_currency(payment.amount_cents / 100.0, precision: 0) %></td>
-                <td><%= payment.admin_account&.user&.english_name || payment.admin_account&.user&.email || "System" %></td>
+                <td><%= payment.admin_account&.user&.english_name || payment.admin_account&.user&.email || t("admin.payments.index.system_fallback") %></td>
               </tr>
             <% end %>
           </tbody>
         </table>
       </div>
     <% else %>
-      <p class="muted">No payment records for this year.</p>
+      <p class="muted"><%= t("admin.archives.details.payments.empty") %></p>
     <% end %>
   </section>
 
   <section class="card archive-detail">
     <header class="card-header-with-controls">
       <div>
-        <h2>Certificates · <%= @selected_year %></h2>
-        <p class="muted">Issued certificate numbers tied to their registrations.</p>
+        <h2><%= t("admin.archives.details.certificates.title", year: @selected_year) %></h2>
+        <p class="muted"><%= t("admin.archives.details.certificates.body") %></p>
       </div>
       <% if allow_archive_exports? %>
-        <%= link_to "Export CSV", admin_archive_certificates_export_path(year: @selected_year), class: "button secondary", data: { turbo: false } %>
+        <%= link_to t("admin.archives.details.export"), admin_archive_certificates_export_path(year: @selected_year), class: "btn btn-secondary", data: { turbo: false } %>
       <% end %>
     </header>
     <% if @certificates.any? %>
@@ -157,11 +157,11 @@
         <table>
           <thead>
             <tr>
-              <th>Certificate</th>
-              <th>Issued</th>
-              <th>Reference</th>
-              <th>Offering</th>
-              <th>Patron</th>
+              <th><%= t("admin.archives.details.certificates.table.certificate") %></th>
+              <th><%= t("admin.archives.details.certificates.table.issued") %></th>
+              <th><%= t("admin.archives.details.certificates.table.reference") %></th>
+              <th><%= t("admin.archives.details.certificates.table.offering") %></th>
+              <th><%= t("admin.archives.details.certificates.table.patron") %></th>
             </tr>
           </thead>
           <tbody>
@@ -171,24 +171,21 @@
                 <td><%= registration.updated_at.strftime("%Y-%m-%d") %></td>
                 <td><%= registration.reference_code %></td>
                 <td><%= registration.temple_offering&.title || "—" %></td>
-                <td><%= registration.user&.english_name || registration.user&.email || registration.contact_payload["name"] || "Guest" %></td>
+                <td><%= registration.user&.english_name || registration.user&.email || registration.contact_payload["name"] || t("admin.archives.guest_fallback") %></td>
               </tr>
             <% end %>
           </tbody>
         </table>
       </div>
     <% else %>
-      <p class="muted">No certificates issued for this year.</p>
+      <p class="muted"><%= t("admin.archives.details.certificates.empty") %></p>
     <% end %>
   </section>
 <% else %>
   <section class="card">
     <header>
-      <h2>Limited access</h2>
+      <h2><%= t("admin.archives.limited.title") %></h2>
     </header>
-    <p class="muted">
-      You’re viewing the annual snapshots. Detailed history requires an owner role or the financials capability.
-      Contact the head administrator if you need to review individual records.
-    </p>
+    <p class="muted"><%= t("admin.archives.limited.body_html") %></p>
   </section>
 <% end %>

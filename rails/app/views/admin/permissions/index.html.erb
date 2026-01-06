@@ -1,9 +1,9 @@
 <section class="card">
   <header>
-    <p class="eyebrow">Permissions</p>
-    <h1>Admin capabilities</h1>
+    <p class="eyebrow"><%= t("admin.permissions.index.eyebrow") %></p>
+    <h1><%= t("admin.permissions.index.title") %></h1>
     <p class="muted">
-      Only temple owners can change these flags. Use them to align access between offerings, onsite staff, and finance reviewers.
+      <%= t("admin.permissions.index.body") %>
     </p>
   </header>
 
@@ -22,7 +22,8 @@
           <%= form_with model: permission_form,
                 scope: :admin_permission,
                 url: admin_permission_path(permission_form.admin_account),
-                method: :patch,
+                method: :post,
+                local: true,
                 data: { turbo: false },
                 class: "permission-form" do |form| %>
             <% if permission_form.errors.any? %>
@@ -50,13 +51,13 @@
             </div>
 
             <div class="permission-actions">
-              <%= form.submit "Save", class: "button" %>
+              <%= form.submit t("admin.permissions.index.save"), class: "btn btn-primary" %>
             </div>
           <% end %>
         </div>
       <% end %>
     </div>
   <% else %>
-    <p class="muted">No admin accounts found for this temple.</p>
+    <p class="muted"><%= t("admin.permissions.index.empty") %></p>
   <% end %>
 </section>

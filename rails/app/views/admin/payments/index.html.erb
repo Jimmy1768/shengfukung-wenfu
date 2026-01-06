@@ -2,23 +2,21 @@
 
 <section class="card">
   <header>
-    <p class="eyebrow">Payments</p>
-    <h1>Payment reporting</h1>
-    <p class="muted">
-      Totals update in real time as payments are recorded. Export CSVs for finance teams from here.
-    </p>
+    <p class="eyebrow"><%= t("admin.payments.index.eyebrow") %></p>
+    <h1><%= t("admin.payments.index.title") %></h1>
+    <p class="muted"><%= t("admin.payments.index.body") %></p>
     <% if @show_export %>
-      <%= link_to "Download CSV export", export_admin_payments_path(format: :csv), class: "pill-link" %>
+      <%= link_to t("admin.payments.index.export"), export_admin_payments_path(format: :csv), class: "pill-link" %>
     <% end %>
   </header>
 
   <div class="metric-row">
     <article class="metric">
-      <span>Total received</span>
+      <span><%= t("admin.payments.index.metrics.total_received") %></span>
       <strong><%= number_to_currency(@payment_summary.total_amount_cents / 100.0, unit: "#{currency_unit} ") %></strong>
     </article>
     <article class="metric">
-      <span>Payments logged</span>
+      <span><%= t("admin.payments.index.metrics.payments_logged") %></span>
       <strong><%= @payment_summary.total_count %></strong>
     </article>
   </div>
@@ -26,23 +24,23 @@
 
 <section class="card">
   <header>
-    <p class="eyebrow">Breakdowns</p>
-    <h2>By method / offering / day</h2>
+    <p class="eyebrow"><%= t("admin.payments.index.breakdowns.eyebrow") %></p>
+    <h2><%= t("admin.payments.index.breakdowns.title") %></h2>
   </header>
   <div class="payment-breakdowns">
     <div>
-      <h3>By method</h3>
+      <h3><%= t("admin.payments.index.breakdowns.by_method") %></h3>
       <ul class="breakdown-list">
         <% @payment_summary.totals_by_method.each do |entry| %>
           <li>
-            <span><%= entry[:label].titleize %></span>
+            <span><%= t("admin.payments.methods.#{entry[:label]}", default: entry[:label].titleize) %></span>
             <strong><%= number_to_currency(entry[:amount_cents] / 100.0, unit: "#{currency_unit} ") %></strong>
           </li>
         <% end %>
       </ul>
     </div>
     <div>
-      <h3>By offering</h3>
+      <h3><%= t("admin.payments.index.breakdowns.by_offering") %></h3>
       <ul class="breakdown-list">
         <% @payment_summary.totals_by_offering.each do |entry| %>
           <li>
@@ -53,7 +51,7 @@
       </ul>
     </div>
     <div>
-      <h3>By date</h3>
+      <h3><%= t("admin.payments.index.breakdowns.by_date") %></h3>
       <ul class="breakdown-list">
         <% @payment_summary.totals_by_date.each do |entry| %>
           <li>
@@ -68,8 +66,8 @@
 
 <section class="card">
   <header>
-    <p class="eyebrow">Recent activity</p>
-    <h2>Latest 100 payments</h2>
+    <p class="eyebrow"><%= t("admin.payments.index.recent.eyebrow") %></p>
+    <h2><%= t("admin.payments.index.recent.title") %></h2>
   </header>
 
   <% if @payments.any? %>
@@ -77,22 +75,26 @@
       <table class="admin-table">
         <thead>
           <tr>
-            <th>編號</th>
-            <th>Method</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Registration</th>
-            <th>Recorded by</th>
-            <th>Processed</th>
+            <th><%= t("admin.payments.index.table.reference") %></th>
+            <th><%= t("admin.payments.index.table.method") %></th>
+            <th><%= t("admin.payments.index.table.amount") %></th>
+            <th><%= t("admin.payments.index.table.status") %></th>
+            <th><%= t("admin.payments.index.table.registration") %></th>
+            <th><%= t("admin.payments.index.table.recorded_by") %></th>
+            <th><%= t("admin.payments.index.table.processed") %></th>
           </tr>
         </thead>
         <tbody>
           <% @payments.each do |payment| %>
             <tr>
               <td><%= payment.external_reference.presence || payment.id %></td>
-              <td><%= payment.payment_method.humanize %></td>
+              <td><%= t("admin.payments.methods.#{payment.payment_method}", default: payment.payment_method.humanize) %></td>
               <td><%= number_to_currency(payment.amount_cents / 100.0, unit: payment.currency) %></td>
-              <td><span class="status-pill status-<%= payment.status %>"><%= payment.status.humanize %></span></td>
+              <td>
+                <span class="status-pill status-<%= payment.status %>">
+                  <%= t("admin.payments.statuses.#{payment.status}", default: payment.status.humanize) %>
+                </span>
+              </td>
               <td>
                 <% if payment.temple_event_registration&.temple_offering.present? %>
                   <%= link_to payment.temple_event_registration.reference_code,
@@ -102,7 +104,7 @@
                   —
                 <% end %>
               </td>
-              <td><%= payment.admin_account&.user&.english_name || payment.user&.english_name || "System" %></td>
+              <td><%= payment.admin_account&.user&.english_name || payment.user&.english_name || t("admin.payments.index.system_fallback") %></td>
               <td><%= payment.processed_at&.strftime("%Y/%m/%d %H:%M") || payment.created_at.strftime("%Y/%m/%d %H:%M") %></td>
             </tr>
           <% end %>
@@ -110,6 +112,6 @@
       </table>
     </div>
   <% else %>
-    <p class="muted">No payments recorded yet.</p>
+    <p class="muted"><%= t("admin.payments.index.empty") %></p>
   <% end %>
 </section>

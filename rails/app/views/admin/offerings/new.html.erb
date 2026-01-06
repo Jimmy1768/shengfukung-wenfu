@@ -1,3 +1,66 @@
-<h1>New Offering</h1>
+<h1><%= t("admin.offerings.new.title") %></h1>
+
+<% loader = Offerings::TemplateLoader.new(current_temple.slug) %>
+<% templates = loader.templates %>
+<% selected_template = params[:template_slug].presence %>
+<% selected_template_entry = selected_template.present? ? loader.template_for(selected_template) : nil %>
+
+<% if templates.any? %>
+  <div class="template-picker">
+    <% if selected_template_entry.present? %>
+      <p class="muted">
+        <%= t("admin.offerings.new.template_selected", name: selected_template_entry[:label] || selected_template_entry[:slug]) %>
+        <button type="button" class="btn btn-secondary btn-sm" data-modal-trigger="offering-template-modal">
+          <%= t("admin.offerings.new.template_change") %>
+        </button>
+      </p>
+    <% else %>
+      <button type="button" class="btn btn-secondary" data-modal-trigger="offering-template-modal">
+        <%= t("admin.offerings.new.template_open") %>
+      </button>
+    <% end %>
+  </div>
+
+  <%= render "shared/modal_panel",
+    modal_key: "offering-template-modal",
+    title: t("admin.offerings.new.template_modal_title"),
+    close_label: t("admin.offerings.new.template_close") do %>
+    <div class="template-list">
+      <% templates.each do |template| %>
+        <% slug = template[:slug] %>
+        <% selected = slug == selected_template %>
+        <%= button_to new_admin_offering_path,
+          method: :get,
+          params: { template_slug: slug },
+          class: ["btn", "template-card-button", ("is-selected" if selected)] do %>
+          <div class="template-card-body">
+            <div>
+              <h3><%= template[:label] || slug.titleize %></h3>
+            </div>
+            <% if template[:defaults]&.[](:period).present? %>
+              <p class="template-meta"><%= t("admin.offerings.new.template_period", period: template[:defaults][:period]) %></p>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
+<% if selected_template_entry.present? %>
+  <% template = selected_template_entry %>
+  <% @offering.metadata ||= {} %>
+  <% @offering.metadata["form_fields"] = template[:form_fields] %>
+  <% @offering.metadata["form_defaults"] = template[:defaults] %>
+  <% @offering.metadata["form_options"] = template[:options] %>
+  <% @offering.metadata["form_label"] = template[:label] %>
+  <% @offering.slug ||= template[:slug] %>
+  <% @offering.title ||= template[:label] %>
+  <% @offering.offering_type ||= template.dig(:defaults, :offering_type) %>
+<% else %>
+  <div class="alert alert-info">
+    <%= t("admin.offerings.new.template_prompt") %>
+  </div>
+<% end %>
 
 <%= render "form" %>

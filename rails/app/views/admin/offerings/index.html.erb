@@ -1,16 +1,18 @@
-<h1>Temple Offerings</h1>
+<h1><%= t("admin.offerings.index.title") %></h1>
 
 <p>
-  <%= link_to "New Offering", new_admin_offering_path, class: "button" if current_admin_permissions&.allow?(:manage_offerings) %>
+  <% if current_admin_permissions&.allow?(:manage_offerings) %>
+    <%= link_to t("admin.offerings.index.new_button"), new_admin_offering_path, class: "btn btn-primary" %>
+  <% end %>
 </p>
 
 <table class="table">
   <thead>
     <tr>
-      <th>Title</th>
-      <th>Type</th>
-      <th>Price</th>
-      <th>Status</th>
+      <th><%= t("admin.offerings.index.table.title") %></th>
+      <th><%= t("admin.offerings.index.table.type") %></th>
+      <th><%= t("admin.offerings.index.table.price") %></th>
+      <th><%= t("admin.offerings.index.table.status") %></th>
       <th></th>
     </tr>
   </thead>
@@ -18,10 +20,12 @@
     <% @offerings.each do |offering| %>
       <tr>
         <td><%= offering.title %></td>
-        <td><%= offering.offering_type.humanize %></td>
+        <td><%= t("admin.offerings.types.#{offering.offering_type}", default: offering.offering_type.humanize) %></td>
         <td><%= number_to_currency(offering.price_cents / 100.0, unit: offering.currency) %></td>
-        <td><%= offering.active? ? "Active" : "Archived" %></td>
-        <td><%= link_to "View", admin_offering_path(offering) %></td>
+        <td>
+          <%= offering.active? ? t("admin.offerings.statuses.active") : t("admin.offerings.statuses.archived") %>
+        </td>
+        <td><%= link_to t("admin.offerings.index.table.view"), admin_offering_path(offering) %></td>
       </tr>
     <% end %>
   </tbody>

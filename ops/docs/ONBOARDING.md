@@ -48,6 +48,25 @@ Use this when you need representative data locally or on staging:
      ```
    - Cash-only pipeline: use `/admin/offerings/<id>/orders` to create registrations, then “Record cash payment” to log receipts + ledger entries. LINE Pay arrives after onsite validation.
    - Cash-only pipeline: use `/admin/offerings/<id>/orders` to create registrations, then “Record cash payment” to log receipts + ledger entries. LINE Pay arrives after onsite validation.
+6. **Customize product lines / offerings per temple**
+   - Each `TempleOffering` stores a JSONB `metadata` column. Use the `form_fields` key to describe which inputs should render for that offering (e.g., `sections`, `fields`, `required`, custom labels/hints).
+   - During onboarding, create a config file under `rails/db/temples/offerings/<slug>.yml`. Suggested structure:
+     ```yaml
+     offerings:
+       - slug: pudu-table
+         form_fields:
+           basics: [title, slug, offering_type, period, price_cents, currency]
+           schedule: [starts_on, ends_on, available_slots, active]
+           certificate: [certificate_prefix, certificate_hint]
+           logistics: [ancestor_placard_hint, logistics_notes]
+           description: true
+     ```
+   - Extend the seed task (or run a one-off script) to load this YAML and merge `form_fields` into each offering’s `metadata`. The admin `_form.html.erb` partial will read `@offering.metadata['form_fields']` and only render the listed sections/inputs, so each temple sees a tailored form without separate partials.
+   - Store the YAML in Git so the config remains the source of truth. When a temple needs tweaks, edit the YAML, rerun the sync task, and the form will update automatically.
+7. **In-tower workflow summary**
+   - **Product line (template)** – defined in `rails/db/temples/offerings/<slug>.yml` + merged into `temple_offerings.metadata`. Requires dev support to add new slugs/sections.
+   - **Offering (event instance)** – admins use `/admin/offerings/new` to create/edit/delete instances of those product lines (set price, dates, copy). No code change required.
+   - **Registration / payment** – staff use `/admin/offerings/<id>/orders` to capture onsite registrations, then record payments. Ledger/history sits at this level.
 
 ## Production Flow
 

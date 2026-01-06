@@ -3,30 +3,10 @@
 ```bash
 
 git add .
-git commit -m "building temple offerings system v1"
+git commit -m "building inital users section"
 git push
 
 git reset --hard HEAD
-```
-
----
-
-## Phase 3 • Multi-temple env overrides
-
-- Add per-temple secrets to `etc/default/<temple-slug>.env` (mirror `.env.development` and keep real keys out of git). The folder now exists in the repo; just drop the file per active temple slug.
-- Rails boot automatically loads `.env`, `.env.<env>`, and the matching `etc/default/<slug>.env` (falling back to `.env.development` when no temple file exists). The slug is resolved from `TEMPLE_SLUG`, `PROJECT_SLUG`, or the value stored in `shared/app_constants/project.json`.
-- Run any process against a specific temple via `bin/load_temple_env <slug> -- <command>`. The script sources the right env files and execs the command (Rails, Vue, Expo, scripts, etc.) without leaking credentials into your shell session.
-- Example flows:
-
-```bash
-# Preview the env files that would be loaded for a slug
-bin/load_temple_env shenfukung-wenfu
-
-# Run the Rails server with that slug's credentials
-bin/load_temple_env shenfukung-wenfu -- (cd rails && bundle exec rails server -p 3001)
-
-# Execute the new env-loader tests
-bin/load_temple_env shenfukung-wenfu -- (cd rails && bundle exec rails test test/services/multi_temple_env_loader_test.rb)
 ```
 
 ---
@@ -121,14 +101,6 @@ bundle exec rails server -p 3001 -b 0.0.0.0
 
 # Run any pending migrations
 bin/rails db:migrate
-
-# Targeted integration tests for new admin/user flows
-bundle exec rails test test/integration/admin/offerings_audit_test.rb
-bundle exec rails test test/integration/admin/patron_picker_test.rb
-bundle exec rails test test/integration/account/account_portal_flow_test.rb
-bundle exec rails test test/integration/admin/multi_temple_access_test.rb
-bundle exec rails test test/integration/admin/archives_access_test.rb
-bundle exec rails test test/integration/account/api
 ```
 
 ---
@@ -141,16 +113,7 @@ bundle exec rails test test/integration/account/api
 - Admin console → “Profile” lets you edit the copy/contact info surfaced on the Vue site. Form submissions append a `SystemAuditLog`.
 - The Vue app reads `http://localhost:3001/api/v1/temples/:slug` (set via `VITE_API_BASE_URL` + `VITE_TEMPLE_SLUG`). Copy `/vue/.env.example` into the repo root as `.env.development` (or merge into your existing `.env.development`) and adjust those keys when targeting another Rails host.
 - Expo builds now read `EXPO_PROJECT_SLUG`, `EXPO_PROJECT_SCHEME`, `EXPO_ANDROID_PACKAGE`, and `EXPO_IOS_BUNDLE_IDENTIFIER` (falling back to the shared keys when absent), so add those to `.env.*` alongside `MOBILE_API_BASE_URL`, `MOBILE_JWT_LOGIN_PATH`, and `MOBILE_JWT_REFRESH_PATH`.
-
-### Account/mobile read APIs
-
-- Mobile clients consume `/account/api/...` scoped to the signed-in account (or admin, if they have temple access). Endpoints:
-  - `GET /account/api/registrations`
-  - `GET /account/api/payment_statuses/:reference`
-  - `GET /account/api/certificates`
-  - `GET /account/api/guest_lists/:offering_id` (requires `view_guest_lists`)
-- Run the API suite after touching presenters/serializers: `bundle exec rails test test/integration/account/api`.
-- When testing locally, wrap Expo/Vite/Rails commands with `bin/load_temple_env <slug> -- ...` so the same credential set is loaded across web/mobile.
+- Offering templates (per-temple form configs) live in `rails/db/temples/offerings/<slug>.yml`. After editing those YAML files, run `ruby ops/scripts/sync_offering_configs.rb` to push the metadata (`form_fields`, defaults, options) into each `TempleOffering` so the admin form reflects the changes.
 
 ---
 

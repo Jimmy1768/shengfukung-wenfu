@@ -6,26 +6,26 @@
   </header>
   <dl class="detail-grid">
     <div>
-      <dt>Type</dt>
-      <dd><%= @offering.offering_type.humanize %></dd>
+      <dt><%= t("admin.offerings.show.type") %></dt>
+      <dd><%= t("admin.offerings.types.#{@offering.offering_type}", default: @offering.offering_type.humanize) %></dd>
     </div>
     <div>
       <dt><%= t("admin.registration_form.fields.unit_price") %></dt>
       <dd><%= number_to_currency(@offering.price_cents / 100.0, unit: @offering.currency) %></dd>
     </div>
     <div>
-      <dt>Period</dt>
-      <dd><%= @offering.period.presence || "N/A" %></dd>
+      <dt><%= t("admin.offerings.show.period") %></dt>
+      <dd><%= @offering.period.presence || t("admin.offerings.show.period_empty") %></dd>
     </div>
     <div>
-      <dt>Schedule</dt>
-      <dd><%= [@offering.starts_on, @offering.ends_on].compact.join(" - ").presence || "Flexible" %></dd>
+      <dt><%= t("admin.offerings.show.schedule") %></dt>
+      <dd><%= [@offering.starts_on, @offering.ends_on].compact.join(" - ").presence || t("admin.offerings.show.schedule_flexible") %></dd>
     </div>
   </dl>
   <div class="actions">
-    <%= link_to "Manage registrations", admin_offering_offering_orders_path(@offering), class: "button" %>
+    <%= link_to t("admin.offerings.show.manage_registrations"), admin_offering_offering_orders_path(@offering), class: "btn btn-primary" %>
     <% if current_admin_permissions&.allow?(:manage_offerings) %>
-      <%= link_to "Edit offering", edit_admin_offering_path(@offering), class: "button secondary" %>
+      <%= link_to t("admin.offerings.show.edit_offering"), edit_admin_offering_path(@offering), class: "btn btn-secondary" %>
     <% end %>
   </div>
 </section>

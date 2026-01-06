@@ -92,10 +92,293 @@ en:
         certificate: "Certificate settings"
         logistics: "Logistics metadata"
       fields:
+        title: "Title"
+        slug: "Slug"
+        offering_type: "Offering type"
+        period: "Period"
         certificate_prefix: "Certificate prefix"
         certificate_hint: "Certificate instructions"
         ancestor_placard_hint: "Ancestor placard hint"
         logistics_notes: "Default logistics notes"
+        currency: "Currency"
+        starts_on: "Starts on"
+        ends_on: "Ends on"
+        available_slots: "Available slots"
+        active: "Active"
+        description: "Description"
       hints:
         certificate: "Define how certificates should be numbered/labeled."
         logistics: "Guidance that appears on registration forms for staff."
+      actions:
+        save: "Save offering"
+    language_selector:
+      label: "Language"
+      apply: "Apply"
+      options:
+        en: "English"
+        zh-TW: "Traditional Chinese"
+      flash: "Language updated."
+    nav:
+      menu_heading: "Console menu"
+      signed_in_label: "Signed in"
+      sign_out: "Sign out"
+    dashboard:
+      hero:
+        eyebrow: "Admin console"
+        title: "Welcome back, %{name}"
+        body_html: "This placeholder mirrors the structure of the production admin. Replace these cards with the real KPIs, resource tables, and workflows your client needs."
+      metrics:
+        title: "Starter metrics"
+        subtitle: "Swap these for live KPIs once the backend endpoints are wired."
+        entries:
+          active_members: "Active members"
+          pending_invites: "Pending invites"
+          revenue_placeholder: "Revenue (placeholder)"
+      next_steps:
+        title: "Next steps"
+        subtitle: "Use this section to outline the backend work for your client engagement."
+        fill_profile: "Fill out the temple profile →"
+        connect_data: "Connect real-world data sources to the KPIs above."
+        first_workflow: "Replace this placeholder with the first CRUD workflow (users, orders, bookings, etc.)."
+        document_scope_html: "Document the admin scope inside <code>docs/</code> for each new client."
+    temple_profile:
+      hero:
+        eyebrow: "Temple profile"
+        title: "Update site copy"
+        body: "These fields power the public site hero, footer, and contact sections."
+      sections:
+        basics:
+          title: "Basic details"
+          subtitle: "Displayed in the Vue header/footer."
+        contact:
+          title: "Contact information"
+          subtitle: "Shown on the contact page + footer."
+        schedule:
+          title: "Service schedule"
+          subtitle: "Displayed alongside the contact info on the Vue + Expo clients."
+      fields:
+        name: "Temple name"
+        tagline: "Tagline"
+        hero_copy: "Homepage hero copy"
+        primary_image_url: "Hero image URL"
+        address_zh: "Address (ZH)"
+        address_en: "Address (EN)"
+        phone: "Phone"
+        plus_code: "Plus Code"
+        map_url: "Map URL"
+        weekday_hours: "Weekday hours"
+        weekend_hours: "Weekend hours"
+        notes: "Notes"
+      placeholders:
+        name: "e.g., Zhunan Shengfukung Temple"
+        tagline: "e.g., Serenity · Dignity · Local faith"
+        hero_copy: "Summarize your mission, services, and visitor tips."
+        primary_image_url: "https://..."
+        address_zh: "e.g., 136 Gongjiao Rd., Zhunan Township"
+        address_en: "e.g., No. 136, Gongjiao Rd, Zhunan Township..."
+        phone: "e.g., 03-747-2826"
+        plus_code: "e.g., MVWF+54 Zhunan"
+        map_url: "https://maps.google.com/?q=..."
+        weekday_hours: "e.g., 08:00 – 17:00"
+        weekend_hours: "e.g., 07:30 – 18:00"
+        notes: "e.g., Extended hours on lunar 1st and 15th."
+      actions:
+        save: "Save profile"
+        cancel: "Cancel"
+    offerings:
+      index:
+        title: "Temple Offerings"
+        new_button: "New Offering"
+        table:
+          title: "Title"
+          type: "Type"
+          price: "Price"
+          status: "Status"
+          view: "View"
+      statuses:
+        active: "Active"
+        archived: "Archived"
+      types:
+        general: "General"
+        lamp: "Lamp"
+        ritual: "Ritual"
+        donation: "Donation"
+        table: "Table"
+      new:
+        title: "New Offering"
+        template_open: "Select offering template"
+        template_change: "Change template"
+        template_modal_title: "Choose an offering template"
+        template_close: "Close template picker"
+        template_use: "Use this template"
+        template_period: "Default period: %{period}"
+        template_selected: "Using template: %{name}"
+        template_prompt: "Select a template to load the form fields."
+      edit:
+        title: "Edit Offering"
+      show:
+        type: "Type"
+        period: "Period"
+        period_empty: "N/A"
+        schedule: "Schedule"
+        schedule_flexible: "Flexible"
+        manage_registrations: "Manage registrations"
+        edit_offering: "Edit offering"
+    orders:
+      index:
+        eyebrow: "Orders"
+        title: "Registrations & onsite orders"
+        body: "Use this list to review recent registrations before refining the reporting filters in the next phase."
+        empty: "No registrations have been recorded for this temple yet."
+        guest_fallback: "Guest"
+        table:
+          reference: "Reference"
+          offering: "Offering"
+          applicant: "Applicant"
+          quantity: "Quantity"
+          status: "Status"
+          created: "Created"
+          view: "View"
+      statuses:
+        pending: "Pending"
+        paid: "Paid"
+        refunded: "Refunded"
+        failed: "Failed"
+    offering_orders:
+      index:
+        title: "Registrations for %{offering}"
+        new_registration: "New Registration"
+        table:
+          reference: "Reference"
+          user: "User"
+          status: "Status"
+          quantity: "Quantity"
+          total: "Total"
+          view: "View"
+    payments:
+      index:
+        eyebrow: "Payments"
+        title: "Payment reporting"
+        body: "Totals update in real time as payments are recorded. Export CSVs for finance teams from here."
+        export: "Download CSV export"
+        empty: "No payments recorded yet."
+        system_fallback: "System"
+        metrics:
+          total_received: "Total received"
+          payments_logged: "Payments logged"
+        breakdowns:
+          eyebrow: "Breakdowns"
+          title: "By method / offering / day"
+          by_method: "By method"
+          by_offering: "By offering"
+          by_date: "By date"
+        recent:
+          eyebrow: "Recent activity"
+          title: "Latest 100 payments"
+        table:
+          reference: "Reference"
+          method: "Method"
+          amount: "Amount"
+          status: "Status"
+          registration: "Registration"
+          recorded_by: "Recorded by"
+          processed: "Processed"
+          view: "View"
+      statuses:
+        pending: "Pending"
+        completed: "Completed"
+        failed: "Failed"
+        refunded: "Refunded"
+      methods:
+        cash: "Cash"
+        bank_transfer: "Bank transfer"
+        credit_card: "Credit card"
+        line_pay: "LINE Pay"
+    archives:
+      hero:
+        eyebrow: "Archives · %{temple}"
+        title: "Historical records"
+        body: "Review annual registrations, payments, and certificate issuance. Owners can export the raw datasets for compliance or audits."
+      year_filter:
+        title: "Year filter"
+        body: "Pick a year to view the detailed history. Snapshots always include all years."
+        label: "Year"
+        apply: "Apply"
+      metrics:
+        registrations: "Registrations (%{year})"
+        paid_registrations: "Paid registrations"
+        payments_total: "Payments total"
+        certificates_issued: "Certificates issued"
+      snapshots:
+        title: "Annual snapshots"
+        body: "Staff can reference these totals without drilling into personal data."
+        registrations: "Registrations"
+        certificates: "Certificates"
+        payments: "Payments"
+      details:
+        export: "Export CSV"
+        registrations:
+          title: "Registrations · %{year}"
+          body: "Read-only list of registrations captured in the selected year."
+          empty: "No registrations recorded for this year."
+          table:
+            date: "Date"
+            reference: "Reference"
+            offering: "Offering"
+            patron: "Patron"
+            status: "Status"
+            certificate: "Certificate"
+        payments:
+          title: "Payments · %{year}"
+          body: "Read-only payment ledger. Export requires the financials capability."
+          empty: "No payment records for this year."
+          table:
+            processed: "Processed"
+            reference: "Reference"
+            method: "Method"
+            status: "Status"
+            amount: "Amount"
+            recorded_by: "Recorded by"
+        certificates:
+          title: "Certificates · %{year}"
+          body: "Issued certificate numbers tied to their registrations."
+          empty: "No certificates issued for this year."
+          table:
+            certificate: "Certificate"
+            issued: "Issued"
+            reference: "Reference"
+            offering: "Offering"
+            patron: "Patron"
+      guest_fallback: "Guest"
+      limited:
+        title: "Limited access"
+        body_html: "You’re viewing the annual snapshots. Detailed history requires an owner role or the financials capability. Contact the head administrator if you need to review individual records."
+    permissions:
+      index:
+        eyebrow: "Permissions"
+        title: "Admin capabilities"
+        body: "Only temple owners can change these flags. Use them to align access between offerings, onsite staff, and finance reviewers."
+        save: "Save"
+        empty: "No admin accounts found for this temple."
+      capabilities:
+        manage_offerings:
+          label: "Manage offerings"
+          hint: "Create and edit offerings shown on the site."
+        manage_registrations:
+          label: "Manage registrations"
+          hint: "Access registration records and onsite orders."
+        record_cash_payments:
+          label: "Record cash payments"
+          hint: "Record offline/cash payments for orders."
+        view_financials:
+          label: "View financial summaries"
+          hint: "See payment history and dashboard totals."
+        export_financials:
+          label: "Export ledgers"
+          hint: "Download CSV exports of payments and ledgers."
+        view_guest_lists:
+          label: "View guest lists"
+          hint: "View attendee rosters for onsite events."
+        manage_permissions:
+          label: "Manage permissions"
+          hint: "Grant or revoke staff access levels."
