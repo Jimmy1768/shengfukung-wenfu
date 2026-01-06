@@ -25,7 +25,9 @@ class Temple < ApplicationRecord
 
   scope :published, -> { where(published: true) }
   scope :for_admin, lambda { |admin_account|
-    joins(:admin_temple_memberships).where(admin_temple_memberships: { admin_account_id: admin_account.id })
+    joins(:admin_temple_memberships)
+      .where(admin_temple_memberships: { admin_account_id: admin_account.id })
+      .distinct
   }
 
   validates :slug, :name, presence: true

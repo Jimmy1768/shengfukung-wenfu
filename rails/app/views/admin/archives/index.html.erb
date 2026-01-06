@@ -1,0 +1,194 @@
+<section class="hero">
+  <div class="hero-text">
+    <p class="eyebrow">Archives · <%= current_temple&.name %></p>
+    <h1>Historical records</h1>
+    <p>Review annual registrations, payments, and certificate issuance. Owners can export the raw datasets for compliance or audits.</p>
+  </div>
+</section>
+
+<section class="card">
+  <header class="card-header-with-controls">
+    <div>
+      <h2>Year filter</h2>
+      <p class="muted">Pick a year to view the detailed history. Snapshots always include all years.</p>
+    </div>
+    <%= form_with url: admin_archives_path, method: :get, local: true, class: "inline-form" do |form| %>
+      <label for="archives-year">Year</label>
+      <%= form.select :year, options_for_select(@available_years, @selected_year), {}, id: "archives-year" %>
+      <%= form.submit "Apply", class: "button" %>
+    <% end %>
+  </header>
+
+  <div class="archive-summary">
+    <div class="metric">
+      <span>Registrations (<%= @selected_year %>)</span>
+      <strong><%= number_with_delimiter(@summary[:registrations_count]) %></strong>
+    </div>
+    <div class="metric">
+      <span>Paid registrations</span>
+      <strong><%= number_with_delimiter(@summary[:paid_registrations]) %></strong>
+    </div>
+    <div class="metric">
+      <span>Payments total</span>
+      <strong><%= number_to_currency(@summary[:payments_total_cents] / 100.0, unit: @lookup.registrations.first&.currency || "NT$", precision: 0) %></strong>
+    </div>
+    <div class="metric">
+      <span>Certificates issued</span>
+      <strong><%= number_with_delimiter(@summary[:certificates_count]) %></strong>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <header>
+    <h2>Annual snapshots</h2>
+    <p class="muted">Staff can reference these totals without drilling into personal data.</p>
+  </header>
+  <div class="archive-rollups">
+    <% @annual_rollups.each do |rollup| %>
+      <div class="rollup">
+        <p class="eyebrow"><%= rollup[:year] %></p>
+        <p class="rollup-metric">Registrations: <strong><%= number_with_delimiter(rollup[:registrations]) %></strong></p>
+        <p class="rollup-metric">Certificates: <strong><%= number_with_delimiter(rollup[:certificates]) %></strong></p>
+        <p class="rollup-metric">Payments: <strong><%= number_to_currency(rollup[:payment_total_cents] / 100.0, precision: 0) %></strong></p>
+      </div>
+    <% end %>
+  </div>
+</section>
+
+<% if allow_archive_details? %>
+  <section class="card archive-detail">
+    <header class="card-header-with-controls">
+      <div>
+        <h2>Registrations · <%= @selected_year %></h2>
+        <p class="muted">Read-only list of registrations captured in the selected year.</p>
+      </div>
+      <% if allow_archive_exports? %>
+        <%= link_to "Export CSV", admin_archive_registrations_export_path(year: @selected_year), class: "button secondary", data: { turbo: false } %>
+      <% end %>
+    </header>
+    <% if @registrations.any? %>
+      <div class="table-responsive archive-detail-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Reference</th>
+              <th>Offering</th>
+              <th>Patron</th>
+              <th>Status</th>
+              <th>Certificate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @registrations.each do |registration| %>
+              <tr>
+                <td><%= registration.created_at.strftime("%Y-%m-%d") %></td>
+                <td><%= registration.reference_code %></td>
+                <td><%= registration.temple_offering&.title || "—" %></td>
+                <td><%= registration.user&.english_name || registration.user&.email || registration.contact_payload["name"] || "Guest" %></td>
+                <td><%= registration.payment_status %></td>
+                <td><%= registration.certificate_number.presence || "—" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="muted">No registrations recorded for this year.</p>
+    <% end %>
+  </section>
+
+  <section class="card archive-detail">
+    <header class="card-header-with-controls">
+      <div>
+        <h2>Payments · <%= @selected_year %></h2>
+        <p class="muted">Read-only payment ledger. Export requires the financials capability.</p>
+      </div>
+      <% if allow_archive_exports? %>
+        <%= link_to "Export CSV", admin_archive_payments_export_path(year: @selected_year), class: "button secondary", data: { turbo: false } %>
+      <% end %>
+    </header>
+    <% if @payments.any? %>
+      <div class="table-responsive archive-detail-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Processed</th>
+              <th>Reference</th>
+              <th>Method</th>
+              <th>Status</th>
+              <th>Amount</th>
+              <th>Recorded By</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @payments.each do |payment| %>
+              <% timestamp = payment.processed_at || payment.created_at %>
+              <tr>
+                <td><%= timestamp.strftime("%Y-%m-%d") %></td>
+                <td><%= payment.temple_event_registration&.reference_code || payment.external_reference || payment.id %></td>
+                <td><%= payment.payment_method %></td>
+                <td><%= payment.status %></td>
+                <td><%= number_to_currency(payment.amount_cents / 100.0, precision: 0) %></td>
+                <td><%= payment.admin_account&.user&.english_name || payment.admin_account&.user&.email || "System" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="muted">No payment records for this year.</p>
+    <% end %>
+  </section>
+
+  <section class="card archive-detail">
+    <header class="card-header-with-controls">
+      <div>
+        <h2>Certificates · <%= @selected_year %></h2>
+        <p class="muted">Issued certificate numbers tied to their registrations.</p>
+      </div>
+      <% if allow_archive_exports? %>
+        <%= link_to "Export CSV", admin_archive_certificates_export_path(year: @selected_year), class: "button secondary", data: { turbo: false } %>
+      <% end %>
+    </header>
+    <% if @certificates.any? %>
+      <div class="table-responsive archive-detail-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Certificate</th>
+              <th>Issued</th>
+              <th>Reference</th>
+              <th>Offering</th>
+              <th>Patron</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @certificates.each do |registration| %>
+              <tr>
+                <td><%= registration.certificate_number %></td>
+                <td><%= registration.updated_at.strftime("%Y-%m-%d") %></td>
+                <td><%= registration.reference_code %></td>
+                <td><%= registration.temple_offering&.title || "—" %></td>
+                <td><%= registration.user&.english_name || registration.user&.email || registration.contact_payload["name"] || "Guest" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="muted">No certificates issued for this year.</p>
+    <% end %>
+  </section>
+<% else %>
+  <section class="card">
+    <header>
+      <h2>Limited access</h2>
+    </header>
+    <p class="muted">
+      You’re viewing the annual snapshots. Detailed history requires an owner role or the financials capability.
+      Contact the head administrator if you need to review individual records.
+    </p>
+  </section>
+<% end %>

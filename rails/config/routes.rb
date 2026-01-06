@@ -48,8 +48,13 @@ namespace :marketing_admin, path: "/marketing/admin", module: "dev/demo/rails" d
         get :export
       end
     end
+    get "/archives", to: "archives#index", as: :archives
+    get "/archives/registrations", to: "archives#registrations_export", defaults: { format: :csv }, as: :archive_registrations_export
+    get "/archives/payments", to: "archives#payments_export", defaults: { format: :csv }, as: :archive_payments_export
+    get "/archives/certificates", to: "archives#certificates_export", defaults: { format: :csv }, as: :archive_certificates_export
     resources :permissions, only: %i[index update], param: :admin_account_id
     resources :patrons, only: %i[index create]
+    resource :temple_switch, only: :create, controller: "temple_switches"
   end
 
   # --- User account console --------------------------------------------------
@@ -66,6 +71,13 @@ namespace :marketing_admin, path: "/marketing/admin", module: "dev/demo/rails" d
     resources :registrations, only: %i[index show edit update]
     resources :events, only: :index
     resources :payments, only: :index
+
+    namespace :api do
+      resources :registrations, only: :index
+      resources :payment_statuses, only: :show, param: :reference
+      resources :certificates, only: :index
+      resources :guest_lists, only: :show, param: :offering_id
+    end
   end
 
   resource :password, controller: "utils/passwords", only: %i[new create edit]

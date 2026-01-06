@@ -10,7 +10,14 @@ module TestDataHelpers
     )
   end
 
-  def create_admin_user(temple: create_temple, create_permission: true, password: "Password123!")
+  def create_admin_user(
+    temple: create_temple,
+    create_permission: true,
+    password: "Password123!",
+    role: "owner",
+    membership_role: nil,
+    permission_overrides: {}
+  )
     user = User.create!(
       email: "admin-#{SecureRandom.hex(2)}@example.com",
       encrypted_password: User.password_hash(password),
@@ -19,11 +26,65 @@ module TestDataHelpers
     admin_account = AdminAccount.create!(
       user:,
       active: true,
-      role: "owner"
+      role: role.to_s
     )
-    AdminTempleMembership.create!(admin_account:, temple:, role: "owner")
-    AdminPermission.create!(admin_account:, temple:, manage_permissions: true) if create_permission
+    AdminTempleMembership.create!(
+      admin_account:,
+      temple:,
+      role: (membership_role || role).to_s
+    )
+    if create_permission
+      AdminPermission.create!(
+        { admin_account:, temple:, manage_permissions: role.to_s == "owner" }
+          .merge(permission_overrides)
+      )
+    end
     user
+  end
+
+  def create_offering(temple: create_temple, price_cents: 1_000, currency: "TWD", **attrs)
+    temple.temple_offerings.create!(
+      {
+        slug: "offering-#{SecureRandom.hex(2)}",
+        title: "Test Offering",
+        offering_type: "general",
+        price_cents:,
+        currency:
+      }.merge(attrs)
+    )
+  end
+
+  def create_registration(user:, offering:, **attrs)
+    TempleEventRegistration.create!(
+      {
+        temple: offering.temple,
+        temple_offering: offering,
+        user:,
+        reference_code: "REG-#{SecureRandom.hex(2).upcase}",
+        quantity: 1,
+        unit_price_cents: offering.price_cents,
+        total_price_cents: offering.price_cents,
+        currency: offering.currency,
+        payment_status: "pending",
+        fulfillment_status: "open",
+        contact_payload: { "name" => user.english_name, "email" => user.email }
+      }.merge(attrs)
+    )
+  end
+
+  def create_payment(registration:, amount_cents: registration.total_price_cents, status: TemplePayment::STATUSES[:completed], method: TemplePayment::PAYMENT_METHODS[:cash], **attrs)
+    TemplePayment.create!(
+      {
+        temple: registration.temple,
+        temple_event_registration: registration,
+        user: registration.user,
+        amount_cents:,
+        currency: registration.currency,
+        payment_method: method,
+        status:,
+        processed_at: Time.current
+      }.merge(attrs)
+    )
   end
 end
 

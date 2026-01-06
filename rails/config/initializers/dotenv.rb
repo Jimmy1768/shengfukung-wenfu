@@ -1,7 +1,5 @@
 # Ensure dotenv also loads the repo-level .env files, not just ones inside /rails.
 if defined?(Dotenv)
-  project_root = Rails.root.join("..")
-  Dotenv.load(project_root.join(".env")) if File.exist?(project_root.join(".env"))
-  env_file = project_root.join(".env.#{Rails.env}")
-  Dotenv.load(env_file) if File.exist?(env_file)
+  require Rails.root.join("lib/multi_temple_env_loader")
+  MultiTempleEnvLoader.load!(dotenv: Dotenv, env: ENV, rails_env: Rails.env, root: Rails.root.join(".."))
 end

@@ -37,6 +37,12 @@ module Admin
         capabilities: %i[view_financials export_financials]
       },
       {
+        key: :archives,
+        label: "Archives",
+        description: "年度紀錄與報表",
+        path: -> { admin_archives_path }
+      },
+      {
         key: :permissions,
         label: "Permissions",
         description: "管理管理員權限",

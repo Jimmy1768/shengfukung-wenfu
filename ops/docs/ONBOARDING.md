@@ -12,6 +12,12 @@ This file documents how we bring a new temple onto the Shenfukung Wenfu stack. I
 
 Use this when you need representative data locally or on staging:
 
+> 🔐 **Per-temple env overrides**
+>
+> - Keep third-party credentials in `etc/default/<temple-slug>.env`. This folder is tracked via `.keep`, but the files themselves should not be committed.
+> - Load a specific temple’s secrets by prefixing any command with `bin/load_temple_env <slug> -- <command>`. Example: `bin/load_temple_env shenfukung-wenfu -- (cd rails && bundle exec rails server -p 3001)`.
+> - The loader sources `.env`, `.env.<env>`, then `etc/default/<slug>.env` (falling back to `.env.development`), so Vue/Expo builds and Rails share the exact same credential set for the active temple.
+
 1. **Author profile YAML**
    - Copy `rails/db/temples/shenfukung-wenfu.yml` as a starting point.
    - Set `slug`, `name`, `contact`, `service_times`, and optional hero/about/meta copy.
@@ -67,6 +73,9 @@ Production onboarding avoids creating real user passwords in seeds—only the te
    - Gather LINE Pay channel ID/secret but keep them out of Git; store temporarily in `etc/default/<slug>.env` until vaulting is ready.
    - Decide which staff get financial permissions and run `bin/rails "temple_financial:grant_permissions[slug,email]"`.
    - Cash entries live under `/admin/offerings/...` while we finish LINE Pay.
+7. **Mobile/API consumers**
+   - Expo/mobile clients now call `/account/api/registrations`, `/account/api/payment_statuses/:reference`, `/account/api/certificates`, and `/account/api/guest_lists/:offering_id`.
+   - Owner/staff roles determine what data comes back (guest lists additionally require `view_guest_lists`). When debugging, wrap Expo commands with `bin/load_temple_env <slug> -- ...` so the API and client agree on credentials.
 
 ## Owner Privileges
 

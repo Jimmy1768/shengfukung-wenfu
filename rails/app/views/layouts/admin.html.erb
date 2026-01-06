@@ -15,6 +15,7 @@
           <span class="brand-slug"><%= AppConstants::Project.slug %></span>
         </div>
         <% if admin_signed_in? %>
+          <%= render "admin/shared/temple_switcher" %>
           <div class="nav-links">
             <span class="nav-user-label">Signed in</span>
             <span class="nav-user-name"><%= current_admin&.english_name || current_admin&.email %></span>

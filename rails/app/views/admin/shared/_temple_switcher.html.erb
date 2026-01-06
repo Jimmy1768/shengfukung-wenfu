@@ -1,0 +1,14 @@
+<div class="temple-switcher">
+  <span class="temple-switcher-label">Temple</span>
+  <% if allow_temple_switch? %>
+    <%= form_with url: admin_temple_switch_path, method: :post, class: "temple-switcher-form", local: true do |form| %>
+      <%= form.select :temple_slug,
+        options_from_collection_for_select(available_admin_temples, :slug, :name, current_temple&.slug),
+        {},
+        class: "temple-switcher-select",
+        onchange: "this.form.submit()" %>
+    <% end %>
+  <% else %>
+    <span class="temple-switcher-name"><%= current_temple&.name || "No temple selected" %></span>
+  <% end %>
+</div>
