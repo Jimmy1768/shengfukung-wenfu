@@ -13,6 +13,19 @@ offerings:
       donation:
         fields:
           - description
+    registration_form:
+      sections:
+        order:
+          fields: [quantity, unit_price_cents, currency]
+        contact:
+          fields: [primary_contact, phone, email, notes]
+        logistics:
+          fields: []
+        ritual_metadata:
+          fields: [dedication_message]
+      defaults:
+        order:
+          quantity: 1
 
   - slug: family-peace
     label: "平安戲丁口捐"
@@ -29,6 +42,19 @@ offerings:
       ritual:
         fields:
           - description
+    registration_form:
+      sections:
+        order:
+          fields: [quantity, unit_price_cents, currency, certificate_number]
+        contact:
+          fields: [primary_contact, phone, email, dependents_notes, notes]
+        logistics:
+          fields: [preferred_date, preferred_slot, arrival_window]
+        ritual_metadata:
+          fields: [dedication_message]
+      defaults:
+        logistics:
+          preferred_slot: "上午"
 
   - slug: lantern-lighting
     label: "點燈作業"
@@ -49,6 +75,16 @@ offerings:
           - ends_on
           - active
       description: true
+    registration_form:
+      sections:
+        order:
+          fields: [quantity, unit_price_cents, currency]
+        contact:
+          fields: [primary_contact, phone, email]
+        logistics:
+          fields: [preferred_date, preferred_slot]
+        ritual_metadata:
+          fields: [ancestor_placard_name, dedication_message, certificate_notes]
 
   - slug: ancestor-ritual
     label: "祖先拔薦"
@@ -68,6 +104,16 @@ offerings:
       logistics:
         fields:
           - logistics_notes
+    registration_form:
+      sections:
+        order:
+          fields: [quantity, unit_price_cents, currency, certificate_number]
+        contact:
+          fields: [primary_contact, phone, email, dependents_notes, notes]
+        logistics:
+          fields: [preferred_date, preferred_slot, arrival_window, ceremony_location]
+        ritual_metadata:
+          fields: [ancestor_placard_name, dedication_message, incense_option, certificate_notes]
 
   - slug: pudu-table
     label: "普渡供桌"
@@ -100,3 +146,16 @@ offerings:
           - ancestor_placard_hint
           - logistics_notes
       description: true
+    registration_form:
+      sections:
+        order:
+          fields: [quantity, unit_price_cents, currency]
+        contact:
+          fields: [primary_contact, phone, email]
+        logistics:
+          fields: [preferred_date, ceremony_location]
+        ritual_metadata:
+          fields: [ancestor_placard_name, dedication_message]
+      defaults:
+        logistics:
+          ceremony_location: "戶外祭壇"

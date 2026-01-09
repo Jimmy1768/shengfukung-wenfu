@@ -60,6 +60,8 @@ zh-TW:
         submit: "建立報名"
         select_patron: "選擇"
         create_patron: "建立信眾"
+        cancel: "取消"
+        back_to_orders: "返回報名列表"
       labels:
         dependents: "眷屬："
       errors:
@@ -72,6 +74,7 @@ zh-TW:
         logistics: "服務安排"
         ritual: "儀式備註"
       headings:
+        summary: "報名摘要"
         contact: "主要聯絡人"
         logistics: "時程與場域"
         ritual: "儀式細節"
@@ -85,6 +88,7 @@ zh-TW:
       hints:
         summary: "%{offering} 的報名詳情。"
       actions:
+        back_to_orders: "返回報名列表"
         record_cash: "登記現金繳費"
     offering_form:
       sections:
@@ -246,14 +250,32 @@ zh-TW:
         failed: "失敗"
     offering_orders:
       index:
+        eyebrow: "現場報到"
         title: "%{offering} 的報名紀錄"
+        body: "集中管理現場報名、面談紀錄與繳費狀態。"
+        view_offering: "供品設定"
         new_registration: "新增報名"
+        guest_fallback: "現場來賓"
+        metrics:
+          total_registrations: "報名數"
+          total_hint: "所有現場填報"
+          paid: "已入帳"
+          paid_hint: "已標記為完成"
+          pending: "待收款"
+          pending_hint: "仍在收現金"
+          gross: "毛額"
+          gross_hint: "未扣除退款"
+        table_title: "最新紀錄"
+        table_heading: "現場報名列表"
+        table_body: "最新填報會列在這裡，方便稽核。"
+        empty: "這個供品尚未建立現場報名。"
         table:
           reference: "編號"
           user: "信眾"
           status: "狀態"
           quantity: "數量"
           total: "總額"
+          created: "建立時間"
           view: "檢視"
     payments:
       index:

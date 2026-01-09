@@ -23,6 +23,7 @@ Temple.find_each do |temple|
     offering.metadata['form_defaults'] = entry[:defaults] if entry[:defaults]
     offering.metadata['form_options'] = entry[:options] if entry[:options]
     offering.metadata['form_label'] = entry[:label] if entry[:label]
+    offering.metadata['registration_form'] = entry[:registration_form] if entry[:registration_form]
     offering.save!
     puts "Updated #{offering.slug} for #{temple.slug}"
   end

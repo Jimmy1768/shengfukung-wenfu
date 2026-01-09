@@ -7,12 +7,18 @@ module Admin
     before_action :set_registration, only: :show
 
     def index
-      @registrations = @offering.temple_event_registrations.recent
+      scope = @offering.temple_event_registrations
+      @registrations = scope.recent
+      @registrations_total = scope.count
+      @registrations_paid = scope.with_status(TempleEventRegistration::PAYMENT_STATUSES[:paid]).count
+      @registrations_pending = scope.with_status(TempleEventRegistration::PAYMENT_STATUSES[:pending]).count
+      @registrations_total_amount_cents = scope.sum(:total_price_cents)
     end
 
     def new
       @registration = @offering.temple_event_registrations.new(quantity: 1)
       prepare_registration_payloads
+      apply_registration_defaults
     end
 
     def create
@@ -28,6 +34,7 @@ module Admin
     rescue ActiveRecord::RecordInvalid => e
       @registration = e.record
       prepare_registration_payloads
+      apply_registration_defaults
       render :new, status: :unprocessable_entity
     end
 
@@ -77,5 +84,30 @@ module Admin
       @registration.logistics_payload ||= {}
       @registration.metadata ||= {}
     end
+
+    def apply_registration_defaults
+      defaults = registration_form_schema.defaults_for(:order)
+      @registration.quantity ||= defaults[:quantity]
+      @registration.unit_price_cents ||= defaults[:unit_price_cents] || @offering.price_cents
+      @registration.currency ||= defaults[:currency] || @offering.currency
+      @registration.certificate_number ||= defaults[:certificate_number]
+
+      merge_payload_defaults(@registration.contact_payload, registration_form_schema.defaults_for(:contact))
+      merge_payload_defaults(@registration.logistics_payload, registration_form_schema.defaults_for(:logistics))
+      merge_payload_defaults(@registration.metadata, registration_form_schema.defaults_for(:ritual_metadata))
+    end
+
+    def merge_payload_defaults(payload, defaults)
+      return if defaults.blank?
+
+      payload.merge!(defaults.transform_keys(&:to_s)) do |_key, existing, default|
+        existing.presence || default
+      end
+    end
+
+    def registration_form_schema
+      @registration_form_schema ||= Registrations::FormSchema.new(@offering.metadata["registration_form"])
+    end
+    helper_method :registration_form_schema
   end
 end

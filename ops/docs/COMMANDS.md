@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "building inital users section"
+git commit -m "building temple admin v4"
 git push
 
 git reset --hard HEAD

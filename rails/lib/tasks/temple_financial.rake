@@ -3,6 +3,7 @@ namespace :temple_financial do
   task :seed_offerings, [:slug] => :environment do |_, args|
     slug = args[:slug] || AppConstants::Project.slug
     temple = Temple.find_by!(slug:)
+    loader = Offerings::TemplateLoader.new(slug)
 
     offerings = [
       { slug: "incense-donation", title: "香油捐獻", offering_type: "donation", price_cents: 500 },
@@ -13,8 +14,17 @@ namespace :temple_financial do
     ]
 
     offerings.each do |attrs|
+      template = loader.template_for(attrs[:slug])
       record = TempleOffering.find_or_initialize_by(temple:, slug: attrs[:slug])
-      record.assign_attributes(attrs.merge(currency: "TWD", metadata: {}))
+      metadata = record.metadata || {}
+      if template
+        metadata["form_fields"] = template[:form_fields] if template[:form_fields]
+        metadata["form_defaults"] = template[:defaults] if template[:defaults]
+        metadata["form_options"] = template[:options] if template[:options]
+        metadata["form_label"] = template[:label] if template[:label]
+        metadata["registration_form"] = template[:registration_form] if template[:registration_form]
+      end
+      record.assign_attributes(attrs.merge(currency: "TWD", metadata: metadata))
       record.save!
     end
 

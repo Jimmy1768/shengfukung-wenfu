@@ -14,6 +14,7 @@ require_relative "seeds/background_tasks"
 require_relative "seeds/api_protection"
 require_relative "seeds/compliance"
 require_relative "seeds/analytics_exports"
+require_relative "seeds/temple_demo_users"
 
 Seeds::AuthCore.seed
 Seeds::SessionPreferences.seed
@@ -27,6 +28,7 @@ Seeds::BackgroundTasks.seed
 Seeds::ApiProtection.seed
 Seeds::Compliance.seed
 Seeds::AnalyticsExports.seed
+Seeds::TempleDemoUsers.seed
 
 if Rails.env.test?
   puts "Seeding test fixtures..." # rubocop:disable Rails/Output

@@ -60,6 +60,8 @@ en:
         submit: "Create registration"
         select_patron: "Select"
         create_patron: "Create patron"
+        cancel: "Cancel"
+        back_to_orders: "Back to registrations"
       labels:
         dependents: "Dependents:"
       errors:
@@ -72,6 +74,7 @@ en:
         logistics: "Logistics"
         ritual: "Ritual metadata"
       headings:
+        summary: "Order snapshot"
         contact: "Primary contact"
         logistics: "Schedule & logistics"
         ritual: "Ceremony notes"
@@ -85,6 +88,7 @@ en:
       hints:
         summary: "Details for %{offering}."
       actions:
+        back_to_orders: "Back to registrations"
         record_cash: "Record cash payment"
     offering_form:
       sections:
@@ -246,14 +250,32 @@ en:
         failed: "Failed"
     offering_orders:
       index:
+        eyebrow: "Onsite desk"
         title: "Registrations for %{offering}"
+        body: "Track onsite registrations, reference interview notes, and keep finance synced."
+        view_offering: "Offering settings"
         new_registration: "New Registration"
+        guest_fallback: "Guest"
+        metrics:
+          total_registrations: "Registrations"
+          total_hint: "All onsite submissions"
+          paid: "Paid in full"
+          paid_hint: "Marked as settled"
+          pending: "Awaiting payment"
+          pending_hint: "Still collecting cash"
+          gross: "Gross total"
+          gross_hint: "Before refunds"
+        table_title: "Recent activity"
+        table_heading: "Onsite registrations"
+        table_body: "Latest submissions appear here for quick auditing."
+        empty: "No registrations captured for this offering yet."
         table:
           reference: "Reference"
           user: "User"
           status: "Status"
           quantity: "Quantity"
           total: "Total"
+          created: "Created"
           view: "View"
     payments:
       index:

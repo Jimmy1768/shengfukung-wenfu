@@ -106,6 +106,7 @@ module Admin
       offering.metadata["form_defaults"] = template[:defaults]
       offering.metadata["form_options"] = template[:options]
       offering.metadata["form_label"] = template[:label]
+      offering.metadata["registration_form"] = template[:registration_form]
     end
 
     def load_template_loader

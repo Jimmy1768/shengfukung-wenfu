@@ -5,9 +5,8 @@ module Admin
     before_action :require_manage_registrations!
 
     def index
-      patrons = patron_scope
-      patrons = patrons.where("english_name ILIKE :q OR email ILIKE :q", q: "%#{params[:q].to_s.strip}%") if params[:q].present?
-      patrons = patrons.order("english_name asc NULLS LAST").limit(20)
+      patrons = filtered_scope
+      patrons = patrons.limit(20)
 
       render json: {
         patrons: patrons.map { |user| patron_payload(user) }
@@ -34,12 +33,42 @@ module Admin
       User.all
     end
 
+    def filtered_scope
+      query = params[:q].to_s.strip
+      return patron_scope.order(created_at: :desc) if query.blank?
+
+      tokens = query.split(/\s+/).presence || [query]
+
+      conditions = tokens.each_with_index.map do |_, index|
+        "(english_name ILIKE :token#{index} OR native_name ILIKE :token#{index} OR email ILIKE :token#{index})"
+      end.join(" AND ")
+      bindings = tokens.each_with_index.to_h do |token, index|
+        ["token#{index}".to_sym, "%#{token}%"]
+      end
+
+      patron_scope
+        .where(conditions, bindings)
+        .order(Arel.sql(sanitized_order_clause(tokens.first)))
+    end
+
+    def sanitized_order_clause(first_token)
+      exact_match = "#{ActiveRecord::Base.sanitize_sql_like(first_token)}%"
+      ApplicationRecord.send(
+        :sanitize_sql_array,
+        ["CASE WHEN english_name ILIKE :exact THEN 0 ELSE 1 END, english_name ASC NULLS LAST", { exact: exact_match }]
+      )
+    end
+
     def patron_payload(user)
+      metadata = user.metadata || {}
       {
         id: user.id,
         name: user.english_name,
         email: user.email,
-        dependents: user.dependents.pluck(:english_name)
+        dependents: user.dependents.pluck(:english_name),
+        phone: metadata["phone"],
+        notes: metadata["notes"],
+        offerings: metadata["offerings"] || {}
       }
     end
 
