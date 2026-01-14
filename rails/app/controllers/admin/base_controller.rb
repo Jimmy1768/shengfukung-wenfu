@@ -7,6 +7,7 @@ module Admin
     protect_from_forgery with: :exception
 
     helper Forms::LayoutHelper
+    helper Admin::FiltersHelper
     helper_method :current_admin,
                   :admin_signed_in?,
                   :available_admin_temples,
@@ -128,7 +129,7 @@ module Admin
     def admin_brand_name
       return "Temple Management System" unless admin_signed_in?
 
-      AppConstants::Project.name
+      current_temple&.name || AppConstants::Project.name
     end
 
     def admin_brand_slug
@@ -136,5 +137,24 @@ module Admin
 
       AppConstants::Project.slug
     end
+
+    def filter_params
+      @filter_params ||= params
+        .fetch(:filter, {})
+        .permit(:query, :offering_id, :payment_method, :start_date, :end_date, :status)
+        .to_h
+        .symbolize_keys
+    end
+
+    def normalized_filter_params
+      @normalized_filter_params ||= filter_params.transform_values do |value|
+        value.respond_to?(:presence) ? value.presence : value
+      end
+    end
+
+    def filter_hidden_params
+      request.query_parameters.except("filter")
+    end
+
   end
 end

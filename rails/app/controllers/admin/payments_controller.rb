@@ -8,12 +8,17 @@ module Admin
     before_action :set_registration, only: %i[new create]
 
     def index
-      @payments = base_payment_scope
-        .includes(:temple_event_registration, :user, admin_account: :user)
-        .order(created_at: :desc)
-        .limit(100)
-      @payment_summary = Reporting::PaymentSummary.new(payments: base_payment_scope)
+      @filters = normalized_filter_params
+      apply_default_payment_range!
+      scoped = filtered_payments_scope
+      @payments = scoped
+        .order(Arel.sql("COALESCE(temple_payments.processed_at, temple_payments.created_at) DESC"))
+        .limit(200)
+      @payment_summary = Reporting::PaymentSummary.new(payments: scoped)
       @show_export = current_admin_permissions&.allow?(:export_financials)
+      @filter_offerings = current_temple.temple_offerings.order(:title)
+      @filter_payment_methods = TemplePayment::PAYMENT_METHODS.values
+      @filter_hidden_fields = filter_hidden_params
     end
 
     def export
@@ -74,6 +79,17 @@ module Admin
 
     def base_payment_scope
       current_temple.temple_payments
+    end
+
+    def apply_default_payment_range!
+      return if @filters[:start_date].present? || @filters[:end_date].present?
+
+      @filters[:start_date] = 90.days.ago.to_date.iso8601
+      @default_payment_window = true
+    end
+
+    def filtered_payments_scope
+      base_payment_scope.merge(TemplePayment.admin_filtered(@filters))
     end
   end
 end

@@ -1,0 +1,32 @@
+<% if payments.any? %>
+  <div class="table-scroll">
+    <table class="admin-table admin-payments-table">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Patron</th>
+          <th>Offering</th>
+          <th>Amount</th>
+          <th>Method</th>
+          <th>Recorded by</th>
+          <th>Processed</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% payments.each do |payment| %>
+          <tr>
+            <td class="mono"><%= payment.external_reference.presence || payment.id %></td>
+            <td><%= payment.temple_event_registration&.user&.english_name || payment.user&.english_name || payment.temple_event_registration&.user&.email || payment.temple_event_registration&.contact_payload&.dig("name") || t("admin.payments.index.system_fallback") %></td>
+            <td><%= payment.temple_event_registration&.temple_offering&.title || "—" %></td>
+            <td><%= number_to_currency(payment.amount_cents / 100.0, unit: payment.currency) %></td>
+            <td><span class="payment-method-pill"><%= t("admin.payments.methods.#{payment.payment_method}", default: payment.payment_method.humanize) %></span></td>
+            <td><%= payment.admin_account&.user&.english_name || payment.admin_account&.user&.email || payment.user&.english_name || t("admin.payments.index.system_fallback") %></td>
+            <td><%= payment.processed_at&.strftime("%Y/%m/%d %H:%M") || payment.created_at.strftime("%Y/%m/%d %H:%M") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="muted"><%= empty_message || "No payments match the current filters." %></p>
+<% end %>

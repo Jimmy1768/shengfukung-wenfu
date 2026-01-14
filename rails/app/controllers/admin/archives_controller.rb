@@ -7,19 +7,23 @@ module Admin
     before_action :require_archive_exports!, only: %i[registrations_export payments_export certificates_export]
 
     def index
-      @selected_year = selected_year
-      @lookup = Archives::Lookup.new(temple: current_temple, year: @selected_year)
-      @available_years = @lookup.available_years
-      @annual_rollups = Archives::AnnualRollup.new(temple: current_temple).rollups(limit: 5)
-      @summary = build_summary(@lookup)
+      @filters = normalized_filter_params
+      @filter_hidden_fields = filter_hidden_params
+      @filter_offerings = current_temple.temple_offerings.order(:title)
+      @filter_payment_methods = TemplePayment::PAYMENT_METHODS.values
+      @filter_errors = []
+      @awaiting_range = @filters[:start_date].blank? && @filters[:end_date].blank?
       if allow_archive_details?
-        @registrations = @lookup.registrations.limit(100)
-        @payments = @lookup.payments.limit(100)
-        @certificates = @lookup.certificates.limit(100)
+        if archive_range_selected?
+          @archived_payments = archive_payment_scope.limit(500)
+        else
+          @archived_payments = TemplePayment.none
+          @filter_errors << "Please select both a start and end date to load archives." if partial_range_selected?
+        end
       else
-        @registrations = TempleEventRegistration.none
-        @payments = TemplePayment.none
-        @certificates = TempleEventRegistration.none
+        @filter_errors = []
+        @awaiting_range = true
+        @archived_payments = TemplePayment.none
       end
     end
 
@@ -43,6 +47,24 @@ module Admin
 
     private
 
+    def archive_range_selected?
+      @filters[:start_date].present? && @filters[:end_date].present?
+    end
+
+    def partial_range_selected?
+      @filters[:start_date].present? ^ @filters[:end_date].present?
+    end
+
+    def archive_payment_scope
+      current_temple.temple_payments
+        .merge(TemplePayment.admin_filtered(@filters))
+        .order(Arel.sql("COALESCE(temple_payments.processed_at, temple_payments.created_at) DESC"))
+    end
+
+    def allow_archive_details?
+      current_admin.admin_account.owner_role? || current_admin_permissions&.allow?(:view_financials)
+    end
+
     def selected_year
       year = params[:year].presence&.to_i
       return year if year.present? && year > 2000
@@ -54,10 +76,6 @@ module Admin
       @lookup ||= Archives::Lookup.new(temple: current_temple, year: selected_year)
     end
 
-    def allow_archive_details?
-      current_admin.admin_account.owner_role? || current_admin_permissions&.allow?(:view_financials)
-    end
-
     def allow_archive_exports?
       current_admin.admin_account.owner_role? || current_admin_permissions&.allow?(:export_financials)
     end
@@ -66,15 +84,6 @@ module Admin
       return if allow_archive_exports?
 
       redirect_to admin_archives_path(year: selected_year), alert: "You do not have permission to export archives."
-    end
-
-    def build_summary(lookup)
-      {
-        registrations_count: lookup.registrations.count,
-        payments_total_cents: lookup.payments.sum(:amount_cents),
-        certificates_count: lookup.certificates.count,
-        paid_registrations: lookup.registrations.where(payment_status: TempleEventRegistration::PAYMENT_STATUSES[:paid]).count
-      }
     end
 
     def send_archive(payload, label)

@@ -1,0 +1,74 @@
+<% filters ||= {} %>
+<% offerings ||= [] %>
+<% payment_methods ||= [] %>
+<% hidden_params ||= {} %>
+
+<%= form_with url: filter_path, method: :get, scope: :filter, local: true, class: "admin-filter-bar" do |form| %>
+  <% hidden_params.each do |key, value| %>
+    <% if value.is_a?(Array) %>
+      <% value.each do |entry| %>
+        <%= hidden_field_tag "#{key}[]", entry %>
+      <% end %>
+    <% elsif value.is_a?(Hash) %>
+      <% value.each do |sub_key, sub_value| %>
+        <%= hidden_field_tag "#{key}[#{sub_key}]", sub_value %>
+      <% end %>
+    <% elsif value.present? %>
+      <%= hidden_field_tag key, value %>
+    <% end %>
+  <% end %>
+
+  <div class="filter-grid">
+    <div class="filter-field">
+      <%= form.label :query, "Search", class: "filter-label" %>
+      <%= form.search_field :query,
+        placeholder: "Search by patron name, email, or reference",
+        value: filters[:query],
+        class: "filter-input" %>
+    </div>
+    <div class="filter-field">
+      <%= form.label :offering_id, "Offering", class: "filter-label" %>
+      <%= form.select :offering_id,
+        options_from_collection_for_select(offerings, :id, :title, filters[:offering_id]),
+        { include_blank: "All offerings" },
+        class: "filter-input" %>
+    </div>
+    <div class="filter-field">
+      <%= form.label :payment_method, "Payment method", class: "filter-label" %>
+      <%= form.select :payment_method,
+        options_for_select(payment_methods.map { |method| [admin_filter_payment_label(method), method] }, filters[:payment_method]),
+        { include_blank: "All methods" },
+        class: "filter-input" %>
+    </div>
+    <div class="filter-field">
+      <%= form.label :start_date, "Start date", class: "filter-label" %>
+      <%= form.date_field :start_date, value: filters[:start_date], class: "filter-input" %>
+    </div>
+    <div class="filter-field">
+      <%= form.label :end_date, "End date", class: "filter-label" %>
+      <%= form.date_field :end_date, value: filters[:end_date], class: "filter-input" %>
+    </div>
+  </div>
+
+  <% if show_status_chips %>
+    <div class="filter-status-chips">
+      <span class="filter-label">Payment status</span>
+      <div class="filter-chip-row">
+        <% { "unpaid" => "Unpaid", TempleEventRegistration::PAYMENT_STATUSES[:paid] => "Paid" }.each do |value, label| %>
+          <% active = admin_filter_status_active?(filters, value) %>
+          <label class="filter-chip <%= active ? "is-active" : "" %>">
+            <%= form.radio_button :status, value, checked: active %>
+            <span><%= label %></span>
+          </label>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="filter-actions">
+    <%= form.submit "Apply filters", class: "btn btn-secondary" %>
+    <% clear_classes = ["filter-clear"] %>
+    <% clear_classes << "is-disabled" unless admin_filters_active?(filters) %>
+    <%= link_to "Clear filters", clear_path, class: clear_classes.join(" "), data: { turbo: false } %>
+  </div>
+<% end %>

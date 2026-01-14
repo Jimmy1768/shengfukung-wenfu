@@ -1,48 +1,42 @@
-<section class="card">
+<section class="card admin-card-with-filter">
   <header>
     <p class="eyebrow"><%= t("admin.orders.index.eyebrow") %></p>
     <h1><%= t("admin.orders.index.title") %></h1>
     <p class="muted"><%= t("admin.orders.index.body") %></p>
   </header>
 
-  <% if @registrations.any? %>
-    <div class="table-scroll">
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th><%= t("admin.orders.index.table.reference") %></th>
-            <th><%= t("admin.orders.index.table.offering") %></th>
-            <th><%= t("admin.orders.index.table.applicant") %></th>
-            <th><%= t("admin.orders.index.table.quantity") %></th>
-            <th><%= t("admin.orders.index.table.status") %></th>
-            <th><%= t("admin.orders.index.table.created") %></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @registrations.each do |registration| %>
-            <tr>
-              <td><%= registration.reference_code %></td>
-              <td><%= registration.temple_offering&.title || "—" %></td>
-              <td><%= registration.user&.english_name || registration.user&.email || t("admin.orders.index.guest_fallback") %></td>
-              <td><%= registration.quantity %></td>
-              <td>
-                <span class="status-pill status-<%= registration.payment_status %>">
-                  <%= t("admin.orders.statuses.#{registration.payment_status}", default: registration.payment_status.humanize) %>
-                </span>
-              </td>
-              <td><%= registration.created_at.strftime("%Y/%m/%d %H:%M") %></td>
-              <td>
-                <% if registration.temple_offering.present? %>
-                  <%= link_to t("admin.orders.index.table.view"), admin_offering_offering_order_path(registration.temple_offering, registration), class: "pill-link" %>
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+  <%= render "admin/shared/filters",
+    filters: @filters,
+    filter_path: admin_orders_path,
+    clear_path: admin_orders_path,
+    offerings: @filter_offerings,
+    payment_methods: @filter_payment_methods,
+    show_status_chips: true,
+    hidden_params: @filter_hidden_fields %>
+</section>
+
+<% if @unpaid_orders.any? %>
+  <section class="card admin-table-card">
+    <header class="admin-section-header">
+      <div>
+        <p class="eyebrow">Needs payment</p>
+        <h2>Needs payment</h2>
+        <p class="muted">Unpaid registrations are shown here first.</p>
+      </div>
+    </header>
+
+    <%= render "table", orders: @unpaid_orders, show_mark_button: true %>
+  </section>
+<% end %>
+
+<section class="card admin-table-card">
+  <header class="admin-section-header">
+    <div>
+      <p class="eyebrow">Recent orders</p>
+      <h2>Recent orders</h2>
+      <p class="muted">Paid registrations sorted by newest first.</p>
     </div>
-  <% else %>
-    <p class="muted"><%= t("admin.orders.index.empty") %></p>
-  <% end %>
+  </header>
+
+  <%= render "table", orders: @recent_orders, show_mark_button: false %>
 </section>

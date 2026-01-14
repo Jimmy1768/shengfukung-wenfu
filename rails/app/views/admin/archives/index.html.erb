@@ -1,186 +1,48 @@
-<section class="hero">
-  <div class="hero-text">
-    <p class="eyebrow"><%= t("admin.archives.hero.eyebrow", temple: current_temple&.name) %></p>
-    <h1><%= t("admin.archives.hero.title") %></h1>
-    <p><%= t("admin.archives.hero.body") %></p>
-  </div>
-</section>
-
-<section class="card">
-  <header class="card-header-with-controls">
-    <div>
-      <h2><%= t("admin.archives.year_filter.title") %></h2>
-      <p class="muted"><%= t("admin.archives.year_filter.body") %></p>
-    </div>
-    <%= form_with url: admin_archives_path, method: :get, local: true, class: "inline-form" do |form| %>
-      <label for="archives-year"><%= t("admin.archives.year_filter.label") %></label>
-      <%= form.select :year, options_for_select(@available_years, @selected_year), {}, id: "archives-year" %>
-      <%= form.submit t("admin.archives.year_filter.apply"), class: "btn btn-secondary" %>
-    <% end %>
-  </header>
-
-  <div class="archive-summary">
-    <div class="metric">
-      <span><%= t("admin.archives.metrics.registrations", year: @selected_year) %></span>
-      <strong><%= number_with_delimiter(@summary[:registrations_count]) %></strong>
-    </div>
-    <div class="metric">
-      <span><%= t("admin.archives.metrics.paid_registrations") %></span>
-      <strong><%= number_with_delimiter(@summary[:paid_registrations]) %></strong>
-    </div>
-    <div class="metric">
-      <span><%= t("admin.archives.metrics.payments_total") %></span>
-      <strong><%= number_to_currency(@summary[:payments_total_cents] / 100.0, unit: @lookup.registrations.first&.currency || "NT$", precision: 0) %></strong>
-    </div>
-    <div class="metric">
-      <span><%= t("admin.archives.metrics.certificates_issued") %></span>
-      <strong><%= number_with_delimiter(@summary[:certificates_count]) %></strong>
-    </div>
-  </div>
-</section>
-
-<section class="card">
-  <header>
-    <h2><%= t("admin.archives.snapshots.title") %></h2>
-    <p class="muted"><%= t("admin.archives.snapshots.body") %></p>
-  </header>
-  <div class="archive-rollups">
-    <% @annual_rollups.each do |rollup| %>
-      <div class="rollup">
-        <p class="eyebrow"><%= rollup[:year] %></p>
-        <p class="rollup-metric"><%= t("admin.archives.snapshots.registrations") %>: <strong><%= number_with_delimiter(rollup[:registrations]) %></strong></p>
-        <p class="rollup-metric"><%= t("admin.archives.snapshots.certificates") %>: <strong><%= number_with_delimiter(rollup[:certificates]) %></strong></p>
-        <p class="rollup-metric"><%= t("admin.archives.snapshots.payments") %>: <strong><%= number_to_currency(rollup[:payment_total_cents] / 100.0, precision: 0) %></strong></p>
-      </div>
-    <% end %>
-  </div>
-</section>
-
 <% if allow_archive_details? %>
-  <section class="card archive-detail">
-    <header class="card-header-with-controls">
-      <div>
-        <h2><%= t("admin.archives.details.registrations.title", year: @selected_year) %></h2>
-        <p class="muted"><%= t("admin.archives.details.registrations.body") %></p>
-      </div>
-      <% if allow_archive_exports? %>
-        <%= link_to t("admin.archives.details.export"), admin_archive_registrations_export_path(year: @selected_year), class: "btn btn-secondary", data: { turbo: false } %>
-      <% end %>
+  <section class="card admin-card-with-filter">
+    <header>
+      <p class="eyebrow">Archived payments</p>
+      <h1>Search payment archives</h1>
+      <p class="muted">Use a date range to audit historical ledger entries across offerings and methods.</p>
     </header>
-    <% if @registrations.any? %>
-      <div class="table-responsive archive-detail-table">
-        <table>
-          <thead>
-            <tr>
-              <th><%= t("admin.archives.details.registrations.table.date") %></th>
-              <th><%= t("admin.archives.details.registrations.table.reference") %></th>
-              <th><%= t("admin.archives.details.registrations.table.offering") %></th>
-              <th><%= t("admin.archives.details.registrations.table.patron") %></th>
-              <th><%= t("admin.archives.details.registrations.table.status") %></th>
-              <th><%= t("admin.archives.details.registrations.table.certificate") %></th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @registrations.each do |registration| %>
-              <tr>
-                <td><%= registration.created_at.strftime("%Y-%m-%d") %></td>
-                <td><%= registration.reference_code %></td>
-                <td><%= registration.temple_offering&.title || "—" %></td>
-                <td><%= registration.user&.english_name || registration.user&.email || registration.contact_payload["name"] || t("admin.archives.guest_fallback") %></td>
-                <td><%= t("admin.orders.statuses.#{registration.payment_status}", default: registration.payment_status) %></td>
-                <td><%= registration.certificate_number.presence || "—" %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    <% else %>
-      <p class="muted"><%= t("admin.archives.details.registrations.empty") %></p>
+
+    <%= render "admin/shared/filters",
+      filters: @filters,
+      filter_path: admin_archives_path,
+      clear_path: admin_archives_path,
+      offerings: @filter_offerings,
+      payment_methods: @filter_payment_methods,
+      show_status_chips: false,
+      hidden_params: @filter_hidden_fields %>
+
+    <% if @filter_errors.any? %>
+      <ul class="filter-error-list">
+        <% @filter_errors.each do |error| %>
+          <li><%= error %></li>
+        <% end %>
+      </ul>
     <% end %>
   </section>
 
-  <section class="card archive-detail">
-    <header class="card-header-with-controls">
-      <div>
-        <h2><%= t("admin.archives.details.payments.title", year: @selected_year) %></h2>
-        <p class="muted"><%= t("admin.archives.details.payments.body") %></p>
-      </div>
-      <% if allow_archive_exports? %>
-        <%= link_to t("admin.archives.details.export"), admin_archive_payments_export_path(year: @selected_year), class: "btn btn-secondary", data: { turbo: false } %>
-      <% end %>
-    </header>
-    <% if @payments.any? %>
-      <div class="table-responsive archive-detail-table">
-        <table>
-          <thead>
-            <tr>
-              <th><%= t("admin.archives.details.payments.table.processed") %></th>
-              <th><%= t("admin.archives.details.payments.table.reference") %></th>
-              <th><%= t("admin.archives.details.payments.table.method") %></th>
-              <th><%= t("admin.archives.details.payments.table.status") %></th>
-              <th><%= t("admin.archives.details.payments.table.amount") %></th>
-              <th><%= t("admin.archives.details.payments.table.recorded_by") %></th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @payments.each do |payment| %>
-              <% timestamp = payment.processed_at || payment.created_at %>
-              <tr>
-                <td><%= timestamp.strftime("%Y-%m-%d") %></td>
-                <td><%= payment.temple_event_registration&.reference_code || payment.external_reference || payment.id %></td>
-                <td><%= t("admin.payments.methods.#{payment.payment_method}", default: payment.payment_method) %></td>
-                <td><%= t("admin.payments.statuses.#{payment.status}", default: payment.status) %></td>
-                <td><%= number_to_currency(payment.amount_cents / 100.0, precision: 0) %></td>
-                <td><%= payment.admin_account&.user&.english_name || payment.admin_account&.user&.email || t("admin.payments.index.system_fallback") %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    <% else %>
-      <p class="muted"><%= t("admin.archives.details.payments.empty") %></p>
-    <% end %>
-  </section>
+  <% if @awaiting_range %>
+    <section class="card empty-state-card">
+      <p class="muted">Select a date range to view archived payments.</p>
+    </section>
+  <% else %>
+    <section class="card admin-table-card">
+      <header class="admin-section-header">
+        <div>
+          <p class="eyebrow">Archive results</p>
+          <h2>Payments from <%= @filters[:start_date] %> to <%= @filters[:end_date] %></h2>
+          <p class="muted">No default window is applied here—archives return everything in the selected range.</p>
+        </div>
+      </header>
 
-  <section class="card archive-detail">
-    <header class="card-header-with-controls">
-      <div>
-        <h2><%= t("admin.archives.details.certificates.title", year: @selected_year) %></h2>
-        <p class="muted"><%= t("admin.archives.details.certificates.body") %></p>
-      </div>
-      <% if allow_archive_exports? %>
-        <%= link_to t("admin.archives.details.export"), admin_archive_certificates_export_path(year: @selected_year), class: "btn btn-secondary", data: { turbo: false } %>
-      <% end %>
-    </header>
-    <% if @certificates.any? %>
-      <div class="table-responsive archive-detail-table">
-        <table>
-          <thead>
-            <tr>
-              <th><%= t("admin.archives.details.certificates.table.certificate") %></th>
-              <th><%= t("admin.archives.details.certificates.table.issued") %></th>
-              <th><%= t("admin.archives.details.certificates.table.reference") %></th>
-              <th><%= t("admin.archives.details.certificates.table.offering") %></th>
-              <th><%= t("admin.archives.details.certificates.table.patron") %></th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @certificates.each do |registration| %>
-              <tr>
-                <td><%= registration.certificate_number %></td>
-                <td><%= registration.updated_at.strftime("%Y-%m-%d") %></td>
-                <td><%= registration.reference_code %></td>
-                <td><%= registration.temple_offering&.title || "—" %></td>
-                <td><%= registration.user&.english_name || registration.user&.email || registration.contact_payload["name"] || t("admin.archives.guest_fallback") %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    <% else %>
-      <p class="muted"><%= t("admin.archives.details.certificates.empty") %></p>
-    <% end %>
-  </section>
+      <%= render "admin/payments/ledger_table",
+        payments: @archived_payments,
+        empty_message: "No archived payments for this range." %>
+    </section>
+  <% end %>
 <% else %>
   <section class="card">
     <header>

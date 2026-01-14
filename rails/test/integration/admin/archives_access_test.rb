@@ -41,9 +41,16 @@ class Admin::ArchivesAccessTest < ActionDispatch::IntegrationTest
 
     get admin_archives_path
     assert_response :success
-    assert_select "h2", text: /Registrations/
-    assert_select ".archive-detail-table table tbody tr", minimum: 1
-    assert_select "a", text: /Export CSV/
+    assert_select ".empty-state-card", text: /Select a date range/
+
+    get admin_archives_path, params: {
+      filter: {
+        start_date: Time.zone.today.beginning_of_year.to_s,
+        end_date: Time.zone.today.end_of_year.to_s
+      }
+    }
+    assert_response :success
+    assert_select ".admin-table-card table tbody tr", minimum: 1
 
     assert_difference -> { SystemAuditLog.where(action: "admin.archives.export").count }, 1 do
       get admin_archive_registrations_export_path(format: :csv, year: Time.zone.today.year)
@@ -63,8 +70,8 @@ class Admin::ArchivesAccessTest < ActionDispatch::IntegrationTest
     sign_in_admin(staff)
     get admin_archives_path
     assert_response :success
-    assert_select "section.card h2", text: "Limited access"
-    assert_select ".archive-detail-table", false
+    assert_select "section.card h2", text: I18n.t("admin.archives.limited.title")
+    assert_select ".admin-card-with-filter", false
   end
 
   test "export route is blocked without capability" do

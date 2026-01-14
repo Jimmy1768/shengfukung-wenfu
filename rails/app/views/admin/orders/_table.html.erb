@@ -1,0 +1,57 @@
+<% if orders.any? %>
+  <div class="table-scroll">
+    <table class="admin-table admin-orders-table">
+      <thead>
+        <tr>
+          <th>Registration</th>
+          <th>Patron</th>
+          <th>Offering</th>
+          <th>Payment method</th>
+          <th>Amount</th>
+          <th>Created</th>
+          <th>Status</th>
+          <th class="text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.each do |registration| %>
+          <% latest_payment = registration.temple_payments.max_by { |payment| payment.processed_at || payment.created_at } %>
+          <% status_key = registration.payment_status %>
+          <% row_classes = ["orders-row"] %>
+          <% row_classes << "is-unpaid" unless registration.payment_status == TempleEventRegistration::PAYMENT_STATUSES[:paid] %>
+          <tr class="<%= row_classes.join(" ") %>">
+            <td class="mono"><%= registration.reference_code %></td>
+            <td><%= registration.user&.english_name || registration.user&.email || registration.contact_payload["name"] || t("admin.orders.index.guest_fallback") %></td>
+            <td><%= registration.temple_offering&.title || "—" %></td>
+            <td>
+              <% if latest_payment.present? %>
+                <span class="payment-method-pill"><%= admin_filter_payment_label(latest_payment.payment_method) %></span>
+              <% else %>
+                <span class="payment-method-pill unpaid">Unpaid</span>
+              <% end %>
+            </td>
+            <td><%= number_to_currency(registration.total_price_cents / 100.0, unit: registration.currency) %></td>
+            <td><%= registration.created_at.strftime("%Y/%m/%d %H:%M") %></td>
+            <td>
+              <span class="status-pill status-<%= status_key %>">
+                <%= t("admin.orders.statuses.#{status_key}", default: status_key.humanize) %>
+              </span>
+            </td>
+            <td class="actions-cell">
+              <div class="order-actions">
+                <% if show_mark_button && registration.payment_status != TempleEventRegistration::PAYMENT_STATUSES[:paid] %>
+                  <button type="button" class="btn btn-ghost" disabled>Mark as paid</button>
+                <% end %>
+                <% if registration.temple_offering.present? %>
+                  <%= link_to "View order", admin_offering_offering_order_path(registration.temple_offering, registration), class: "pill-link" %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="muted">No registrations match the current filters.</p>
+<% end %>

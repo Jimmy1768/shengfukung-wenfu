@@ -64,54 +64,32 @@
   </div>
 </section>
 
+<section class="card admin-card-with-filter">
+  <header>
+    <p class="eyebrow">Filters</p>
+    <h2>Filter payments</h2>
+    <p class="muted">Search across patrons, offerings, payment methods, and date ranges.</p>
+  </header>
+
+  <%= render "admin/shared/filters",
+    filters: @filters,
+    filter_path: admin_payments_path,
+    clear_path: admin_payments_path,
+    offerings: @filter_offerings,
+    payment_methods: @filter_payment_methods,
+    show_status_chips: false,
+    hidden_params: @filter_hidden_fields %>
+
+  <% if @default_payment_window %>
+    <p class="filter-hint muted">Default view limited to the last 90 days. Add a range above to expand.</p>
+  <% end %>
+</section>
+
 <section class="card">
   <header>
     <p class="eyebrow"><%= t("admin.payments.index.recent.eyebrow") %></p>
     <h2><%= t("admin.payments.index.recent.title") %></h2>
   </header>
 
-  <% if @payments.any? %>
-    <div class="table-scroll">
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th><%= t("admin.payments.index.table.reference") %></th>
-            <th><%= t("admin.payments.index.table.method") %></th>
-            <th><%= t("admin.payments.index.table.amount") %></th>
-            <th><%= t("admin.payments.index.table.status") %></th>
-            <th><%= t("admin.payments.index.table.registration") %></th>
-            <th><%= t("admin.payments.index.table.recorded_by") %></th>
-            <th><%= t("admin.payments.index.table.processed") %></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @payments.each do |payment| %>
-            <tr>
-              <td><%= payment.external_reference.presence || payment.id %></td>
-              <td><%= t("admin.payments.methods.#{payment.payment_method}", default: payment.payment_method.humanize) %></td>
-              <td><%= number_to_currency(payment.amount_cents / 100.0, unit: payment.currency) %></td>
-              <td>
-                <span class="status-pill status-<%= payment.status %>">
-                  <%= t("admin.payments.statuses.#{payment.status}", default: payment.status.humanize) %>
-                </span>
-              </td>
-              <td>
-                <% if payment.temple_event_registration&.temple_offering.present? %>
-                  <%= link_to payment.temple_event_registration.reference_code,
-                    admin_offering_offering_order_path(payment.temple_event_registration.temple_offering, payment.temple_event_registration),
-                    class: "pill-link" %>
-                <% else %>
-                  —
-                <% end %>
-              </td>
-              <td><%= payment.admin_account&.user&.english_name || payment.user&.english_name || t("admin.payments.index.system_fallback") %></td>
-              <td><%= payment.processed_at&.strftime("%Y/%m/%d %H:%M") || payment.created_at.strftime("%Y/%m/%d %H:%M") %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
-  <% else %>
-    <p class="muted"><%= t("admin.payments.index.empty") %></p>
-  <% end %>
+  <%= render "ledger_table", payments: @payments, empty_message: t("admin.payments.index.empty") %>
 </section>
