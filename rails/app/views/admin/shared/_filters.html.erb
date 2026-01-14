@@ -20,41 +20,50 @@
 
   <div class="filter-grid">
     <div class="filter-field">
-      <%= form.label :query, "Search", class: "filter-label" %>
-      <%= form.search_field :query,
-        placeholder: "Search by patron name, email, or reference",
+      <%= form.label :query, t("admin.filters.search.label"), class: "filter-label" %>
+      <%= form.text_field :query,
+        placeholder: t("admin.filters.search.placeholder"),
         value: filters[:query],
-        class: "filter-input" %>
+        class: "filter-input search-input" %>
     </div>
     <div class="filter-field">
-      <%= form.label :offering_id, "Offering", class: "filter-label" %>
+      <%= form.label :offering_id, t("admin.filters.offering.label"), class: "filter-label" %>
       <%= form.select :offering_id,
         options_from_collection_for_select(offerings, :id, :title, filters[:offering_id]),
-        { include_blank: "All offerings" },
+        { include_blank: t("admin.filters.offering.all") },
         class: "filter-input" %>
     </div>
     <div class="filter-field">
-      <%= form.label :payment_method, "Payment method", class: "filter-label" %>
+      <%= form.label :payment_method, t("admin.filters.payment_method.label"), class: "filter-label" %>
       <%= form.select :payment_method,
         options_for_select(payment_methods.map { |method| [admin_filter_payment_label(method), method] }, filters[:payment_method]),
-        { include_blank: "All methods" },
+        { include_blank: t("admin.filters.payment_method.all") },
         class: "filter-input" %>
     </div>
     <div class="filter-field">
-      <%= form.label :start_date, "Start date", class: "filter-label" %>
-      <%= form.date_field :start_date, value: filters[:start_date], class: "filter-input" %>
+      <%= form.label :start_date, t("admin.filters.date.start"), class: "filter-label" %>
+      <%= form.date_field :start_date,
+        value: filters[:start_date],
+        class: "filter-input date-input admin-date-input",
+        placeholder: "yyyy/mm/dd" %>
     </div>
     <div class="filter-field">
-      <%= form.label :end_date, "End date", class: "filter-label" %>
-      <%= form.date_field :end_date, value: filters[:end_date], class: "filter-input" %>
+      <%= form.label :end_date, t("admin.filters.date.end"), class: "filter-label" %>
+      <%= form.date_field :end_date,
+        value: filters[:end_date],
+        class: "filter-input date-input admin-date-input",
+        placeholder: "yyyy/mm/dd" %>
     </div>
   </div>
 
   <% if show_status_chips %>
     <div class="filter-status-chips">
-      <span class="filter-label">Payment status</span>
+      <span class="filter-label"><%= t("admin.filters.status.label") %></span>
       <div class="filter-chip-row">
-        <% { "unpaid" => "Unpaid", TempleEventRegistration::PAYMENT_STATUSES[:paid] => "Paid" }.each do |value, label| %>
+        <% {
+          "unpaid" => t("admin.filters.status.unpaid"),
+          TempleEventRegistration::PAYMENT_STATUSES[:paid] => t("admin.filters.status.paid")
+        }.each do |value, label| %>
           <% active = admin_filter_status_active?(filters, value) %>
           <label class="filter-chip <%= active ? "is-active" : "" %>">
             <%= form.radio_button :status, value, checked: active %>
@@ -66,9 +75,9 @@
   <% end %>
 
   <div class="filter-actions">
-    <%= form.submit "Apply filters", class: "btn btn-secondary" %>
+    <%= form.submit t("admin.filters.apply"), class: "btn btn-secondary" %>
     <% clear_classes = ["filter-clear"] %>
     <% clear_classes << "is-disabled" unless admin_filters_active?(filters) %>
-    <%= link_to "Clear filters", clear_path, class: clear_classes.join(" "), data: { turbo: false } %>
+    <%= link_to t("admin.filters.clear"), clear_path, class: clear_classes.join(" "), data: { turbo: false } %>
   </div>
 <% end %>

@@ -1,0 +1,36 @@
+<script>
+  (function() {
+    if (window.__adminDatePickerInitialized) return;
+    window.__adminDatePickerInitialized = true;
+
+    function enhance(input) {
+      if (!input) return;
+      if (!input.classList.contains("admin-date-input")) {
+        input.classList.add("admin-date-input");
+      }
+      if (!input.getAttribute("placeholder")) {
+        input.setAttribute("placeholder", input.dataset.placeholder || "yyyy/mm/dd");
+      }
+    }
+
+    function enhanceAll() {
+      document.querySelectorAll("input[type='date']").forEach(enhance);
+    }
+
+    function handleClick(event) {
+      var input = event.target.closest("input[type='date']");
+      if (!input) return;
+      if (typeof input.showPicker === "function") {
+        input.showPicker();
+      } else {
+        input.focus();
+      }
+    }
+
+    document.addEventListener("click", handleClick);
+    document.addEventListener("DOMContentLoaded", enhanceAll);
+    document.addEventListener("turbo:render", enhanceAll);
+    document.addEventListener("turbo:frame-load", enhanceAll);
+    enhanceAll();
+  })();
+</script>

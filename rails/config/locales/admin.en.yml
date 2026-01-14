@@ -1,5 +1,24 @@
 en:
   admin:
+    filters:
+      search:
+        label: "Search"
+        placeholder: "Search by patron name, email, or reference"
+      offering:
+        label: "Offering"
+        all: "All offerings"
+      payment_method:
+        label: "Payment method"
+        all: "All methods"
+      date:
+        start: "Start date"
+        end: "End date"
+      status:
+        label: "Payment status"
+        paid: "Paid"
+        unpaid: "Unpaid"
+      apply: "Apply filters"
+      clear: "Clear filters"
     registration_form:
       title: "New onsite registration"
       subtitle: "Connect a patron and capture interview notes for %{offering}."

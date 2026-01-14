@@ -42,10 +42,17 @@ module Admin
         rows = html_options.delete(:rows)
         builder.text_area(field, html_options.merge(value: value, rows: rows || 3))
       when :date
+        html_options[:class] = merge_css_classes(html_options[:class], "admin-date-input")
+        html_options[:placeholder] ||= "yyyy/mm/dd"
         builder.date_field(field, html_options.merge(value: value))
       else
         builder.text_field(field, html_options.merge(value: value))
       end
+    end
+
+    def merge_css_classes(existing, additional)
+      existing_classes = Array(existing).flat_map { |value| value.to_s.split(" ") }
+      ([additional] + existing_classes).compact.uniq.join(" ").strip
     end
   end
 end

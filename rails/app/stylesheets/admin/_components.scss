@@ -119,6 +119,36 @@
   border: 1px solid var(--border);
   background: var(--surface);
   box-shadow: var(--shadow-soft);
+  gap: var(--spacing-sm);
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.85rem;
+    font: inherit;
+    color: var(--text);
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+    }
+
+    &:read-only {
+      cursor: not-allowed;
+      opacity: 0.85;
+    }
+  }
+
+  textarea {
+    min-height: 6rem;
+    resize: vertical;
+  }
 
   .panel-body {
     flex: 1;
@@ -399,6 +429,7 @@
   position: relative;
 }
 
+.search-input,
 .patron-search-input {
   width: 100%;
   border: 1px solid var(--border);
@@ -410,6 +441,7 @@
   box-shadow: var(--shadow-soft);
 }
 
+.search-input:focus,
 .patron-search-input:focus {
   outline: none;
   border-color: var(--accent);

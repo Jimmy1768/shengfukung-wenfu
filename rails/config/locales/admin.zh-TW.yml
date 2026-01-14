@@ -1,5 +1,24 @@
 zh-TW:
   admin:
+    filters:
+      search:
+        label: "搜尋"
+        placeholder: "輸入信眾姓名、Email 或訂單編號"
+      offering:
+        label: "供品"
+        all: "全部供品"
+      payment_method:
+        label: "付款方式"
+        all: "全部方式"
+      date:
+        start: "開始日期"
+        end: "結束日期"
+      status:
+        label: "付款狀態"
+        paid: "已付款"
+        unpaid: "未付款"
+      apply: "套用條件"
+      clear: "清除篩選"
     registration_form:
       title: "建立現場報名"
       subtitle: "連結信眾並為 %{offering} 記錄面談重點。"
