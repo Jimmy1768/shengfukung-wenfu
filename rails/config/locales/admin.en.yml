@@ -33,6 +33,7 @@ en:
         dependents: "List household members or relationship context."
         unit_price: "Defaults to the offering price if left blank."
         manual_user_id: "If JavaScript is disabled, enter the numeric user ID."
+        save_additional: "Keep the current default and store this value as another selectable choice."
       fields:
         quantity: "Quantity"
         unit_price: "Unit price (cents)"
@@ -64,6 +65,7 @@ en:
         back_to_orders: "Back to registrations"
       labels:
         dependents: "Dependents:"
+        save_additional: "Save as additional option"
       errors:
         search_failed: "Unable to search patrons right now."
         create_failed: "Unable to create patron."

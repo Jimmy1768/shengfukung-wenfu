@@ -1,16 +1,12 @@
 <% search_endpoint = admin_patrons_path(format: :json) %>
-<% create_endpoint = admin_patrons_path(format: :json) %>
 <% selected_patron = registration.user %>
 
 <section id="patron-picker" class="card form-section patron-picker"
   data-search-endpoint="<%= search_endpoint %>"
-  data-create-endpoint="<%= create_endpoint %>"
   data-csrf="<%= form_authenticity_token %>"
   data-selected-hint="<%= t('admin.registration_form.hints.selected_patron') %>"
-  data-created-hint="<%= t('admin.registration_form.hints.created_patron') %>"
   data-no-results="<%= t('admin.registration_form.hints.no_results_placeholder') %>"
   data-search-error="<%= t('admin.registration_form.errors.search_failed') %>"
-  data-create-error="<%= t('admin.registration_form.errors.create_failed') %>"
   data-dependents-label="<%= t('admin.registration_form.labels.dependents') %>"
   data-offering-slug="<%= @offering.slug %>">
   <header>
@@ -37,31 +33,6 @@
       <div class="picker-message" data-role="picker-message"></div>
     </div>
 
-    <div class="patron-picker-create">
-      <h3><%= t("admin.registration_form.headings.new_patron") %></h3>
-      <p class="muted"><%= t("admin.registration_form.hints.new_patron") %></p>
-      <form data-role="create-form">
-        <div class="field">
-          <label><%= t("admin.registration_form.fields.primary_contact") %></label>
-          <input type="text" name="patron[english_name]" required />
-        </div>
-        <div class="field">
-          <label><%= t("admin.registration_form.fields.email") %></label>
-          <input type="email" name="patron[email]" required />
-        </div>
-        <div class="field">
-          <label><%= t("admin.registration_form.fields.phone") %></label>
-          <input type="tel" name="patron[phone]" />
-        </div>
-        <div class="field">
-          <label><%= t("admin.registration_form.fields.contact_notes") %></label>
-          <textarea name="patron[notes]" rows="2"></textarea>
-        </div>
-        <div class="field">
-          <button type="submit" class="btn btn-secondary"><%= t("admin.registration_form.actions.create_patron") %></button>
-        </div>
-      </form>
-    </div>
   </div>
 
   <input type="hidden" name="temple_event_registration[user_id]" id="temple_event_registration_user_id" value="<%= registration.user_id %>" />
@@ -86,7 +57,6 @@
       const resultsNode = picker.querySelector('[data-role="results"]');
       const hiddenField = document.getElementById("temple_event_registration_user_id");
       const selectionNode = picker.querySelector('[data-role="selection"]');
-      const createForm = picker.querySelector('[data-role="create-form"]');
       const messageNode = picker.querySelector('[data-role="picker-message"]');
       const formElement = picker.closest('form[data-registration-form]') ||
         document.querySelector('form[data-registration-form]') ||
@@ -280,50 +250,6 @@
         }
       });
 
-      if (createForm) {
-        createForm.addEventListener('submit', function(event) {
-          event.preventDefault();
-          const formData = new FormData(createForm);
-          const payload = {};
-          formData.forEach(function(value, key) {
-            const match = key.match(/patron\[(.+)\]/);
-            const attribute = match ? match[1] : key;
-            payload[attribute] = value;
-          });
-
-          fetch(picker.dataset.createEndpoint, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-              'X-CSRF-Token': picker.dataset.csrf
-            },
-            body: JSON.stringify({ patron: payload })
-          })
-            .then(function(response) {
-              if (!response.ok) { throw response; }
-              return response.json();
-            })
-            .then(function(data) {
-              if (data.patron) {
-                selectPatron(data.patron);
-                createForm.reset();
-                setMessage(picker.dataset.createdHint.replace('%{name}', data.patron.name), 'success');
-                closeResults();
-                if (searchInput) searchInput.value = '';
-              }
-            })
-            .catch(function(response) {
-              if (response && response.json) {
-                response.json().then(function(body) {
-                  setMessage(body.errors ? body.errors.join(', ') : picker.dataset.createError, 'error');
-                });
-              } else {
-                setMessage(picker.dataset.createError, 'error');
-              }
-            });
-        });
-      }
     }
 
     document.addEventListener('DOMContentLoaded', initializePatronPicker);

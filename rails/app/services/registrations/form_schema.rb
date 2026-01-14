@@ -15,12 +15,13 @@ module Registrations
       }
     }.freeze
 
-    attr_reader :sections, :defaults
+    attr_reader :sections, :defaults, :field_settings
 
     def initialize(config = nil)
       config = (config || {}).deep_symbolize_keys
       @sections = build_sections(config[:sections])
       @defaults = build_defaults(config[:defaults])
+      @field_settings = build_field_settings(config[:field_settings])
     end
 
     def fields_for(section)
@@ -37,6 +38,16 @@ module Registrations
 
     def defaults_for(section)
       defaults[section.to_sym] || {}
+    end
+
+    def field_options(field)
+      config = field_settings[field.to_sym] || {}
+      normalize_options(config[:options])
+    end
+
+    def allow_multiple?(field)
+      config = field_settings[field.to_sym] || {}
+      config[:allow_multiple].present?
     end
 
     private
@@ -72,6 +83,36 @@ module Registrations
         defaults[section.to_sym].merge!(values.deep_symbolize_keys)
       end
       defaults
+    end
+
+    def build_field_settings(config)
+      return {} if config.blank?
+
+      config.each_with_object({}) do |(field, settings), memo|
+        memo[field.to_sym] = normalize_field_settings(settings)
+      end
+    end
+
+    def normalize_field_settings(settings)
+      case settings
+      when Hash
+        settings.deep_symbolize_keys
+      when Array
+        { options: settings }
+      else
+        {}
+      end
+    end
+
+    def normalize_options(options)
+      return [] if options.blank?
+
+      case options
+      when Hash
+        options.map { |value, label| [label, value] }
+      else
+        Array(options).map { |value| [value, value] }
+      end
     end
   end
 end

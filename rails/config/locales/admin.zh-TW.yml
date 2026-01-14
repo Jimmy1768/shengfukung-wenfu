@@ -33,6 +33,7 @@ zh-TW:
         dependents: "列出同戶成員或關係說明。"
         unit_price: "若留白即使用供品預設金額。"
         manual_user_id: "若無法使用搜尋，可輸入信眾 ID。"
+        save_additional: "保留原本預設值，並把此輸入存成另一個可選項。"
       fields:
         quantity: "數量"
         unit_price: "單價（分）"
@@ -64,6 +65,7 @@ zh-TW:
         back_to_orders: "返回報名列表"
       labels:
         dependents: "眷屬："
+        save_additional: "另存為選項"
       errors:
         search_failed: "目前無法搜尋信眾。"
         create_failed: "建立信眾失敗。"

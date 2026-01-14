@@ -42,13 +42,22 @@
             <% if schema.include_field?(:order, :quantity) %>
               <div class="field-panel">
                 <%= form.label :quantity, t("admin.registration_form.fields.quantity") %>
-                <%= form.number_field :quantity, min: 1, value: @registration.quantity %>
+                <%= registration_field_control(form, :quantity,
+                      type: :number,
+                      schema:,
+                      value: @registration.quantity,
+                      html_options: { min: 1 }) %>
+                <%= registration_multi_value_toggle(:quantity, schema) %>
               </div>
             <% end %>
             <% if schema.include_field?(:order, :unit_price_cents) %>
               <div class="field-panel">
                 <%= form.label :unit_price_cents, t("admin.registration_form.fields.unit_price") %>
-                <%= form.number_field :unit_price_cents %>
+                <%= registration_field_control(form, :unit_price_cents,
+                      type: :number,
+                      schema:,
+                      value: @registration.unit_price_cents) %>
+                <%= registration_multi_value_toggle(:unit_price_cents, schema) %>
                 <p class="hint"><%= t("admin.registration_form.hints.unit_price") %></p>
               </div>
             <% end %>
@@ -60,13 +69,21 @@
             <% if schema.include_field?(:order, :currency) %>
               <div class="field-panel">
                 <%= form.label :currency, t("admin.registration_form.fields.currency") %>
-                <%= form.text_field :currency, value: @registration.currency || @offering.currency %>
+                <%= registration_field_control(form, :currency,
+                      type: :text,
+                      schema:,
+                      value: @registration.currency || @offering.currency) %>
+                <%= registration_multi_value_toggle(:currency, schema) %>
               </div>
             <% end %>
             <% if schema.include_field?(:order, :certificate_number) %>
               <div class="field-panel">
                 <%= form.label :certificate_number, t("admin.registration_form.fields.certificate_number") %>
-                <%= form.text_field :certificate_number %>
+                <%= registration_field_control(form, :certificate_number,
+                      type: :text,
+                      schema:,
+                      value: @registration.certificate_number) %>
+                <%= registration_multi_value_toggle(:certificate_number, schema) %>
               </div>
             <% end %>
           </div>
@@ -89,13 +106,21 @@
               <% if schema.include_field?(:contact, :primary_contact) %>
                 <div class="field-panel">
                   <%= contact_fields.label :primary_contact, t("admin.registration_form.fields.primary_contact") %>
-                  <%= contact_fields.text_field :primary_contact, data: { contact_field: "primary_contact" } %>
+                  <%= registration_field_control(contact_fields, :primary_contact,
+                        type: :text,
+                        schema:,
+                        value: contact_data[:primary_contact],
+                        html_options: { data: { contact_field: "primary_contact" }, readonly: true }) %>
                 </div>
               <% end %>
               <% if schema.include_field?(:contact, :phone) %>
                 <div class="field-panel">
                   <%= contact_fields.label :phone, t("admin.registration_form.fields.phone") %>
-                  <%= contact_fields.telephone_field :phone, data: { contact_field: "phone" } %>
+                  <%= registration_field_control(contact_fields, :phone,
+                        type: :telephone,
+                        schema:,
+                        value: contact_data[:phone],
+                        html_options: { data: { contact_field: "phone" }, readonly: true }) %>
                 </div>
               <% end %>
             </div>
@@ -106,13 +131,21 @@
               <% if schema.include_field?(:contact, :email) %>
                 <div class="field-panel">
                   <%= contact_fields.label :email, t("admin.registration_form.fields.email") %>
-                  <%= contact_fields.email_field :email, data: { contact_field: "email" } %>
+                  <%= registration_field_control(contact_fields, :email,
+                        type: :email,
+                        schema:,
+                        value: contact_data[:email],
+                        html_options: { data: { contact_field: "email" }, readonly: true }) %>
                 </div>
               <% end %>
               <% if schema.include_field?(:contact, :dependents_notes) %>
                 <div class="field-panel">
                   <%= contact_fields.label :dependents_notes, t("admin.registration_form.fields.dependents") %>
-                  <%= contact_fields.text_field :dependents_notes, data: { contact_field: "dependents_notes" } %>
+                  <%= registration_field_control(contact_fields, :dependents_notes,
+                        type: :text,
+                        schema:,
+                        value: contact_data[:dependents_notes],
+                        html_options: { data: { contact_field: "dependents_notes" }, readonly: true }) %>
                   <p class="hint"><%= t("admin.registration_form.hints.dependents") %></p>
                 </div>
               <% end %>
@@ -122,7 +155,11 @@
           <% if schema.include_field?(:contact, :notes) %>
             <div class="field-panel">
               <%= contact_fields.label :notes, t("admin.registration_form.fields.contact_notes") %>
-              <%= contact_fields.text_area :notes, rows: 3, data: { contact_field: "notes" } %>
+              <%= registration_field_control(contact_fields, :notes,
+                    type: :textarea,
+                    schema:,
+                    value: contact_data[:notes],
+                    html_options: { rows: 3, data: { contact_field: "notes" }, readonly: true }) %>
             </div>
           <% end %>
         <% end %>
@@ -144,13 +181,22 @@
               <% if schema.include_field?(:logistics, :preferred_date) %>
                 <div class="field-panel">
                   <%= logistics_fields.label :preferred_date, t("admin.registration_form.fields.preferred_date") %>
-                  <%= logistics_fields.date_field :preferred_date %>
+                  <%= registration_field_control(logistics_fields, :preferred_date,
+                        type: :date,
+                        schema:,
+                        value: logistics_data[:preferred_date]) %>
+                  <%= registration_multi_value_toggle(:preferred_date, schema) %>
                 </div>
               <% end %>
               <% if schema.include_field?(:logistics, :preferred_slot) %>
                 <div class="field-panel">
                   <%= logistics_fields.label :preferred_slot, t("admin.registration_form.fields.preferred_slot") %>
-                  <%= logistics_fields.text_field :preferred_slot, placeholder: t("admin.registration_form.placeholders.preferred_slot") %>
+                  <%= registration_field_control(logistics_fields, :preferred_slot,
+                        type: :text,
+                        schema:,
+                        value: logistics_data[:preferred_slot],
+                        html_options: { placeholder: t("admin.registration_form.placeholders.preferred_slot") }) %>
+                  <%= registration_multi_value_toggle(:preferred_slot, schema) %>
                 </div>
               <% end %>
             </div>
@@ -161,13 +207,21 @@
               <% if schema.include_field?(:logistics, :arrival_window) %>
                 <div class="field-panel">
                   <%= logistics_fields.label :arrival_window, t("admin.registration_form.fields.arrival_window") %>
-                  <%= logistics_fields.text_field :arrival_window %>
+                  <%= registration_field_control(logistics_fields, :arrival_window,
+                        type: :text,
+                        schema:,
+                        value: logistics_data[:arrival_window]) %>
+                  <%= registration_multi_value_toggle(:arrival_window, schema) %>
                 </div>
               <% end %>
               <% if schema.include_field?(:logistics, :ceremony_location) %>
                 <div class="field-panel">
                   <%= logistics_fields.label :ceremony_location, t("admin.registration_form.fields.ceremony_location") %>
-                  <%= logistics_fields.text_field :ceremony_location %>
+                  <%= registration_field_control(logistics_fields, :ceremony_location,
+                        type: :text,
+                        schema:,
+                        value: logistics_data[:ceremony_location]) %>
+                  <%= registration_multi_value_toggle(:ceremony_location, schema) %>
                 </div>
               <% end %>
             </div>
@@ -191,13 +245,21 @@
               <% if schema.include_field?(:ritual_metadata, :ancestor_placard_name) %>
                 <div class="field-panel">
                   <%= metadata_fields.label :ancestor_placard_name, t("admin.registration_form.fields.ancestor_placard") %>
-                  <%= metadata_fields.text_field :ancestor_placard_name %>
+                  <%= registration_field_control(metadata_fields, :ancestor_placard_name,
+                        type: :text,
+                        schema:,
+                        value: ritual_metadata[:ancestor_placard_name]) %>
+                  <%= registration_multi_value_toggle(:ancestor_placard_name, schema) %>
                 </div>
               <% end %>
               <% if schema.include_field?(:ritual_metadata, :dedication_message) %>
                 <div class="field-panel">
                   <%= metadata_fields.label :dedication_message, t("admin.registration_form.fields.dedication_message") %>
-                  <%= metadata_fields.text_field :dedication_message %>
+                  <%= registration_field_control(metadata_fields, :dedication_message,
+                        type: :text,
+                        schema:,
+                        value: ritual_metadata[:dedication_message]) %>
+                  <%= registration_multi_value_toggle(:dedication_message, schema) %>
                 </div>
               <% end %>
             </div>
@@ -208,13 +270,22 @@
               <% if schema.include_field?(:ritual_metadata, :incense_option) %>
                 <div class="field-panel">
                   <%= metadata_fields.label :incense_option, t("admin.registration_form.fields.incense_option") %>
-                  <%= metadata_fields.text_field :incense_option %>
+                  <%= registration_field_control(metadata_fields, :incense_option,
+                        type: :text,
+                        schema:,
+                        value: ritual_metadata[:incense_option]) %>
+                  <%= registration_multi_value_toggle(:incense_option, schema) %>
                 </div>
               <% end %>
               <% if schema.include_field?(:ritual_metadata, :certificate_notes) %>
                 <div class="field-panel">
                   <%= metadata_fields.label :certificate_notes, t("admin.registration_form.fields.certificate_notes") %>
-                  <%= metadata_fields.text_area :certificate_notes, rows: 3 %>
+                  <%= registration_field_control(metadata_fields, :certificate_notes,
+                        type: :textarea,
+                        schema:,
+                        value: ritual_metadata[:certificate_notes],
+                        html_options: { rows: 3 }) %>
+                  <%= registration_multi_value_toggle(:certificate_notes, schema) %>
                 </div>
               <% end %>
             </div>

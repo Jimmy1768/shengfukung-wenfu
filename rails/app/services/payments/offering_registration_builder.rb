@@ -16,6 +16,8 @@ module Payments
         registration.event_slug ||= offering.slug
         registration.save!
 
+        persist_user_defaults(registration)
+
         SystemAuditLogger.log!(
           action: "temple.registration.create",
           admin: admin_user,
@@ -34,6 +36,10 @@ module Payments
     private
 
     attr_reader :temple, :offering, :admin_user, :attributes
+
+    def multi_value_fields
+      @multi_value_fields ||= Array(@attributes.delete(:multi_value_fields)).map(&:to_s)
+    end
 
     def registration_attributes
       {
@@ -55,6 +61,24 @@ module Payments
       return offering.price_cents if value.blank? || value.to_i.zero?
 
       value.to_i
+    end
+
+    def persist_user_defaults(registration)
+      user = registration.user
+      return unless user
+
+      Registrations::UserMetadataUpdater.new(
+        user:,
+        offering_slug: registration.event_slug || offering.slug,
+        contact_payload: attributes[:contact_payload],
+        logistics_payload: attributes[:logistics_payload],
+        ritual_metadata: attributes[:metadata],
+        order_details: {
+          quantity: registration.quantity,
+          certificate_number: registration.certificate_number
+        },
+        multi_value_fields: multi_value_fields
+      ).update!
     end
   end
 end

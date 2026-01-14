@@ -62,7 +62,9 @@ namespace :marketing_admin, path: "/marketing/admin", module: "dev/demo/rails" d
       # API-only stack drops method override middleware, so HTML forms submit POST.
       post "/", on: :member, action: :update
     end
-    resources :patrons, only: %i[index create]
+    resources :patrons, only: %i[index create] do
+      resources :metadata_values, only: %i[create destroy], controller: "patron_metadata_values"
+    end
     resource :temple_switch, only: :create, controller: "temple_switches"
     resource :locale, only: :create, controller: "locales"
   end

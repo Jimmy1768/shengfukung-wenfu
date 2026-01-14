@@ -63,7 +63,28 @@ Use this when you need representative data locally or on staging:
      ```
    - Extend the seed task (or run a one-off script) to load this YAML and merge `form_fields` into each offering’s `metadata`. The admin `_form.html.erb` partial will read `@offering.metadata['form_fields']` and only render the listed sections/inputs, so each temple sees a tailored form without separate partials.
    - Store the YAML in Git so the config remains the source of truth. When a temple needs tweaks, edit the YAML, rerun the sync task, and the form will update automatically.
-7. **In-tower workflow summary**
+   - `registration_form.field_settings` unlocks richer controls:
+     - `options` (array or `{ value: label }`) renders a `<select>` so staff pick from approved values instead of typing.
+     - `allow_multiple: true` shows the “Save as additional option” toggle, letting admins append new defaults instead of overwriting prior ones.
+     - Example:
+       ```yaml
+       registration_form:
+         sections:
+           contact:
+             fields: [primary_contact, phone, email]
+         field_settings:
+           preferred_slot:
+             options: ["Morning", "Afternoon", "Evening"]
+           dedication_message:
+             allow_multiple: true
+       ```
+7. **Rolling patron defaults (registration auto-fill)**
+   - Patron selection now hydrates the form with values from `user.metadata` and `user.metadata.offerings[slug]` (see `Registrations::UserMetadataUpdater`).
+   - When a registration saves, contact + non-transient logistics/ritual fields merge back into the user metadata so future registrations start pre-filled.
+   - Fields flagged with `allow_multiple` append into arrays whenever the admin checks “Save as additional option”.
+   - Date/time-ish logistics keys are treated as transient and skipped.
+   - JSON endpoints (`/admin/patrons/:id/metadata_values`) exist for future UI that lists/removes multi-value entries; wire a modal when needed.
+8. **In-tower workflow summary**
    - **Product line (template)** – defined in `rails/db/temples/offerings/<slug>.yml` + merged into `temple_offerings.metadata`. Requires dev support to add new slugs/sections.
    - **Offering (event instance)** – admins use `/admin/offerings/new` to create/edit/delete instances of those product lines (set price, dates, copy). No code change required.
    - **Registration / payment** – staff use `/admin/offerings/<id>/orders` to capture onsite registrations, then record payments. Ledger/history sits at this level.

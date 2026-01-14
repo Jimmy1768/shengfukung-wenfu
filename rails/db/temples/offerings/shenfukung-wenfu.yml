@@ -26,6 +26,9 @@ offerings:
       defaults:
         order:
           quantity: 1
+      field_settings:
+        dedication_message:
+          allow_multiple: false
 
   - slug: family-peace
     label: "平安戲丁口捐"
@@ -55,6 +58,11 @@ offerings:
       defaults:
         logistics:
           preferred_slot: "上午"
+      field_settings:
+        preferred_slot:
+          options: ["上午", "下午", "晚上"]
+        arrival_window:
+          options: ["08:00-09:00", "09:00-10:00", "10:00-11:00"]
 
   - slug: lantern-lighting
     label: "點燈作業"
@@ -85,6 +93,11 @@ offerings:
           fields: [preferred_date, preferred_slot]
         ritual_metadata:
           fields: [ancestor_placard_name, dedication_message, certificate_notes]
+      field_settings:
+        preferred_slot:
+          options: ["Morning", "Afternoon", "Evening"]
+        dedication_message:
+          allow_multiple: true
 
   - slug: ancestor-ritual
     label: "祖先拔薦"
@@ -114,6 +127,13 @@ offerings:
           fields: [preferred_date, preferred_slot, arrival_window, ceremony_location]
         ritual_metadata:
           fields: [ancestor_placard_name, dedication_message, incense_option, certificate_notes]
+      field_settings:
+        preferred_slot:
+          options: ["上午", "下午"]
+        ceremony_location:
+          options: ["本殿", "天官殿", "戶外祭壇"]
+        incense_option:
+          options: ["Three-stick set", "Five-stick set", "Ten-stick set"]
 
   - slug: pudu-table
     label: "普渡供桌"
@@ -159,3 +179,8 @@ offerings:
       defaults:
         logistics:
           ceremony_location: "戶外祭壇"
+      field_settings:
+        ceremony_location:
+          options: ["戶外祭壇", "本殿入口", "後殿"]
+        dedication_message:
+          allow_multiple: false

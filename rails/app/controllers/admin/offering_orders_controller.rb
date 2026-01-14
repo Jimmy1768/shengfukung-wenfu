@@ -62,10 +62,13 @@ module Admin
         :currency,
         :certificate_number,
         :event_slug,
+        { multi_value_fields: [] },
         contact_details: %i[primary_contact email phone dependents_notes notes],
         logistics_details: %i[preferred_date preferred_slot arrival_window ceremony_location],
         ritual_metadata: %i[ancestor_placard_name dedication_message incense_option certificate_notes]
       )
+      multi_fields = permitted.delete(:multi_value_fields)
+      permitted[:multi_value_fields] = Array(multi_fields).map(&:to_s)
       permitted[:contact_payload] = sanitize_payload(permitted.delete(:contact_details))
       permitted[:logistics_payload] = sanitize_payload(permitted.delete(:logistics_details))
       metadata_fields = sanitize_payload(permitted.delete(:ritual_metadata))
