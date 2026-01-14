@@ -1,7 +1,6 @@
 <% if allow_archive_details? %>
   <section class="card admin-card-with-filter">
     <header>
-      <p class="eyebrow">Archived payments</p>
       <h1>Search payment archives</h1>
       <p class="muted">Use a date range to audit historical ledger entries across offerings and methods.</p>
     </header>
@@ -32,7 +31,6 @@
     <section class="card admin-table-card">
       <header class="admin-section-header">
         <div>
-          <p class="eyebrow">Archive results</p>
           <h2>Payments from <%= @filters[:start_date] %> to <%= @filters[:end_date] %></h2>
           <p class="muted">No default window is applied here—archives return everything in the selected range.</p>
         </div>

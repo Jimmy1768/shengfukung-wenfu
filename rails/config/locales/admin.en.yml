@@ -151,6 +151,21 @@ en:
       switch_temple: "Switch temple"
       temple_selector_label: "Temple"
       no_temple: "No temple selected"
+      items:
+        dashboard:
+          label: "Dashboard"
+        temple_profile:
+          label: "Temple profile"
+        offerings:
+          label: "Offerings"
+        orders:
+          label: "Orders"
+        payments:
+          label: "Payments"
+        archives:
+          label: "Archives"
+        permissions:
+          label: "Permissions"
     dashboard:
       hero:
         eyebrow: "Admin console"
@@ -261,13 +276,16 @@ en:
         empty: "No registrations have been recorded for this temple yet."
         guest_fallback: "Guest"
         table:
-          reference: "Reference"
+          patron: "Patron"
           offering: "Offering"
-          applicant: "Applicant"
-          quantity: "Quantity"
-          status: "Status"
+          payment_method: "Method"
+          amount: "Amount"
           created: "Created"
+          status: "Status"
+          actions: "Actions"
           view: "View"
+          unpaid_payment: "Unpaid"
+          reference_hint: "Reference %{reference}"
       statuses:
         pending: "Pending"
         paid: "Paid"

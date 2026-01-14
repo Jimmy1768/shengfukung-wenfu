@@ -706,11 +706,10 @@ body {
 }
 
 .filter-input.search-input {
-  border-radius: var(--radius-lg);
-  padding: 0.85rem 1rem;
-  font-size: 1.05rem;
-  box-shadow: var(--shadow-soft);
-  background: var(--surface-muted, rgba(15, 23, 42, 0.35));
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.85rem;
+  font-size: 0.95rem;
+  background: var(--surface);
 }
 
 .admin-date-input,
@@ -874,6 +873,12 @@ body.admin-body input[type=date]::placeholder {
   color: var(--danger, #d1452f);
 }
 
+.admin-orders-table .orders-created {
+  white-space: nowrap;
+  min-width: 160px;
+  font-variant-numeric: tabular-nums;
+}
+
 .empty-state-card {
   text-align: center;
   color: var(--text-muted);
@@ -882,7 +887,7 @@ body.admin-body input[type=date]::placeholder {
 
 .admin-layout {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) 1fr;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
   gap: var(--spacing-lg);
   padding: var(--spacing-lg);
   width: 100%;
@@ -901,6 +906,9 @@ body.admin-body input[type=date]::placeholder {
 }
 
 .admin-sidebar {
+  width: 100%;
+  max-width: 240px;
+  min-width: 0;
   background: rgba(15, 23, 42, 0.65);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -921,18 +929,27 @@ body.admin-body input[type=date]::placeholder {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  align-items: center;
+  width: 100%;
 }
 .admin-sidebar .sidebar-link {
   display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding: var(--spacing-sm);
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 0.85rem 1rem;
   border-radius: var(--radius-md);
   border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
   text-decoration: none;
   color: var(--admin-shell-text, inherit);
   background: rgba(2, 6, 23, 0.5);
   transition: border-color 120ms ease, background 120ms ease;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: normal;
+  width: min(240px, 100%);
+  box-sizing: border-box;
 }
 .admin-sidebar .sidebar-link:hover {
   border-color: var(--accent);
@@ -948,12 +965,10 @@ body.admin-body input[type=date]::placeholder {
   color: var(--admin-shell-text, inherit);
 }
 .admin-sidebar .sidebar-link-title {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--admin-shell-text, inherit);
-}
-.admin-sidebar .sidebar-link-desc {
-  font-size: 0.82rem;
-  color: color-mix(in srgb, var(--admin-shell-muted-text, #ffe27a) 90%, transparent);
+  display: inline-block;
+  width: 100%;
 }
 .admin-sidebar form {
   margin: 0;
@@ -965,6 +980,9 @@ body.admin-body input[type=date]::placeholder {
 
 .admin-main {
   flex: 1;
+  width: 100%;
+  min-width: 0;
+  padding-left: var(--spacing-lg);
   padding-bottom: var(--spacing-lg);
 }
 
@@ -1106,7 +1124,7 @@ body.admin-body input[type=date]::placeholder {
   font-weight: 600;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
   .admin-layout {
     grid-template-columns: 1fr;
   }

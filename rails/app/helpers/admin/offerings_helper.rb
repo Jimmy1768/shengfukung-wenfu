@@ -38,10 +38,7 @@ module Admin
       content_tag(:section, class: "card form-section") do
         safe_join([
           content_tag(:header) do
-            safe_join([
-              content_tag(:p, section_key.to_s.titleize, class: "eyebrow"),
-              content_tag(:h2, title)
-            ])
+            content_tag(:h2, title)
           end,
           render_offering_fields(form, fields, defaults, option_map)
         ])

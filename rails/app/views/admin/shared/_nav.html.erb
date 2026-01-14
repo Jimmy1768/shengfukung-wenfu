@@ -7,8 +7,8 @@
         <% classes = ["sidebar-link"] %>
         <% classes << "is-active" if current_page?(path) %>
         <%= link_to path, class: classes.join(" ") do %>
-          <span class="sidebar-link-title"><%= item[:label] %></span>
-          <span class="sidebar-link-desc"><%= item[:description] %></span>
+          <% label_text = t("admin.nav.items.#{item[:key]}.label", default: item[:label]) %>
+          <span class="sidebar-link-title"><%= label_text %></span>
         <% end %>
       <% end %>
     </div>

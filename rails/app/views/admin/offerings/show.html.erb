@@ -1,6 +1,5 @@
 <section class="card">
   <header>
-    <p class="eyebrow"><%= t("admin.offering_form.sections.basics") %></p>
     <h1><%= @offering.title %></h1>
     <p class="muted"><%= @offering.description %></p>
   </header>
@@ -33,7 +32,6 @@
 <% metadata = @offering.metadata.with_indifferent_access %>
 <section class="card">
   <header>
-    <p class="eyebrow"><%= t("admin.offering_form.sections.certificate") %></p>
     <h2><%= t("admin.offering_form.sections.certificate") %></h2>
     <p class="muted"><%= t("admin.offering_form.hints.certificate") %></p>
   </header>
@@ -51,7 +49,6 @@
 
 <section class="card">
   <header>
-    <p class="eyebrow"><%= t("admin.offering_form.sections.logistics") %></p>
     <h2><%= t("admin.offering_form.sections.logistics") %></h2>
     <p class="muted"><%= t("admin.offering_form.hints.logistics") %></p>
   </header>

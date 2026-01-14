@@ -1,6 +1,5 @@
 <section class="page-header">
   <div class="page-header-body">
-    <p class="eyebrow"><%= t("admin.offering_orders.index.eyebrow") %></p>
     <h1><%= t("admin.offering_orders.index.title", offering: @offering.title) %></h1>
     <p class="muted"><%= t("admin.offering_orders.index.body") %></p>
   </div>
@@ -13,22 +12,18 @@
 <section class="card metrics-card">
   <div class="metrics-grid">
     <article class="metric-card">
-      <p class="eyebrow"><%= t("admin.offering_orders.index.metrics.total_registrations") %></p>
       <h3><%= number_with_delimiter(@registrations_total) %></h3>
       <p class="muted"><%= t("admin.offering_orders.index.metrics.total_hint") %></p>
     </article>
     <article class="metric-card">
-      <p class="eyebrow"><%= t("admin.offering_orders.index.metrics.paid") %></p>
       <h3><%= number_with_delimiter(@registrations_paid) %></h3>
       <p class="muted"><%= t("admin.offering_orders.index.metrics.paid_hint") %></p>
     </article>
     <article class="metric-card">
-      <p class="eyebrow"><%= t("admin.offering_orders.index.metrics.pending") %></p>
       <h3><%= number_with_delimiter(@registrations_pending) %></h3>
       <p class="muted"><%= t("admin.offering_orders.index.metrics.pending_hint") %></p>
     </article>
     <article class="metric-card">
-      <p class="eyebrow"><%= t("admin.offering_orders.index.metrics.gross") %></p>
       <h3><%= number_to_currency(@registrations_total_amount_cents / 100.0, unit: @offering.currency) %></h3>
       <p class="muted"><%= t("admin.offering_orders.index.metrics.gross_hint") %></p>
     </article>
@@ -37,7 +32,6 @@
 
 <section class="card">
   <header>
-    <p class="eyebrow"><%= t("admin.offering_orders.index.table_title") %></p>
     <h2><%= t("admin.offering_orders.index.table_heading") %></h2>
     <p class="muted"><%= t("admin.offering_orders.index.table_body") %></p>
   </header>

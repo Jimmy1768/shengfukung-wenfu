@@ -151,6 +151,21 @@ zh-TW:
       settings: "設定"
       menu_toggle: "開啟管理選單"
       switch_temple: "切換宮廟"
+      items:
+        dashboard:
+          label: "掌握指標與待辦"
+        temple_profile:
+          label: "更新官網基本資料"
+        offerings:
+          label: "管理登記項目與檔期"
+        orders:
+          label: "檢視報名與紙本訂單"
+        payments:
+          label: "查看付款統計與記錄"
+        archives:
+          label: "年度紀錄與報表"
+        permissions:
+          label: "管理管理員權限"
     dashboard:
       hero:
         eyebrow: "管理主控台"
@@ -261,13 +276,16 @@ zh-TW:
         empty: "此宮廟尚未建立任何報名。"
         guest_fallback: "訪客"
         table:
-          reference: "編號"
+          patron: "申請人"
           offering: "供品"
-          applicant: "申請人"
-          quantity: "數量"
-          status: "狀態"
+          payment_method: "付款方式"
+          amount: "金額"
           created: "建立時間"
+          status: "狀態"
+          actions: "操作"
           view: "檢視"
+          unpaid_payment: "未付款"
+          reference_hint: "訂單編號 %{reference}"
       statuses:
         pending: "待付款"
         paid: "已付款"

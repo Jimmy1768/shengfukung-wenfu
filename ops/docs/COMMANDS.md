@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "building temple admin fixed loading user data in forms"
+git commit -m "improved orders/payments/archive views v3"
 git push
 
 git reset --hard HEAD
