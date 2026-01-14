@@ -126,8 +126,12 @@ en:
       flash: "Language updated."
     nav:
       menu_heading: "Console menu"
-      signed_in_label: "Signed in"
       sign_out: "Sign out"
+      settings: "Settings"
+      menu_toggle: "Open admin actions"
+      switch_temple: "Switch temple"
+      temple_selector_label: "Temple"
+      no_temple: "No temple selected"
     dashboard:
       hero:
         eyebrow: "Admin console"
@@ -383,7 +387,7 @@ en:
         title: "Admin capabilities"
         body: "Only temple owners can change these flags. Use them to align access between offerings, onsite staff, and finance reviewers."
         save: "Save"
-        empty: "No admin accounts found for this temple."
+        empty: "No staff admins yet. Invite a user from the Users screen to grant access."
       capabilities:
         manage_offerings:
           label: "Manage offerings"

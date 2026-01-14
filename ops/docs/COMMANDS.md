@@ -216,6 +216,16 @@ ssh jimmy1768_user@143.198.91.24
 ```
 ---
 
+# Dummy Logins
+```bash
+admin@shenfukung-wenfu.local
+GoldenTemplate!123
+
+demo@shenfukung-wenfu.local
+guest@shenfukung-wenfu.local
+DemoPassword!23
+```
+
 cd Projects/sourcegrid-labs
 
 set -a

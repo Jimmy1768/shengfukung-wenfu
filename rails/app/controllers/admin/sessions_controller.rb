@@ -13,7 +13,7 @@ module Admin
         establish_admin_session!(user)
         redirect_to admin_dashboard_path, notice: "Signed in to the admin console."
       else
-        flash.now[:alert] = "Those credentials did not match. Use an active admin account."
+        flash.now[:alert] = login_failure_message(user)
         render :new, status: :unprocessable_entity
       end
     end
@@ -29,6 +29,18 @@ module Admin
       return false unless user&.admin_account&.active?
 
       secure_compare(user.encrypted_password, User.password_hash(password.to_s))
+    end
+
+    def login_failure_message(user)
+      if user.nil?
+        "Those credentials did not match. Use an active admin account."
+      elsif user.admin_account.nil?
+        "That account hasn't been granted temple admin access yet. Ask your owner admin to invite you."
+      elsif !user.admin_account.active?
+        "Your temple admin access is inactive. Contact your owner admin for help."
+      else
+        "Those credentials did not match. Use an active admin account."
+      end
     end
 
     def session_params

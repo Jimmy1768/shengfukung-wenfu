@@ -1,5 +1,13 @@
 <script>
   (() => {
+    const ready = (fn) => {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", fn);
+      } else {
+        fn();
+      }
+    };
+
     const hideModal = (modal) => {
       if (modal && !modal.classList.contains('is-hidden')) {
         modal.classList.add('is-hidden');
@@ -35,6 +43,53 @@
     document.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape') return;
       document.querySelectorAll('[data-modal-key]').forEach(hideModal);
+    });
+
+    ready(() => {
+      const menus = Array.from(document.querySelectorAll('[data-profile-menu]'));
+      if (!menus.length) return;
+
+      const closeMenu = (menu) => {
+        menu.classList.remove('is-open');
+        const trigger = menu.querySelector('[data-profile-menu-trigger]');
+        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      };
+
+      const openMenu = (menu) => {
+        menus.forEach((other) => {
+          if (other !== menu) closeMenu(other);
+        });
+        menu.classList.add('is-open');
+        const trigger = menu.querySelector('[data-profile-menu-trigger]');
+        if (trigger) trigger.setAttribute('aria-expanded', 'true');
+      };
+
+      document.addEventListener('click', (event) => {
+        const trigger = event.target.closest('[data-profile-menu-trigger]');
+        if (trigger) {
+          event.preventDefault();
+          const menu = trigger.closest('[data-profile-menu]');
+          if (!menu) return;
+          if (menu.classList.contains('is-open')) {
+            closeMenu(menu);
+          } else {
+            openMenu(menu);
+          }
+          return;
+        }
+
+        if (event.target.closest('[data-profile-menu]')) {
+          return;
+        }
+
+        menus.forEach(closeMenu);
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          menus.forEach(closeMenu);
+        }
+      });
     });
   })();
 </script>

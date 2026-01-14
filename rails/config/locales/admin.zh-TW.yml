@@ -126,8 +126,12 @@ zh-TW:
       flash: "已切換語言。"
     nav:
       menu_heading: "管理選單"
-      signed_in_label: "已登入"
       sign_out: "登出"
+      temple_selector_label: "宮廟"
+      no_temple: "尚未選擇宮廟"
+      settings: "設定"
+      menu_toggle: "開啟管理選單"
+      switch_temple: "切換宮廟"
     dashboard:
       hero:
         eyebrow: "管理主控台"
@@ -383,7 +387,7 @@ zh-TW:
         title: "管理員權限"
         body: "只有宮廟擁有者可以調整這些權限，請依供品、現場人員與財務審核的需求配置。"
         save: "儲存"
-        empty: "此宮廟尚未有任何管理帳號。"
+        empty: "尚未邀請任何工作管理員，請在使用者頁面發送邀請並授權。"
       capabilities:
         manage_offerings:
           label: "管理供品"

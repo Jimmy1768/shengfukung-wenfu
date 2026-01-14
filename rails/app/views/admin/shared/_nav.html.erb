@@ -13,10 +13,4 @@
       <% end %>
     </div>
   </div>
-
-  <% if admin_signed_in? %>
-    <div class="sidebar-footer">
-      <%= button_to t("admin.nav.sign_out"), admin_logout_path, method: :delete, class: "sidebar-link logout-button" %>
-    </div>
-  <% end %>
 </aside>

@@ -10,42 +10,102 @@
   <body class="admin-body">
     <div class="admin-shell">
       <header class="admin-nav">
-        <div class="brand">
-          <span class="brand-name"><%= AppConstants::Project.name %></span>
-          <span class="brand-slug"><%= AppConstants::Project.slug %></span>
+        <div class="nav-leading">
+          <div class="brand">
+            <span class="brand-name"><%= admin_brand_name %></span>
+          </div>
+          <% if flash.any? %>
+            <div class="admin-flash-tray">
+              <% flash.each do |type, message| %>
+                <div class="admin-flash admin-flash-<%= type %>"><%= message %></div>
+              <% end %>
+            </div>
+          <% end %>
         </div>
         <% if admin_signed_in? %>
           <div class="nav-controls">
-            <%= render "admin/shared/temple_switcher" %>
-            <div class="language-selector">
-              <%= form_with url: admin_locale_path,
-                            scope: :locale_switch,
-                            method: :post,
-                            data: { turbo: false },
-                            local: true do |form| %>
-                <label class="language-label"><%= t("admin.language_selector.label") %></label>
-                <div class="language-field">
-                  <%= form.select :locale,
-                                  admin_locale_options.map { |option| [option[:label], option[:value]] },
-                                  { selected: current_admin_locale },
-                                  class: "language-dropdown" %>
-                  <%= form.submit t("admin.language_selector.apply"), class: "language-submit" %>
-                </div>
-              <% end %>
+            <% if allow_temple_switch? %>
+              <div class="temple-switcher">
+                <%= render "admin/shared/temple_switcher" %>
+              </div>
+            <% end %>
+            <div class="profile-menu language-selector" data-profile-menu>
+              <button
+                type="button"
+                class="nav-user-trigger"
+                aria-haspopup="true"
+                aria-expanded="false"
+                data-profile-menu-trigger
+              >
+                <span class="nav-user-name"><%= admin_locale_options.find { |opt| opt[:value] == current_admin_locale }&.dig(:label) || current_admin_locale %></span>
+                <span class="nav-user-chevron" aria-hidden="true">▾</span>
+                <span class="sr-only"><%= t("admin.nav.menu_toggle") %></span>
+              </button>
+              <div class="nav-user-dropdown" role="menu" data-profile-menu-panel>
+                <%= form_with url: admin_locale_path,
+                              scope: :locale_switch,
+                              method: :post,
+                              data: { turbo: false },
+                              local: true,
+                              html: { class: "language-dropdown-menu" } do |form| %>
+                  <% admin_locale_options.each do |option| %>
+                    <button
+                      type="submit"
+                      name="locale_switch[locale]"
+                      value="<%= option[:value] %>"
+                      class="nav-dropdown-item <%= 'is-disabled' if option[:value] == current_admin_locale %>"
+                      <%= 'disabled' if option[:value] == current_admin_locale %>>
+                      <span class="nav-dropdown-title"><%= option[:label] %></span>
+                    </button>
+                  <% end %>
+                <% end %>
+              </div>
             </div>
             <div class="nav-links">
-              <span class="nav-user-label"><%= t("admin.nav.signed_in_label") %></span>
-              <span class="nav-user-name"><%= current_admin&.english_name || current_admin&.email %></span>
+              <div class="profile-menu nav-user-menu" data-profile-menu>
+                <button
+                  type="button"
+                  class="nav-user-trigger"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  data-profile-menu-trigger
+                >
+                  <span class="nav-user-name"><%= current_admin&.english_name || current_admin&.email %></span>
+                  <span class="nav-user-chevron" aria-hidden="true">▾</span>
+                  <span class="sr-only"><%= t("admin.nav.menu_toggle") %></span>
+                </button>
+                <div class="nav-user-dropdown" role="menu" data-profile-menu-panel>
+                  <div class="nav-dropdown-group">
+                    <button type="button" class="nav-dropdown-item is-disabled">
+                      <span class="nav-dropdown-title"><%= t("admin.nav.switch_temple") %></span>
+                    </button>
+                  </div>
+                  <div class="nav-dropdown-group">
+                    <%= link_to "#",
+                          class: "nav-dropdown-item",
+                          role: "menuitem" do %>
+                      <span class="nav-dropdown-title"><%= t("admin.nav.settings") %></span>
+                    <% end %>
+                    <%= button_to t("admin.nav.sign_out"),
+                          admin_logout_path,
+                          method: :delete,
+                          class: "nav-dropdown-item",
+                          data: { turbo: false },
+                          form: { class: "nav-dropdown-form" } %>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         <% end %>
       </header>
-      <div class="admin-layout">
-        <%= render "admin/shared/nav" %>
+      <% layout_classes = ["admin-layout"] %>
+      <% layout_classes << "admin-layout--public" unless admin_signed_in? %>
+      <div class="<%= layout_classes.join(" ") %>">
+        <% if admin_signed_in? %>
+          <%= render "admin/shared/nav" %>
+        <% end %>
         <main class="admin-main">
-          <% flash.each do |type, message| %>
-            <div class="flash flash-<%= type %>"><%= message %></div>
-          <% end %>
           <%= yield %>
         </main>
       </div>

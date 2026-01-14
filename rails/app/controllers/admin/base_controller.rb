@@ -12,7 +12,9 @@ module Admin
                   :available_admin_temples,
                   :allow_temple_switch?,
                   :current_admin_locale,
-                  :admin_locale_options
+                  :admin_locale_options,
+                  :admin_brand_name,
+                  :admin_brand_slug
 
     before_action :authenticate_admin!
     before_action :ensure_admin_temple_scope
@@ -121,6 +123,18 @@ module Admin
 
     def apply_admin_locale
       I18n.locale = normalize_admin_locale(session[LOCALE_SESSION_KEY])
+    end
+
+    def admin_brand_name
+      return "Temple Management System" unless admin_signed_in?
+
+      AppConstants::Project.name
+    end
+
+    def admin_brand_slug
+      return nil unless admin_signed_in?
+
+      AppConstants::Project.slug
     end
   end
 end

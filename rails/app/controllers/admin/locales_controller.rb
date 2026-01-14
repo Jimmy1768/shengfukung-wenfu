@@ -6,9 +6,10 @@ module Admin
       next_locale = normalize_admin_locale(locale_params[:locale])
       session[LOCALE_SESSION_KEY] = next_locale
       @current_admin_locale = next_locale
+      notice_message = I18n.t("admin.language_selector.flash", locale: next_locale)
       redirect_back(
         fallback_location: admin_dashboard_path,
-        notice: I18n.t("admin.language_selector.flash")
+        notice: notice_message
       )
     end
 

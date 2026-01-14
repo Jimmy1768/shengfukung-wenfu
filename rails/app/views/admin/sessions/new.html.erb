@@ -2,16 +2,16 @@
 
 <section class="card login-card">
   <header>
-    <p class="eyebrow">Admin access</p>
-    <h1>Control center</h1>
-    <p>Signed administrators may continue with OAuth or email.</p>
+    <p class="eyebrow">Temple admins</p>
+    <h1>Temple Management System</h1>
+    <p>Sign in to manage offerings, orders, and patron communications for your temple.</p>
   </header>
 
-  <div class="login-grid">
+  <div class="login-grid single-temple">
     <div class="login-credentials field-panel register-panel register-social">
       <div class="login-panel-head">
-        <h2 class="login-subhead">Social sign in</h2>
-        <p class="muted">Use your approved provider credentials.</p>
+        <h2 class="login-subhead">Continue with OAuth</h2>
+        <p class="muted">Use the provider your owner or staff admin approved.</p>
       </div>
       <% if oauth_links.any? %>
         <div class="oauth-button-grid">
@@ -27,13 +27,13 @@
       <% else %>
         <p class="muted">OAuth providers are not configured yet.</p>
       <% end %>
-      <p class="muted">Need access? Ask an existing admin to invite you.</p>
+      <p class="muted">Need access? Ask your owner admin to invite you.</p>
     </div>
 
     <div class="login-actions field-panel register-panel register-email">
       <div class="login-panel-head">
-        <h2 class="login-subhead">Email sign in</h2>
-        <p class="muted">Use your admin password.</p>
+        <h2 class="login-subhead">Sign in with email</h2>
+        <p class="muted">Use the credentials from your onboarding email.</p>
       </div>
       <%= form_with url: admin_sessions_path, scope: :session, local: true, class: "login-form" do |f| %>
         <div class="form-field">
@@ -45,8 +45,14 @@
           <%= f.label :password, "Password" %>
           <%= f.password_field :password, required: true, placeholder: "••••••••" %>
         </div>
-        <%= f.submit "Open console", class: "btn btn-primary" %>
+        <%= f.submit "Sign in", class: "btn btn-primary" %>
       <% end %>
     </div>
   </div>
+
+  <footer class="login-footer">
+    <p class="muted">
+      Each admin account is scoped to a single temple. Owners can grant or revoke staff access anytime.
+    </p>
+  </footer>
 </section>
