@@ -1,39 +1,47 @@
-<section class="card admin-card-with-filter">
-  <header>
-    <h1><%= t("admin.orders.index.title") %></h1>
-    <p class="muted"><%= t("admin.orders.index.body") %></p>
-  </header>
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item admin-card-with-filter">
+      <header>
+        <h1><%= t("admin.orders.index.title") %></h1>
+        <p class="muted"><%= t("admin.orders.index.body") %></p>
+      </header>
 
-  <%= render "admin/shared/filters",
-    filters: @filters,
-    filter_path: admin_orders_path,
-    clear_path: admin_orders_path,
-    offerings: @filter_offerings,
-    payment_methods: @filter_payment_methods,
-    show_status_chips: true,
-    hidden_params: @filter_hidden_fields %>
-</section>
+      <%= render "admin/shared/filters",
+        filters: @filters,
+        filter_path: admin_orders_path,
+        clear_path: admin_orders_path,
+        offerings: @filter_offerings,
+        payment_methods: @filter_payment_methods,
+        show_status_chips: true,
+        hidden_params: @filter_hidden_fields %>
+    </section>
+  </div>
 
-<% if @unpaid_orders.any? %>
-  <section class="card admin-table-card">
-    <header class="admin-section-header">
-      <div>
-        <h2>Needs payment</h2>
-        <p class="muted">Unpaid registrations are shown here first.</p>
-      </div>
-    </header>
+  <% if @unpaid_orders.any? %>
+    <div class="admin-stack__row">
+      <section class="card stack-item stack-item--fluid admin-table-card">
+        <header class="admin-section-header">
+          <div>
+            <h2>Needs payment</h2>
+            <p class="muted">Unpaid registrations are shown here first.</p>
+          </div>
+        </header>
 
-    <%= render "table", orders: @unpaid_orders, show_mark_button: true %>
-  </section>
-<% end %>
-
-<section class="card admin-table-card">
-  <header class="admin-section-header">
-    <div>
-      <h2>Recent orders</h2>
-      <p class="muted">Paid registrations sorted by newest first.</p>
+        <%= render "table", orders: @unpaid_orders, show_mark_button: true %>
+      </section>
     </div>
-  </header>
+  <% end %>
 
-  <%= render "table", orders: @recent_orders, show_mark_button: false %>
-</section>
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--fluid admin-table-card">
+      <header class="admin-section-header">
+        <div>
+          <h2>Recent orders</h2>
+          <p class="muted">Paid registrations sorted by newest first.</p>
+        </div>
+      </header>
+
+      <%= render "table", orders: @recent_orders, show_mark_button: false %>
+    </section>
+  </div>
+</div>

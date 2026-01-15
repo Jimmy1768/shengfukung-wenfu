@@ -37,7 +37,7 @@
                 <span class="payment-method-pill unpaid"><%= t("admin.orders.index.table.unpaid_payment") %></span>
               <% end %>
             </td>
-            <td><%= number_to_currency(registration.total_price_cents / 100.0, unit: registration.currency) %></td>
+            <td><%= Currency::Symbols.format_amount(registration.total_price_cents, registration.currency) %></td>
             <td class="orders-created"><%= registration.created_at.strftime("%Y/%m/%d %H:%M") %></td>
             <td>
               <span class="status-pill status-<%= status_key %>">

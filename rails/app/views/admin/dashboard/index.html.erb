@@ -1,34 +1,44 @@
-<section class="hero">
-  <div class="hero-text">
-    <h1><%= t("admin.dashboard.hero.title", name: current_admin&.english_name || current_admin&.email) %></h1>
-    <p><%= t("admin.dashboard.hero.body_html") %></p>
-  </div>
-</section>
-
-<section class="card">
-  <header>
-    <h2><%= t("admin.dashboard.metrics.title") %></h2>
-    <p><%= t("admin.dashboard.metrics.subtitle") %></p>
-  </header>
-  <div class="metric-row">
-    <% @metrics.each do |metric| %>
-      <div class="metric">
-        <span><%= metric[:label] %></span>
-        <strong><%= metric[:value] %></strong>
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="hero stack-item stack-item--hero">
+      <div class="hero-text">
+        <h1><%= t("admin.dashboard.hero.title", name: current_admin&.english_name || current_admin&.email) %></h1>
+        <p><%= t("admin.dashboard.hero.body_html") %></p>
       </div>
-    <% end %>
+    </section>
   </div>
-</section>
 
-<section class="card">
-  <header>
-    <h2><%= t("admin.dashboard.next_steps.title") %></h2>
-    <p><%= t("admin.dashboard.next_steps.subtitle") %></p>
-  </header>
-  <ul class="idea-list">
-    <li><%= link_to t("admin.dashboard.next_steps.fill_profile"), admin_temple_profile_path, class: "link" %></li>
-    <li><%= t("admin.dashboard.next_steps.connect_data") %></li>
-    <li><%= t("admin.dashboard.next_steps.first_workflow") %></li>
-    <li><%= t("admin.dashboard.next_steps.document_scope_html") %></li>
-  </ul>
-</section>
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--metrics metrics-card">
+      <header>
+        <h2><%= t("admin.dashboard.metrics.title") %></h2>
+        <p class="muted"><%= t("admin.dashboard.metrics.subtitle") %></p>
+      </header>
+      <div class="metrics-grid-container">
+        <div class="metrics-grid">
+          <% @metrics.each do |metric| %>
+            <article class="metric-card">
+              <h3><%= metric[:value] %></h3>
+              <p class="muted"><%= metric[:label] %></p>
+            </article>
+          <% end %>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="admin-stack__row">
+    <section class="card stack-item">
+      <header>
+        <h2><%= t("admin.dashboard.next_steps.title") %></h2>
+        <p><%= t("admin.dashboard.next_steps.subtitle") %></p>
+      </header>
+      <ul class="idea-list">
+        <li><%= link_to t("admin.dashboard.next_steps.fill_profile"), admin_temple_profile_path, class: "link" %></li>
+        <li><%= t("admin.dashboard.next_steps.connect_data") %></li>
+        <li><%= t("admin.dashboard.next_steps.first_workflow") %></li>
+        <li><%= t("admin.dashboard.next_steps.document_scope_html") %></li>
+      </ul>
+    </section>
+  </div>
+</div>

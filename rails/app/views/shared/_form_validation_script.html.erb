@@ -1,0 +1,6 @@
+<% controller_path = Rails.root.join("app/javascript/controllers/form_validation_controller.js") %>
+<% if File.exist?(controller_path) %>
+  <script>
+<%= raw File.read(controller_path) %>
+  </script>
+<% end %>

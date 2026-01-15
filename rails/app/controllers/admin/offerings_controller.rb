@@ -13,8 +13,9 @@ module Admin
     def show; end
 
     def new
-      @offering = current_temple.temple_offerings.new
+      @offering = current_temple.temple_offerings.new(price_cents: nil, currency: "TWD")
       apply_template_defaults(@offering, selected_template_slug)
+      @offering.currency ||= "TWD"
     end
 
     def create
@@ -22,7 +23,12 @@ module Admin
 
       apply_template_defaults(@offering, selected_template_slug)
 
-      if @offering.save
+      missing_fields = Forms::FieldValidation.missing_fields(:offering, offering_params)
+      missing_fields.each do |field|
+        @offering.errors.add(field, :blank)
+      end
+
+      if missing_fields.empty? && @offering.save
         log_offering_event("admin.offerings.create")
         redirect_to admin_offering_path(@offering), notice: "Offering created successfully."
       else
@@ -66,6 +72,8 @@ module Admin
         :active,
         metadata_settings: {}
       )
+      permitted[:currency] = permitted[:currency].presence || "TWD"
+      permitted[:price_cents] = nil if permitted[:price_cents].blank?
       permitted[:metadata] = merge_metadata_settings(permitted.delete(:metadata_settings))
       permitted
     end

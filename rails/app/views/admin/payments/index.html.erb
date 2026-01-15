@@ -1,91 +1,101 @@
 <% currency_unit = @payments.first&.currency || "TWD" %>
 
-<section class="card">
-  <header>
-    <h1><%= t("admin.payments.index.title") %></h1>
-    <p class="muted"><%= t("admin.payments.index.body") %></p>
-    <% if @show_export %>
-      <%= link_to t("admin.payments.index.export"), export_admin_payments_path(format: :csv), class: "pill-link" %>
-    <% end %>
-  </header>
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item">
+      <header>
+        <h1><%= t("admin.payments.index.title") %></h1>
+        <p class="muted"><%= t("admin.payments.index.body") %></p>
+        <% if @show_export %>
+          <%= link_to t("admin.payments.index.export"), export_admin_payments_path(format: :csv), class: "pill-link" %>
+        <% end %>
+      </header>
 
-  <div class="metric-row">
-    <article class="metric">
-      <span><%= t("admin.payments.index.metrics.total_received") %></span>
-      <strong><%= number_to_currency(@payment_summary.total_amount_cents / 100.0, unit: "#{currency_unit} ") %></strong>
-    </article>
-    <article class="metric">
-      <span><%= t("admin.payments.index.metrics.payments_logged") %></span>
-      <strong><%= @payment_summary.total_count %></strong>
-    </article>
+      <div class="metric-row">
+        <article class="metric">
+          <span><%= t("admin.payments.index.metrics.total_received") %></span>
+          <strong><%= Currency::Symbols.format_amount(@payment_summary.total_amount_cents, currency_unit) %></strong>
+        </article>
+        <article class="metric">
+          <span><%= t("admin.payments.index.metrics.payments_logged") %></span>
+          <strong><%= @payment_summary.total_count %></strong>
+        </article>
+      </div>
+    </section>
   </div>
-</section>
 
-<section class="card">
-  <header>
-    <h2><%= t("admin.payments.index.breakdowns.title") %></h2>
-  </header>
-  <div class="payment-breakdowns">
-    <div>
-      <h3><%= t("admin.payments.index.breakdowns.by_method") %></h3>
-      <ul class="breakdown-list">
-        <% @payment_summary.totals_by_method.each do |entry| %>
-          <li>
-            <span><%= t("admin.payments.methods.#{entry[:label]}", default: entry[:label].titleize) %></span>
-            <strong><%= number_to_currency(entry[:amount_cents] / 100.0, unit: "#{currency_unit} ") %></strong>
-          </li>
-        <% end %>
-      </ul>
-    </div>
-    <div>
-      <h3><%= t("admin.payments.index.breakdowns.by_offering") %></h3>
-      <ul class="breakdown-list">
-        <% @payment_summary.totals_by_offering.each do |entry| %>
-          <li>
-            <span><%= entry[:label] %></span>
-            <strong><%= number_to_currency(entry[:amount_cents] / 100.0, unit: "#{currency_unit} ") %></strong>
-          </li>
-        <% end %>
-      </ul>
-    </div>
-    <div>
-      <h3><%= t("admin.payments.index.breakdowns.by_date") %></h3>
-      <ul class="breakdown-list">
-        <% @payment_summary.totals_by_date.each do |entry| %>
-          <li>
-            <span><%= entry[:label] %></span>
-            <strong><%= number_to_currency(entry[:amount_cents] / 100.0, unit: "#{currency_unit} ") %></strong>
-          </li>
-        <% end %>
-      </ul>
-    </div>
+  <div class="admin-stack__row">
+    <section class="card stack-item">
+      <header>
+        <h2><%= t("admin.payments.index.breakdowns.title") %></h2>
+      </header>
+      <div class="payment-breakdowns">
+        <div>
+          <h3><%= t("admin.payments.index.breakdowns.by_method") %></h3>
+          <ul class="breakdown-list">
+            <% @payment_summary.totals_by_method.each do |entry| %>
+              <li>
+                <span><%= t("admin.payments.methods.#{entry[:label]}", default: entry[:label].titleize) %></span>
+            <strong><%= Currency::Symbols.format_amount(entry[:amount_cents], currency_unit) %></strong>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+        <div>
+          <h3><%= t("admin.payments.index.breakdowns.by_offering") %></h3>
+          <ul class="breakdown-list">
+            <% @payment_summary.totals_by_offering.each do |entry| %>
+              <li>
+                <span><%= entry[:label] %></span>
+            <strong><%= Currency::Symbols.format_amount(entry[:amount_cents], currency_unit) %></strong>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+        <div>
+          <h3><%= t("admin.payments.index.breakdowns.by_date") %></h3>
+          <ul class="breakdown-list">
+            <% @payment_summary.totals_by_date.each do |entry| %>
+              <li>
+                <span><%= entry[:label] %></span>
+            <strong><%= Currency::Symbols.format_amount(entry[:amount_cents], currency_unit) %></strong>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </section>
   </div>
-</section>
 
-<section class="card admin-card-with-filter">
-  <header>
-    <h2>Filter payments</h2>
-    <p class="muted">Search across patrons, offerings, payment methods, and date ranges.</p>
-  </header>
+  <div class="admin-stack__row">
+    <section class="card stack-item admin-card-with-filter">
+      <header>
+        <h2>Filter payments</h2>
+        <p class="muted">Search across patrons, offerings, payment methods, and date ranges.</p>
+      </header>
 
-  <%= render "admin/shared/filters",
-    filters: @filters,
-    filter_path: admin_payments_path,
-    clear_path: admin_payments_path,
-    offerings: @filter_offerings,
-    payment_methods: @filter_payment_methods,
-    show_status_chips: false,
-    hidden_params: @filter_hidden_fields %>
+      <%= render "admin/shared/filters",
+        filters: @filters,
+        filter_path: admin_payments_path,
+        clear_path: admin_payments_path,
+        offerings: @filter_offerings,
+        payment_methods: @filter_payment_methods,
+        show_status_chips: false,
+        hidden_params: @filter_hidden_fields %>
 
-  <% if @default_payment_window %>
-    <p class="filter-hint muted">Default view limited to the last 90 days. Add a range above to expand.</p>
-  <% end %>
-</section>
+      <% if @default_payment_window %>
+        <p class="filter-hint muted">Default view limited to the last 90 days. Add a range above to expand.</p>
+      <% end %>
+    </section>
+  </div>
 
-<section class="card">
-  <header>
-    <h2><%= t("admin.payments.index.recent.title") %></h2>
-  </header>
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--fluid">
+      <header>
+        <h2><%= t("admin.payments.index.recent.title") %></h2>
+      </header>
 
-  <%= render "ledger_table", payments: @payments, empty_message: t("admin.payments.index.empty") %>
-</section>
+      <%= render "ledger_table", payments: @payments, empty_message: t("admin.payments.index.empty") %>
+    </section>
+  </div>
+</div>

@@ -1,4 +1,21 @@
-<%= form_with model: [:admin, @offering], local: true, class: "form-stack" do |form| %>
+<% show_form_actions = local_assigns.fetch(:show_form_actions, true) %>
+
+<% show_form_actions = local_assigns.fetch(:show_form_actions, true) %>
+<% validation_rule = local_assigns[:validation_rule] %>
+<% required_fields = validation_rule ? Forms::FieldValidation.required_fields(validation_rule) : [] %>
+<% form_scope = @offering.model_name.param_key %>
+<%
+  form_html_options = { id: "offering-form" }
+  if required_fields.any?
+    form_html_options[:data] = {
+      form_validation: true,
+      required_fields: required_fields.join(","),
+      param_scope: form_scope,
+      validation_message: t("admin.offerings.validation.required_message", default: "請完整填寫所有欄位")
+    }
+  end
+%>
+<%= form_with model: [:admin, @offering], local: true, class: "form-stack", html: form_html_options do |form| %>
   <% if @offering.errors.any? %>
     <div class="alert alert-danger">
       <h3><%= pluralize(@offering.errors.count, "error") %> prevented saving:</h3>
@@ -12,7 +29,13 @@
 
   <% metadata = (@offering.metadata || {}).with_indifferent_access %>
 
-  <%= render_offering_sections(form, metadata) %>
+  <div class="offering-form-grid">
+    <%= render_offering_sections(form, metadata) %>
+  </div>
 
-  <%= form.submit t("admin.offering_form.actions.save"), class: "btn btn-primary" %>
+  <% if show_form_actions %>
+    <div class="form-actions">
+      <%= form.submit t("admin.offering_form.actions.save"), class: "btn btn-primary" %>
+    </div>
+  <% end %>
 <% end %>

@@ -1,51 +1,61 @@
-<% if allow_archive_details? %>
-  <section class="card admin-card-with-filter">
-    <header>
-      <h1>Search payment archives</h1>
-      <p class="muted">Use a date range to audit historical ledger entries across offerings and methods.</p>
-    </header>
+<div class="admin-stack">
+  <% if allow_archive_details? %>
+    <div class="admin-stack__row">
+      <section class="card stack-item admin-card-with-filter">
+        <header>
+          <h1>Search payment archives</h1>
+          <p class="muted">Use a date range to audit historical ledger entries across offerings and methods.</p>
+        </header>
 
-    <%= render "admin/shared/filters",
-      filters: @filters,
-      filter_path: admin_archives_path,
-      clear_path: admin_archives_path,
-      offerings: @filter_offerings,
-      payment_methods: @filter_payment_methods,
-      show_status_chips: false,
-      hidden_params: @filter_hidden_fields %>
+        <%= render "admin/shared/filters",
+          filters: @filters,
+          filter_path: admin_archives_path,
+          clear_path: admin_archives_path,
+          offerings: @filter_offerings,
+          payment_methods: @filter_payment_methods,
+          show_status_chips: false,
+          hidden_params: @filter_hidden_fields %>
 
-    <% if @filter_errors.any? %>
-      <ul class="filter-error-list">
-        <% @filter_errors.each do |error| %>
-          <li><%= error %></li>
+        <% if @filter_errors.any? %>
+          <ul class="filter-error-list">
+            <% @filter_errors.each do |error| %>
+              <li><%= error %></li>
+            <% end %>
+          </ul>
         <% end %>
-      </ul>
+      </section>
+    </div>
+
+    <% if @awaiting_range %>
+      <div class="admin-stack__row">
+        <section class="card stack-item empty-state-card">
+          <p class="muted">Select a date range to view archived payments.</p>
+        </section>
+      </div>
+    <% else %>
+      <div class="admin-stack__row">
+        <section class="card stack-item stack-item--fluid admin-table-card">
+          <header class="admin-section-header">
+            <div>
+              <h2>Payments from <%= @filters[:start_date] %> to <%= @filters[:end_date] %></h2>
+              <p class="muted">No default window is applied here—archives return everything in the selected range.</p>
+            </div>
+          </header>
+
+          <%= render "admin/payments/ledger_table",
+            payments: @archived_payments,
+            empty_message: "No archived payments for this range." %>
+        </section>
+      </div>
     <% end %>
-  </section>
-
-  <% if @awaiting_range %>
-    <section class="card empty-state-card">
-      <p class="muted">Select a date range to view archived payments.</p>
-    </section>
   <% else %>
-    <section class="card admin-table-card">
-      <header class="admin-section-header">
-        <div>
-          <h2>Payments from <%= @filters[:start_date] %> to <%= @filters[:end_date] %></h2>
-          <p class="muted">No default window is applied here—archives return everything in the selected range.</p>
-        </div>
-      </header>
-
-      <%= render "admin/payments/ledger_table",
-        payments: @archived_payments,
-        empty_message: "No archived payments for this range." %>
-    </section>
+    <div class="admin-stack__row">
+      <section class="card stack-item">
+        <header>
+          <h2><%= t("admin.archives.limited.title") %></h2>
+        </header>
+        <p class="muted"><%= t("admin.archives.limited.body_html") %></p>
+      </section>
+    </div>
   <% end %>
-<% else %>
-  <section class="card">
-    <header>
-      <h2><%= t("admin.archives.limited.title") %></h2>
-    </header>
-    <p class="muted"><%= t("admin.archives.limited.body_html") %></p>
-  </section>
-<% end %>
+</div>

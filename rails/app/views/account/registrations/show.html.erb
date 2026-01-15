@@ -23,7 +23,7 @@
     </div>
     <div>
       <dt>數量/金額</dt>
-      <dd><%= @registration.quantity %> × <%= number_to_currency(@registration.unit_price_cents / 100.0, unit: @registration.currency) %></dd>
+      <dd><%= @registration.quantity %> × <%= Currency::Symbols.format_amount(@registration.unit_price_cents, @registration.currency) %></dd>
     </div>
   </dl>
 

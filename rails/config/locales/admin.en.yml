@@ -258,6 +258,8 @@ en:
         template_period: "Default period: %{period}"
         template_selected: "Using template: %{name}"
         template_prompt: "Select a template to load the form fields."
+      validation:
+        required_message: "Please enter a value for this field."
       edit:
         title: "Edit Offering"
       show:

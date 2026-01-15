@@ -25,7 +25,7 @@
             <tr>
               <td><%= payment.external_reference.presence || payment.temple_event_registration&.reference_code || payment.id %></td>
               <td><%= payment.temple_event_registration&.temple_offering&.title || "—" %></td>
-              <td><%= number_to_currency(payment.amount_cents / 100.0, unit: payment.currency) %></td>
+              <td><%= Currency::Symbols.format_amount(payment.amount_cents, payment.currency) %></td>
               <td><span class="status-pill status-<%= payment.status %>"><%= payment.status %></span></td>
               <td><%= (payment.processed_at || payment.created_at).strftime("%Y/%m/%d") %></td>
               <td><%= payment.payment_method.titleize %></td>

@@ -32,7 +32,7 @@
     </div>
     <div>
       <dt><%= t("admin.registration_show.labels.total") %></dt>
-      <dd><%= number_to_currency(@registration.total_price_cents / 100.0, unit: @registration.currency) %></dd>
+      <dd><%= Currency::Symbols.format_amount(@registration.total_price_cents, @registration.currency) %></dd>
     </div>
     <div>
       <dt><%= t("admin.registration_show.labels.certificate_number") %></dt>

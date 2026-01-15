@@ -77,7 +77,13 @@ module Admin
       when :price_cents
         render_number_field(form, :price_cents, I18n.t("admin.registration_form.fields.unit_price"))
       when :currency
-        render_select_or_text_field(form, :currency, I18n.t("admin.offering_form.fields.currency"), option_map[:currency], defaults[:currency])
+        render_select_field(
+          form,
+          :currency,
+          I18n.t("admin.offering_form.fields.currency"),
+          option_map[:currency].presence || Currency::Symbols.options,
+          defaults[:currency] || form.object.currency || "TWD"
+        )
       when :description
         render_text_area(form, :description, I18n.t("admin.offering_form.fields.description"))
       when :starts_on
@@ -218,6 +224,10 @@ module Admin
           [I18n.t("admin.offerings.types.#{value}", default: value.to_s), value]
         end
       end
+    end
+
+    def currency_options
+      Currency::Symbols.options
     end
   end
 end

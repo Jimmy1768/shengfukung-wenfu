@@ -1,65 +1,73 @@
-<section class="card">
-  <header>
-    <h1><%= @offering.title %></h1>
-    <p class="muted"><%= @offering.description %></p>
-  </header>
-  <dl class="detail-grid">
-    <div>
-      <dt><%= t("admin.offerings.show.type") %></dt>
-      <dd><%= t("admin.offerings.types.#{@offering.offering_type}", default: @offering.offering_type.humanize) %></dd>
-    </div>
-    <div>
-      <dt><%= t("admin.registration_form.fields.unit_price") %></dt>
-      <dd><%= number_to_currency(@offering.price_cents / 100.0, unit: @offering.currency) %></dd>
-    </div>
-    <div>
-      <dt><%= t("admin.offerings.show.period") %></dt>
-      <dd><%= @offering.period.presence || t("admin.offerings.show.period_empty") %></dd>
-    </div>
-    <div>
-      <dt><%= t("admin.offerings.show.schedule") %></dt>
-      <dd><%= [@offering.starts_on, @offering.ends_on].compact.join(" - ").presence || t("admin.offerings.show.schedule_flexible") %></dd>
-    </div>
-  </dl>
-  <div class="actions">
-    <%= link_to t("admin.offerings.show.manage_registrations"), admin_offering_offering_orders_path(@offering), class: "btn btn-primary" %>
-    <% if current_admin_permissions&.allow?(:manage_offerings) %>
-      <%= link_to t("admin.offerings.show.edit_offering"), edit_admin_offering_path(@offering), class: "btn btn-secondary" %>
-    <% end %>
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide">
+      <header>
+        <h1><%= @offering.title %></h1>
+        <p class="muted"><%= @offering.description %></p>
+      </header>
+      <dl class="detail-grid">
+        <div>
+          <dt><%= t("admin.offerings.show.type") %></dt>
+          <dd><%= t("admin.offerings.types.#{@offering.offering_type}", default: @offering.offering_type.humanize) %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.registration_form.fields.unit_price") %></dt>
+      <dd><%= Currency::Symbols.format_amount(@offering.price_cents, @offering.currency) %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.offerings.show.period") %></dt>
+          <dd><%= @offering.period.presence || t("admin.offerings.show.period_empty") %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.offerings.show.schedule") %></dt>
+          <dd><%= [@offering.starts_on, @offering.ends_on].compact.join(" - ").presence || t("admin.offerings.show.schedule_flexible") %></dd>
+        </div>
+      </dl>
+      <div class="actions">
+        <%= link_to t("admin.offerings.show.manage_registrations"), admin_offering_offering_orders_path(@offering), class: "btn btn-primary" %>
+        <% if current_admin_permissions&.allow?(:manage_offerings) %>
+          <%= link_to t("admin.offerings.show.edit_offering"), edit_admin_offering_path(@offering), class: "btn btn-secondary" %>
+        <% end %>
+      </div>
+    </section>
   </div>
-</section>
 
-<% metadata = @offering.metadata.with_indifferent_access %>
-<section class="card">
-  <header>
-    <h2><%= t("admin.offering_form.sections.certificate") %></h2>
-    <p class="muted"><%= t("admin.offering_form.hints.certificate") %></p>
-  </header>
-  <dl class="detail-grid">
-    <div>
-      <dt><%= t("admin.offering_form.fields.certificate_prefix") %></dt>
-      <dd><%= metadata[:certificate_prefix].presence || "—" %></dd>
-    </div>
-    <div>
-      <dt><%= t("admin.offering_form.fields.certificate_hint") %></dt>
-      <dd><%= metadata[:certificate_hint].presence || "—" %></dd>
-    </div>
-  </dl>
-</section>
+  <% metadata = @offering.metadata.with_indifferent_access %>
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide">
+      <header>
+        <h2><%= t("admin.offering_form.sections.certificate") %></h2>
+        <p class="muted"><%= t("admin.offering_form.hints.certificate") %></p>
+      </header>
+      <dl class="detail-grid">
+        <div>
+          <dt><%= t("admin.offering_form.fields.certificate_prefix") %></dt>
+          <dd><%= metadata[:certificate_prefix].presence || "—" %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.offering_form.fields.certificate_hint") %></dt>
+          <dd><%= metadata[:certificate_hint].presence || "—" %></dd>
+        </div>
+      </dl>
+    </section>
+  </div>
 
-<section class="card">
-  <header>
-    <h2><%= t("admin.offering_form.sections.logistics") %></h2>
-    <p class="muted"><%= t("admin.offering_form.hints.logistics") %></p>
-  </header>
-  <dl class="detail-grid">
-    <div>
-      <dt><%= t("admin.offering_form.fields.ancestor_placard_hint") %></dt>
-      <dd><%= metadata[:ancestor_placard_hint].presence || "—" %></dd>
-    </div>
-    <div>
-      <dt><%= t("admin.offering_form.fields.logistics_notes") %></dt>
-      <dd><%= metadata[:logistics_notes].presence || "—" %></dd>
-    </div>
-  </dl>
-</section>
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide">
+      <header>
+        <h2><%= t("admin.offering_form.sections.logistics") %></h2>
+        <p class="muted"><%= t("admin.offering_form.hints.logistics") %></p>
+      </header>
+      <dl class="detail-grid">
+        <div>
+          <dt><%= t("admin.offering_form.fields.ancestor_placard_hint") %></dt>
+          <dd><%= metadata[:ancestor_placard_hint].presence || "—" %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.offering_form.fields.logistics_notes") %></dt>
+          <dd><%= metadata[:logistics_notes].presence || "—" %></dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+</div>

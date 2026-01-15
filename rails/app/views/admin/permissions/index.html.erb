@@ -1,62 +1,66 @@
-<section class="card">
-  <header>
-    <h1><%= t("admin.permissions.index.title") %></h1>
-    <p class="muted">
-      <%= t("admin.permissions.index.body") %>
-    </p>
-  </header>
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item">
+      <header>
+        <h1><%= t("admin.permissions.index.title") %></h1>
+        <p class="muted">
+          <%= t("admin.permissions.index.body") %>
+        </p>
+      </header>
 
-  <% if @permission_forms.any? %>
-    <div class="permission-grid">
-      <% @permission_forms.each do |permission_form| %>
-        <div class="permission-card">
-          <header class="permission-card-header">
-            <div>
-              <h2><%= permission_form.admin_account.user.english_name %></h2>
-              <p class="muted"><%= permission_form.admin_account.user.email %></p>
-            </div>
-            <p class="badge"><%= permission_form.admin_account.role.titleize %></p>
-          </header>
+      <% if @permission_forms.any? %>
+        <div class="permission-grid">
+          <% @permission_forms.each do |permission_form| %>
+            <div class="permission-card">
+              <header class="permission-card-header">
+                <div>
+                  <h2><%= permission_form.admin_account.user.english_name %></h2>
+                  <p class="muted"><%= permission_form.admin_account.user.email %></p>
+                </div>
+                <p class="badge"><%= permission_form.admin_account.role.titleize %></p>
+              </header>
 
-          <%= form_with model: permission_form,
-                scope: :admin_permission,
-                url: admin_permission_path(permission_form.admin_account),
-                method: :post,
-                local: true,
-                data: { turbo: false },
-                class: "permission-form" do |form| %>
-            <% if permission_form.errors.any? %>
-              <div class="alert alert-danger">
-                <ul>
-                  <% permission_form.errors.full_messages.each do |message| %>
-                    <li><%= message %></li>
-                  <% end %>
-                </ul>
-              </div>
-            <% end %>
-
-            <div class="permission-checklist">
-              <% AdminPermission::CAPABILITIES.each do |capability| %>
-                <label class="checkbox permission-checkbox">
-                  <%= form.check_box capability %>
-                  <div>
-                    <strong><%= capability_label(capability) %></strong>
-                    <% if capability_hint(capability).present? %>
-                      <p class="muted"><%= capability_hint(capability) %></p>
-                    <% end %>
+              <%= form_with model: permission_form,
+                    scope: :admin_permission,
+                    url: admin_permission_path(permission_form.admin_account),
+                    method: :post,
+                    local: true,
+                    data: { turbo: false },
+                    class: "permission-form" do |form| %>
+                <% if permission_form.errors.any? %>
+                  <div class="alert alert-danger">
+                    <ul>
+                      <% permission_form.errors.full_messages.each do |message| %>
+                        <li><%= message %></li>
+                      <% end %>
+                    </ul>
                   </div>
-                </label>
-              <% end %>
-            </div>
+                <% end %>
 
-            <div class="permission-actions">
-              <%= form.submit t("admin.permissions.index.save"), class: "btn btn-primary" %>
+                <div class="permission-checklist">
+                  <% AdminPermission::CAPABILITIES.each do |capability| %>
+                    <label class="checkbox permission-checkbox">
+                      <%= form.check_box capability %>
+                      <div>
+                        <strong><%= capability_label(capability) %></strong>
+                        <% if capability_hint(capability).present? %>
+                          <p class="muted"><%= capability_hint(capability) %></p>
+                        <% end %>
+                      </div>
+                    </label>
+                  <% end %>
+                </div>
+
+                <div class="permission-actions">
+                  <%= form.submit t("admin.permissions.index.save"), class: "btn btn-primary" %>
+                </div>
+              <% end %>
             </div>
           <% end %>
         </div>
+      <% else %>
+        <p class="muted"><%= t("admin.permissions.index.empty") %></p>
       <% end %>
-    </div>
-  <% else %>
-    <p class="muted"><%= t("admin.permissions.index.empty") %></p>
-  <% end %>
-</section>
+    </section>
+  </div>
+</div>

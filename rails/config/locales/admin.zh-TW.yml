@@ -258,6 +258,8 @@ zh-TW:
         template_period: "預設檔期：%{period}"
         template_selected: "目前使用模板：%{name}"
         template_prompt: "請先選擇模板再填寫供品欄位。"
+      validation:
+        required_message: "請填寫此欄位。"
       edit:
         title: "編輯供品"
       show:
