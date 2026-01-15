@@ -551,6 +551,7 @@ body.admin-body input[type="date"]::placeholder {
   width: 100%;
   min-width: 0;
   padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
   padding-bottom: var(--spacing-lg);
 }
 
@@ -602,6 +603,10 @@ body.admin-body input[type="date"]::placeholder {
   max-width: min(100%, 960px);
 }
 
+.admin-stack__row > .stack-item.stack-item--with-gutter {
+  margin-right: clamp(var(--spacing-md), 4vw, var(--spacing-xl));
+}
+
 .admin-stack__row > .stack-item.stack-item--centered {
   width: auto;
   max-width: min(100%, 960px);
@@ -632,6 +637,10 @@ body.admin-body input[type="date"]::placeholder {
 
   .admin-stack__row > .stack-item.stack-item--metrics {
     width: fit-content(960px);
+  }
+
+  .admin-stack__row > .stack-item.stack-item--with-gutter {
+    margin-right: clamp(var(--spacing-md), 4vw, var(--spacing-xl));
   }
 
   .admin-stack__row > .stack-item.stack-item--centered {

@@ -423,6 +423,18 @@
   padding: var(--spacing-lg);
 }
 
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+  margin-top: var(--spacing-lg);
+}
+
+.form-actions--centered {
+  justify-content: center;
+}
+
 .offering-form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));

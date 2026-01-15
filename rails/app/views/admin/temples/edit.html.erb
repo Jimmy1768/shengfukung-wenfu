@@ -9,7 +9,7 @@
   </div>
 
   <div class="admin-stack__row">
-    <section class="stack-item stack-item--fluid">
+    <section class="card stack-item stack-item--metrics stack-item--with-gutter">
       <%= form_with model: @form,
             scope: :temple,
             url: admin_temple_profile_path,
@@ -127,11 +127,28 @@
                     placeholder: t("admin.temple_profile.placeholders.notes") %>
             </div>
           </section>
+
+          <section class="card form-card">
+            <header>
+              <h2><%= t("admin.temple_profile.sections.gallery.title", default: "形象照片") %></h2>
+              <p><%= t("admin.temple_profile.sections.gallery.subtitle", default: "上傳寺廟或活動的代表圖片") %></p>
+            </header>
+
+            <div class="field">
+              <%= form.label :gallery_primary, t("admin.temple_profile.fields.gallery_primary", default: "主視覺圖片") %>
+              <%= form.file_field :gallery_primary, disabled: true, placeholder: t("admin.temple_profile.placeholders.gallery_primary", default: "尚未串接，僅示意"), class: "file-field--placeholder" %>
+              <p class="muted"><%= t("admin.temple_profile.placeholders.gallery_primary_hint", default: "檔案上傳尚未開放，稍後可改為 API 串接。") %></p>
+            </div>
+
+            <div class="field">
+              <%= form.label :gallery_secondary, t("admin.temple_profile.fields.gallery_secondary", default: "其他圖片") %>
+              <%= form.file_field :gallery_secondary, multiple: true, disabled: true, placeholder: t("admin.temple_profile.placeholders.gallery_secondary", default: "拖曳或點擊選擇"), class: "file-field--placeholder" %>
+            </div>
+          </section>
         </div>
 
-        <div class="actions">
+        <div class="form-actions form-actions--centered">
           <%= form.submit t("admin.temple_profile.actions.save"), class: "btn btn-primary" %>
-          <%= link_to t("admin.temple_profile.actions.cancel"), admin_dashboard_path, class: "btn btn-secondary" %>
         </div>
       <% end %>
     </section>

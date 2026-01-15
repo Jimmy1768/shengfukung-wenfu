@@ -984,6 +984,7 @@ body.admin-body input[type=date]::placeholder {
   width: 100%;
   min-width: 0;
   padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
   padding-bottom: var(--spacing-lg);
 }
 
@@ -1034,6 +1035,10 @@ body.admin-body input[type=date]::placeholder {
   max-width: min(100%, 960px);
 }
 
+.admin-stack__row > .stack-item.stack-item--with-gutter {
+  margin-right: clamp(var(--spacing-md), 4vw, var(--spacing-xl));
+}
+
 .admin-stack__row > .stack-item.stack-item--centered {
   width: auto;
   max-width: min(100%, 960px);
@@ -1061,6 +1066,9 @@ body.admin-body input[type=date]::placeholder {
   }
   .admin-stack__row > .stack-item.stack-item--metrics {
     width: fit-content(960px);
+  }
+  .admin-stack__row > .stack-item.stack-item--with-gutter {
+    margin-right: clamp(var(--spacing-md), 4vw, var(--spacing-xl));
   }
   .admin-stack__row > .stack-item.stack-item--centered {
     width: fit-content(960px);
@@ -1657,6 +1665,18 @@ body.admin-body input[type=date]::placeholder {
   padding: var(--spacing-lg);
 }
 
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+  margin-top: var(--spacing-lg);
+}
+
+.form-actions--centered {
+  justify-content: center;
+}
+
 .offering-form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -1667,6 +1687,13 @@ body.admin-body input[type=date]::placeholder {
   align-items: stretch;
   align-content: flex-start;
   grid-auto-rows: minmax(0, auto);
+}
+
+.temple-profile-grid {
+  width: 100%;
+  max-width: 1040px;
+  margin-right: auto;
+  margin-left: 0;
 }
 
 .offering-form-grid .form-section {
