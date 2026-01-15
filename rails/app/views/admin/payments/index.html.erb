@@ -1,4 +1,5 @@
 <% currency_unit = @payments.first&.currency || "TWD" %>
+<% breakdown_limit = 4 %>
 
 <div class="admin-stack">
   <div class="admin-stack__row">
@@ -25,43 +26,64 @@
   </div>
 
   <div class="admin-stack__row">
-    <section class="card stack-item">
+    <section class="card stack-item stack-item--metrics stack-item--with-gutter metrics-card">
       <header>
         <h2><%= t("admin.payments.index.breakdowns.title") %></h2>
       </header>
-      <div class="payment-breakdowns">
-        <div>
-          <h3><%= t("admin.payments.index.breakdowns.by_method") %></h3>
-          <ul class="breakdown-list">
-            <% @payment_summary.totals_by_method.each do |entry| %>
-              <li>
-                <span><%= t("admin.payments.methods.#{entry[:label]}", default: entry[:label].titleize) %></span>
-            <strong><%= Currency::Symbols.format_amount(entry[:amount_cents], currency_unit) %></strong>
-              </li>
+      <div class="metrics-grid-container">
+        <div class="metrics-grid metrics-grid--pill-row">
+          <% method_entries = @payment_summary.totals_by_method %>
+          <% offering_entries = @payment_summary.totals_by_offering %>
+          <% date_entries = @payment_summary.totals_by_date %>
+
+          <article class="metric-card metric-card--list">
+            <p class="muted"><%= t("admin.payments.index.breakdowns.by_method") %></p>
+            <div class="metric-card-list">
+              <% method_entries.first(breakdown_limit).each do |entry| %>
+                <div class="metric-card-list__item">
+                  <span><%= t("admin.payments.methods.#{entry[:label]}", default: entry[:label].titleize) %></span>
+                  <strong><%= Currency::Symbols.format_amount(entry[:amount_cents], currency_unit) %></strong>
+                </div>
+              <% end %>
+            </div>
+            <% if method_entries.size > breakdown_limit %>
+              <p class="metric-card-note muted">
+                <%= t("admin.payments.index.breakdowns.more_methods", default: "另有 %{count} 筆可在下方列表檢視", count: method_entries.size - breakdown_limit) %>
+              </p>
             <% end %>
-          </ul>
-        </div>
-        <div>
-          <h3><%= t("admin.payments.index.breakdowns.by_offering") %></h3>
-          <ul class="breakdown-list">
-            <% @payment_summary.totals_by_offering.each do |entry| %>
-              <li>
-                <span><%= entry[:label] %></span>
-            <strong><%= Currency::Symbols.format_amount(entry[:amount_cents], currency_unit) %></strong>
-              </li>
+          </article>
+          <article class="metric-card metric-card--list">
+            <p class="muted"><%= t("admin.payments.index.breakdowns.by_offering") %></p>
+            <div class="metric-card-list">
+              <% offering_entries.first(breakdown_limit).each do |entry| %>
+                <div class="metric-card-list__item">
+                  <span><%= entry[:label] %></span>
+                  <strong><%= Currency::Symbols.format_amount(entry[:amount_cents], currency_unit) %></strong>
+                </div>
+              <% end %>
+            </div>
+            <% if offering_entries.size > breakdown_limit %>
+              <p class="metric-card-note muted">
+                <%= t("admin.payments.index.breakdowns.more_offerings", default: "另有 %{count} 筆可在下方列表檢視", count: offering_entries.size - breakdown_limit) %>
+              </p>
             <% end %>
-          </ul>
-        </div>
-        <div>
-          <h3><%= t("admin.payments.index.breakdowns.by_date") %></h3>
-          <ul class="breakdown-list">
-            <% @payment_summary.totals_by_date.each do |entry| %>
-              <li>
-                <span><%= entry[:label] %></span>
-            <strong><%= Currency::Symbols.format_amount(entry[:amount_cents], currency_unit) %></strong>
-              </li>
+          </article>
+          <article class="metric-card metric-card--list">
+            <p class="muted"><%= t("admin.payments.index.breakdowns.by_date") %></p>
+            <div class="metric-card-list metric-card-list--wrap">
+              <% date_entries.first(breakdown_limit).each do |entry| %>
+                <div class="metric-card-list__item metric-card-list__item--wrap">
+                  <span><%= entry[:label] %></span>
+                  <strong><%= Currency::Symbols.format_amount(entry[:amount_cents], currency_unit) %></strong>
+                </div>
+              <% end %>
+            </div>
+            <% if date_entries.size > breakdown_limit %>
+              <p class="metric-card-note muted">
+                <%= t("admin.payments.index.breakdowns.more_dates", default: "另有 %{count} 筆可在下方列表檢視", count: date_entries.size - breakdown_limit) %>
+              </p>
             <% end %>
-          </ul>
+          </article>
         </div>
       </div>
     </section>
@@ -90,7 +112,7 @@
   </div>
 
   <div class="admin-stack__row">
-    <section class="card stack-item stack-item--fluid">
+    <section class="card stack-item stack-item--fluid stack-item--with-gutter">
       <header>
         <h2><%= t("admin.payments.index.recent.title") %></h2>
       </header>

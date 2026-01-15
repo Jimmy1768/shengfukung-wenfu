@@ -1615,10 +1615,65 @@ body.admin-body input[type=date]::placeholder {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+.metrics-grid--pill-row {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  justify-content: stretch;
+  width: 100%;
+  max-width: 960px;
+}
+
 .metrics-grid-container {
   width: 100%;
   max-width: 960px;
+  margin: 0 auto;
+}
+
+.metric-card--list {
+  gap: var(--spacing-sm);
+}
+
+.metric-card-list {
   margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.metric-card-list__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+.metric-card-list__item span {
+  color: var(--text-muted);
+}
+.metric-card-list__item strong {
+  font-size: 1rem;
+  margin-left: var(--spacing-sm);
+}
+
+.metric-card-list--wrap {
+  flex-wrap: wrap;
+  column-gap: var(--spacing-md);
+}
+
+.metric-card-list__item--wrap {
+  width: 100%;
+  justify-content: space-between;
+  column-gap: 10px;
+  white-space: nowrap;
+}
+.metric-card-list__item--wrap span,
+.metric-card-list__item--wrap strong {
+  white-space: nowrap;
+}
+
+.metric-card-note {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
 }
 
 .metric-card {
