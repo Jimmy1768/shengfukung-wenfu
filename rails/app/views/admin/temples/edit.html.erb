@@ -9,12 +9,7 @@
   </div>
 
   <div class="admin-stack__row">
-    <section class="card stack-item">
-      <header>
-        <h2><%= t("admin.temple_profile.sections.basics.title") %></h2>
-        <p><%= t("admin.temple_profile.sections.basics.subtitle") %></p>
-      </header>
-
+    <section class="stack-item stack-item--fluid">
       <%= form_with model: @form,
             scope: :temple,
             url: admin_temple_profile_path,
@@ -23,106 +18,115 @@
             authenticity_token: true,
             local: true,
             data: { turbo: false } do |form| %>
-        <div class="field">
-          <%= form.label :name, t("admin.temple_profile.fields.name") %>
-          <%= form.text_field :name, required: true, placeholder: t("admin.temple_profile.placeholders.name") %>
-        </div>
+        <div class="card-grid two-column temple-profile-grid">
+          <section class="card form-card">
+            <header>
+              <h2><%= t("admin.temple_profile.sections.basics.title") %></h2>
+              <p><%= t("admin.temple_profile.sections.basics.subtitle") %></p>
+            </header>
 
-        <div class="field">
-          <%= form.label :tagline, t("admin.temple_profile.fields.tagline") %>
-          <%= form.text_field :tagline, placeholder: t("admin.temple_profile.placeholders.tagline") %>
-        </div>
+            <div class="field">
+              <%= form.label :name, t("admin.temple_profile.fields.name") %>
+              <%= form.text_field :name, required: true, placeholder: t("admin.temple_profile.placeholders.name") %>
+            </div>
 
-        <div class="field">
-          <%= form.label :hero_copy, t("admin.temple_profile.fields.hero_copy") %>
-          <%= form.text_area :hero_copy, rows: 3, placeholder: t("admin.temple_profile.placeholders.hero_copy") %>
-        </div>
+            <div class="field">
+              <%= form.label :tagline, t("admin.temple_profile.fields.tagline") %>
+              <%= form.text_field :tagline, placeholder: t("admin.temple_profile.placeholders.tagline") %>
+            </div>
 
-        <div class="field">
-          <%= form.label :primary_image_url, t("admin.temple_profile.fields.primary_image_url") %>
-          <%= form.url_field :primary_image_url, placeholder: t("admin.temple_profile.placeholders.primary_image_url") %>
-        </div>
+            <div class="field">
+              <%= form.label :hero_copy, t("admin.temple_profile.fields.hero_copy") %>
+              <%= form.text_area :hero_copy, rows: 3, placeholder: t("admin.temple_profile.placeholders.hero_copy") %>
+            </div>
 
-        <hr />
+            <div class="field">
+              <%= form.label :primary_image_url, t("admin.temple_profile.fields.primary_image_url") %>
+              <%= form.url_field :primary_image_url, placeholder: t("admin.temple_profile.placeholders.primary_image_url") %>
+            </div>
+          </section>
 
-        <header>
-          <h2><%= t("admin.temple_profile.sections.contact.title") %></h2>
-          <p><%= t("admin.temple_profile.sections.contact.subtitle") %></p>
-        </header>
+          <section class="card form-card">
+            <header>
+              <h2><%= t("admin.temple_profile.sections.contact.title") %></h2>
+              <p><%= t("admin.temple_profile.sections.contact.subtitle") %></p>
+            </header>
 
-        <div class="grid-2">
-          <div class="field">
-            <%= form.label :contact_addressZh, t("admin.temple_profile.fields.address_zh") %>
-            <%= form.text_field :contact_addressZh,
-                  name: "temple[contact][addressZh]",
-                  value: @form.contact["addressZh"],
-                  placeholder: t("admin.temple_profile.placeholders.address_zh") %>
-          </div>
-          <div class="field">
-            <%= form.label :contact_addressEn, t("admin.temple_profile.fields.address_en") %>
-            <%= form.text_field :contact_addressEn,
-                  name: "temple[contact][addressEn]",
-                  value: @form.contact["addressEn"],
-                  placeholder: t("admin.temple_profile.placeholders.address_en") %>
-          </div>
-        </div>
+            <div class="grid-2">
+              <div class="field">
+                <%= form.label :contact_addressZh, t("admin.temple_profile.fields.address_zh") %>
+                <%= form.text_field :contact_addressZh,
+                      name: "temple[contact][addressZh]",
+                      value: @form.contact["addressZh"],
+                      placeholder: t("admin.temple_profile.placeholders.address_zh") %>
+              </div>
+              <div class="field">
+                <%= form.label :contact_addressEn, t("admin.temple_profile.fields.address_en") %>
+                <%= form.text_field :contact_addressEn,
+                      name: "temple[contact][addressEn]",
+                      value: @form.contact["addressEn"],
+                      placeholder: t("admin.temple_profile.placeholders.address_en") %>
+              </div>
+            </div>
 
-        <div class="grid-2">
-          <div class="field">
-            <%= form.label :contact_phone, t("admin.temple_profile.fields.phone") %>
-            <%= form.text_field :contact_phone,
-                  name: "temple[contact][phone]",
-                  value: @form.contact["phone"],
-                  placeholder: t("admin.temple_profile.placeholders.phone") %>
-          </div>
-          <div class="field">
-            <%= form.label :contact_plusCode, t("admin.temple_profile.fields.plus_code") %>
-            <%= form.text_field :contact_plusCode,
-                  name: "temple[contact][plusCode]",
-                  value: @form.contact["plusCode"],
-                  placeholder: t("admin.temple_profile.placeholders.plus_code") %>
-          </div>
-        </div>
+            <div class="grid-2">
+              <div class="field">
+                <%= form.label :contact_phone, t("admin.temple_profile.fields.phone") %>
+                <%= form.text_field :contact_phone,
+                      name: "temple[contact][phone]",
+                      value: @form.contact["phone"],
+                      placeholder: t("admin.temple_profile.placeholders.phone") %>
+              </div>
+              <div class="field">
+                <%= form.label :contact_plusCode, t("admin.temple_profile.fields.plus_code") %>
+                <%= form.text_field :contact_plusCode,
+                      name: "temple[contact][plusCode]",
+                      value: @form.contact["plusCode"],
+                      placeholder: t("admin.temple_profile.placeholders.plus_code") %>
+              </div>
+            </div>
 
-        <div class="field">
-          <%= form.label :contact_mapUrl, t("admin.temple_profile.fields.map_url") %>
-          <%= form.url_field :contact_mapUrl,
-                name: "temple[contact][mapUrl]",
-                value: @form.contact["mapUrl"],
-                placeholder: t("admin.temple_profile.placeholders.map_url") %>
-        </div>
+            <div class="field">
+              <%= form.label :contact_mapUrl, t("admin.temple_profile.fields.map_url") %>
+              <%= form.url_field :contact_mapUrl,
+                    name: "temple[contact][mapUrl]",
+                    value: @form.contact["mapUrl"],
+                    placeholder: t("admin.temple_profile.placeholders.map_url") %>
+            </div>
+          </section>
 
-        <hr />
+          <section class="card form-card">
+            <header>
+              <h2><%= t("admin.temple_profile.sections.schedule.title") %></h2>
+              <p><%= t("admin.temple_profile.sections.schedule.subtitle") %></p>
+            </header>
 
-        <header>
-          <h2><%= t("admin.temple_profile.sections.schedule.title") %></h2>
-          <p><%= t("admin.temple_profile.sections.schedule.subtitle") %></p>
-        </header>
+            <div class="grid-2">
+              <div class="field">
+                <%= form.label :service_times_weekday, t("admin.temple_profile.fields.weekday_hours") %>
+                <%= form.text_field :service_times_weekday,
+                      name: "temple[service_times][weekday]",
+                      value: @form.service_times["weekday"],
+                      placeholder: t("admin.temple_profile.placeholders.weekday_hours") %>
+              </div>
+              <div class="field">
+                <%= form.label :service_times_weekend, t("admin.temple_profile.fields.weekend_hours") %>
+                <%= form.text_field :service_times_weekend,
+                      name: "temple[service_times][weekend]",
+                      value: @form.service_times["weekend"],
+                      placeholder: t("admin.temple_profile.placeholders.weekend_hours") %>
+              </div>
+            </div>
 
-        <div class="grid-2">
-          <div class="field">
-            <%= form.label :service_times_weekday, t("admin.temple_profile.fields.weekday_hours") %>
-            <%= form.text_field :service_times_weekday,
-                  name: "temple[service_times][weekday]",
-                  value: @form.service_times["weekday"],
-                  placeholder: t("admin.temple_profile.placeholders.weekday_hours") %>
-          </div>
-          <div class="field">
-            <%= form.label :service_times_weekend, t("admin.temple_profile.fields.weekend_hours") %>
-            <%= form.text_field :service_times_weekend,
-                  name: "temple[service_times][weekend]",
-                  value: @form.service_times["weekend"],
-                  placeholder: t("admin.temple_profile.placeholders.weekend_hours") %>
-          </div>
-        </div>
-
-        <div class="field">
-          <%= form.label :service_times_notes, t("admin.temple_profile.fields.notes") %>
-          <%= form.text_area :service_times_notes,
-                name: "temple[service_times][notes]",
-                value: @form.service_times["notes"],
-                rows: 2,
-                placeholder: t("admin.temple_profile.placeholders.notes") %>
+            <div class="field">
+              <%= form.label :service_times_notes, t("admin.temple_profile.fields.notes") %>
+              <%= form.text_area :service_times_notes,
+                    name: "temple[service_times][notes]",
+                    value: @form.service_times["notes"],
+                    rows: 2,
+                    placeholder: t("admin.temple_profile.placeholders.notes") %>
+            </div>
+          </section>
         </div>
 
         <div class="actions">

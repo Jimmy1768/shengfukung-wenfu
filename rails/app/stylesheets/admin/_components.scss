@@ -435,6 +435,13 @@
   grid-auto-rows: minmax(0, auto);
 }
 
+.temple-profile-grid {
+  width: 100%;
+  max-width: 1040px;
+  margin-right: auto;
+  margin-left: 0;
+}
+
 .offering-form-grid .form-section {
   display: flex;
   flex-direction: column;
