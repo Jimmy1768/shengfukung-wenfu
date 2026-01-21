@@ -1031,6 +1031,12 @@ body.admin-body input[type=date]::placeholder {
   max-width: min(100%, 720px);
 }
 
+.admin-stack__row > .stack-item.stack-item--xl {
+  width: min(100%, 80vw);
+  max-width: min(100%, 1200px);
+  flex: 1 1 auto;
+}
+
 .admin-stack__row > .stack-item.stack-item--metrics {
   max-width: min(100%, 960px);
 }
@@ -1050,6 +1056,12 @@ body.admin-body input[type=date]::placeholder {
   flex: 1 1 100%;
 }
 
+.admin-stack__row > .stack-item.stack-item--fluid.admin-table-card {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 100%;
+}
+
 .admin-stack__row > .stack-item.stack-item--narrow {
   max-width: min(100%, 520px);
 }
@@ -1063,6 +1075,9 @@ body.admin-body input[type=date]::placeholder {
   }
   .admin-stack__row > .stack-item.stack-item--wide {
     width: fit-content(720px);
+  }
+  .admin-stack__row > .stack-item.stack-item--xl {
+    width: min(100%, clamp(0px, 80vw, 1200px));
   }
   .admin-stack__row > .stack-item.stack-item--metrics {
     width: fit-content(960px);
@@ -1078,6 +1093,10 @@ body.admin-body input[type=date]::placeholder {
   }
   .admin-stack__row > .stack-item.stack-item--fluid {
     width: 100%;
+  }
+  .admin-stack__row > .stack-item.stack-item--fluid.admin-table-card {
+    width: fit-content(1040px);
+    max-width: 100%;
   }
 }
 .card {
@@ -1713,6 +1732,17 @@ body.admin-body input[type=date]::placeholder {
   white-space: nowrap;
 }
 
+.admin-orders-table,
+.admin-payments-table {
+  width: max-content;
+}
+.admin-orders-table th,
+.admin-orders-table td,
+.admin-payments-table th,
+.admin-payments-table td {
+  white-space: nowrap;
+}
+
 .form-card {
   display: flex;
   flex-direction: column;
@@ -1734,7 +1764,7 @@ body.admin-body input[type=date]::placeholder {
 
 .offering-form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   column-gap: var(--spacing-md);
   row-gap: clamp(var(--spacing-md), 4vw, var(--spacing-xl));
   width: 100%;
@@ -1744,13 +1774,24 @@ body.admin-body input[type=date]::placeholder {
   grid-auto-rows: minmax(0, auto);
 }
 
-.temple-profile-grid {
-  width: 100%;
-  max-width: 1040px;
+@media (min-width: 900px) {
+  .offering-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.card-grid.temple-profile-grid {
+  width: min(100%, 80vw);
+  max-width: min(100%, 1200px);
   margin-right: auto;
   margin-left: 0;
+  grid-template-columns: minmax(0, 1fr);
 }
 
+@media (min-width: 900px) {
+  .card-grid.temple-profile-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 .offering-form-grid .form-section {
   display: flex;
   flex-direction: column;

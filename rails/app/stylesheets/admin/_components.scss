@@ -474,6 +474,16 @@
   }
 }
 
+.admin-orders-table,
+.admin-payments-table {
+  width: max-content;
+
+  th,
+  td {
+    white-space: nowrap;
+  }
+}
+
 .form-card {
   display: flex;
   flex-direction: column;
@@ -495,7 +505,7 @@
 
 .offering-form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   column-gap: var(--spacing-md);
   row-gap: clamp(var(--spacing-md), 4vw, var(--spacing-xl));
   width: 100%;
@@ -505,11 +515,24 @@
   grid-auto-rows: minmax(0, auto);
 }
 
-.temple-profile-grid {
-  width: 100%;
-  max-width: 1040px;
+@media (min-width: 900px) {
+  .offering-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.card-grid.temple-profile-grid {
+  width: min(100%, 80vw);
+  max-width: min(100%, 1200px);
   margin-right: auto;
   margin-left: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 900px) {
+  .card-grid.temple-profile-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .offering-form-grid .form-section {

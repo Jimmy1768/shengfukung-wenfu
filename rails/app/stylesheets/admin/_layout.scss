@@ -599,6 +599,11 @@ body.admin-body input[type="date"]::placeholder {
   max-width: min(100%, 720px);
 }
 
+.admin-stack__row > .stack-item.stack-item--xl {
+  width: min(100%, 80vw);
+  max-width: min(100%, 1200px);
+  flex: 1 1 auto;
+}
 
 .admin-stack__row > .stack-item.stack-item--metrics {
   max-width: min(100%, 960px);
@@ -619,6 +624,12 @@ body.admin-body input[type="date"]::placeholder {
   flex: 1 1 100%;
 }
 
+.admin-stack__row > .stack-item.stack-item--fluid.admin-table-card {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 100%;
+}
+
 .admin-stack__row > .stack-item.stack-item--narrow {
   max-width: min(100%, 520px);
 }
@@ -634,6 +645,10 @@ body.admin-body input[type="date"]::placeholder {
 
   .admin-stack__row > .stack-item.stack-item--wide {
     width: fit-content(720px);
+  }
+
+  .admin-stack__row > .stack-item.stack-item--xl {
+    width: min(100%, clamp(0px, 80vw, 1200px));
   }
 
   .admin-stack__row > .stack-item.stack-item--metrics {
@@ -654,6 +669,11 @@ body.admin-body input[type="date"]::placeholder {
 
   .admin-stack__row > .stack-item.stack-item--fluid {
     width: 100%;
+  }
+
+  .admin-stack__row > .stack-item.stack-item--fluid.admin-table-card {
+    width: fit-content(1040px);
+    max-width: 100%;
   }
 }
 
