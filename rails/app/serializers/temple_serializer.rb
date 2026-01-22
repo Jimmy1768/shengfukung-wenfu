@@ -16,6 +16,7 @@ class TempleSerializer
       service_times: service_times_payload,
       metadata: temple.metadata,
       primary_image_url: temple.primary_image_url,
+      hero_images: hero_images_payload,
       pages: pages_json,
       media_assets: media_json
     }
@@ -74,5 +75,9 @@ class TempleSerializer
     return data if data.present?
 
     AppConstants::TempleProfilePlaceholders.service_times
+  end
+
+  def hero_images_payload
+    temple.hero_images_with_fallback
   end
 end

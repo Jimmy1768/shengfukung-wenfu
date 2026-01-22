@@ -583,6 +583,34 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_15_000014) do
     t.index ["user_id"], name: "index_temple_event_registrations_on_user_id"
   end
 
+  create_table "temple_gallery_entries", force: :cascade do |t|
+    t.bigint "temple_id", null: false
+    t.string "title", null: false
+    t.text "body"
+    t.datetime "event_date"
+    t.jsonb "photo_urls", default: [], null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["temple_id", "event_date"], name: "index_gallery_entries_on_temple_and_event_date"
+    t.index ["temple_id"], name: "index_temple_gallery_entries_on_temple_id"
+  end
+
+  create_table "temple_news_posts", force: :cascade do |t|
+    t.bigint "temple_id", null: false
+    t.string "title", null: false
+    t.text "body"
+    t.datetime "published_at"
+    t.boolean "published", default: true, null: false
+    t.boolean "pinned", default: false, null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["temple_id", "published"], name: "index_news_posts_on_temple_and_status"
+    t.index ["temple_id", "published_at"], name: "index_news_posts_on_temple_and_published_at"
+    t.index ["temple_id"], name: "index_temple_news_posts_on_temple_id"
+  end
+
   create_table "temple_offerings", force: :cascade do |t|
     t.bigint "temple_id", null: false
     t.string "slug", null: false
@@ -665,6 +693,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_15_000014) do
     t.string "primary_image_url"
     t.text "hero_copy"
     t.text "about_html"
+    t.jsonb "hero_images", default: {}, null: false
     t.jsonb "contact_info", default: {}, null: false
     t.jsonb "service_times", default: {}, null: false
     t.jsonb "metadata", default: {}, null: false
@@ -770,6 +799,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_15_000014) do
   add_foreign_key "temple_event_registrations", "temple_offerings"
   add_foreign_key "temple_event_registrations", "temples"
   add_foreign_key "temple_event_registrations", "users"
+  add_foreign_key "temple_gallery_entries", "temples"
+  add_foreign_key "temple_news_posts", "temples"
   add_foreign_key "temple_offerings", "temples"
   add_foreign_key "temple_pages", "temples"
   add_foreign_key "temple_payments", "admins", column: "admin_account_id"

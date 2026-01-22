@@ -4,6 +4,15 @@ tagline: 清淨・莊嚴・在地信仰
 hero_copy: 用簡潔的段落說明本廟的宗旨、服務與交通資訊。
 primary_image_url:
 about_html:
+hero_images:
+  home: https://placehold.co/1600x900/8c1f1f/ffffff?text=%E7%B4%85%E9%BB%83%E5%A4%A9%E5%A0%82
+  about: https://placehold.co/1600x900/304153/ffffff?text=%E9%97%9C%E6%96%BC%E6%9C%AC%E5%BB%9F
+  events: https://placehold.co/1600x900/2b5f44/ffffff?text=%E6%B4%BB%E5%8B%95%E8%88%87%E6%B3%95%E6%9C%83
+  event: https://placehold.co/1600x900/5b3b96/ffffff?text=%E6%B4%BB%E5%8B%95%E7%B4%B0%E7%AF%80
+  archive: https://placehold.co/1600x900/7c2f40/ffffff?text=%E6%B4%BB%E5%8B%95%E5%9B%9E%E9%A1%A7
+  news: https://placehold.co/1600x900/223c63/ffffff?text=%E6%9C%80%E6%96%B0%E6%B6%88%E6%81%AF
+  services: https://placehold.co/1600x900/385f2c/ffffff?text=%E5%8F%83%E6%8B%9C%E6%9C%8D%E5%8B%99
+  contact: https://placehold.co/1600x900/164255/ffffff?text=%E8%81%AF%E7%B5%A1%E8%B3%87%E8%A8%8A
 contact:
   addressZh: 苗栗縣竹南鎮公教路 136 號
   addressEn: No. 136, Gongjiao Rd, Zhunan Township, Miaoli County 350
@@ -16,3 +25,29 @@ service_times:
   notes: 農曆初一、十五延長開放。
 metadata:
   seed_profile: shenfukung-wenfu
+news_posts:
+  - slug: new-year-prayer
+    title: 新年迎春祈福法會
+    body: >
+      春節前夕舉行點燈儀式，邀請信眾一起寫下新年的祝福，並由法師誦經祈求庇佑。
+    published_at: 2026-01-05 08:30:00
+    pinned: true
+  - slug: lantern-workshop
+    title: 手作花燈體驗
+    body: >
+      與在地文創合作，提供家長與孩子一起動手製作花燈的課程，名額有限敬請提前報名。
+    published_at: 2026-01-20 12:00:00
+gallery_entries:
+  - title: 2025 元宵祝燈
+    body: >
+      信眾提燈繞境後留影，廟方在廣場設置祝福牆，留下祝福字句。
+    event_date: 2025-02-15
+    photo_urls:
+      - https://placehold.co/1200x800/d97706/ffffff?text=%E7%87%88%E7%AF%80%E7%9A%84%E8%A8%98%E6%86%B6
+      - https://placehold.co/1200x800/92400e/ffffff?text=%E6%9C%AC%E6%AE%BF%E6%99%AF%E8%A7%80
+  - title: 2025 春祭平安餐
+    body: >
+      志工與長者共享平安餐，並發放祈福香包。
+    event_date: 2025-03-28
+    photo_urls:
+      - https://placehold.co/1200x800/14532d/ffffff?text=%E5%B9%B3%E5%AE%89%E9%A4%90

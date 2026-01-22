@@ -1,0 +1,49 @@
+slug: demo-lotus
+name: 蓮城慈航宮
+tagline: 蓮心啟航・護佑四方
+hero_copy: 以蓮為名，結合書法與音樂的禪修課程，讓每位信眾在繁忙城市中找到寧靜。
+primary_image_url: https://placehold.co/1600x900/1f3a5f/ffffff?text=%E8%93%AE%E5%9F%8E%E6%85%88%E8%88%AA%E5%AE%AE
+about_html: >
+  座落於新北河畔的蓮城慈航宮，由青年團隊與在地耆老共同維護。
+  透過多語導覽、音樂療癒以及線上祈福服務，讓遠地信眾也能參與宮廟文化。
+hero_images:
+  home: https://placehold.co/1600x900/1f3a5f/ffffff?text=%E8%93%AE%E5%9F%8E%E9%A6%96%E9%A0%81
+  about: https://placehold.co/1600x900/264653/ffffff?text=%E5%85%B7%E9%AB%94%E4%BB%8B%E7%B4%B9
+  events: https://placehold.co/1600x900/2a9d8f/ffffff?text=%E6%8E%92%E7%A8%8B%E6%B4%BB%E5%8B%95
+  event: https://placehold.co/1600x900/e9c46a/14342b?text=%E7%B0%A1%E4%BB%8B
+  archive: https://placehold.co/1600x900/f4a261/14342b?text=%E5%9B%9E%E9%A1%A7
+  news: https://placehold.co/1600x900/e76f51/ffffff?text=%E6%96%B0%E8%81%9E
+  services: https://placehold.co/1600x900/264653/ffffff?text=%E6%9C%8D%E5%8B%99
+  contact: https://placehold.co/1600x900/2a9d8f/ffffff?text=%E6%9C%8D%E5%8B%99%E8%B3%87%E8%A8%8A
+contact:
+  addressZh: 新北市中和區蓮城路 88 號
+  addressEn: No. 88, Liancheng Rd., Zhonghe District, New Taipei City
+  phone: '02-2222-5888'
+  plusCode: 3G9R+3R Zhonghe District, New Taipei City
+  mapUrl: https://maps.google.com/?q=No.+88,+Liancheng+Rd.,+Zhonghe+District,+New+Taipei
+service_times:
+  weekday: 09:00 – 19:00
+  weekend: 08:30 – 20:30
+  notes: 每週三為閉館整理日，僅供預約導覽。
+metadata:
+  seed_profile: demo-lotus
+news_posts:
+  - slug: bilingual-tours
+    title: 雙語導覽志工招募
+    body: >
+      為了迎接國際交流團，宮廟開放英日雙語志工招募，聘請專業老師訓練導覽技巧。
+    published_at: 2026-02-02 10:00:00
+    pinned: true
+  - slug: lotus-sutra-night
+    title: 夜間抄經與音樂療癒
+    body: >
+      結合西塔琴與頌缽的療癒音樂，搭配抄經靜心，名額僅 40 位。
+    published_at: 2026-02-12 18:30:00
+gallery_entries:
+  - title: 2025 秋分水陸法會
+    body: >
+      信眾於河畔放水燈祈福，晚間配合光雕投影，創造獨特的城市宮廟夜景。
+    event_date: 2025-09-23
+    photo_urls:
+      - https://placehold.co/1200x800/0d1b2a/FFFFFF?text=%E6%B0%B4%E7%87%88
+      - https://placehold.co/1200x800/1b263b/FFFFFF?text=%E5%B7%A5%E4%BD%9C%E5%9C%98

@@ -50,14 +50,13 @@ module Seeds
     end
 
     def ensure_temple_membership(admin)
-      temple = Temple.find_by(slug: AppConstants::Project.slug)
-      return unless temple
-
-      AdminTempleMembership.find_or_create_by!(
-        admin_account: admin,
-        temple:
-      ) do |membership|
-        membership.role = admin.role
+      Temple.find_each do |temple|
+        AdminTempleMembership.find_or_create_by!(
+          admin_account: admin,
+          temple:
+        ) do |membership|
+          membership.role = admin.role
+        end
       end
     end
 

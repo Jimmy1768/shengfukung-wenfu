@@ -9,6 +9,7 @@ class CreateTempleCmsTables < ActiveRecord::Migration[7.1]
       t.string :primary_image_url
       t.text :hero_copy
       t.text :about_html
+      t.jsonb :hero_images, null: false, default: {}
       t.jsonb :contact_info, null: false, default: {}
       t.jsonb :service_times, null: false, default: {}
       t.jsonb :metadata, null: false, default: {}
@@ -58,6 +59,30 @@ class CreateTempleCmsTables < ActiveRecord::Migration[7.1]
       t.timestamps
     end
     add_index :admin_temple_memberships, %i[admin_account_id temple_id], unique: true, name: "index_memberships_on_admin_and_temple"
+
+    create_table :temple_news_posts do |t|
+      t.references :temple, null: false, foreign_key: true
+      t.string :title, null: false
+      t.text :body
+      t.datetime :published_at
+      t.boolean :published, null: false, default: true
+      t.boolean :pinned, null: false, default: false
+      t.jsonb :metadata, null: false, default: {}
+      t.timestamps
+    end
+    add_index :temple_news_posts, %i[temple_id published], name: "index_news_posts_on_temple_and_status"
+    add_index :temple_news_posts, %i[temple_id published_at], name: "index_news_posts_on_temple_and_published_at"
+
+    create_table :temple_gallery_entries do |t|
+      t.references :temple, null: false, foreign_key: true
+      t.string :title, null: false
+      t.text :body
+      t.datetime :event_date
+      t.jsonb :photo_urls, null: false, default: []
+      t.jsonb :metadata, null: false, default: {}
+      t.timestamps
+    end
+    add_index :temple_gallery_entries, %i[temple_id event_date], name: "index_gallery_entries_on_temple_and_event_date"
 
     add_reference :system_audit_logs, :temple, foreign_key: true
   end

@@ -194,6 +194,11 @@ zh-TW:
         basics:
           title: "基本資訊"
           subtitle: "顯示在 Vue 首頁的抬頭與頁尾。"
+        hero_images:
+          title: "各頁籤主視覺"
+          subtitle: "可為每個分頁提供圖片網址；若留白則自動沿用首頁主視覺。"
+          fallback_hint: "未填寫的頁面會使用「首頁」圖片，確保畫面不留白。"
+          row_hint: "可留白，系統會使用首頁圖片。"
         contact:
           title: "聯絡方式"
           subtitle: "呈現於聯絡頁與頁尾。"
@@ -205,6 +210,7 @@ zh-TW:
         tagline: "標語"
         hero_copy: "首頁介紹段落"
         primary_image_url: "首頁主視覺網址"
+        hero_images: "分頁主視覺"
         address_zh: "地址（中文）"
         address_en: "地址（英文）"
         phone: "電話"
@@ -218,6 +224,7 @@ zh-TW:
         tagline: "例：清淨・莊嚴・在地信仰"
         hero_copy: "用簡潔語句說明宗旨、服務、交通提醒。"
         primary_image_url: "https://…"
+        hero_image_url: "https://example.com/hero.jpg"
         address_zh: "例：苗栗縣竹南鎮公教路 136 號"
         address_en: "例：No. 136, Gongjiao Rd, Zhunan Township..."
         phone: "例：03-747-2826"
@@ -228,6 +235,15 @@ zh-TW:
         notes: "例：農曆初一、十五延長開放。"
       actions:
         save: "儲存資料"
+      hero_tabs:
+        home: "首頁"
+        about: "關於本廟"
+        events: "活動 / 法會"
+        event: "活動詳情"
+        archive: "活動回顧"
+        news: "最新消息"
+        services: "參拜 / 服務"
+        contact: "聯絡 / 交通"
         cancel: "取消"
     offerings:
       index:

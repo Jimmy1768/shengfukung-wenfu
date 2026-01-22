@@ -28,6 +28,7 @@ module Admin
         :tagline,
         :hero_copy,
         :primary_image_url,
+        hero_images: Temple::HERO_TABS,
         contact: %i[addressZh addressEn phone plusCode mapUrl],
         service_times: {}
       )

@@ -6,6 +6,7 @@ require_relative "seeds/auth_core"
 require_relative "seeds/session_preferences"
 require_relative "seeds/messaging"
 require_relative "seeds/temples"
+require_relative "seeds/temple_financials"
 require_relative "seeds/admin_controls"
 require_relative "seeds/cache_control"
 require_relative "seeds/record_archives"
@@ -20,6 +21,7 @@ Seeds::AuthCore.seed
 Seeds::SessionPreferences.seed
 Seeds::Messaging.seed
 Seeds::Temples.seed
+Seeds::Temples.seed(slug: "demo-lotus")
 Seeds::AdminControls.seed
 Seeds::CacheControl.seed
 Seeds::RecordArchives.seed
@@ -29,6 +31,7 @@ Seeds::ApiProtection.seed
 Seeds::Compliance.seed
 Seeds::AnalyticsExports.seed
 Seeds::TempleDemoUsers.seed
+Seeds::TempleFinancials.seed
 
 if Rails.env.test?
   puts "Seeding test fixtures..." # rubocop:disable Rails/Output

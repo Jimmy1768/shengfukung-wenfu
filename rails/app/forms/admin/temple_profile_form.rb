@@ -11,6 +11,7 @@ module Admin
     attribute :primary_image_url, :string
     attribute :contact, default: -> { {} }
     attribute :service_times, default: -> { {} }
+    attribute :hero_images, default: -> { {} }
 
     validates :name, presence: true
 
@@ -31,7 +32,8 @@ module Admin
         hero_copy:,
         primary_image_url:,
         contact_info: compact_hash(contact),
-        service_times: compact_hash(service_times)
+        service_times: compact_hash(service_times),
+        hero_images: normalized_hero_images
       )
 
       Temple.transaction do
@@ -40,7 +42,7 @@ module Admin
           action: "admin.temple.profile.update",
           admin: current_admin,
           target: temple,
-          metadata: { contact:, service_times: },
+          metadata: { contact:, service_times:, hero_images: normalized_hero_images },
           temple:
         )
       end
@@ -58,6 +60,10 @@ module Admin
       super || {}
     end
 
+    def hero_images
+      (super || {}).stringify_keys
+    end
+
     private
 
     def extracted_attributes(record)
@@ -67,7 +73,8 @@ module Admin
         hero_copy: record.hero_copy,
         primary_image_url: record.primary_image_url,
         contact: record.contact_details,
-        service_times: record.service_schedule
+        service_times: record.service_schedule,
+        hero_images: record.hero_images
       }
     end
 
@@ -80,6 +87,10 @@ module Admin
       else
         {}
       end
+    end
+
+    def normalized_hero_images
+      hero_images.slice(*Temple::HERO_TABS)
     end
   end
 end

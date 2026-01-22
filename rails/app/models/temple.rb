@@ -22,6 +22,10 @@ class Temple < ApplicationRecord
     through: :temple_event_registrations
   has_many :admin_permissions,
     dependent: :destroy
+  has_many :temple_news_posts,
+    dependent: :destroy
+  has_many :temple_gallery_entries,
+    dependent: :destroy
 
   scope :published, -> { where(published: true) }
   scope :for_admin, lambda { |admin_account|
@@ -32,11 +36,31 @@ class Temple < ApplicationRecord
 
   validates :slug, :name, presence: true
 
+  HERO_TABS = %w[home about events event archive news services contact].freeze
+
   def contact_details
     contact_info.presence || {}
   end
 
   def service_schedule
     service_times.presence || {}
+  end
+
+  def hero_images
+    value = self[:hero_images]
+    value.present? ? value.stringify_keys : {}
+  end
+
+  def hero_image_for(tab)
+    tab_key = tab.to_s
+    hero_images[tab_key].presence ||
+      hero_images["home"].presence ||
+      primary_image_url
+  end
+
+  def hero_images_with_fallback
+    HERO_TABS.each_with_object({}) do |tab, buffer|
+      buffer[tab] = hero_image_for(tab)
+    end
   end
 end

@@ -10,6 +10,7 @@ module Seeds
     DEFAULT_PAGES = %w[home about events services contact].freeze
     DEFAULT_HERO_COPY = "用簡潔的段落說明本廟的宗旨、服務與交通資訊。"
     PLACEHOLDER_QR_PATH = "system/placeholders/line-pay-qr.png"
+    DEFAULT_HERO_IMAGE = "https://placehold.co/1600x900/111827/FFFFFF?text=Temple+Hero"
 
     def seed(slug: AppConstants::Project.slug)
       config = profile_config(slug)
@@ -17,6 +18,8 @@ module Seeds
       temple = ensure_temple(config)
       ensure_pages(temple)
       ensure_sections(temple)
+       ensure_news_posts(temple, config["news_posts"])
+       ensure_gallery_entries(temple, config["gallery_entries"])
       puts "Temple profile ready (#{temple.slug})." # rubocop:disable Rails/Output
     end
 
@@ -28,7 +31,11 @@ module Seeds
         raise ArgumentError, "Missing temple profile config at #{path}. Add one under rails/db/temples."
       end
 
-      raw = YAML.safe_load(File.read(path), aliases: true) || {}
+      raw = YAML.safe_load(
+        File.read(path),
+        permitted_classes: [Time, Date],
+        aliases: true
+      ) || {}
       config = raw.deep_stringify_keys
       config["slug"] ||= slug
       config
@@ -42,6 +49,7 @@ module Seeds
           hero_copy: config["hero_copy"] || DEFAULT_HERO_COPY,
           primary_image_url: config["primary_image_url"],
           about_html: config["about_html"],
+          hero_images: normalized_hero_images(config["hero_images"]),
           contact_info: config.fetch("contact", {}),
           service_times: config.fetch("service_times", {}),
           published: config.fetch("published", true),
@@ -78,6 +86,45 @@ module Seeds
             { slug: "lantern-festival", month: "FEB", day: "12", title: "元宵祈福", when: "2026/02/12 10:00", where: "服務處", summary: "示範資料，稍後改由 Admin 輸入。", badge: "名額有限" }
           ]
         }
+      end
+    end
+
+    def ensure_news_posts(temple, entries)
+      Array(entries).each do |attrs|
+        next if attrs.blank?
+
+        identifier = attrs["slug"].presence || attrs["title"]
+        next unless identifier
+
+        temple.temple_news_posts.find_or_initialize_by(title: attrs["title"]).tap do |post|
+          post.body = attrs["body"]
+          post.published_at = attrs["published_at"]
+          post.published = attrs.fetch("published", true)
+          post.pinned = attrs.fetch("pinned", false)
+          post.metadata = (post.metadata || {}).merge(attrs["metadata"] || {}).merge(seed_metadata).merge("seed_slug" => identifier)
+          post.save!
+        end
+      end
+    end
+
+    def ensure_gallery_entries(temple, entries)
+      Array(entries).each do |attrs|
+        next if attrs.blank?
+
+        temple.temple_gallery_entries.find_or_initialize_by(title: attrs["title"]).tap do |entry|
+          entry.body = attrs["body"]
+          entry.event_date = attrs["event_date"]
+          entry.photo_urls = Array(attrs["photo_urls"])
+          entry.metadata = (entry.metadata || {}).merge(attrs["metadata"] || {}).merge(seed_metadata)
+          entry.save!
+        end
+      end
+    end
+
+    def normalized_hero_images(images)
+      data = images.to_h.stringify_keys rescue {}
+      Temple::HERO_TABS.index_with do |tab|
+        data[tab].presence || data["home"].presence || DEFAULT_HERO_IMAGE
       end
     end
 

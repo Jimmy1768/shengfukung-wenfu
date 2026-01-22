@@ -194,6 +194,11 @@ en:
         basics:
           title: "Basic details"
           subtitle: "Displayed in the Vue header/footer."
+        hero_images:
+          title: "Hero images per page"
+          subtitle: "Provide an image URL for each tab. Leave blank to fall back to the home hero."
+          fallback_hint: "Pages without a custom URL reuse the Home hero image automatically."
+          row_hint: "Optional — inherits the Home image when left blank."
         contact:
           title: "Contact information"
           subtitle: "Shown on the contact page + footer."
@@ -205,6 +210,7 @@ en:
         tagline: "Tagline"
         hero_copy: "Homepage hero copy"
         primary_image_url: "Hero image URL"
+        hero_images: "Per-tab hero images"
         address_zh: "Address (ZH)"
         address_en: "Address (EN)"
         phone: "Phone"
@@ -218,6 +224,7 @@ en:
         tagline: "e.g., Serenity · Dignity · Local faith"
         hero_copy: "Summarize your mission, services, and visitor tips."
         primary_image_url: "https://..."
+        hero_image_url: "https://example.com/hero.jpg"
         address_zh: "e.g., 136 Gongjiao Rd., Zhunan Township"
         address_en: "e.g., No. 136, Gongjiao Rd, Zhunan Township..."
         phone: "e.g., 03-747-2826"
@@ -228,6 +235,15 @@ en:
         notes: "e.g., Extended hours on lunar 1st and 15th."
       actions:
         save: "Save profile"
+      hero_tabs:
+        home: "Home"
+        about: "About"
+        events: "Events"
+        event: "Event detail"
+        archive: "Archive"
+        news: "News"
+        services: "Services"
+        contact: "Contact"
         cancel: "Cancel"
     offerings:
       index:
