@@ -38,6 +38,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_15_000014) do
     t.boolean "export_financials", default: false, null: false
     t.boolean "view_guest_lists", default: false, null: false
     t.boolean "manage_permissions", default: false, null: false
+    t.boolean "manage_profile", default: false, null: false
+    t.boolean "manage_news", default: false, null: false
+    t.boolean "manage_gallery", default: false, null: false
     t.jsonb "metadata", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

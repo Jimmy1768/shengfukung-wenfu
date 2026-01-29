@@ -1,0 +1,41 @@
+<%= form_with model: [:admin, gallery_entry], class: "form-stack" do |form| %>
+  <% if gallery_entry.errors.any? %>
+    <div class="inline-validation" data-inline-validation>
+      <strong><%= t("admin.gallery_entries.form.errors", count: gallery_entry.errors.count) %></strong>
+      <ul>
+        <% gallery_entry.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :title, t("admin.gallery_entries.fields.title") %>
+    <%= form.text_field :title, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :body, t("admin.gallery_entries.fields.body") %>
+    <%= form.text_area :body, rows: 6 %>
+  </div>
+
+  <div class="field">
+    <%= form.label :event_date, t("admin.gallery_entries.fields.event_date") %>
+    <%= form.date_field :event_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :photo_urls_raw, t("admin.gallery_entries.fields.photo_urls") %>
+    <%= text_area_tag "temple_gallery_entry[photo_urls_raw]",
+      gallery_entry.photo_urls.join("\n"),
+      rows: 4,
+      class: "form-control" %>
+    <p class="muted"><%= t("admin.gallery_entries.hints.photo_urls") %></p>
+  </div>
+
+  <div class="form-actions form-actions--centered">
+    <%= form.submit t("admin.gallery_entries.actions.save"), class: "btn btn-primary" %>
+    <%= link_to t("admin.gallery_entries.actions.cancel"), admin_gallery_entries_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

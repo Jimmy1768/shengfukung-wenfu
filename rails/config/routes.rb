@@ -8,6 +8,8 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :demo_contacts, only: :create
       resources :temples, only: :show, param: :slug
+      get "temples/:slug/news", to: "temple_news#index"
+      get "temples/:slug/archive", to: "temple_galleries#index"
     end
   end
 
@@ -54,6 +56,8 @@ namespace :marketing_admin, path: "/marketing/admin", module: "dev/demo/rails" d
         get :export
       end
     end
+    resources :news_posts
+    resources :gallery_entries
     get "/archives", to: "archives#index", as: :archives
     get "/archives/registrations", to: "archives#registrations_export", defaults: { format: :csv }, as: :archive_registrations_export
     get "/archives/payments", to: "archives#payments_export", defaults: { format: :csv }, as: :archive_payments_export
@@ -94,6 +98,10 @@ namespace :marketing_admin, path: "/marketing/admin", module: "dev/demo/rails" d
 
   resource :password, controller: "utils/passwords", only: %i[new create edit]
   post "/password/reset", to: "utils/passwords#update", as: :password_update
+
+  namespace :utils do
+    resources :uploads, only: :create
+  end
 
   # --- OmniAuth callbacks -----------------------------------------------------
   match "/auth/:provider/callback", to: "auth/omniauth#callback", via: %i[get post]

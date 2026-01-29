@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "added hero image upload to temple profile"
+git commit -m "building news and gallery"
 git push
 
 git reset --hard HEAD

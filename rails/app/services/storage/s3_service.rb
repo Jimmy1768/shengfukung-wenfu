@@ -1,48 +1,64 @@
 
-# app/services/storage/s3_service.rb
-#
-# Wrapper around S3 (or compatible) storage.
-# This service is responsible for:
-# - Generating presigned URLs for direct uploads/downloads.
-# - (Optionally) performing server-side uploads or deletions.
-#
-# NOTE:
-# - Backed by environment variables for bucket, region, and credentials.
-# - Implementation can reuse your existing, working S3 code.
 module Storage
   class S3Service
-    # Example accessors for configuration (fill in as needed).
-    # def self.client
-    #   @client ||= Aws::S3::Client.new(
-    #     region: ENV["S3_REGION"],
-    #     access_key_id: ENV["S3_ACCESS_KEY_ID"],
-    #     secret_access_key: ENV["S3_SECRET_ACCESS_KEY"]
-    #   )
-    # end
+    class << self
+      def upload(io:, key:, content_type: nil)
+        storage_key = namespaced_key(key)
+        io.rewind if io.respond_to?(:rewind)
+        client.put_object(
+          bucket: bucket,
+          key: storage_key,
+          body: io,
+          content_type: content_type
+        )
+        storage_key
+      end
 
-    # def self.bucket
-    #   ENV.fetch("S3_BUCKET") { "change-me" }
-    # end
+      def delete(key:)
+        storage_key = namespaced_key(key)
+        client.delete_object(bucket:, key: storage_key)
+      end
 
-    # Returns a presigned URL for uploading a file.
-    # @param key [String] object key/path
-    # @param expires_in [Integer] seconds until expiration
-    # @return [String] presigned URL
-    def self.presigned_upload_url(key:, expires_in: 15 * 60)
-      # TODO: implement using Aws::S3::Presigner
-      raise NotImplementedError, "Storage::S3Service.presigned_upload_url is not implemented yet"
-    end
+      def public_url(key)
+        storage_key = namespaced_key(key)
+        base = ENV["S3_PUBLIC_BASE_URL"].presence
+        return "#{base}/#{storage_key}" if base
 
-    # Returns a presigned URL for downloading a file.
-    def self.presigned_download_url(key:, expires_in: 15 * 60)
-      # TODO: implement using Aws::S3::Presigner
-      raise NotImplementedError, "Storage::S3Service.presigned_download_url is not implemented yet"
-    end
+        "https://#{bucket}.s3.#{region}.amazonaws.com/#{storage_key}"
+      end
 
-    # Deletes an object at the given key.
-    def self.delete(key:)
-      # TODO: implement object deletion
-      raise NotImplementedError, "Storage::S3Service.delete is not implemented yet"
+      private
+
+      def client
+        @client ||= Aws::S3::Client.new(
+          region: region,
+          access_key_id: ENV["S3_ACCESS_KEY_ID"],
+          secret_access_key: ENV["S3_SECRET_ACCESS_KEY"]
+        )
+      end
+
+      def region
+        ENV.fetch("S3_REGION") { raise "S3_REGION is not configured" }
+      end
+
+      def bucket
+        ENV.fetch("S3_BUCKET") { raise "S3_BUCKET is not configured" }
+      end
+
+      def object_prefix
+        ENV["S3_OBJECT_PREFIX"].to_s
+      end
+
+      def namespaced_key(key)
+        raw = key.to_s
+        prefix = object_prefix
+        return raw if prefix.blank?
+
+        normalized_prefix = prefix.end_with?("/") ? prefix : "#{prefix}/"
+        return raw if raw.start_with?(normalized_prefix) || raw == prefix
+
+        File.join(prefix, raw)
+      end
     end
   end
 end

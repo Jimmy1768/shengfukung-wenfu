@@ -167,7 +167,7 @@ zh-TW:
         permissions:
           label: "管理管理員權限"
     dashboard:
-      hero:
+    hero:
         eyebrow: "管理主控台"
         title: "%{name}，歡迎回來"
         body_html: "此頁示範正式環境的結構；請依客戶需求填入真實指標、資料表與工作流程。"
@@ -199,6 +199,14 @@ zh-TW:
           subtitle: "可為每個分頁提供圖片網址；若留白則自動沿用首頁主視覺。"
           fallback_hint: "未填寫的頁面會使用「首頁」圖片，確保畫面不留白。"
           row_hint: "可留白，系統會使用首頁圖片。"
+          choose_file: "選擇檔案"
+          upload_button: "上傳"
+          uploading_label: "上傳中..."
+          paste_url: "或貼上已託管的網址"
+          url_hint: "暫時可先貼上已存在的圖片網址，等待完整上傳流程。"
+          upload_success: "圖片已更新。"
+          upload_error: "上傳失敗，請再試一次。"
+          generic_error: "系統忙碌，請稍後再試。"
         contact:
           title: "聯絡方式"
           subtitle: "呈現於聯絡頁與頁尾。"
@@ -244,6 +252,83 @@ zh-TW:
         news: "最新消息"
         services: "參拜 / 服務"
         contact: "聯絡 / 交通"
+    news_posts:
+      index:
+        title: "最新消息"
+        body: "發布公告或重要提醒，顯示在行銷網站。"
+      new:
+        title: "新增公告"
+        body: "以簡短文字說明最新活動或提醒，可包含連結。"
+      edit:
+        title: "編輯公告"
+        body: "更新內容或調整發佈狀態。"
+      table:
+        title: "標題"
+        published: "狀態"
+        published_at: "發佈時間"
+        actions: "操作"
+      fields:
+        title: "標題"
+        body: "內文"
+        published: "立即發佈"
+        published_at: "指定發佈時間"
+      hints:
+        published_at: "可留白，發佈時自動填入現在時間。"
+      labels:
+        published: "已發佈"
+        draft: "草稿"
+      actions:
+        new: "新增公告"
+        save: "儲存公告"
+        cancel: "取消"
+        edit: "編輯"
+        delete: "刪除"
+      notices:
+        created: "公告已建立。"
+        updated: "公告已更新。"
+        deleted: "公告已刪除。"
+      confirmations:
+        delete: "確定刪除此公告？"
+      form:
+        errors: "%{count} 項錯誤導致無法儲存"
+      empty: "目前尚無公告。"
+    gallery_entries:
+      index:
+        title: "活動回顧"
+        body: "整理過往活動亮點，提供行銷網站的相簿或圖文。"
+      new:
+        title: "新增活動回顧"
+        body: "輸入簡短說明，並可貼上圖片網址。"
+      edit:
+        title: "編輯活動回顧"
+        body: "更新內容或照片列表。"
+      table:
+        title: "標題"
+        event_date: "活動日期"
+        photos: "照片數"
+        actions: "操作"
+      fields:
+        title: "標題"
+        body: "內容"
+        event_date: "活動日期"
+        photo_urls: "照片網址（每行一筆）"
+      hints:
+        photo_urls: "可貼上已託管的圖片網址，每行一筆；留白表示無照片。"
+      actions:
+        new: "新增回顧"
+        save: "儲存內容"
+        cancel: "取消"
+        edit: "編輯"
+        delete: "刪除"
+      notices:
+        created: "活動回顧已建立。"
+        updated: "活動回顧已更新。"
+        deleted: "活動回顧已刪除。"
+      confirmations:
+        delete: "確定刪除此活動回顧？"
+      form:
+        errors: "%{count} 項錯誤導致無法儲存"
+      empty: "目前尚無活動回顧。"
         cancel: "取消"
     offerings:
       index:

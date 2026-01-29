@@ -12,6 +12,9 @@ class CreateAdminPermissions < ActiveRecord::Migration[7.1]
       t.boolean :export_financials, null: false, default: false
       t.boolean :view_guest_lists, null: false, default: false
       t.boolean :manage_permissions, null: false, default: false
+      t.boolean :manage_profile, null: false, default: false
+      t.boolean :manage_news, null: false, default: false
+      t.boolean :manage_gallery, null: false, default: false
       t.jsonb :metadata, null: false, default: {}
       t.timestamps
     end

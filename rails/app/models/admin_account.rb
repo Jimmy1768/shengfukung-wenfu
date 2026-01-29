@@ -41,7 +41,7 @@ class AdminAccount < ApplicationRecord
     record = admin_permissions.build(temple:)
     if owner_role?
       AdminPermission::CAPABILITIES.each do |capability|
-        record[capability] = true
+        record[capability] = true if record.respond_to?(capability)
       end
     end
     record

@@ -43,6 +43,20 @@ module Admin
         path: -> { admin_archives_path }
       },
       {
+        key: :news_posts,
+        label: "News",
+        description: "公告與最新消息",
+        path: -> { admin_news_posts_path },
+        capabilities: :manage_news
+      },
+      {
+        key: :gallery_entries,
+        label: "Gallery",
+        description: "活動回顧與相簿",
+        path: -> { admin_gallery_entries_path },
+        capabilities: :manage_gallery
+      },
+      {
         key: :permissions,
         label: "Permissions",
         description: "管理管理員權限",

@@ -12,6 +12,9 @@ class AdminPermission < ApplicationRecord
     export_financials
     view_guest_lists
     manage_permissions
+    manage_profile
+    manage_news
+    manage_gallery
   ].freeze
 
   validates :admin_account_id, uniqueness: { scope: :temple_id }

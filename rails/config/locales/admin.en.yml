@@ -186,19 +186,27 @@ en:
         first_workflow: "Replace this placeholder with the first CRUD workflow (users, orders, bookings, etc.)."
         document_scope_html: "Document the admin scope inside <code>docs/</code> for each new client."
     temple_profile:
-      hero:
-        eyebrow: "Temple profile"
+    hero:
+      eyebrow: "Temple profile"
         title: "Update site copy"
         body: "These fields power the public site hero, footer, and contact sections."
       sections:
         basics:
           title: "Basic details"
           subtitle: "Displayed in the Vue header/footer."
-        hero_images:
+    hero_images:
           title: "Hero images per page"
           subtitle: "Provide an image URL for each tab. Leave blank to fall back to the home hero."
           fallback_hint: "Pages without a custom URL reuse the Home hero image automatically."
           row_hint: "Optional — inherits the Home image when left blank."
+          choose_file: "Choose file"
+          upload_button: "Upload"
+          uploading_label: "Uploading..."
+          paste_url: "Or paste a hosted image URL"
+          url_hint: "Temporary fallback: paste an existing hosted URL until uploads are live."
+          upload_success: "Image uploaded successfully."
+          upload_error: "Upload failed. Please try again."
+          generic_error: "Something went wrong. Please try again."
         contact:
           title: "Contact information"
           subtitle: "Shown on the contact page + footer."
@@ -244,6 +252,83 @@ en:
         news: "News"
         services: "Services"
         contact: "Contact"
+    news_posts:
+      index:
+        title: "News posts"
+        body: "Share recent announcements or updates across the marketing site."
+      new:
+        title: "New announcement"
+        body: "Write a short update for patrons. Links are allowed."
+      edit:
+        title: "Edit announcement"
+        body: "Update the post content or publish status."
+      table:
+        title: "Title"
+        published: "Status"
+        published_at: "Published at"
+        actions: "Actions"
+      fields:
+        title: "Title"
+        body: "Body"
+        published: "Publish immediately"
+        published_at: "Publish date"
+      hints:
+        published_at: "Optional. Defaults to now when publishing."
+      labels:
+        published: "Published"
+        draft: "Draft"
+      actions:
+        new: "New post"
+        save: "Save post"
+        cancel: "Cancel"
+        edit: "Edit"
+        delete: "Delete"
+      notices:
+        created: "News post created."
+        updated: "News post updated."
+        deleted: "News post deleted."
+      confirmations:
+        delete: "Delete this news post?"
+      form:
+        errors: "%{count} issues prevented saving"
+      empty: "No news posts yet."
+    gallery_entries:
+      index:
+        title: "Gallery entries"
+        body: "Highlight past events or share photo recaps."
+      new:
+        title: "New gallery entry"
+        body: "Add a short description and optional photo URLs."
+      edit:
+        title: "Edit gallery entry"
+        body: "Update event details or photo list."
+      table:
+        title: "Title"
+        event_date: "Event date"
+        photos: "Photos"
+        actions: "Actions"
+      fields:
+        title: "Title"
+        body: "Body"
+        event_date: "Event date"
+        photo_urls: "Photo URLs (one per line)"
+      hints:
+        photo_urls: "Paste hosted image URLs, one per line. Leave blank if not available."
+      actions:
+        new: "New entry"
+        save: "Save entry"
+        cancel: "Cancel"
+        edit: "Edit"
+        delete: "Delete"
+      notices:
+        created: "Gallery entry created."
+        updated: "Gallery entry updated."
+        deleted: "Gallery entry deleted."
+      confirmations:
+        delete: "Delete this gallery entry?"
+      form:
+        errors: "%{count} issues prevented saving"
+      empty: "No gallery entries yet."
         cancel: "Cancel"
     offerings:
       index:

@@ -16,6 +16,7 @@ module Seeds
       config = profile_config(slug)
       puts "Seeding temple profile for #{config.fetch('slug')}..." # rubocop:disable Rails/Output
       temple = ensure_temple(config)
+      ensure_hero_media_assets(temple)
       ensure_pages(temple)
       ensure_sections(temple)
        ensure_news_posts(temple, config["news_posts"])
@@ -86,6 +87,19 @@ module Seeds
             { slug: "lantern-festival", month: "FEB", day: "12", title: "元宵祈福", when: "2026/02/12 10:00", where: "服務處", summary: "示範資料，稍後改由 Admin 輸入。", badge: "名額有限" }
           ]
         }
+      end
+    end
+
+    def ensure_hero_media_assets(temple)
+      temple.hero_images.each do |tab, url|
+        next if url.blank?
+
+        asset = temple.media_assets.hero.where("metadata ->> 'hero_tab' = ?", tab).first_or_initialize
+        asset.role = :hero_image
+        asset.file_uid = asset.file_uid.presence || url
+        meta = (asset.metadata || {}).merge("hero_tab" => tab, "url" => url)
+        asset.metadata = meta.merge(seed_metadata)
+        asset.save!
       end
     end
 

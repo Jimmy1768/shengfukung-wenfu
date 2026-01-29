@@ -697,3 +697,115 @@
   margin-top: auto;
   padding-top: var(--spacing-lg);
 }
+
+.hero-image-card {
+  margin-top: var(--spacing-lg);
+}
+
+.hero-image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.hero-image-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  background: var(--surface);
+}
+
+.hero-image-preview-wrapper {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface-muted);
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+.hero-image-preview {
+  width: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-image-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+
+.hero-image-upload-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.hero-image-file-name {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.hero-image-file-label {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.hero-image-file-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.hero-image-url-field {
+  border: 1px dashed color-mix(in srgb, var(--border) 70%, transparent);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: color-mix(in srgb, var(--surface-muted) 40%, transparent);
+}
+
+.hero-image-url-field summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.hero-image-url-input {
+  margin-top: var(--spacing-xs);
+}
+
+.hero-image-row-hint {
+  font-size: 0.8rem;
+}
+
+.hero-image-status {
+  font-size: 0.85rem;
+  min-height: 1rem;
+  color: var(--text-muted);
+}
+
+.hero-image-status[data-state="error"] {
+  color: var(--danger, #d1452f);
+}
+
+.hero-image-status[data-state="success"] {
+  color: var(--accent);
+}
+
+@media (max-width: 960px) {
+  .hero-image-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

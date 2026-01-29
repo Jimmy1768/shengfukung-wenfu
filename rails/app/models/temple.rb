@@ -53,7 +53,8 @@ class Temple < ApplicationRecord
 
   def hero_image_for(tab)
     tab_key = tab.to_s
-    hero_images[tab_key].presence ||
+    hero_media_asset_for(tab_key)&.metadata&.dig("url") ||
+      hero_images[tab_key].presence ||
       hero_images["home"].presence ||
       primary_image_url
   end
@@ -62,5 +63,9 @@ class Temple < ApplicationRecord
     HERO_TABS.each_with_object({}) do |tab, buffer|
       buffer[tab] = hero_image_for(tab)
     end
+  end
+
+  def hero_media_asset_for(tab)
+    media_assets.hero.where("metadata ->> 'hero_tab' = ?", tab.to_s).first
   end
 end

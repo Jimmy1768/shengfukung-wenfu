@@ -1,0 +1,40 @@
+<%= form_with model: [:admin, news_post], class: "form-stack" do |form| %>
+  <% if news_post.errors.any? %>
+    <div class="inline-validation" data-inline-validation>
+      <strong><%= t("admin.news_posts.form.errors", count: news_post.errors.count) %></strong>
+      <ul>
+        <% news_post.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :title, t("admin.news_posts.fields.title") %>
+    <%= form.text_field :title, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :body, t("admin.news_posts.fields.body") %>
+    <%= form.text_area :body, rows: 6 %>
+  </div>
+
+  <div class="field">
+    <%= form.label :published_at, t("admin.news_posts.fields.published_at") %>
+    <%= form.datetime_local_field :published_at %>
+    <p class="muted"><%= t("admin.news_posts.hints.published_at") %></p>
+  </div>
+
+  <div class="field checkbox-field">
+    <label>
+      <%= form.check_box :published %>
+      <span><%= t("admin.news_posts.fields.published") %></span>
+    </label>
+  </div>
+
+  <div class="form-actions form-actions--centered">
+    <%= form.submit t("admin.news_posts.actions.save"), class: "btn btn-primary" %>
+    <%= link_to t("admin.news_posts.actions.cancel"), admin_news_posts_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

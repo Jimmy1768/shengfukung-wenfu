@@ -17,6 +17,7 @@
             class: "form-stack",
             authenticity_token: true,
             local: true,
+            html: { multipart: true },
             data: { turbo: false } do |form| %>
         <div class="card-grid two-column temple-profile-grid">
           <section class="card form-card">
@@ -43,29 +44,6 @@
             <div class="field">
               <%= form.label :primary_image_url, t("admin.temple_profile.fields.primary_image_url") %>
               <%= form.url_field :primary_image_url, placeholder: t("admin.temple_profile.placeholders.primary_image_url") %>
-            </div>
-          </section>
-
-          <section class="card form-card">
-            <header>
-              <h2><%= t("admin.temple_profile.sections.hero_images.title") %></h2>
-              <p class="muted"><%= t("admin.temple_profile.sections.hero_images.subtitle") %></p>
-            </header>
-
-            <p class="muted"><%= t("admin.temple_profile.sections.hero_images.fallback_hint") %></p>
-
-            <div class="grid-2">
-              <% Temple::HERO_TABS.each do |tab| %>
-                <div class="field">
-                  <%= label_tag "temple_hero_images_#{tab}", t("admin.temple_profile.hero_tabs.#{tab}"), class: "form-label" %>
-                  <%= url_field_tag "temple[hero_images][#{tab}]",
-                    form.object.hero_images[tab],
-                    placeholder: t("admin.temple_profile.placeholders.hero_image_url") %>
-                  <% if tab != "home" %>
-                    <p class="muted"><%= t("admin.temple_profile.sections.hero_images.row_hint") %></p>
-                  <% end %>
-                </div>
-              <% end %>
             </div>
           </section>
 
@@ -153,6 +131,66 @@
 
         </div>
 
+        <section class="card form-card hero-image-card">
+          <header>
+            <h2><%= t("admin.temple_profile.sections.hero_images.title") %></h2>
+            <p class="muted"><%= t("admin.temple_profile.sections.hero_images.subtitle") %></p>
+          </header>
+          <p class="muted"><%= t("admin.temple_profile.sections.hero_images.fallback_hint") %></p>
+
+          <div class="hero-image-grid">
+            <% Temple::HERO_TABS.each do |tab| %>
+              <div class="hero-image-item"
+                data-hero-image-slot
+                data-hero-tab="<%= tab %>">
+                <div class="hero-image-preview-wrapper">
+                  <% preview_url = hero_image_preview_for(form.object, tab) %>
+                  <%= image_tag(preview_url,
+                    alt: t("admin.temple_profile.hero_tabs.#{tab}"),
+                    class: "hero-image-preview",
+                    data: { hero_preview: true }) %>
+                </div>
+                <div class="hero-image-field">
+                  <p class="form-label hero-image-label"><%= t("admin.temple_profile.hero_tabs.#{tab}") %></p>
+                  <div class="hero-image-upload-controls">
+                    <label class="btn btn-secondary hero-image-file-label">
+                      <span><%= t("admin.temple_profile.sections.hero_images.choose_file") %></span>
+                      <%= file_field_tag "hero_image_upload[#{tab}]",
+                        accept: "image/*",
+                        class: "hero-image-file-input" %>
+                    </label>
+                    <button type="button"
+                      class="btn btn-primary hero-image-upload-button"
+                      disabled
+                      data-hero-upload-button
+                      data-upload-label="<%= t("admin.temple_profile.sections.hero_images.upload_button") %>"
+                      data-uploading-label="<%= t("admin.temple_profile.sections.hero_images.uploading_label") %>">
+                      <%= t("admin.temple_profile.sections.hero_images.upload_button") %>
+                    </button>
+                    <span class="hero-image-file-name" data-hero-file-name></span>
+                  </div>
+
+                  <div class="hero-image-status" data-hero-status></div>
+
+                  <details class="hero-image-url-field">
+                    <summary><%= t("admin.temple_profile.sections.hero_images.paste_url") %></summary>
+                    <p class="muted"><%= t("admin.temple_profile.sections.hero_images.url_hint") %></p>
+                    <%= url_field_tag "temple[hero_images][#{tab}]",
+                      form.object.hero_images[tab],
+                      placeholder: t("admin.temple_profile.placeholders.hero_image_url"),
+                      class: "hero-image-url-input",
+                      data: { hero_url_input: true } %>
+                  </details>
+
+                  <% if tab != "home" %>
+                    <p class="muted hero-image-row-hint"><%= t("admin.temple_profile.sections.hero_images.row_hint") %></p>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </section>
+
         <div class="form-actions form-actions--centered">
           <%= form.submit t("admin.temple_profile.actions.save"), class: "btn btn-primary" %>
         </div>
@@ -160,3 +198,109 @@
     </section>
   </div>
 </div>
+
+<script>
+  (() => {
+    const HERO_UPLOAD_I18N = {
+      success: "<%= j t("admin.temple_profile.sections.hero_images.upload_success") %>",
+      error: "<%= j t("admin.temple_profile.sections.hero_images.upload_error") %>",
+      generic: "<%= j t("admin.temple_profile.sections.hero_images.generic_error") %>"
+    };
+
+    const csrfToken = () => {
+      const meta = document.querySelector('meta[name="csrf-token"]');
+      return meta ? meta.content : null;
+    };
+
+    const resetButton = (button, label) => {
+      if (!button) return;
+      button.disabled = true;
+      button.textContent = label;
+    };
+
+    const setStatus = (element, message, state = "muted") => {
+      if (!element) return;
+      element.textContent = message || "";
+      element.dataset.state = state;
+    };
+
+    const bindHeroSlot = (slot) => {
+      if (slot.dataset.heroUploaderBound === "true") return;
+      slot.dataset.heroUploaderBound = "true";
+
+      const fileInput = slot.querySelector(".hero-image-file-input");
+      const uploadButton = slot.querySelector("[data-hero-upload-button]");
+      const preview = slot.querySelector(".hero-image-preview");
+      const urlInput = slot.querySelector("[data-hero-url-input]");
+      const fileName = slot.querySelector("[data-hero-file-name]");
+      const statusEl = slot.querySelector("[data-hero-status]");
+      const heroTab = slot.dataset.heroTab;
+      if (!fileInput || !uploadButton || !heroTab) return;
+
+      const defaultLabel = uploadButton.dataset.uploadLabel || uploadButton.textContent;
+      const uploadingLabel = uploadButton.dataset.uploadingLabel || "Uploading...";
+
+      fileInput.addEventListener("change", () => {
+        if (fileInput.files && fileInput.files.length > 0) {
+          uploadButton.disabled = false;
+          if (fileName) fileName.textContent = fileInput.files[0].name;
+        } else {
+          resetButton(uploadButton, defaultLabel);
+          if (fileName) fileName.textContent = "";
+        }
+      });
+
+      uploadButton.addEventListener("click", async () => {
+        const file = fileInput.files ? fileInput.files[0] : null;
+        if (!file) return;
+        uploadButton.disabled = true;
+        uploadButton.textContent = uploadingLabel;
+        setStatus(statusEl, "", "muted");
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("hero_tab", heroTab);
+
+        try {
+          const response = await fetch("/utils/uploads", {
+            method: "POST",
+            headers: csrfToken() ? { "X-CSRF-Token": csrfToken() } : {},
+            body: formData
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            throw new Error(payload.error || HERO_UPLOAD_I18N.generic);
+          }
+
+          if (payload.url) {
+            if (preview) preview.src = payload.url;
+            if (urlInput) urlInput.value = payload.url;
+          }
+          if (fileName) fileName.textContent = "";
+          if (fileInput) fileInput.value = "";
+          resetButton(uploadButton, defaultLabel);
+          setStatus(statusEl, HERO_UPLOAD_I18N.success, "success");
+        } catch (error) {
+          uploadButton.disabled = false;
+          uploadButton.textContent = defaultLabel;
+          setStatus(statusEl, error.message || HERO_UPLOAD_I18N.error, "error");
+        }
+      });
+    };
+
+    const initHeroImageUploads = () => {
+      document.querySelectorAll("[data-hero-image-slot]").forEach(bindHeroSlot);
+    };
+
+    const ready = (fn) => {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", fn);
+      } else {
+        fn();
+      }
+    };
+
+    ready(initHeroImageUploads);
+    document.addEventListener("turbo:load", initHeroImageUploads);
+  })();
+</script>

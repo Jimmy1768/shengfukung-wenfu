@@ -3,6 +3,7 @@
 module Admin
   class TemplesController < BaseController
     before_action :ensure_temple!
+    before_action -> { require_capability!(:manage_profile) }
     skip_before_action :verify_authenticity_token, only: :update
 
     def edit
