@@ -31,7 +31,8 @@ module Admin
         :primary_image_url,
         hero_images: Temple::HERO_TABS,
         contact: %i[addressZh addressEn phone plusCode mapUrl],
-        service_times: {}
+        service_times: {},
+        visit_info: %i[transportation parking]
       )
     end
 

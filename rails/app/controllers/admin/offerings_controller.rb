@@ -73,14 +73,24 @@ module Admin
         metadata_settings: {}
       )
       permitted[:currency] = permitted[:currency].presence || "TWD"
-      permitted[:price_cents] = nil if permitted[:price_cents].blank?
+      if permitted.key?(:price_cents)
+        permitted[:price_cents] = nil if permitted[:price_cents].blank?
+      end
       permitted[:metadata] = merge_metadata_settings(permitted.delete(:metadata_settings))
       permitted
     end
 
     def merge_metadata_settings(raw)
       base = (@offering&.metadata || {}).with_indifferent_access
-      settings = raw.to_h
+      settings =
+        case raw
+        when ActionController::Parameters
+          raw.to_unsafe_h
+        when Hash
+          raw
+        else
+          {}
+        end
       base.merge(settings)
     end
 

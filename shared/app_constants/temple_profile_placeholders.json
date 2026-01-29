@@ -10,5 +10,9 @@
     "weekday": "尚未設定（請更新開放時間）",
     "weekend": "尚未設定（請更新開放時間）",
     "notes": "提示：在 Temple Profile → Service schedule 填寫詳細說明。"
+  },
+  "visit_info": {
+    "transportation": "尚未設定交通資訊（請在 Temple Profile → Visit info 填寫）。",
+    "parking": "尚未設定停車/提醒資訊（請在 Temple Profile → Visit info 填寫）。"
   }
 }

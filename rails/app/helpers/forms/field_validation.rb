@@ -26,7 +26,15 @@ module Forms
     def missing_fields(rule, attributes)
       attrs_hash = attributes.to_h
       required_fields(rule).each_with_object([]) do |field, missing|
-        value = attrs_hash[field.to_s] || attrs_hash[field.to_sym]
+        key =
+          if attrs_hash.key?(field.to_s)
+            field.to_s
+          elsif attrs_hash.key?(field.to_sym)
+            field.to_sym
+          end
+        next unless key
+
+        value = attrs_hash[key]
         missing << field if value.blank?
       end
     end

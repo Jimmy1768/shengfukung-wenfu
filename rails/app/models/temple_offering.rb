@@ -29,6 +29,20 @@ class TempleOffering < ApplicationRecord
 
   scope :active, -> { where(active: true) }
   scope :for_type, ->(type) { where(offering_type: type) }
+  scope :order_for_marketing, lambda {
+    order(Arel.sql("COALESCE(starts_on, CURRENT_DATE) ASC, title ASC"))
+  }
+  scope :upcoming_or_active, lambda {
+    today = Date.current
+    where(active: true)
+      .where(
+        arel_table[:ends_on].eq(nil).or(arel_table[:ends_on].gteq(today))
+      )
+  }
+  scope :past_events, lambda {
+    today = Date.current
+    where.not(ends_on: nil).where(arel_table[:ends_on].lt(today))
+  }
 
   before_validation :assign_slug
 
@@ -38,7 +52,19 @@ class TempleOffering < ApplicationRecord
     available_slots - temple_event_registrations.count
   end
 
+  def timeline_status
+    today = Date.current
+    return :past if ended_before?(today)
+    return :upcoming if starts_on.present? && starts_on > today
+
+    :ongoing
+  end
+
   private
+
+  def ended_before?(date)
+    ends_on.present? && ends_on < date
+  end
 
   def assign_slug
     return if slug.present?

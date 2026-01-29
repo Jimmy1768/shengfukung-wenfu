@@ -3,39 +3,40 @@ import { computed } from 'vue';
 import PageHero from '@/components/site/PageHero.vue';
 import SectionTitle from '@/components/site/SectionTitle.vue';
 import EventCard from '@/components/site/EventCard.vue';
-import { useTempleSections } from '@/app/siteContent.js';
+import { useHeroImage, useTempleContent, useTempleEvents } from '@/app/siteContent.js';
+import { formatEventCard, statusLabel } from '@/utils/events.js';
 
-const eventsSections = useTempleSections('events');
+const heroImage = useHeroImage('events');
+const siteContent = useTempleContent();
+const eventList = useTempleEvents();
 
-const upcomingSection = computed(() =>
-  eventsSections.value.find((section) => section.section_type === 'event_list')
+const defaultLocation = computed(
+  () => siteContent.data?.contact?.addressZh || '本廟'
 );
 
-const upcoming = computed(
-  () =>
-    upcomingSection.value?.payload?.events || [
-      {
-        slug: 'new-year-blessing',
-        month: 'JAN',
-        day: '05',
-        title: '新年祈福法會（Placeholder）',
-        when: '2026/01/05 09:00',
-        where: '本廟主殿',
-        summary: '這裡是活動摘要。',
-        badge: '可報名'
-      },
-      {
-        slug: 'lantern-offering',
-        month: 'FEB',
-        day: '12',
-        title: '點燈／祈福服務日（Placeholder）',
-        when: '2026/02/12 10:00',
-        where: '服務處',
-        summary: '這裡是活動摘要。',
-        badge: '名額有限'
-      }
-    ]
+const normalizedEvents = computed(() => {
+  if (!eventList.value?.length) return [];
+  return eventList.value.map((event) =>
+    formatEventCard(event, {
+      defaultLocation: defaultLocation.value
+    })
+  );
+});
+
+const eventCount = computed(() => eventList.value?.length || 0);
+
+const emptyStateMessage = computed(() =>
+  eventCount.value
+    ? ''
+    : '目前沒有開放的活動，請稍後再查看或關注最新消息。'
 );
+
+const hintMessage = computed(() => {
+  if (!eventCount.value) {
+    return statusLabel('upcoming');
+  }
+  return `共有 ${eventCount.value} 檔活動進行中或即將開始。`;
+});
 </script>
 
 <template>
@@ -43,17 +44,22 @@ const upcoming = computed(
     <PageHero
       title="活動 / 法會"
       subtitle="未登入也能瀏覽活動；登入後可報名與付款（稍後接 Rails）。"
+      :image-url="heroImage"
     />
 
     <section class="section">
       <div class="wrap">
-        <SectionTitle title="近期活動" subtitle="把『時間 / 地點 / 費用 / 名額』做成固定格式。" />
-        <div class="grid">
-          <EventCard v-for="e in upcoming" :key="e.slug" :item="e" />
+        <SectionTitle
+          title="近期活動"
+          subtitle="活動資訊由後台 offerings 管理，顯示目前開放或即將開放的檔期。"
+        />
+        <div v-if="normalizedEvents.length" class="grid">
+          <EventCard v-for="event in normalizedEvents" :key="event.slug" :item="event" />
         </div>
+        <div v-else class="empty">{{ emptyStateMessage }}</div>
 
         <div class="hint">
-          ※ 之後這裡會改成呼叫 Rails API，例如 /api/events?status=upcoming
+          活動進度：{{ hintMessage }}
         </div>
       </div>
     </section>
@@ -61,6 +67,14 @@ const upcoming = computed(
 </template>
 
 <style scoped>
+.empty {
+  padding: var(--spacing-lg);
+  text-align: center;
+  opacity: 0.75;
+  border-radius: var(--radius-lg);
+  border: 1px dashed color-mix(in srgb, var(--border) 75%, transparent);
+}
+
 .hint {
   margin-top: var(--spacing-sm);
   opacity: 0.65;

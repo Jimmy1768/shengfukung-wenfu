@@ -19,6 +19,9 @@ const englishName = computed(() => siteContent.data?.englishName || project.engl
           <div class="title">{{ brandName }}</div>
           <div class="muted">地址：{{ contact.addressZh }}</div>
           <div v-if="contact.plusCode" class="muted">Plus Code：{{ contact.plusCode }}</div>
+          <router-link class="link contact-link" to="/contact">
+            查看交通與聯絡 →
+          </router-link>
         </div>
 
         <div class="col">
@@ -60,6 +63,7 @@ const englishName = computed(() => siteContent.data?.englishName || project.engl
 .cols {
   display: grid;
   gap: var(--spacing-md);
+  grid-template-columns: 1fr;
 }
 
 .col .title {
@@ -80,6 +84,10 @@ const englishName = computed(() => siteContent.data?.englishName || project.engl
   padding: 4px 0;
 }
 
+.contact-link {
+  font-weight: 700;
+}
+
 .bottom {
   margin-top: var(--spacing-md);
   padding-top: var(--spacing-sm);
@@ -89,5 +97,12 @@ const englishName = computed(() => siteContent.data?.englishName || project.engl
   gap: var(--spacing-sm);
   justify-content: space-between;
   font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  .cols {
+    grid-template-columns: 1.2fr 0.8fr 0.8fr;
+    align-items: flex-start;
+  }
 }
 </style>

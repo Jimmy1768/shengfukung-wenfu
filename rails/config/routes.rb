@@ -10,6 +10,8 @@ Rails.application.routes.draw do
       resources :temples, only: :show, param: :slug
       get "temples/:slug/news", to: "temple_news#index"
       get "temples/:slug/archive", to: "temple_galleries#index"
+      get "temples/:slug/events", to: "temple_offerings#index"
+      get "temples/:slug/events/:event_slug", to: "temple_offerings#show"
     end
   end
 

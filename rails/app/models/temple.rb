@@ -46,6 +46,12 @@ class Temple < ApplicationRecord
     service_times.presence || {}
   end
 
+  def visit_info
+    data = metadata.is_a?(Hash) ? metadata : {}
+    info = data["visit_info"]
+    info.is_a?(Hash) ? info : {}
+  end
+
   def hero_images
     value = self[:hero_images]
     value.present? ? value.stringify_keys : {}

@@ -129,6 +129,31 @@
             </div>
           </section>
 
+          <section class="card form-card">
+            <header>
+              <h2><%= t("admin.temple_profile.sections.visit.title") %></h2>
+              <p><%= t("admin.temple_profile.sections.visit.subtitle") %></p>
+            </header>
+
+            <div class="field">
+              <%= form.label :visit_info_transportation, t("admin.temple_profile.fields.transportation") %>
+              <%= form.text_area :visit_info_transportation,
+                    name: "temple[visit_info][transportation]",
+                    value: @form.visit_info["transportation"],
+                    rows: 3,
+                    placeholder: t("admin.temple_profile.placeholders.transportation") %>
+            </div>
+
+            <div class="field">
+              <%= form.label :visit_info_parking, t("admin.temple_profile.fields.parking") %>
+              <%= form.text_area :visit_info_parking,
+                    name: "temple[visit_info][parking]",
+                    value: @form.visit_info["parking"],
+                    rows: 3,
+                    placeholder: t("admin.temple_profile.placeholders.parking") %>
+            </div>
+          </section>
+
         </div>
 
         <section class="card form-card hero-image-card">

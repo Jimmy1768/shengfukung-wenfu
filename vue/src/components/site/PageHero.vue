@@ -4,6 +4,7 @@ defineProps({
   subtitle: { type: String, default: '' },
   ctaText: { type: String, default: '' },
   ctaTo: { type: String, default: '' },
+  imageUrl: { type: String, default: '' }
 });
 </script>
 
@@ -18,8 +19,14 @@ defineProps({
       </div>
 
       <div class="art" aria-hidden="true">
-        <!-- Placeholder for hero image later -->
-        <div class="art-box"></div>
+        <img
+          v-if="imageUrl"
+          class="art-img"
+          :src="imageUrl"
+          alt=""
+          loading="lazy"
+        />
+        <div v-else class="art-box"></div>
       </div>
     </div>
   </section>
@@ -79,8 +86,18 @@ defineProps({
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
 }
 
+.art-img {
+  width: 100%;
+  height: 180px;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  box-shadow: var(--shadow-soft);
+}
+
 @media (min-width: 900px) {
   .inner { grid-template-columns: 1.1fr 0.9fr; }
-  .art-box { height: 240px; }
+  .art-box,
+  .art-img { height: 240px; }
 }
 </style>

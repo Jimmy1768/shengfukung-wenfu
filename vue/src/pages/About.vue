@@ -2,6 +2,9 @@
 import PageHero from '@/components/site/PageHero.vue';
 import SectionTitle from '@/components/site/SectionTitle.vue';
 import SimpleCard from '@/components/site/SimpleCard.vue';
+import { useHeroImage } from '@/app/siteContent.js';
+
+const heroImage = useHeroImage('about');
 </script>
 
 <template>
@@ -9,6 +12,7 @@ import SimpleCard from '@/components/site/SimpleCard.vue';
     <PageHero
       title="關於本廟"
       subtitle="把歷史、主祀神明、參拜禮儀，用清楚的段落呈現（Placeholder）。"
+      :image-url="heroImage"
     />
 
     <section class="section">

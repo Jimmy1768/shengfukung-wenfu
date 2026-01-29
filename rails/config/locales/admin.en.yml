@@ -186,33 +186,37 @@ en:
         first_workflow: "Replace this placeholder with the first CRUD workflow (users, orders, bookings, etc.)."
         document_scope_html: "Document the admin scope inside <code>docs/</code> for each new client."
     temple_profile:
+  admin:
     hero:
       eyebrow: "Temple profile"
-        title: "Update site copy"
-        body: "These fields power the public site hero, footer, and contact sections."
-      sections:
-        basics:
-          title: "Basic details"
-          subtitle: "Displayed in the Vue header/footer."
-    hero_images:
-          title: "Hero images per page"
-          subtitle: "Provide an image URL for each tab. Leave blank to fall back to the home hero."
-          fallback_hint: "Pages without a custom URL reuse the Home hero image automatically."
-          row_hint: "Optional — inherits the Home image when left blank."
-          choose_file: "Choose file"
-          upload_button: "Upload"
-          uploading_label: "Uploading..."
-          paste_url: "Or paste a hosted image URL"
-          url_hint: "Temporary fallback: paste an existing hosted URL until uploads are live."
-          upload_success: "Image uploaded successfully."
-          upload_error: "Upload failed. Please try again."
-          generic_error: "Something went wrong. Please try again."
-        contact:
-          title: "Contact information"
-          subtitle: "Shown on the contact page + footer."
-        schedule:
-          title: "Service schedule"
-          subtitle: "Displayed alongside the contact info on the Vue + Expo clients."
+      title: "Update site copy"
+      body: "These fields power the public site hero, footer, and contact sections."
+    sections:
+      basics:
+        title: "Basic details"
+        subtitle: "Displayed in the Vue header/footer."
+      hero_images:
+        title: "Hero images per page"
+        subtitle: "Provide an image URL for each tab. Leave blank to fall back to the home hero."
+        fallback_hint: "Pages without a custom URL reuse the Home hero image automatically."
+        row_hint: "Optional — inherits the Home image when left blank."
+        choose_file: "Choose file"
+        upload_button: "Upload"
+        uploading_label: "Uploading..."
+        paste_url: "Or paste a hosted image URL"
+        url_hint: "Temporary fallback: paste an existing hosted URL until uploads are live."
+        upload_success: "Image uploaded successfully."
+        upload_error: "Upload failed. Please try again."
+        generic_error: "Something went wrong. Please try again."
+      contact:
+        title: "Contact information"
+        subtitle: "Shown on the contact page + footer."
+      schedule:
+        title: "Service schedule"
+        subtitle: "Displayed alongside the contact info on the Vue + Expo clients."
+      visit:
+        title: "Visitor info"
+        subtitle: "Transit and parking notes shown on the home + contact sections."
       fields:
         name: "Temple name"
         tagline: "Tagline"
@@ -227,6 +231,8 @@ en:
         weekday_hours: "Weekday hours"
         weekend_hours: "Weekend hours"
         notes: "Notes"
+        transportation: "Transit directions"
+        parking: "Parking / reminders"
       placeholders:
         name: "e.g., Zhunan Shengfukung Temple"
         tagline: "e.g., Serenity · Dignity · Local faith"
@@ -241,6 +247,8 @@ en:
         weekday_hours: "e.g., 08:00 – 17:00"
         weekend_hours: "e.g., 07:30 – 18:00"
         notes: "e.g., Extended hours on lunar 1st and 15th."
+        transportation: "e.g., MRT Zhunan Station → 8 min walk; Bus 581 to Shengfu stop."
+        parking: "e.g., Limited onsite parking; use civic lot on Gongjiao Rd."
       actions:
         save: "Save profile"
       hero_tabs:
@@ -329,7 +337,6 @@ en:
       form:
         errors: "%{count} issues prevented saving"
       empty: "No gallery entries yet."
-        cancel: "Cancel"
     offerings:
       index:
         title: "Temple Offerings"

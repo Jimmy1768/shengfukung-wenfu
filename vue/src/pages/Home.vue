@@ -5,10 +5,20 @@ import SectionTitle from '@/components/site/SectionTitle.vue';
 import SimpleCard from '@/components/site/SimpleCard.vue';
 import EventCard from '@/components/site/EventCard.vue';
 import project from '@/app/project.js';
-import { useTempleContent, useTempleSections } from '@/app/siteContent.js';
+import {
+  useHeroImage,
+  useTempleContent,
+  useTempleEvents,
+  useTempleNews
+} from '@/app/siteContent.js';
+import { formatEventCard } from '@/utils/events.js';
+import placeholders from '@shared/app_constants/temple_profile_placeholders.json';
 
 const siteContent = useTempleContent();
-const homeSections = useTempleSections('home');
+const heroImage = useHeroImage('home');
+const events = useTempleEvents();
+const newsFeed = useTempleNews();
+const contactPlaceholder = placeholders.contact || {};
 
 const heroTitle = computed(
   () => siteContent.data?.tagline || project.tagline || project.name
@@ -19,12 +29,15 @@ const heroSubtitle = computed(
     `用清楚的方式呈現 ${project.name} 的活動、服務與公告；讓長輩也能快速找到時間、地點、方式。`
 );
 
-const eventSection = computed(() =>
-  homeSections.value.find((section) => section.section_type === 'event_list')
+const contactInfo = computed(
+  () => siteContent.data?.contact || contactPlaceholder
 );
-const upcoming = computed(
-  () =>
-    eventSection.value?.payload?.events || [
+const defaultLocation = computed(
+  () => contactInfo.value.addressZh || '本廟'
+);
+const upcoming = computed(() => {
+  if (!events.value?.length) {
+    return [
       {
         slug: 'new-year-blessing',
         month: 'JAN',
@@ -45,7 +58,28 @@ const upcoming = computed(
         summary: '用清楚的條列與流程頁面會更適合。',
         badge: '名額有限'
       }
-    ]
+    ];
+  }
+
+  return events.value.slice(0, 2).map((event) =>
+    formatEventCard(event, {
+      defaultLocation: defaultLocation.value
+    })
+  );
+});
+
+function formatDate(value) {
+  if (!value) return '日期待定';
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleDateString('zh-TW');
+}
+
+const latestNews = computed(() =>
+  (newsFeed.value || []).slice(0, 2).map((post) => ({
+    ...post,
+    dateLabel: formatDate(post.published_at)
+  }))
 );
 </script>
 
@@ -54,6 +88,7 @@ const upcoming = computed(
     <PageHero
       :title="heroTitle"
       :subtitle="heroSubtitle"
+      :image-url="heroImage"
       ctaText="查看近期活動"
       ctaTo="/events"
     />
@@ -83,33 +118,38 @@ const upcoming = computed(
         />
 
         <div class="grid2">
-          <SimpleCard title="公告（Placeholder）" body="例如：春節期間開放時間、交通提醒、活動報名截止日。">
-            <router-link class="link" to="/news">前往最新消息 →</router-link>
+          <SimpleCard
+            v-for="post in latestNews"
+            :key="post.id || post.title"
+            :title="post.title"
+            :body="post.body"
+          >
+            <div class="meta">發佈：{{ post.dateLabel }}</div>
           </SimpleCard>
 
-          <SimpleCard title="參拜 / 服務（Placeholder）" body="例如：點燈、安太歲、祈福、求籤說明，使用 FAQ 結構呈現。">
-            <router-link class="link" to="/services">前往服務項目 →</router-link>
+          <SimpleCard v-if="!latestNews.length" title="最新消息" body="目前尚無公告，之後會顯示後台新增的內容。">
+            <router-link class="link" to="/news">查看全部公告 →</router-link>
           </SimpleCard>
         </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="wrap">
-        <SectionTitle
-          title="來訪資訊"
-          subtitle="把『怎麼來』『停車』『開放時間』放在最容易找到的地方。"
-        />
-
-        <div class="grid2">
-          <SimpleCard title="地址 / 開放時間" body="地址、開放時間、電話（Placeholder）。" />
-          <SimpleCard title="交通方式 / 停車" body="捷運 / 公車 / 停車場資訊（Placeholder）。" />
-        </div>
-
         <div class="more">
-          <router-link class="link" to="/contact">查看交通與聯絡 →</router-link>
+          <router-link class="link" to="/news">前往最新消息 →</router-link>
         </div>
       </div>
     </section>
+
   </div>
 </template>
+
+<style scoped>
+.link {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.meta {
+  margin-top: var(--spacing-xs);
+  font-size: 13px;
+  opacity: 0.75;
+}
+</style>

@@ -135,9 +135,8 @@ module Seeds
         "phone" => attrs[:contact_phone] || "02-1234-5678"
       }.compact
 
-      registration = temple.temple_event_registrations.find_or_initialize_by(
-        reference_code: attrs[:reference_code] || "REG-#{SecureRandom.hex(3).upcase}"
-      )
+      code = attrs[:reference_code].presence || generated_reference
+      registration = temple.temple_event_registrations.find_or_initialize_by(reference_code: code)
       registration.assign_attributes(
         temple_offering: offering,
         temple: temple,
@@ -164,9 +163,9 @@ module Seeds
 
     def ensure_payment(registration, attrs)
       temple = registration.temple
-      payment = registration.temple_payments.find_or_initialize_by(
-        external_reference: attrs[:payment_reference] || "PMT-#{SecureRandom.hex(3).upcase}"
-      )
+      external = attrs[:payment_reference].presence || generated_payment_reference
+      payment = TemplePayment.find_by(external_reference: external) ||
+        registration.temple_payments.build(external_reference: external)
       payment.assign_attributes(
         temple: temple,
         user: registration.user,
@@ -179,6 +178,14 @@ module Seeds
         metadata: (payment.metadata || {}).merge(seed_metadata)
       )
       payment.save!
+    end
+
+    def generated_reference
+      "REG-#{SecureRandom.hex(3).upcase}"
+    end
+
+    def generated_payment_reference
+      "PMT-#{SecureRandom.hex(3).upcase}"
     end
 
     def seed_metadata
