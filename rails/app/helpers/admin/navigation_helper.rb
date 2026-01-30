@@ -5,15 +5,29 @@ module Admin
     NAV_ITEMS = [
       {
         key: :dashboard,
-        label: "Dashboard",
+        label: I18n.t("admin.navigation.dashboard", default: "Dashboard"),
         description: "掌握指標與待辦",
         path: -> { admin_dashboard_path }
       },
       {
         key: :temple_profile,
-        label: "Temple Profile",
+        label: I18n.t("admin.navigation.profile", default: "Temple Profile"),
         description: "更新官網基本資料",
         path: -> { admin_temple_profile_path }
+      },
+      {
+        key: :news_posts,
+        label: I18n.t("admin.navigation.news", default: "最新消息"),
+        description: "公告與最新消息",
+        path: -> { admin_news_posts_path },
+        capabilities: :manage_news
+      },
+      {
+        key: :gallery_entries,
+        label: I18n.t("admin.navigation.gallery", default: "活動回顧"),
+        description: "活動回顧與相簿",
+        path: -> { admin_gallery_entries_path },
+        capabilities: :manage_gallery
       },
       {
         key: :offerings,
@@ -41,20 +55,6 @@ module Admin
         label: "Archives",
         description: "年度紀錄與報表",
         path: -> { admin_archives_path }
-      },
-      {
-        key: :news_posts,
-        label: "News",
-        description: "公告與最新消息",
-        path: -> { admin_news_posts_path },
-        capabilities: :manage_news
-      },
-      {
-        key: :gallery_entries,
-        label: "Gallery",
-        description: "活動回顧與相簿",
-        path: -> { admin_gallery_entries_path },
-        capabilities: :manage_gallery
       },
       {
         key: :permissions,

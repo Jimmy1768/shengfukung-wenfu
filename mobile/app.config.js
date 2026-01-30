@@ -5,7 +5,7 @@ const environments = require('./app/lib/app_constants/env');
 const { defaultThemeId } = require('./theme/tokens');
 const versioning = require('./versioning');
 
-const CONFIG_PLUGIN_ENV_VAR = 'GOLDEN_TEMPLATE_EXPO_PLUGIN';
+const CONFIG_PLUGIN_ENV_VAR = 'KOMAINU_EXPO_PLUGIN';
 
 const coerce = (value, fallback) => {
   if (typeof value === 'string' && value.trim().length > 0) {
@@ -72,12 +72,7 @@ const resolveConfigPluginModule = () => {
     return './plugins-local';
   }
 
-  try {
-    require.resolve('@golden-template/expo-config-plugins');
-    return '@golden-template/expo-config-plugins';
-  } catch {
-    return null;
-  }
+  return null;
 };
 
 const buildConfigPlugins = devClientBuild => {
@@ -102,7 +97,7 @@ const buildConfigPlugins = devClientBuild => {
     ]);
   } else {
     console.warn(
-      'Golden Template Expo config plugins are not configured. Set GOLDEN_TEMPLATE_EXPO_PLUGIN to the shared package or keep mobile/plugins-local available.'
+      'Expo config plugins are not configured. Set KOMAINU_EXPO_PLUGIN to your shared package or ensure mobile/plugins-local exists.'
     );
   }
 

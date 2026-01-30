@@ -2064,3 +2064,21 @@ body.admin-body input[type=date]::placeholder {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+.temple-map-input {
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.95rem;
+  background: var(--input-bg, var(--surface-muted));
+  color: var(--input-text, var(--text));
+  font: inherit;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+  box-sizing: border-box;
+}
+
+.temple-map-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}

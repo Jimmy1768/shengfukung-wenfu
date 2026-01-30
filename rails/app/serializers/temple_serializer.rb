@@ -16,7 +16,6 @@ class TempleSerializer
       service_times: service_times_payload,
       visit_info: visit_info_payload,
       metadata: temple.metadata,
-      primary_image_url: temple.primary_image_url,
       hero_images: hero_images_payload,
       pages: pages_json,
       media_assets: media_json

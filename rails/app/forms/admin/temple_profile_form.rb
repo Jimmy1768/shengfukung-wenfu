@@ -8,11 +8,11 @@ module Admin
     attribute :name, :string
     attribute :tagline, :string
     attribute :hero_copy, :string
-    attribute :primary_image_url, :string
     attribute :contact, default: -> { {} }
     attribute :service_times, default: -> { {} }
     attribute :hero_images, default: -> { {} }
     attribute :visit_info, default: -> { {} }
+    attribute :map_link, :string
 
     validates :name, presence: true
 
@@ -29,12 +29,16 @@ module Admin
 
       metadata = merged_metadata(compact_hash(visit_info))
 
+      resolved_contact = resolve_contact_from_map_link
+      return false if errors.any?
+
+      contact_payload = contact_info_payload(resolved_contact)
+
       temple.assign_attributes(
         name:,
         tagline:,
         hero_copy:,
-        primary_image_url:,
-        contact_info: compact_hash(contact),
+        contact_info: contact_payload,
         service_times: compact_hash(service_times),
         hero_images: normalized_hero_images,
         metadata: metadata
@@ -46,7 +50,7 @@ module Admin
           action: "admin.temple.profile.update",
           admin: current_admin,
           target: temple,
-          metadata: { contact:, service_times:, hero_images: normalized_hero_images, visit_info: visit_info },
+          metadata: { contact: contact_payload, service_times:, hero_images: normalized_hero_images, visit_info: visit_info },
           temple:
         )
       end
@@ -79,11 +83,11 @@ module Admin
         name: record.name,
         tagline: record.tagline,
         hero_copy: record.hero_copy,
-        primary_image_url: record.primary_image_url,
-        contact: record.contact_details,
+        contact: record.contact_details.slice("phone"),
         service_times: record.service_schedule,
         hero_images: record.hero_images,
-        visit_info: record.visit_info
+        visit_info: record.visit_info,
+        map_link: record.contact_details["mapUrl"]
       }
     end
 
@@ -120,6 +124,38 @@ module Admin
         data.delete("visit_info")
       end
       data
+    end
+
+    def resolve_contact_from_map_link
+      return nil if map_link.blank?
+
+      fetcher = Maps::PlaceDetailsFetcher.new(map_link)
+      result = fetcher.call
+      {
+        "addressZh" => result[:address_zh],
+        "addressEn" => result[:address_en],
+        "plusCode" => result[:plus_code],
+        "mapUrl" => result[:map_url],
+        "latitude" => result[:latitude],
+        "longitude" => result[:longitude],
+        "placeId" => result[:place_id]
+      }.compact
+    rescue Maps::PlaceDetailsFetcher::Error => e
+      errors.add(:map_link, e.message)
+      nil
+    end
+
+    def contact_info_payload(resolved_contact)
+      existing = temple.contact_details.deep_dup
+      base =
+        if resolved_contact.present?
+          existing.merge(resolved_contact)
+        else
+          existing
+        end
+
+      phone_value = contact["phone"].presence
+      phone_value.blank? ? base.except("phone") : base.merge("phone" => phone_value)
     end
   end
 end

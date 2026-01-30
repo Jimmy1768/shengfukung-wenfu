@@ -61,8 +61,7 @@ class Temple < ApplicationRecord
     tab_key = tab.to_s
     hero_media_asset_for(tab_key)&.metadata&.dig("url") ||
       hero_images[tab_key].presence ||
-      hero_images["home"].presence ||
-      primary_image_url
+      hero_images["home"].presence
   end
 
   def hero_images_with_fallback

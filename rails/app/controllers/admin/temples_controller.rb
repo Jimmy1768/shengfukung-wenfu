@@ -28,9 +28,9 @@ module Admin
         :name,
         :tagline,
         :hero_copy,
-        :primary_image_url,
+        :map_link,
         hero_images: Temple::HERO_TABS,
-        contact: %i[addressZh addressEn phone plusCode mapUrl],
+        contact: %i[phone],
         service_times: {},
         visit_info: %i[transportation parking]
       )

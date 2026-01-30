@@ -92,7 +92,6 @@ export function useHeroImage(tab) {
     return (
       heroImages[tab] ||
       heroImages.home ||
-      state.data?.primary_image_url ||
       null
     );
   });

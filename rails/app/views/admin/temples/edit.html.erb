@@ -8,17 +8,17 @@
     </section>
   </div>
 
-  <div class="admin-stack__row">
-    <section class="card stack-item stack-item--xl stack-item--with-gutter">
-      <%= form_with model: @form,
-            scope: :temple,
-            url: admin_temple_profile_path,
-            method: :patch,
-            class: "form-stack",
-            authenticity_token: true,
-            local: true,
-            html: { multipart: true },
-            data: { turbo: false } do |form| %>
+  <%= form_with model: @form,
+        scope: :temple,
+        url: admin_temple_profile_path,
+        method: :patch,
+        class: "form-stack temple-profile-form",
+        authenticity_token: true,
+        local: true,
+        html: { multipart: true },
+        data: { turbo: false } do |form| %>
+    <div class="admin-stack__row">
+      <section class="card stack-item stack-item--xl stack-item--with-gutter">
         <div class="card-grid two-column temple-profile-grid">
           <section class="card form-card">
             <header>
@@ -40,11 +40,6 @@
               <%= form.label :hero_copy, t("admin.temple_profile.fields.hero_copy") %>
               <%= form.text_area :hero_copy, rows: 3, placeholder: t("admin.temple_profile.placeholders.hero_copy") %>
             </div>
-
-            <div class="field">
-              <%= form.label :primary_image_url, t("admin.temple_profile.fields.primary_image_url") %>
-              <%= form.url_field :primary_image_url, placeholder: t("admin.temple_profile.placeholders.primary_image_url") %>
-            </div>
           </section>
 
           <section class="card form-card">
@@ -53,46 +48,36 @@
               <p><%= t("admin.temple_profile.sections.contact.subtitle") %></p>
             </header>
 
-            <div class="grid-2">
-              <div class="field">
-                <%= form.label :contact_addressZh, t("admin.temple_profile.fields.address_zh") %>
-                <%= form.text_field :contact_addressZh,
-                      name: "temple[contact][addressZh]",
-                      value: @form.contact["addressZh"],
-                      placeholder: t("admin.temple_profile.placeholders.address_zh") %>
-              </div>
-              <div class="field">
-                <%= form.label :contact_addressEn, t("admin.temple_profile.fields.address_en") %>
-                <%= form.text_field :contact_addressEn,
-                      name: "temple[contact][addressEn]",
-                      value: @form.contact["addressEn"],
-                      placeholder: t("admin.temple_profile.placeholders.address_en") %>
-              </div>
-            </div>
-
-            <div class="grid-2">
-              <div class="field">
-                <%= form.label :contact_phone, t("admin.temple_profile.fields.phone") %>
-                <%= form.text_field :contact_phone,
-                      name: "temple[contact][phone]",
-                      value: @form.contact["phone"],
-                      placeholder: t("admin.temple_profile.placeholders.phone") %>
-              </div>
-              <div class="field">
-                <%= form.label :contact_plusCode, t("admin.temple_profile.fields.plus_code") %>
-                <%= form.text_field :contact_plusCode,
-                      name: "temple[contact][plusCode]",
-                      value: @form.contact["plusCode"],
-                      placeholder: t("admin.temple_profile.placeholders.plus_code") %>
-              </div>
+            <div class="field">
+              <%= form.label :contact_phone, t("admin.temple_profile.fields.phone") %>
+              <%= form.text_field :contact_phone,
+                    name: "temple[contact][phone]",
+                    value: @form.contact["phone"],
+                    placeholder: t("admin.temple_profile.placeholders.phone") %>
             </div>
 
             <div class="field">
-              <%= form.label :contact_mapUrl, t("admin.temple_profile.fields.map_url") %>
-              <%= form.url_field :contact_mapUrl,
-                    name: "temple[contact][mapUrl]",
-                    value: @form.contact["mapUrl"],
-                    placeholder: t("admin.temple_profile.placeholders.map_url") %>
+              <%= form.label :map_link, t("admin.temple_profile.fields.map_link") %>
+              <%= form.url_field :map_link,
+                    value: @form.map_link,
+                    placeholder: t("admin.temple_profile.placeholders.map_link"),
+                    class: "temple-map-input" %>
+              <p class="muted">貼上 Google Maps 分享連結，即可自動帶入地址與 Plus Code。</p>
+            </div>
+
+            <div class="derived-contact">
+              <div>
+                <div class="label">地址（中文）</div>
+                <div class="muted"><%= @form.temple.contact_details["addressZh"].presence || "尚未設定" %></div>
+              </div>
+              <div>
+                <div class="label">地址（英文）</div>
+                <div class="muted"><%= @form.temple.contact_details["addressEn"].presence || "尚未設定" %></div>
+              </div>
+              <div>
+                <div class="label">Plus Code</div>
+                <div class="muted"><%= @form.temple.contact_details["plusCode"].presence || "自動帶入" %></div>
+              </div>
             </div>
           </section>
 
@@ -156,6 +141,14 @@
 
         </div>
 
+        <div class="form-actions form-actions--centered profile-form-actions">
+          <%= form.submit t("admin.temple_profile.actions.save"), class: "btn btn-primary" %>
+        </div>
+      </section>
+    </div>
+
+    <div class="admin-stack__row">
+      <section class="card stack-item stack-item--xl stack-item--with-gutter card--hero-images">
         <section class="card form-card hero-image-card">
           <header>
             <h2><%= t("admin.temple_profile.sections.hero_images.title") %></h2>
@@ -215,13 +208,9 @@
             <% end %>
           </div>
         </section>
-
-        <div class="form-actions form-actions--centered">
-          <%= form.submit t("admin.temple_profile.actions.save"), class: "btn btn-primary" %>
-        </div>
-      <% end %>
-    </section>
-  </div>
+      </section>
+    </div>
+  <% end %>
 </div>
 
 <script>

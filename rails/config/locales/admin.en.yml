@@ -1,5 +1,10 @@
 en:
   admin:
+    navigation:
+      dashboard: "Dashboard"
+      profile: "Temple Profile"
+      news: "News"
+      gallery: "Gallery"
     filters:
       search:
         label: "Search"
@@ -221,13 +226,11 @@ en:
         name: "Temple name"
         tagline: "Tagline"
         hero_copy: "Homepage hero copy"
-        primary_image_url: "Hero image URL"
         hero_images: "Per-tab hero images"
         address_zh: "Address (ZH)"
         address_en: "Address (EN)"
         phone: "Phone"
-        plus_code: "Plus Code"
-        map_url: "Map URL"
+        map_link: "Google Maps link"
         weekday_hours: "Weekday hours"
         weekend_hours: "Weekend hours"
         notes: "Notes"
@@ -237,13 +240,9 @@ en:
         name: "e.g., Zhunan Shengfukung Temple"
         tagline: "e.g., Serenity · Dignity · Local faith"
         hero_copy: "Summarize your mission, services, and visitor tips."
-        primary_image_url: "https://..."
         hero_image_url: "https://example.com/hero.jpg"
-        address_zh: "e.g., 136 Gongjiao Rd., Zhunan Township"
-        address_en: "e.g., No. 136, Gongjiao Rd, Zhunan Township..."
         phone: "e.g., 03-747-2826"
-        plus_code: "e.g., MVWF+54 Zhunan"
-        map_url: "https://maps.google.com/?q=..."
+        map_link: "https://maps.app.goo.gl/..."
         weekday_hours: "e.g., 08:00 – 17:00"
         weekend_hours: "e.g., 07:30 – 18:00"
         notes: "e.g., Extended hours on lunar 1st and 15th."

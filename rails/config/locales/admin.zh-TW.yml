@@ -1,5 +1,10 @@
 zh-TW:
   admin:
+    navigation:
+      dashboard: "儀表板"
+      profile: "宮廟資料"
+      news: "最新消息"
+      gallery: "活動回顧"
     filters:
       search:
         label: "搜尋"
@@ -212,13 +217,9 @@ zh-TW:
         name: "宮廟名稱"
         tagline: "標語"
         hero_copy: "首頁介紹段落"
-        primary_image_url: "首頁主視覺網址"
         hero_images: "分頁主視覺"
-        address_zh: "地址（中文）"
-        address_en: "地址（英文）"
         phone: "電話"
-        plus_code: "Plus Code"
-        map_url: "地圖連結"
+        map_link: "Google Maps 連結"
         weekday_hours: "平日時段"
         weekend_hours: "假日時段"
         notes: "備註"
@@ -228,13 +229,9 @@ zh-TW:
         name: "例：竹南鎮聖福宮"
         tagline: "例：清淨・莊嚴・在地信仰"
         hero_copy: "用簡潔語句說明宗旨、服務、交通提醒。"
-        primary_image_url: "https://…"
         hero_image_url: "https://example.com/hero.jpg"
-        address_zh: "例：苗栗縣竹南鎮公教路 136 號"
-        address_en: "例：No. 136, Gongjiao Rd, Zhunan Township..."
         phone: "例：03-747-2826"
-        plus_code: "例：MVWF+54 竹南鎮"
-        map_url: "https://maps.google.com/?q=..."
+        map_link: "https://maps.app.goo.gl/..."
         weekday_hours: "例：08:00 – 17:00"
         weekend_hours: "例：07:30 – 18:00"
         notes: "例：農曆初一、十五延長開放。"
