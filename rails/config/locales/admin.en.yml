@@ -286,7 +286,7 @@ en:
         draft: "Draft"
       actions:
         new: "New post"
-        save: "Save post"
+        save: "Save"
         cancel: "Cancel"
         edit: "Edit"
         delete: "Delete"

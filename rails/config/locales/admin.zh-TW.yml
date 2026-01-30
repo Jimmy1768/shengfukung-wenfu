@@ -204,6 +204,14 @@ zh-TW:
           subtitle: "可為每個分頁提供圖片網址；若留白則自動沿用首頁主視覺。"
           fallback_hint: "未填寫的頁面會使用「首頁」圖片，確保畫面不留白。"
           row_hint: "可留白，系統會使用首頁圖片。"
+          choose_file: "選擇檔案"
+          upload_button: "上傳"
+          uploading_label: "上傳中..."
+          paste_url: "或貼上圖片網址"
+          url_hint: "暫時可貼上現有網址，之後再改成正式上傳。"
+          upload_success: "圖片上傳成功。"
+          upload_error: "上傳失敗，請再試一次。"
+          generic_error: "發生錯誤，請稍後重試。"
         contact:
           title: "聯絡方式"
           subtitle: "呈現於聯絡頁與頁尾。"
@@ -248,6 +256,9 @@ zh-TW:
         news: "最新消息"
         services: "參拜 / 服務"
         contact: "聯絡 / 交通"
+    news_posts:
+      actions:
+        save: "儲存"
     offerings:
       index:
         title: "供品管理"

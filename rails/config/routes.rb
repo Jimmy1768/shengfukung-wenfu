@@ -34,6 +34,10 @@ namespace :marketing_admin, path: "/marketing/admin", module: "dev/demo/rails" d
   # the general offerings routes so `/admin/offerings/new` does not hit `#show`.
   get "/admin/offerings/new", to: "admin/offerings#new", as: :new_admin_offering
   get "/admin/offerings/:id/edit", to: "admin/offerings#edit", as: :edit_admin_offering
+  get "/admin/news_posts/new", to: "admin/news_posts#new", as: :new_admin_news_post
+  get "/admin/news_posts/:id/edit", to: "admin/news_posts#edit", as: :edit_admin_news_post
+  get "/admin/gallery_entries/new", to: "admin/gallery_entries#new", as: :new_admin_gallery_entry
+  get "/admin/gallery_entries/:id/edit", to: "admin/gallery_entries#edit", as: :edit_admin_gallery_entry
 
   # --- Real admin console ----------------------------------------------------
   namespace :admin do

@@ -698,8 +698,9 @@
   padding-top: var(--spacing-lg);
 }
 
-.hero-image-card {
-  margin-top: var(--spacing-lg);
+
+.card--hero-images {
+  margin-top: var(--spacing-xl);
 }
 
 .hero-image-grid {
@@ -707,6 +708,18 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--spacing-md);
   margin-top: var(--spacing-md);
+}
+
+.hero-image-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.hero-image-fallback-hint {
+  margin: 0;
 }
 
 .hero-image-item {

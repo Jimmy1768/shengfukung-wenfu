@@ -575,6 +575,14 @@ body.admin-body input[type="date"]::placeholder {
   width: 100%;
 }
 
+.admin-stack__row--primary {
+  margin-bottom: var(--spacing-xl);
+}
+
+.admin-stack__row--hero {
+  margin-top: 0;
+}
+
 .admin-stack__row {
   width: 100%;
   display: flex;

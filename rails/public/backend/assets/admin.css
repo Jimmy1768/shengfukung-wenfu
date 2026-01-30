@@ -1007,6 +1007,14 @@ body.admin-body input[type=date]::placeholder {
   width: 100%;
 }
 
+.admin-stack__row--primary {
+  margin-bottom: var(--spacing-xl);
+}
+
+.admin-stack__row--hero {
+  margin-top: 0;
+}
+
 .admin-stack__row {
   width: 100%;
   display: flex;
@@ -1953,8 +1961,8 @@ body.admin-body input[type=date]::placeholder {
   padding-top: var(--spacing-lg);
 }
 
-.hero-image-card {
-  margin-top: var(--spacing-lg);
+.card--hero-images {
+  margin-top: var(--spacing-xl);
 }
 
 .hero-image-grid {
@@ -1962,6 +1970,18 @@ body.admin-body input[type=date]::placeholder {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--spacing-md);
   margin-top: var(--spacing-md);
+}
+
+.hero-image-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.hero-image-fallback-hint {
+  margin: 0;
 }
 
 .hero-image-item {
@@ -2081,4 +2101,16 @@ body.admin-body input[type=date]::placeholder {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.derived-contact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.derived-contact__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }

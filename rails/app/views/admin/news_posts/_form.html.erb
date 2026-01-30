@@ -1,4 +1,5 @@
-<%= form_with model: [:admin, news_post], class: "form-stack" do |form| %>
+<% form_action = news_post.persisted? ? admin_news_post_path(news_post) : admin_news_posts_path %>
+<%= form_with model: news_post, url: form_action, scope: :news_post, class: "form-stack" do |form| %>
   <% if news_post.errors.any? %>
     <div class="inline-validation" data-inline-validation>
       <strong><%= t("admin.news_posts.form.errors", count: news_post.errors.count) %></strong>
