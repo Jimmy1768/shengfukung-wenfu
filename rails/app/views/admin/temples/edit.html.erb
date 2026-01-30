@@ -62,19 +62,19 @@
                     value: @form.map_link,
                     placeholder: t("admin.temple_profile.placeholders.map_link"),
                     class: "temple-map-input" %>
-              <p class="muted">貼上 Google Maps 分享連結，即可自動帶入地址與 Plus Code。</p>
+              <p class="muted">貼上 Google Maps 分享連結，即可自動帶入地址資訊。</p>
             </div>
 
             <div class="derived-contact">
-              <div>
+              <div class="derived-contact__item">
                 <div class="label">地址（中文）</div>
                 <div class="muted"><%= @form.temple.contact_details["addressZh"].presence || "尚未設定" %></div>
               </div>
-              <div>
+              <div class="derived-contact__item">
                 <div class="label">地址（英文）</div>
                 <div class="muted"><%= @form.temple.contact_details["addressEn"].presence || "尚未設定" %></div>
               </div>
-              <div>
+              <div class="derived-contact__item">
                 <div class="label">Plus Code</div>
                 <div class="muted"><%= @form.temple.contact_details["plusCode"].presence || "自動帶入" %></div>
               </div>

@@ -828,3 +828,15 @@
   border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
 }
+
+.derived-contact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.derived-contact__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
