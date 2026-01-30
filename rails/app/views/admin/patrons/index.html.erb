@@ -6,7 +6,10 @@
         <p class="muted"><%= t("admin.patrons.index.subtitle") %></p>
       </header>
 
-      <%= form_with url: admin_patrons_path, method: :get, local: true, class: "patron-search-form" do |form| %>
+      <%= form_with url: admin_patrons_path,
+                    method: :get,
+                    local: true,
+                    class: "patron-search-form" do |form| %>
         <div class="field">
           <%= form.label :q, t("admin.patrons.index.search_label") %>
           <%= form.text_field :q,
@@ -14,13 +17,25 @@
                 placeholder: t("admin.patrons.index.search_placeholder"),
                 class: "search-input" %>
         </div>
+        <%= form.hidden_field :view, value: @view %>
         <div class="form-actions">
           <%= form.submit t("admin.patrons.index.search_action"), class: "btn btn-primary" %>
           <% if @query.present? %>
-            <%= link_to t("admin.patrons.index.clear_action"), admin_patrons_path, class: "btn btn-secondary" %>
+            <%= link_to t("admin.patrons.index.clear_action"), admin_patrons_path(view: @view), class: "btn btn-secondary" %>
           <% end %>
         </div>
       <% end %>
+
+      <div class="filter-chip-row">
+        <% [["all", t("admin.patrons.index.filters.all")],
+            ["admins", t("admin.patrons.index.filters.admins")]].each do |value, label| %>
+          <% classes = ["filter-chip"] %>
+          <% classes << "is-active" if @view == value %>
+          <%= link_to label,
+                admin_patrons_path(view: value, q: @query),
+                class: classes.join(" ") %>
+        <% end %>
+      </div>
       <p class="muted"><%= t("admin.patrons.index.hint") %></p>
     </section>
   </div>
@@ -43,29 +58,90 @@
                 <th><%= t("admin.patrons.index.table.name") %></th>
                 <th><%= t("admin.patrons.index.table.email") %></th>
                 <th><%= t("admin.patrons.index.table.phone") %></th>
-                <th><%= t("admin.patrons.index.table.dependents") %></th>
-                <th><%= t("admin.patrons.index.table.notes") %></th>
+                <th><%= t("admin.patrons.index.table.actions") %></th>
               </tr>
             </thead>
             <tbody>
               <% @patrons.each do |patron| %>
                 <% details = patron.metadata || {} %>
+                <% modal_key = "patron-profile-#{patron.id}" %>
+                <% membership = patron.admin_account&.admin_temple_memberships&.find { |record| record.temple_id == current_temple.id } %>
                 <tr>
                   <td><%= patron.english_name.presence || patron.native_name || "—" %></td>
                   <td><%= patron.email %></td>
                   <td><%= details["phone"].presence || "—" %></td>
                   <td>
-                    <% if patron.dependents.any? %>
-                      <ul class="inline-list">
-                        <% patron.dependents.each do |dependent| %>
-                          <li><%= dependent.english_name %></li>
+                    <div class="profile-menu patron-actions" data-profile-menu>
+                      <button type="button"
+                        class="btn btn-secondary"
+                        data-profile-menu-trigger>
+                        <%= t("admin.patrons.index.actions.button") %>
+                      </button>
+                      <div class="patron-actions-menu"
+                        data-profile-menu-panel>
+                        <button type="button"
+                          class="patron-actions-item"
+                          data-modal-trigger="<%= modal_key %>">
+                          <span><%= t("admin.patrons.index.actions.view_profile") %></span>
+                        </button>
+                        <%= link_to t("admin.patrons.index.actions.view_records"),
+                              admin_orders_path(q: patron.email),
+                              class: "patron-actions-item",
+                              target: "_blank" %>
+                        <% if @can_manage_admins %>
+                          <% if membership %>
+                            <%= button_to revoke_admin_patron_path(patron, view: @view, q: @query),
+                                  method: :delete,
+                                  class: "patron-actions-item",
+                                  form: { class: "patron-actions-form" },
+                                  data: { confirm: t("admin.patrons.index.actions.revoke_confirm", name: patron.english_name.presence || patron.email) } do %>
+                              <span><%= t("admin.patrons.index.actions.revoke") %></span>
+                            <% end %>
+                          <% else %>
+                            <%= button_to promote_admin_patron_path(patron, view: @view, q: @query),
+                                  method: :post,
+                                  class: "patron-actions-item",
+                                  form: { class: "patron-actions-form" } do %>
+                              <span><%= t("admin.patrons.index.actions.promote") %></span>
+                            <% end %>
+                          <% end %>
                         <% end %>
-                      </ul>
-                    <% else %>
-                      —
-                    <% end %>
+                      </div>
+                    </div>
+
+                    <div class="modal-overlay is-hidden" data-modal-key="<%= modal_key %>">
+                      <div class="modal-panel">
+                        <button class="modal-close" data-modal-close="<%= modal_key %>">&times;</button>
+                        <header class="modal-header">
+                          <h2 class="modal-title"><%= patron.english_name.presence || patron.native_name || t("admin.patrons.index.profile_modal.unknown_name") %></h2>
+                          <p class="muted"><%= patron.email %></p>
+                        </header>
+                        <div class="modal-body">
+                          <dl class="patron-profile-summary">
+                            <dt><%= t("admin.patrons.index.profile_modal.phone") %></dt>
+                            <dd><%= details["phone"].presence || "—" %></dd>
+                            <dt><%= t("admin.patrons.index.profile_modal.notes") %></dt>
+                            <dd><%= details["notes"].presence || "—" %></dd>
+                            <dt><%= t("admin.patrons.index.profile_modal.dependents") %></dt>
+                            <dd>
+                              <% if patron.dependents.any? %>
+                                <ul class="inline-list">
+                                  <% patron.dependents.each do |dependent| %>
+                                    <li><%= dependent.english_name %></li>
+                                  <% end %>
+                                </ul>
+                              <% else %>
+                                —
+                              <% end %>
+                            </dd>
+                          </dl>
+                        </div>
+                        <div class="modal-footer">
+                          <button class="btn btn-secondary" data-modal-close="<%= modal_key %>"><%= t("admin.patrons.index.profile_modal.close") %></button>
+                        </div>
+                      </div>
+                    </div>
                   </td>
-                  <td><%= details["notes"].presence || "—" %></td>
                 </tr>
               <% end %>
             </tbody>

@@ -10,6 +10,9 @@ Progress tracking: fill in each `Completed:` line once the section is implemente
 - Add Active Storage + S3 plumbing for hero images, archive galleries, and news thumbnails (placeholders acceptable until uploads are ready).
 
 Completed:
+- Temple profile form now persists hero copy, per-tab hero images, contact/service/visit metadata, and validates Google Maps links via Places API.
+- Hero image uploads use the new AJAX uploader + fallback URL inputs; map_link automatically populates address + plus code fields.
+- News posts (`TempleNewsPost`) and gallery entries (`TempleGalleryEntry`) models/controllers in place with scoped seeds for each temple.
 
 ## Phase 2 – Admin UX Enhancements
 
@@ -19,6 +22,11 @@ Completed:
 - Lock down permissions so only authorized owner/staff accounts can access the new sections.
 
 Completed:
+- `/admin/temple/profile` redesigned with per-section cards, distinct hero image controls, inline validation, and map-link derived metadata display.
+- `/admin/news_posts` CRUD (list + form) + `/admin/gallery_entries` CRUD now use the shared admin card layout, localized copy, and stylized datetime pickers.
+- Payments dashboard, archives filters, and ledger tables have localized copy + spacing fixes; metrics/pill cards match the latest visual system.
+- Added the patrons directory screen (owner-only) with search + table view as the precursor to the “promote patron to admin” flow.
+- Temple switcher allows admin owners to move between slugs locally (disabled in production environments).
 
 ## Phase 3 – Public API Surface
 
@@ -56,3 +64,9 @@ Completed:
 - Expo endpoints should mirror Rails cache payloads 1:1, omitting only the datasets intentionally excluded from mobile to keep screens lightweight.
 
 Completed:
+
+## Upcoming Enhancements / Notes for Codex
+
+- Patron → Admin workflow: owners need UI actions to promote patrons into admin accounts and revoke access, plus filters for viewing current admins only.
+- Owner-only tasks on the dashboard should continue to drive these workflows (temple profile completeness, missing offerings, patron promotions, permission review).
+- Future documentation updates should track any new service objects or endpoints introduced for admin promotion/removal.

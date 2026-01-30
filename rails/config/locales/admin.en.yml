@@ -185,13 +185,35 @@ en:
         results_title: "Latest matches"
         results_hint: "Add more keywords above to narrow the list."
         manage_permissions: "Open admin permissions"
+        filters:
+          all: "All patrons"
+          admins: "Current admins"
+        actions:
+          button: "Actions"
+          view_profile: "View profile"
+          view_records: "View records"
+          promote: "Promote to admin"
+          revoke: "Remove admin access"
+          revoke_confirm: "Remove admin access for %{name}?"
         table:
           name: "Name"
           email: "Email"
           phone: "Phone"
-          dependents: "Dependents"
-          notes: "Notes"
+          actions: "Actions"
         empty: "No patrons match this search."
+      flash:
+        promoted: "%{name} is now an admin."
+        revoked: "%{name} no longer has admin access."
+        invalid_user: "Unable to find that patron."
+        not_admin: "This patron is not currently an admin for this temple."
+        cannot_remove_owner: "Owner accounts cannot be removed from a temple."
+        forbidden: "You do not have access to modify patron permissions."
+      profile_modal:
+        phone: "Phone"
+        notes: "Notes"
+        dependents: "Dependents"
+        close: "Close"
+        unknown_name: "Unknown member"
     dashboard:
       hero:
         eyebrow: "Admin console"
@@ -591,3 +613,12 @@ en:
         manage_permissions:
           label: "Manage permissions"
           hint: "Grant or revoke staff access levels."
+        manage_profile:
+          label: "Manage profile"
+          hint: "Edit the temple profile, hero copy, and contact details."
+        manage_news:
+          label: "Manage news"
+          hint: "Create and publish temple news posts."
+        manage_gallery:
+          label: "Manage gallery"
+          hint: "Add or update gallery/event recap content."

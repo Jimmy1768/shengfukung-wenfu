@@ -185,13 +185,35 @@ zh-TW:
         results_title: "搜尋結果"
         results_hint: "如需縮小範圍，請輸入更多關鍵字。"
         manage_permissions: "開啟管理員權限"
+        filters:
+          all: "所有信眾"
+          admins: "現有管理員"
+        actions:
+          button: "操作"
+          view_profile: "檢視資料"
+          view_records: "查看紀錄"
+          promote: "升為管理員"
+          revoke: "移除管理員"
+          revoke_confirm: "確定要移除 %{name} 的管理權限嗎？"
         table:
           name: "姓名"
           email: "Email"
           phone: "電話"
-          dependents: "家屬"
-          notes: "備註"
+          actions: "操作"
         empty: "沒有符合條件的信眾。"
+      flash:
+        promoted: "%{name} 已加入管理員。"
+        revoked: "%{name} 的管理權限已移除。"
+        invalid_user: "找不到指定的信眾。"
+        not_admin: "此信眾目前不是本宮廟的管理員。"
+        cannot_remove_owner: "擁有者帳號不得移除。"
+        forbidden: "您沒有權限執行此操作。"
+      profile_modal:
+        phone: "電話"
+        notes: "備註"
+        dependents: "家屬"
+        close: "關閉"
+        unknown_name: "未知信眾"
     dashboard:
       hero:
         eyebrow: "管理主控台"
@@ -517,3 +539,12 @@ zh-TW:
         manage_permissions:
           label: "管理權限"
           hint: "賦予或移除工作人員權限。"
+        manage_profile:
+          label: "管理宮廟資料"
+          hint: "編輯官網的文案、主視覺與聯絡資訊。"
+        manage_news:
+          label: "管理最新消息"
+          hint: "建立、發佈或更新最新消息文章。"
+        manage_gallery:
+          label: "管理活動回顧"
+          hint: "新增或編輯活動回顧與相簿內容。"

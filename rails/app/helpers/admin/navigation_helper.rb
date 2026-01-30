@@ -51,24 +51,24 @@ module Admin
         capabilities: %i[view_financials export_financials]
       },
       {
-        key: :patrons,
-        label: "Patrons",
-        description: "查看信眾與管理員候選人",
-        path: -> { admin_patrons_path },
-        capabilities: :manage_permissions
-      },
-      {
         key: :archives,
         label: "Archives",
         description: "年度紀錄與報表",
         path: -> { admin_archives_path }
       },
       {
+        key: :patrons,
+        label: "Patrons",
+        description: "查看信眾與管理員候選人",
+        path: -> { admin_patrons_path },
+        capabilities: %i[manage_permissions manage_registrations]
+      },
+      {
         key: :permissions,
         label: "Permissions",
         description: "管理管理員權限",
         path: -> { admin_permissions_path },
-        capabilities: :manage_permissions
+        owner_only: true
       }
     ].freeze
 
@@ -83,6 +83,8 @@ module Admin
     private
 
     def nav_item_visible?(item)
+      return false if item[:owner_only] && !owner_admin_account?
+
       capabilities = Array(item[:capabilities]).compact
       return true if capabilities.empty?
 
@@ -90,6 +92,10 @@ module Admin
       return false if permissions.nil?
 
       capabilities.any? { |capability| permissions.allow?(capability) }
+    end
+
+    def owner_admin_account?
+      current_admin&.admin_account&.owner_role?
     end
   end
 end

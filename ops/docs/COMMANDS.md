@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "building news and gallery v3"
+git commit -m ""
 git push
 
 git reset --hard HEAD

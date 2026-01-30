@@ -69,7 +69,7 @@ body {
     background: #050914;
     border-radius: var(--radius-md);
     box-shadow: 0 30px 70px rgba(1, 5, 16, 0.7);
-    display: inline-flex;
+    display: none;
     flex-direction: column;
     min-width: 0;
     padding: var(--spacing-sm);
@@ -81,6 +81,7 @@ body {
   }
 
   .profile-menu.is-open .nav-user-dropdown {
+    display: inline-flex;
     opacity: 1;
     pointer-events: auto;
   }
@@ -885,6 +886,71 @@ body.admin-body input[type="datetime-local"]::placeholder {
   border-radius: var(--radius-sm);
   background: rgba(148, 163, 184, 0.15);
   font-size: 0.85rem;
+}
+
+.patron-actions {
+  position: relative;
+  display: inline-flex;
+}
+
+.patron-actions-menu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  display: none;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 180px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm);
+  box-shadow: var(--shadow-soft);
+  z-index: 50;
+}
+
+.patron-actions.is-open .patron-actions-menu {
+  display: flex;
+}
+
+.patron-actions-form {
+  margin: 0;
+}
+
+.patron-actions-item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 0.35rem 0.4rem;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  color: var(--text);
+  font: inherit;
+}
+
+.patron-actions-item:hover {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.patron-profile-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.patron-profile-summary dt {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: var(--text-muted);
+}
+
+.patron-profile-summary dd {
+  margin: 0;
+  color: var(--text);
 }
 
 .setting-list {
