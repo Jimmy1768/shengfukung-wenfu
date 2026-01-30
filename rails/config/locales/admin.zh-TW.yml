@@ -167,10 +167,31 @@ zh-TW:
           label: "檢視報名與紙本訂單"
         payments:
           label: "查看付款統計與記錄"
+        patrons:
+          label: "信眾與管理員"
         archives:
           label: "年度紀錄與報表"
         permissions:
           label: "管理管理員權限"
+    patrons:
+      index:
+        title: "信眾名單"
+        subtitle: "可在此搜尋既有信眾，並視需要升為管理員。"
+        search_label: "搜尋"
+        search_placeholder: "輸入姓名、Email 或關鍵字"
+        search_action: "搜尋信眾"
+        clear_action: "清除"
+        hint: "僅顯示最近 25 筆符合的結果，若要升為管理員請前往權限頁面操作。"
+        results_title: "搜尋結果"
+        results_hint: "如需縮小範圍，請輸入更多關鍵字。"
+        manage_permissions: "開啟管理員權限"
+        table:
+          name: "姓名"
+          email: "Email"
+          phone: "電話"
+          dependents: "家屬"
+          notes: "備註"
+        empty: "沒有符合條件的信眾。"
     dashboard:
       hero:
         eyebrow: "管理主控台"
@@ -185,11 +206,12 @@ zh-TW:
           revenue_placeholder: "營收（示意）"
       next_steps:
         title: "下一步"
-        subtitle: "可用此區塊整理合作案的後端工作。"
+        subtitle: "快速完成宮廟上線時會用到的幾個任務。"
         fill_profile: "前往填寫宮廟資料 →"
-        connect_data: "將真實資料源串入上述 KPI。"
-        first_workflow: "把此範例換成第一個 CRUD 流程（信眾、訂單、預約等）。"
-        document_scope_html: "於 <code>docs/</code> 詳列客戶的管理需求。"
+        setup_offerings: "建立第一個供品模板"
+        promote_admin_from_patron: "從信眾名單挑選並建立管理員"
+        manage_permissions: "檢視並調整管理員權限"
+        complete: "已完成主要任務，接著可透過左側選單繼續操作。"
     temple_profile:
       hero:
         eyebrow: "宮廟資料"
@@ -377,6 +399,8 @@ zh-TW:
           title: "最近 100 筆付款"
         table:
           reference: "編號"
+          patron: "信眾"
+          offering: "供品"
           method: "付款方式"
           amount: "金額"
           status: "狀態"
@@ -384,6 +408,10 @@ zh-TW:
           recorded_by: "紀錄人員"
           processed: "處理時間"
           view: "檢視"
+      filters:
+        title: "篩選付款"
+        subtitle: "可依信眾、供品、付款方式或自訂日期區間搜尋。"
+        default_window_hint: "預設僅顯示最近 90 天，如需查看更多請輸入日期區間。"
       statuses:
         pending: "待處理"
         completed: "已完成"
@@ -453,6 +481,13 @@ zh-TW:
       limited:
         title: "權限不足"
         body_html: "目前僅能檢視年度快照。若需查看完整明細，請向擁有者或具財務權限的管理員申請。"
+      payments:
+        title: "搜尋付款封存"
+        subtitle: "輸入日期區間，即可檢視歷史帳冊的付款紀錄與付款方式。"
+        awaiting_range: "請先選擇日期區間以檢視封存紀錄。"
+        range_heading: "%{start} 至 %{end} 的付款紀錄"
+        range_hint: "封存區塊不套用視窗限制，會回傳所選區間的所有資料。"
+        empty_range: "此日期區間沒有封存的付款紀錄。"
     permissions:
       index:
         eyebrow: "權限"

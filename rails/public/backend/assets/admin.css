@@ -1247,6 +1247,7 @@ body.admin-body input[type=datetime-local]::placeholder {
   grid-template-columns: repeat(auto-fit, minmax(140px, max-content));
   gap: var(--spacing-sm);
   justify-content: flex-start;
+  margin-top: var(--spacing-lg);
 }
 
 .metric {
@@ -1264,6 +1265,7 @@ body.admin-body input[type=datetime-local]::placeholder {
 .metric strong {
   font-size: 1.15rem;
   line-height: 1.2;
+  color: #fff;
 }
 
 .idea-list {
@@ -1280,6 +1282,22 @@ body.admin-body input[type=datetime-local]::placeholder {
   border-radius: var(--radius-sm);
   padding: var(--spacing-sm);
   background: rgba(15, 23, 42, 0.35);
+}
+
+.inline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.inline-list li {
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  background: rgba(148, 163, 184, 0.15);
+  font-size: 0.85rem;
 }
 
 .setting-list {
@@ -1680,7 +1698,7 @@ body.admin-body input[type=datetime-local]::placeholder {
 .metrics-grid-container {
   width: 100%;
   max-width: 960px;
-  margin: 0 auto;
+  margin: var(--spacing-md) auto 0 auto;
 }
 
 .metric-card--list {

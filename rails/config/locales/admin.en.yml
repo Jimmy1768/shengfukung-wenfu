@@ -167,10 +167,31 @@ en:
           label: "Orders"
         payments:
           label: "Payments"
+        patrons:
+          label: "Patrons"
         archives:
           label: "Archives"
         permissions:
           label: "Permissions"
+    patrons:
+      index:
+        title: "Member directory"
+        subtitle: "Search patrons and promote them to the admin roster when needed."
+        search_label: "Search"
+        search_placeholder: "Name, email, or keyword"
+        search_action: "Search members"
+        clear_action: "Clear"
+        hint: "Search returns the latest 25 matches. Use the permissions page to promote someone into an admin role."
+        results_title: "Latest matches"
+        results_hint: "Add more keywords above to narrow the list."
+        manage_permissions: "Open admin permissions"
+        table:
+          name: "Name"
+          email: "Email"
+          phone: "Phone"
+          dependents: "Dependents"
+          notes: "Notes"
+        empty: "No patrons match this search."
     dashboard:
       hero:
         eyebrow: "Admin console"
@@ -185,11 +206,12 @@ en:
           revenue_placeholder: "Revenue (placeholder)"
       next_steps:
         title: "Next steps"
-        subtitle: "Use this section to outline the backend work for your client engagement."
-        fill_profile: "Fill out the temple profile →"
-        connect_data: "Connect real-world data sources to the KPIs above."
-        first_workflow: "Replace this placeholder with the first CRUD workflow (users, orders, bookings, etc.)."
-        document_scope_html: "Document the admin scope inside <code>docs/</code> for each new client."
+        subtitle: "Quick links to finish onboarding tasks."
+        fill_profile: "Complete the temple profile →"
+        setup_offerings: "Create your first offering template"
+        promote_admin_from_patron: "Promote a patron into the admin roster"
+        manage_permissions: "Review and adjust admin permissions"
+        complete: "All onboarding tasks are done. Use the navigation to continue."
     temple_profile:
   admin:
     hero:
@@ -451,6 +473,8 @@ en:
           title: "Latest 100 payments"
         table:
           reference: "Reference"
+          patron: "Patron"
+          offering: "Offering"
           method: "Method"
           amount: "Amount"
           status: "Status"
@@ -458,6 +482,10 @@ en:
           recorded_by: "Recorded by"
           processed: "Processed"
           view: "View"
+      filters:
+        title: "Filter payments"
+        subtitle: "Search patrons, offerings, payment methods, or provide a custom date range."
+        default_window_hint: "Default view limits results to the last 90 days. Add a range to expand."
       statuses:
         pending: "Pending"
         completed: "Completed"
@@ -527,6 +555,13 @@ en:
       limited:
         title: "Limited access"
         body_html: "You’re viewing the annual snapshots. Detailed history requires an owner role or the financials capability. Contact the head administrator if you need to review individual records."
+      payments:
+        title: "Search payment archives"
+        subtitle: "Use a date range to audit historical ledger entries across offerings and payment methods."
+        awaiting_range: "Select a date range to view archived payments."
+        range_heading: "Payments from %{start} to %{end}"
+        range_hint: "No default window is applied here—archives return everything in the selected range."
+        empty_range: "No archived payments for this range."
     permissions:
       index:
         eyebrow: "Permissions"

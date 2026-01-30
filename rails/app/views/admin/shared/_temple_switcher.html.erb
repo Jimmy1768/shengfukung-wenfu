@@ -2,6 +2,7 @@
   <% if allow_temple_switch? %>
     <%= form_with url: admin_temple_switch_path,
                   method: :post,
+                  scope: :temple_switch,
                   class: "temple-switcher-form",
                   local: true do |form| %>
       <%= form.select :temple_slug,

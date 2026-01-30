@@ -3,13 +3,13 @@
     <table class="admin-table admin-payments-table">
       <thead>
         <tr>
-          <th>Reference</th>
-          <th>Patron</th>
-          <th>Offering</th>
-          <th>Amount</th>
-          <th>Method</th>
-          <th>Recorded by</th>
-          <th>Processed</th>
+          <th><%= t("admin.payments.index.table.reference") %></th>
+          <th><%= t("admin.payments.index.table.patron", default: "Patron") %></th>
+          <th><%= t("admin.payments.index.table.offering", default: "Offering") %></th>
+          <th><%= t("admin.payments.index.table.amount") %></th>
+          <th><%= t("admin.payments.index.table.method") %></th>
+          <th><%= t("admin.payments.index.table.recorded_by") %></th>
+          <th><%= t("admin.payments.index.table.processed") %></th>
         </tr>
       </thead>
       <tbody>
@@ -28,5 +28,5 @@
     </table>
   </div>
 <% else %>
-  <p class="muted"><%= empty_message || "No payments match the current filters." %></p>
+  <p class="muted"><%= empty_message || t("admin.payments.index.empty") %></p>
 <% end %>

@@ -33,12 +33,21 @@
         <h2><%= t("admin.dashboard.next_steps.title") %></h2>
         <p><%= t("admin.dashboard.next_steps.subtitle") %></p>
       </header>
-      <ul class="idea-list">
-        <li><%= link_to t("admin.dashboard.next_steps.fill_profile"), admin_temple_profile_path, class: "link" %></li>
-        <li><%= t("admin.dashboard.next_steps.connect_data") %></li>
-        <li><%= t("admin.dashboard.next_steps.first_workflow") %></li>
-        <li><%= t("admin.dashboard.next_steps.document_scope_html") %></li>
-      </ul>
+      <% if @next_steps.any? %>
+        <ul class="idea-list">
+          <% @next_steps.each do |step| %>
+            <li>
+              <% if step[:url].present? %>
+                <%= link_to step[:label], step[:url], class: "link" %>
+              <% else %>
+                <span><%= step[:label] %></span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="muted"><%= t("admin.dashboard.next_steps.complete") %></p>
+      <% end %>
     </section>
   </div>
 </div>

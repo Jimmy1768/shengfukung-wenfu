@@ -65,6 +65,8 @@ module Admin
     end
 
     def allow_temple_switch?
+      return false if Rails.env.production?
+
       admin_signed_in? &&
         current_admin.admin_account.owner_role? &&
         available_admin_temples.size > 1

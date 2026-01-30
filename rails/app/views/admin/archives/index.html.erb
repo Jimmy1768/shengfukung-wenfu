@@ -3,8 +3,8 @@
     <div class="admin-stack__row">
       <section class="card stack-item admin-card-with-filter">
         <header>
-          <h1>Search payment archives</h1>
-          <p class="muted">Use a date range to audit historical ledger entries across offerings and methods.</p>
+          <h1><%= t("admin.archives.payments.title") %></h1>
+          <p class="muted"><%= t("admin.archives.payments.subtitle") %></p>
         </header>
 
         <%= render "admin/shared/filters",
@@ -29,7 +29,7 @@
     <% if @awaiting_range %>
       <div class="admin-stack__row">
         <section class="card stack-item empty-state-card">
-          <p class="muted">Select a date range to view archived payments.</p>
+          <p class="muted"><%= t("admin.archives.payments.awaiting_range") %></p>
         </section>
       </div>
     <% else %>
@@ -37,14 +37,14 @@
         <section class="card stack-item stack-item--fluid admin-table-card">
           <header class="admin-section-header">
             <div>
-              <h2>Payments from <%= @filters[:start_date] %> to <%= @filters[:end_date] %></h2>
-              <p class="muted">No default window is applied here—archives return everything in the selected range.</p>
+              <h2><%= t("admin.archives.payments.range_heading", start: @filters[:start_date], end: @filters[:end_date]) %></h2>
+              <p class="muted"><%= t("admin.archives.payments.range_hint") %></p>
             </div>
           </header>
 
           <%= render "admin/payments/ledger_table",
             payments: @archived_payments,
-            empty_message: "No archived payments for this range." %>
+            empty_message: t("admin.archives.payments.empty_range") %>
         </section>
       </div>
     <% end %>

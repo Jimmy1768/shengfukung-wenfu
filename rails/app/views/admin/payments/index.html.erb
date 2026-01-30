@@ -92,8 +92,8 @@
   <div class="admin-stack__row">
     <section class="card stack-item admin-card-with-filter">
       <header>
-        <h2>Filter payments</h2>
-        <p class="muted">Search across patrons, offerings, payment methods, and date ranges.</p>
+        <h2><%= t("admin.payments.filters.title") %></h2>
+        <p class="muted"><%= t("admin.payments.filters.subtitle") %></p>
       </header>
 
       <%= render "admin/shared/filters",
@@ -106,7 +106,7 @@
         hidden_params: @filter_hidden_fields %>
 
       <% if @default_payment_window %>
-        <p class="filter-hint muted">Default view limited to the last 90 days. Add a range above to expand.</p>
+        <p class="filter-hint muted"><%= t("admin.payments.filters.default_window_hint") %></p>
       <% end %>
     </section>
   </div>

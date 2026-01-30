@@ -70,6 +70,11 @@ class Temple < ApplicationRecord
     end
   end
 
+  def profile_complete?
+    details = contact_details
+    [name, tagline, hero_copy, details["phone"], details["mapUrl"]].all?(&:present?)
+  end
+
   def hero_media_asset_for(tab)
     media_assets.hero.where("metadata ->> 'hero_tab' = ?", tab.to_s).first
   end

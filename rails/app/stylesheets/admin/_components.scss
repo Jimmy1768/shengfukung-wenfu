@@ -380,7 +380,7 @@
 .metrics-grid-container {
   width: 100%;
   max-width: 960px;
-  margin: 0 auto;
+  margin: var(--spacing-md) auto 0 auto;
 }
 
 .metric-card--list {

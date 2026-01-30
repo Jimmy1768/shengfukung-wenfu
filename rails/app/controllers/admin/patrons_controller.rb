@@ -2,15 +2,22 @@
 
 module Admin
   class PatronsController < BaseController
-    before_action :require_manage_registrations!
+    before_action :require_manage_permissions!
 
     def index
       patrons = filtered_scope
-      patrons = patrons.limit(20)
 
-      render json: {
-        patrons: patrons.map { |user| patron_payload(user) }
-      }
+      respond_to do |format|
+        format.html do
+          @query = params[:q].to_s.strip
+          @patrons = patrons.limit(25)
+        end
+        format.json do
+          render json: {
+            patrons: patrons.limit(50).map { |user| patron_payload(user) }
+          }
+        end
+      end
     end
 
     def create
@@ -25,8 +32,8 @@ module Admin
 
     private
 
-    def require_manage_registrations!
-      require_capability!(:manage_registrations)
+    def require_manage_permissions!
+      require_capability!(:manage_permissions)
     end
 
     def patron_scope

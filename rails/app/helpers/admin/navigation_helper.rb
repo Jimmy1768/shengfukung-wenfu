@@ -51,6 +51,13 @@ module Admin
         capabilities: %i[view_financials export_financials]
       },
       {
+        key: :patrons,
+        label: "Patrons",
+        description: "查看信眾與管理員候選人",
+        path: -> { admin_patrons_path },
+        capabilities: :manage_permissions
+      },
+      {
         key: :archives,
         label: "Archives",
         description: "年度紀錄與報表",

@@ -1,0 +1,79 @@
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item admin-card-with-filter">
+      <header>
+        <h1><%= t("admin.patrons.index.title") %></h1>
+        <p class="muted"><%= t("admin.patrons.index.subtitle") %></p>
+      </header>
+
+      <%= form_with url: admin_patrons_path, method: :get, local: true, class: "patron-search-form" do |form| %>
+        <div class="field">
+          <%= form.label :q, t("admin.patrons.index.search_label") %>
+          <%= form.text_field :q,
+                value: @query,
+                placeholder: t("admin.patrons.index.search_placeholder"),
+                class: "search-input" %>
+        </div>
+        <div class="form-actions">
+          <%= form.submit t("admin.patrons.index.search_action"), class: "btn btn-primary" %>
+          <% if @query.present? %>
+            <%= link_to t("admin.patrons.index.clear_action"), admin_patrons_path, class: "btn btn-secondary" %>
+          <% end %>
+        </div>
+      <% end %>
+      <p class="muted"><%= t("admin.patrons.index.hint") %></p>
+    </section>
+  </div>
+
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--fluid admin-table-card">
+      <header class="admin-section-header">
+        <div>
+          <h2><%= t("admin.patrons.index.results_title") %></h2>
+          <p class="muted"><%= t("admin.patrons.index.results_hint") %></p>
+        </div>
+        <%= link_to t("admin.patrons.index.manage_permissions"), admin_permissions_path, class: "btn btn-secondary" %>
+      </header>
+
+      <% if @patrons.any? %>
+        <div class="table-scroll">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th><%= t("admin.patrons.index.table.name") %></th>
+                <th><%= t("admin.patrons.index.table.email") %></th>
+                <th><%= t("admin.patrons.index.table.phone") %></th>
+                <th><%= t("admin.patrons.index.table.dependents") %></th>
+                <th><%= t("admin.patrons.index.table.notes") %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @patrons.each do |patron| %>
+                <% details = patron.metadata || {} %>
+                <tr>
+                  <td><%= patron.english_name.presence || patron.native_name || "—" %></td>
+                  <td><%= patron.email %></td>
+                  <td><%= details["phone"].presence || "—" %></td>
+                  <td>
+                    <% if patron.dependents.any? %>
+                      <ul class="inline-list">
+                        <% patron.dependents.each do |dependent| %>
+                          <li><%= dependent.english_name %></li>
+                        <% end %>
+                      </ul>
+                    <% else %>
+                      —
+                    <% end %>
+                  </td>
+                  <td><%= details["notes"].presence || "—" %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="muted"><%= t("admin.patrons.index.empty") %></p>
+      <% end %>
+    </section>
+  </div>
+</div>
