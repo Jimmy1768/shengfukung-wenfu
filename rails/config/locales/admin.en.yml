@@ -323,7 +323,7 @@ en:
         photo_urls: "Paste hosted image URLs, one per line. Leave blank if not available."
       actions:
         new: "New entry"
-        save: "Save entry"
+        save: "Save"
         cancel: "Cancel"
         edit: "Edit"
         delete: "Delete"

@@ -1,4 +1,5 @@
-<%= form_with model: [:admin, gallery_entry], class: "form-stack" do |form| %>
+<% form_action = gallery_entry.persisted? ? admin_gallery_entry_path(gallery_entry) : admin_gallery_entries_path %>
+<%= form_with model: gallery_entry, url: form_action, scope: :temple_gallery_entry, class: "form-stack" do |form| %>
   <% if gallery_entry.errors.any? %>
     <div class="inline-validation" data-inline-validation>
       <strong><%= t("admin.gallery_entries.form.errors", count: gallery_entry.errors.count) %></strong>

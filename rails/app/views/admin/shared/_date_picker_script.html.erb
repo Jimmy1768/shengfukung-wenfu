@@ -9,16 +9,19 @@
         input.classList.add("admin-date-input");
       }
       if (!input.getAttribute("placeholder")) {
-        input.setAttribute("placeholder", input.dataset.placeholder || "yyyy/mm/dd");
+        var defaultPlaceholder = input.getAttribute("type") === "datetime-local"
+          ? "yyyy/mm/dd --:--"
+          : "yyyy/mm/dd";
+        input.setAttribute("placeholder", input.dataset.placeholder || defaultPlaceholder);
       }
     }
 
     function enhanceAll() {
-      document.querySelectorAll("input[type='date']").forEach(enhance);
+      document.querySelectorAll("input[type='date'], input[type='datetime-local']").forEach(enhance);
     }
 
     function handleClick(event) {
-      var input = event.target.closest("input[type='date']");
+      var input = event.target.closest("input[type='date'], input[type='datetime-local']");
       if (!input) return;
       if (typeof input.showPicker === "function") {
         input.showPicker();

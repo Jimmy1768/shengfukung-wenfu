@@ -352,6 +352,9 @@ zh-TW:
           total: "總額"
           created: "建立時間"
           view: "檢視"
+    gallery_entries:
+      actions:
+        save: "儲存"
     payments:
       index:
         eyebrow: "收款"

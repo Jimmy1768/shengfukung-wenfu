@@ -713,7 +713,8 @@ body {
 }
 
 .admin-date-input,
-body.admin-body input[type=date] {
+body.admin-body input[type=date],
+body.admin-body input[type=datetime-local] {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -735,20 +736,23 @@ body.admin-body input[type=date] {
 }
 
 .admin-date-input::-webkit-calendar-picker-indicator,
-body.admin-body input[type=date]::-webkit-calendar-picker-indicator {
+body.admin-body input[type=date]::-webkit-calendar-picker-indicator,
+body.admin-body input[type=datetime-local]::-webkit-calendar-picker-indicator {
   opacity: 0;
   width: 0;
   height: 0;
 }
 
 .admin-date-input:focus,
-body.admin-body input[type=date]:focus {
+body.admin-body input[type=date]:focus,
+body.admin-body input[type=datetime-local]:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
 }
 
 .admin-date-input::placeholder,
-body.admin-body input[type=date]::placeholder {
+body.admin-body input[type=date]::placeholder,
+body.admin-body input[type=datetime-local]::placeholder {
   color: color-mix(in srgb, var(--text-muted) 90%, transparent);
 }
 
@@ -1015,6 +1019,21 @@ body.admin-body input[type=date]::placeholder {
   margin-top: 0;
 }
 
+.admin-form-card {
+  width: min(100%, 760px);
+  max-width: min(100%, 820px);
+  flex: 0 1 auto;
+}
+
+.admin-form-card .form-stack {
+  width: 100%;
+}
+
+.form-card .admin-date-input,
+.admin-form-card .admin-date-input {
+  width: min(100%, 320px);
+}
+
 .admin-stack__row {
   width: 100%;
   display: flex;
@@ -1074,6 +1093,12 @@ body.admin-body input[type=date]::placeholder {
   max-width: min(100%, 520px);
 }
 
+.admin-stack__row > .stack-item.admin-form-card {
+  width: min(100%, 760px);
+  max-width: min(100%, 820px);
+  flex: 0 1 auto;
+}
+
 @supports (width: fit-content(560px)) {
   .admin-stack__row > .stack-item {
     width: fit-content(560px);
@@ -1105,6 +1130,9 @@ body.admin-body input[type=date]::placeholder {
   .admin-stack__row > .stack-item.stack-item--fluid.admin-table-card {
     width: fit-content(1040px);
     max-width: 100%;
+  }
+  .admin-stack__row > .stack-item.admin-form-card {
+    width: min(100%, clamp(640px, 60vw, 820px));
   }
 }
 .card {
