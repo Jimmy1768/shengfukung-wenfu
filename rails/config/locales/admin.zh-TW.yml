@@ -214,6 +214,16 @@ zh-TW:
         dependents: "家屬"
         close: "關閉"
         unknown_name: "未知信眾"
+      records:
+        eyebrow: "歷史報名紀錄"
+        back_to_list: "回到信眾名單"
+        print: "列印"
+        table:
+          offering: "供品 / 活動"
+          status: "狀態"
+          amount: "金額"
+          created: "建立時間"
+        empty: "此信眾尚未建立任何報名紀錄。"
     dashboard:
       hero:
         eyebrow: "管理主控台"

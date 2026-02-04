@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m ""
+git commit -m "restore full-stack rails for admin/html surfaces"
 git push
 
 git reset --hard HEAD

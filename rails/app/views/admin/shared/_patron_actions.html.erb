@@ -1,0 +1,43 @@
+<% modal_key = "patron-profile-#{patron.id}" %>
+<% membership = patron.admin_account&.admin_temple_memberships&.find { |record| record.temple_id == current_temple.id } %>
+
+<div class="profile-menu patron-actions" data-profile-menu>
+  <button type="button"
+    class="btn btn-secondary"
+    data-profile-menu-trigger>
+    <%= t("admin.patrons.index.actions.button") %>
+  </button>
+  <div class="patron-actions-menu"
+    data-profile-menu-panel>
+    <button type="button"
+      class="patron-actions-item"
+      data-modal-trigger="<%= modal_key %>">
+      <span><%= t("admin.patrons.index.actions.view_profile") %></span>
+    </button>
+    <%= link_to t("admin.patrons.index.actions.view_records"),
+          records_admin_patron_path(patron),
+          class: "patron-actions-item" %>
+    <% if can_manage_admins %>
+      <% if membership %>
+        <%= button_to revoke_admin_patron_path(patron, view: view, q: query),
+              method: :delete,
+              data: { turbo: false },
+              class: "patron-actions-item",
+              onclick: "return confirm('#{j t("admin.patrons.index.actions.revoke_confirm", name: patron.english_name.presence || patron.email)}');",
+              form: { class: "patron-actions-form" } do %>
+          <%= t("admin.patrons.index.actions.revoke") %>
+        <% end %>
+      <% else %>
+        <%= button_to promote_admin_patron_path(patron, view: view, q: query),
+              method: :post,
+              data: { turbo: false },
+              class: "patron-actions-item",
+              form: { class: "patron-actions-form" } do %>
+          <%= t("admin.patrons.index.actions.promote") %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "admin/shared/patron_profile_modal", patron: patron, modal_key: modal_key %>

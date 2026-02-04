@@ -1,8 +1,7 @@
 module Account
-  class BaseController < ActionController::Base
+  class BaseController < ApplicationController
     include TempleContext
     layout "account"
-    protect_from_forgery with: :exception
 
     helper Forms::LayoutHelper
     helper_method :current_user, :user_signed_in?, :account_theme_options, :active_nav?

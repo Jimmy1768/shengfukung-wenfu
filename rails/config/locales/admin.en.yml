@@ -214,6 +214,16 @@ en:
         dependents: "Dependents"
         close: "Close"
         unknown_name: "Unknown member"
+      records:
+        eyebrow: "Registration history"
+        back_to_list: "Back to patrons"
+        print: "Print"
+        table:
+          offering: "Offering"
+          status: "Status"
+          amount: "Amount"
+          created: "Created at"
+        empty: "No registrations recorded for this patron."
     dashboard:
       hero:
         eyebrow: "Admin console"

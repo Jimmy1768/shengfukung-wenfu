@@ -33,18 +33,16 @@ module Backend
     # Rails 7.1 supports: config.autoload_lib(ignore: [...])
     config.autoload_lib(ignore: %w(assets tasks))
 
-    # === API-only mode =======================================================
-    # We want Rails to behave like a pure backend API service by default.
-    config.api_only = true
+    # === API + HTML mode =====================================================
+    # Enable the full middleware stack so HTML admin/account consoles work out
+    # of the box (method override, CSRF, helpers, etc.) while API namespaces
+    # can still opt into lightweight controllers.
+    config.api_only = false
     config.session_store :cookie_store,
                          key: "_#{Profile::Identity.app_codename}_session",
                          secure: Rails.env.production?,
                          same_site: :lax
 
-    config.middleware.use ActionDispatch::Static, "#{Rails.root}/public"
-    config.middleware.use ActionDispatch::Cookies
-    config.middleware.use ActionDispatch::Session::CookieStore, config.session_options
-    config.middleware.use ActionDispatch::Flash
     config.middleware.use ApiProtection::AuditMiddleware
 
     # === Custom App Metadata (Golden Template) ===============================

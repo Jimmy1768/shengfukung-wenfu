@@ -1,0 +1,32 @@
+<div class="modal-overlay is-hidden" data-modal-key="<%= modal_key %>">
+  <div class="modal-panel">
+    <button class="modal-close" data-modal-close="<%= modal_key %>">&times;</button>
+    <header class="modal-header">
+      <h2 class="modal-title"><%= patron.english_name.presence || patron.native_name || t("admin.patrons.index.profile_modal.unknown_name") %></h2>
+      <p class="muted"><%= patron.email %></p>
+    </header>
+    <div class="modal-body">
+      <dl class="patron-profile-summary">
+        <dt><%= t("admin.patrons.index.profile_modal.phone") %></dt>
+        <dd><%= patron.metadata.to_h["phone"].presence || "—" %></dd>
+        <dt><%= t("admin.patrons.index.profile_modal.notes") %></dt>
+        <dd><%= patron.metadata.to_h["notes"].presence || "—" %></dd>
+        <dt><%= t("admin.patrons.index.profile_modal.dependents") %></dt>
+        <dd>
+          <% if patron.dependents.any? %>
+            <ul class="inline-list">
+              <% patron.dependents.each do |dependent| %>
+                <li><%= dependent.english_name %></li>
+              <% end %>
+            </ul>
+          <% else %>
+            —
+          <% end %>
+        </dd>
+      </dl>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-modal-close="<%= modal_key %>"><%= t("admin.patrons.index.profile_modal.close") %></button>
+    </div>
+  </div>
+</div>

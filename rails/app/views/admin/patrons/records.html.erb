@@ -1,0 +1,49 @@
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--with-gutter patron-records-card">
+      <header class="admin-section-header">
+        <div>
+          <p class="eyebrow"><%= t("admin.patrons.records.eyebrow") %></p>
+          <h1><%= @patron.english_name.presence || @patron.native_name || @patron.email %></h1>
+          <p class="muted"><%= @patron.email %></p>
+        </div>
+        <div class="record-actions">
+          <%= link_to t("admin.patrons.records.back_to_list"),
+                admin_patrons_path,
+                class: "btn btn-secondary" %>
+          <button type="button" class="btn btn-primary" onclick="window.print()">
+            <%= t("admin.patrons.records.print") %>
+          </button>
+        </div>
+      </header>
+
+      <% if @registrations.any? %>
+        <div class="table-scroll">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th><%= t("admin.patrons.records.table.offering") %></th>
+                <th><%= t("admin.patrons.records.table.status") %></th>
+                <th><%= t("admin.patrons.records.table.amount") %></th>
+                <th><%= t("admin.patrons.records.table.created") %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @registrations.each do |registration| %>
+                <% offering = registration.temple_offering %>
+                <tr>
+                  <td><%= offering&.title || "—" %></td>
+                  <td><%= registration.payment_status.to_s.titleize %></td>
+                  <td><%= number_to_currency(registration.temple_payments.sum(:amount_cents) / 100.0, unit: "NT$") %></td>
+                  <td><%= registration.created_at.strftime("%Y/%m/%d %H:%M") %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="muted"><%= t("admin.patrons.records.empty") %></p>
+      <% end %>
+    </section>
+  </div>
+</div>

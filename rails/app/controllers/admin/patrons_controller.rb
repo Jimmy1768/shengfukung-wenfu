@@ -4,7 +4,7 @@ module Admin
   class PatronsController < BaseController
     before_action :require_patron_access!, only: :index
     before_action :require_manage_permissions!, only: %i[promote revoke create]
-    before_action :set_patron, only: %i[promote revoke]
+    before_action :set_patron, only: %i[promote revoke records]
 
     def index
       patrons = filtered_scope
@@ -48,6 +48,11 @@ module Admin
       redirect_to admin_patrons_path(view: params[:view], q: params[:q]), notice: t("admin.patrons.flash.revoked", name: @patron.english_name)
     rescue Admin::PatronAdminManager::Error => e
       redirect_to admin_patrons_path(view: params[:view], q: params[:q]), alert: e.message
+    end
+
+    def records
+      require_patron_access!
+      @registrations = patron_registrations.includes(:temple_offering, :temple_payments).order(created_at: :desc)
     end
 
     private
@@ -117,6 +122,12 @@ module Admin
 
     def set_patron
       @patron = User.find(params[:id])
+    end
+
+    def patron_registrations
+      TempleEventRegistration
+        .includes(:temple_offering, :temple_payments)
+        .where(user: @patron, temple_offering: current_temple.temple_offerings.select(:id))
     end
 
     def manager

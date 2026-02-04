@@ -930,6 +930,7 @@ body.admin-body input[type="datetime-local"]::placeholder {
   cursor: pointer;
   color: var(--text);
   font: inherit;
+  text-decoration: none;
 }
 
 .patron-actions-item:hover {
@@ -951,6 +952,13 @@ body.admin-body input[type="datetime-local"]::placeholder {
 .patron-profile-summary dd {
   margin: 0;
   color: var(--text);
+}
+
+.record-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  align-items: center;
 }
 
 .setting-list {

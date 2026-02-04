@@ -23,7 +23,7 @@
               <%= form_with model: permission_form,
                     scope: :admin_permission,
                     url: admin_permission_path(permission_form.admin_account),
-                    method: :post,
+                    method: :patch,
                     local: true,
                     data: { turbo: false },
                     class: "permission-form" do |form| %>

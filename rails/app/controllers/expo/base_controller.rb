@@ -4,7 +4,7 @@
 # - Serving feature flags or app configuration.
 # - Providing metadata used during app startup.
 module Expo
-  class BaseController < ApplicationController
+  class BaseController < ActionController::API
     # TODO: add helpers for app-specific auth / configuration.
   end
 end

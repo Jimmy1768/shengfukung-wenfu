@@ -7,7 +7,7 @@
 # - Current user lookup.
 # - Standard JSON error rendering.
 module Api
-  class BaseController < ApplicationController
+  class BaseController < ActionController::API
     include TempleContext
 
     # TODO: add before_action :authenticate_api_user!
