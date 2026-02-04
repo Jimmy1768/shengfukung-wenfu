@@ -253,6 +253,15 @@ zh-TW:
         basics:
           title: "基本資訊"
           subtitle: "顯示在 Vue 首頁的抬頭與頁尾。"
+        about:
+          title: "關於本廟內容"
+          subtitle: "設定關於頁的副標與沿革、主祀、參拜禮儀說明。"
+        contact:
+          title: "聯絡方式"
+          subtitle: "呈現於聯絡頁與頁尾。"
+        logistics:
+          title: "開放時段 / 交通 / 停車"
+          subtitle: ""
         hero_images:
           title: "各頁籤主視覺"
           subtitle: "可為每個分頁提供圖片網址；若留白則自動沿用首頁主視覺。"
@@ -266,20 +275,16 @@ zh-TW:
           upload_success: "圖片上傳成功。"
           upload_error: "上傳失敗，請再試一次。"
           generic_error: "發生錯誤，請稍後重試。"
-        contact:
-          title: "聯絡方式"
-          subtitle: "呈現於聯絡頁與頁尾。"
-        schedule:
-          title: "開放時段"
-          subtitle: "在前台與 Expo App 的聯絡資訊旁顯示。"
-        visit:
-          title: "交通 / 停車"
-          subtitle: "提供到訪方式與停車提醒，會出現在首頁與聯絡頁。"
       fields:
         name: "宮廟名稱"
         tagline: "標語"
         hero_copy: "首頁介紹段落"
         hero_images: "分頁主視覺"
+        about_hero_subtitle: "關於頁副標"
+        about_cards:
+          history: "沿革"
+          deities: "主祀 / 配祀"
+          etiquette: "參拜禮儀"
         phone: "電話"
         map_link: "Google Maps 連結"
         weekday_hours: "平日時段"
@@ -292,6 +297,11 @@ zh-TW:
         tagline: "例：清淨・莊嚴・在地信仰"
         hero_copy: "用簡潔語句說明宗旨、服務、交通提醒。"
         hero_image_url: "https://example.com/hero.jpg"
+        about_hero_subtitle: "顯示在關於本廟主圖下方的句子。"
+        about_cards:
+          history: "說明創建年代、地方故事與重要里程碑。"
+          deities: "介紹主神、陪祀神祇與參拜重點。"
+          etiquette: "提醒參拜動線、禮儀與注意事項。"
         phone: "例：03-747-2826"
         map_link: "https://maps.app.goo.gl/..."
         weekday_hours: "例：08:00 – 17:00"

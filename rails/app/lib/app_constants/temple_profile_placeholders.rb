@@ -11,6 +11,7 @@ module AppConstants
     CONTACT = RAW_CONFIG.fetch("contact", {}).freeze
     SERVICE_TIMES = RAW_CONFIG.fetch("service_times", {}).freeze
     VISIT_INFO = RAW_CONFIG.fetch("visit_info", {}).freeze
+    ABOUT = RAW_CONFIG.fetch("about", {}).freeze
 
     def self.contact
       CONTACT
@@ -22,6 +23,10 @@ module AppConstants
 
     def self.visit_info
       VISIT_INFO
+    end
+
+    def self.about
+      ABOUT
     end
   end
 end

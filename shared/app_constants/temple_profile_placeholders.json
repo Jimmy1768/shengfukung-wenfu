@@ -14,5 +14,23 @@
   "visit_info": {
     "transportation": "尚未設定交通資訊（請在 Temple Profile → Visit info 填寫）。",
     "parking": "尚未設定停車/提醒資訊（請在 Temple Profile → Visit info 填寫）。"
+  },
+  "about": {
+    "hero_subtitle": "認識本廟的歷史、信仰與參拜文化。",
+    "section_title": "關於本廟",
+    "cards": [
+      {
+        "title": "沿革",
+        "body": "例如：創建年代、地方故事、重要里程碑。"
+      },
+      {
+        "title": "主祀 / 配祀",
+        "body": "例如：主神、陪祀神祇、簡短介紹與參拜重點。"
+      },
+      {
+        "title": "參拜禮儀",
+        "body": "例如：入廟動線、禁忌提醒、拍照注意事項。"
+      }
+    ]
   }
 }

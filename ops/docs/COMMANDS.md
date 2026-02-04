@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "restore full-stack rails for admin/html surfaces"
+git commit -m "temple profile backend and frontend consistent"
 git push
 
 git reset --hard HEAD

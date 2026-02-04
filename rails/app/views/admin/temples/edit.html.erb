@@ -44,6 +44,36 @@
 
           <section class="card form-card">
             <header>
+              <h2><%= t("admin.temple_profile.sections.about.title") %></h2>
+              <p><%= t("admin.temple_profile.sections.about.subtitle") %></p>
+            </header>
+
+            <%= form.fields_for :about do |about_fields| %>
+              <div class="field">
+                <%= about_fields.label :hero_subtitle, t("admin.temple_profile.fields.about_hero_subtitle") %>
+                <%= text_area_tag "temple[about][hero_subtitle]",
+                      @form.about[:hero_subtitle],
+                      rows: 2,
+                      placeholder: t("admin.temple_profile.placeholders.about_hero_subtitle") %>
+              </div>
+
+              <div class="about-card-fields">
+                <% @form.about_card_definitions.each do |card| %>
+                  <div class="field">
+                    <label><%= t("admin.temple_profile.fields.about_cards.#{card[:key]}") %></label>
+                    <%= text_area_tag "temple[about][cards][#{card[:key]}][body]",
+                          card[:body],
+                          rows: 3,
+                          placeholder: t("admin.temple_profile.placeholders.about_cards.#{card[:key]}") %>
+                  </div>
+                <% end %>
+              </div>
+
+            <% end %>
+          </section>
+
+          <section class="card form-card">
+            <header>
               <h2><%= t("admin.temple_profile.sections.contact.title") %></h2>
               <p><%= t("admin.temple_profile.sections.contact.subtitle") %></p>
             </header>
@@ -83,8 +113,8 @@
 
           <section class="card form-card">
             <header>
-              <h2><%= t("admin.temple_profile.sections.schedule.title") %></h2>
-              <p><%= t("admin.temple_profile.sections.schedule.subtitle") %></p>
+              <h2><%= t("admin.temple_profile.sections.logistics.title") %></h2>
+              <p><%= t("admin.temple_profile.sections.logistics.subtitle") %></p>
             </header>
 
             <div class="grid-2">
@@ -112,13 +142,6 @@
                     rows: 2,
                     placeholder: t("admin.temple_profile.placeholders.notes") %>
             </div>
-          </section>
-
-          <section class="card form-card">
-            <header>
-              <h2><%= t("admin.temple_profile.sections.visit.title") %></h2>
-              <p><%= t("admin.temple_profile.sections.visit.subtitle") %></p>
-            </header>
 
             <div class="field">
               <%= form.label :visit_info_transportation, t("admin.temple_profile.fields.transportation") %>

@@ -28,6 +28,9 @@ metadata:
   visit_info:
     transportation: "火車：竹南車站下車步行 8 分鐘；公車 581（聖福里站）即達。自行開車可循台61線竹南交流道出口接公教路。"
     parking: "廟埕前保留敬老專用停車位，周邊可使用公教路公有停車場或仁愛街停車格，建議預留 10 分鐘找車位。"
+  about:
+    hero_subtitle: "把歷史、主祀神明與參拜禮儀整理成段，讓第一次造訪的信眾也能快速認識本廟。"
+    section_title: "本廟沿革與信仰特色"
 news_posts:
   - slug: new-year-prayer
     title: 新年迎春祈福法會

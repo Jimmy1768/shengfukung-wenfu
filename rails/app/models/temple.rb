@@ -52,6 +52,12 @@ class Temple < ApplicationRecord
     info.is_a?(Hash) ? info : {}
   end
 
+  def about_content
+    data = metadata.is_a?(Hash) ? metadata : {}
+    about = data["about"]
+    about.is_a?(Hash) ? about : {}
+  end
+
   def hero_images
     value = self[:hero_images]
     value.present? ? value.stringify_keys : {}

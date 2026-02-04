@@ -32,7 +32,15 @@ module Admin
         hero_images: Temple::HERO_TABS,
         contact: %i[phone],
         service_times: {},
-        visit_info: %i[transportation parking]
+        visit_info: %i[transportation parking],
+        about: [
+          :hero_subtitle,
+          { cards: {
+            history: [:body],
+            deities: [:body],
+            etiquette: [:body]
+          } }
+        ]
       )
     end
 

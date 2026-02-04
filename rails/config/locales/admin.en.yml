@@ -254,6 +254,15 @@ en:
       basics:
         title: "Basic details"
         subtitle: "Displayed in the Vue header/footer."
+      about:
+        title: "About content"
+        subtitle: "Controls the About page hero subtitle and the three info cards."
+      contact:
+        title: "Contact information"
+        subtitle: "Shown on the contact page + footer."
+      logistics:
+        title: "Hours, transit, and parking"
+        subtitle: "Open hours plus visit notes shown on the contact sections."
       hero_images:
         title: "Hero images per page"
         subtitle: "Provide an image URL for each tab. Leave blank to fall back to the home hero."
@@ -267,20 +276,16 @@ en:
         upload_success: "Image uploaded successfully."
         upload_error: "Upload failed. Please try again."
         generic_error: "Something went wrong. Please try again."
-      contact:
-        title: "Contact information"
-        subtitle: "Shown on the contact page + footer."
-      schedule:
-        title: "Service schedule"
-        subtitle: "Displayed alongside the contact info on the Vue + Expo clients."
-      visit:
-        title: "Visitor info"
-        subtitle: "Transit and parking notes shown on the home + contact sections."
       fields:
         name: "Temple name"
         tagline: "Tagline"
         hero_copy: "Homepage hero copy"
         hero_images: "Per-tab hero images"
+        about_hero_subtitle: "Hero subtitle"
+        about_cards:
+          history: "History"
+          deities: "Deities"
+          etiquette: "Etiquette"
         address_zh: "Address (ZH)"
         address_en: "Address (EN)"
         phone: "Phone"
@@ -295,6 +300,11 @@ en:
         tagline: "e.g., Serenity · Dignity · Local faith"
         hero_copy: "Summarize your mission, services, and visitor tips."
         hero_image_url: "https://example.com/hero.jpg"
+        about_hero_subtitle: "Displayed under the “About the Temple” hero on the public site."
+        about_cards:
+          history: "Describe the temple's history, founding story, key milestones."
+          deities: "Introduce the main and auxiliary deities plus worship highlights."
+          etiquette: "Share etiquette, traffic flow, dos and don'ts for visitors."
         phone: "e.g., 03-747-2826"
         map_link: "https://maps.app.goo.gl/..."
         weekday_hours: "e.g., 08:00 – 17:00"

@@ -15,6 +15,7 @@ class TempleSerializer
       contact: contact_payload,
       service_times: service_times_payload,
       visit_info: visit_info_payload,
+      about: about_payload,
       metadata: temple.metadata,
       hero_images: hero_images_payload,
       pages: pages_json,
@@ -82,6 +83,13 @@ class TempleSerializer
     return data if data.present?
 
     AppConstants::TempleProfilePlaceholders.visit_info
+  end
+
+  def about_payload
+    data = temple.about_content
+    return data if data.present?
+
+    AppConstants::TempleProfilePlaceholders.about
   end
 
   def hero_images_payload
