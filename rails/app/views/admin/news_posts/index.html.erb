@@ -27,10 +27,12 @@
                 <td><%= post.published_at&.strftime("%Y/%m/%d %H:%M") %></td>
                 <td class="text-right">
                   <%= link_to t("admin.news_posts.actions.edit"), edit_admin_news_post_path(post), class: "pill-link" %>
-                  <%= link_to t("admin.news_posts.actions.delete"), admin_news_post_path(post),
+                  <%= button_to admin_news_post_path(post),
                     method: :delete,
-                    data: { confirm: t("admin.news_posts.confirmations.delete") },
-                    class: "pill-link danger" %>
+                    data: { turbo_confirm: t("admin.news_posts.confirmations.delete") },
+                    form: { class: "pill-link danger delete-link" } do %>
+                    <span><%= t("admin.news_posts.actions.delete") %></span>
+                  <% end %>
                 </td>
               </tr>
             <% end %>

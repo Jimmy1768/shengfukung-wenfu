@@ -19,6 +19,7 @@ module Admin
       )
 
       if @permission_form.save(current_admin:)
+        mark_permissions_reviewed!
         redirect_to admin_permissions_path, notice: "Permissions updated for #{admin_account.user.english_name}."
       else
         @permission_forms = build_permission_forms(overrides: { admin_account.id => @permission_form })
@@ -49,6 +50,14 @@ module Admin
 
     def permission_params
       params.require(:admin_permission).permit(AdminPermission::CAPABILITIES)
+    end
+
+    def mark_permissions_reviewed!
+      account = current_admin&.admin_account
+      return unless account
+
+      metadata = account.metadata.merge("permissions_reviewed" => true)
+      account.update_column(:metadata, metadata)
     end
   end
 end

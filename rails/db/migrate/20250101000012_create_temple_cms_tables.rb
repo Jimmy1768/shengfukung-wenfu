@@ -13,6 +13,8 @@ class CreateTempleCmsTables < ActiveRecord::Migration[7.1]
       t.jsonb :contact_info, null: false, default: {}
       t.jsonb :service_times, null: false, default: {}
       t.jsonb :metadata, null: false, default: {}
+      t.string :payment_mode, null: false, default: "temple"
+      t.jsonb :payment_provider_settings, null: false, default: {}
       t.boolean :published, null: false, default: true
       t.timestamps
     end

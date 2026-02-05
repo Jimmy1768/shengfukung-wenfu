@@ -52,7 +52,7 @@ module Admin
     end
 
     def news_post_params
-      permitted = params.require(:temple_news_post).permit(:title, :body, :published, :published_at)
+      permitted = params.require(:news_post).permit(:title, :body, :published, :published_at)
       permitted[:published_at] = permitted[:published_at].presence
       permitted
     end

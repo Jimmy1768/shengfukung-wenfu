@@ -29,10 +29,12 @@
 
   <div class="admin-stack__row">
     <section class="card stack-item">
-      <header>
-        <h2><%= t("admin.dashboard.next_steps.title") %></h2>
-        <p><%= t("admin.dashboard.next_steps.subtitle") %></p>
-      </header>
+      <% if @next_steps.any? %>
+        <header>
+          <h2><%= t("admin.dashboard.next_steps.title") %></h2>
+          <p><%= t("admin.dashboard.next_steps.subtitle") %></p>
+        </header>
+      <% end %>
       <% if @next_steps.any? %>
         <ul class="idea-list">
           <% @next_steps.each do |step| %>
@@ -46,6 +48,9 @@
           <% end %>
         </ul>
       <% else %>
+        <header>
+          <h2><%= t("admin.dashboard.next_steps.complete_heading") %></h2>
+        </header>
         <p class="muted"><%= t("admin.dashboard.next_steps.complete") %></p>
       <% end %>
     </section>

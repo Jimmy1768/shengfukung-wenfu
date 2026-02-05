@@ -2,9 +2,18 @@ zh-TW:
   admin:
     navigation:
       dashboard: "儀表板"
+      temple_profile: "宮廟資料"
       profile: "宮廟資料"
+      news_posts: "最新消息"
       news: "最新消息"
+      gallery_entries: "活動回顧"
       gallery: "活動回顧"
+      offerings: "供品管理"
+      orders: "報名 / 訂單"
+      payments: "收款資料"
+      patrons: "信眾與管理員"
+      archives: "封存 / 年度資料"
+      permissions: "管理員權限"
     filters:
       search:
         label: "搜尋"
@@ -160,19 +169,23 @@ zh-TW:
         dashboard:
           label: "掌握指標與待辦"
         temple_profile:
-          label: "更新官網基本資料"
+          label: "宮廟資料"
+        news_posts:
+          label: "最新消息"
+        gallery_entries:
+          label: "活動回顧"
         offerings:
-          label: "管理登記項目與檔期"
+          label: "供品管理"
         orders:
-          label: "檢視報名與紙本訂單"
+          label: "報名 / 訂單"
         payments:
-          label: "查看付款統計與記錄"
+          label: "收款資料"
         patrons:
           label: "信眾與管理員"
         archives:
-          label: "年度紀錄與報表"
+          label: "封存 / 年度資料"
         permissions:
-          label: "管理管理員權限"
+          label: "管理員權限"
     patrons:
       index:
         title: "信眾名單"
@@ -243,6 +256,7 @@ zh-TW:
         setup_offerings: "建立第一個供品模板"
         promote_admin_from_patron: "從信眾名單挑選並建立管理員"
         manage_permissions: "檢視並調整管理員權限"
+        complete_heading: "恭喜！"
         complete: "已完成主要任務，接著可透過左側選單繼續操作。"
     temple_profile:
       hero:
@@ -321,8 +335,45 @@ zh-TW:
         services: "參拜 / 服務"
         contact: "聯絡 / 交通"
     news_posts:
+      index:
+        title: "最新消息"
+        body: "於此整理公告、法會通知或其他更新訊息。"
+      new:
+        title: "新增公告"
+        body: "輸入簡短內容，可包含連結。"
+      edit:
+        title: "編輯公告"
+        body: "更新公告內容或發布狀態。"
+      table:
+        title: "標題"
+        published: "狀態"
+        published_at: "發布時間"
+        actions: "操作"
+      fields:
+        title: "標題"
+        body: "內容"
+        published: "發布公告"
+        published_at: "發布時間"
+      hints:
+        published_at: "可留白；發布時預設為現在時間。"
+      labels:
+        published: "已發布"
+        draft: "草稿"
       actions:
+        new: "新增公告"
         save: "儲存"
+        cancel: "取消"
+        edit: "編輯"
+        delete: "刪除"
+      notices:
+        created: "公告已建立。"
+        updated: "公告已更新。"
+        deleted: "公告已刪除。"
+      confirmations:
+        delete: "確定要刪除這則公告嗎？"
+      form:
+        errors: "%{count} 項問題需修正"
+      empty: "尚未建立任何公告。"
     offerings:
       index:
         title: "供品管理"

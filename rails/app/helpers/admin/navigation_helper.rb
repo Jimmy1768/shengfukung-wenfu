@@ -5,26 +5,26 @@ module Admin
     NAV_ITEMS = [
       {
         key: :dashboard,
-        label: I18n.t("admin.navigation.dashboard", default: "Dashboard"),
+        label: "Dashboard",
         description: "掌握指標與待辦",
         path: -> { admin_dashboard_path }
       },
       {
         key: :temple_profile,
-        label: I18n.t("admin.navigation.profile", default: "Temple Profile"),
+        label: "Temple Profile",
         description: "更新官網基本資料",
         path: -> { admin_temple_profile_path }
       },
       {
         key: :news_posts,
-        label: I18n.t("admin.navigation.news", default: "最新消息"),
+        label: "最新消息",
         description: "公告與最新消息",
         path: -> { admin_news_posts_path },
         capabilities: :manage_news
       },
       {
         key: :gallery_entries,
-        label: I18n.t("admin.navigation.gallery", default: "活動回顧"),
+        label: "活動回顧",
         description: "活動回顧與相簿",
         path: -> { admin_gallery_entries_path },
         capabilities: :manage_gallery
@@ -73,7 +73,9 @@ module Admin
     ].freeze
 
     def admin_navigation_items
-      NAV_ITEMS.select { |item| nav_item_visible?(item) }
+      NAV_ITEMS
+        .select { |item| nav_item_visible?(item) }
+        .map { |item| item.merge(label: nav_item_label(item)) }
     end
 
     def admin_navigation_link_path(item)
@@ -96,6 +98,14 @@ module Admin
 
     def owner_admin_account?
       current_admin&.admin_account&.owner_role?
+    end
+
+    def nav_item_label(item)
+      default_label = item[:label] || item[:key].to_s.humanize
+      fallback_chain = []
+      fallback_chain << item[:label_key] if item[:label_key]
+      fallback_chain << :"admin.navigation.#{item[:key]}"
+      I18n.t("admin.nav.items.#{item[:key]}.label", default: fallback_chain + [default_label])
     end
   end
 end

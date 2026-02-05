@@ -16,11 +16,11 @@ module Admin
       steps << { label: t("admin.dashboard.next_steps.fill_profile"), url: admin_temple_profile_path } if profile_incomplete?
       steps << { label: t("admin.dashboard.next_steps.setup_offerings"), url: new_admin_offering_path } if missing_offering_templates?
       if owner_account?
-        steps << { label: t("admin.dashboard.next_steps.promote_admin_from_patron"), url: admin_patrons_path }
-        steps << { label: t("admin.dashboard.next_steps.manage_permissions"), url: admin_permissions_path }
-      end
-      steps
+      steps << { label: t("admin.dashboard.next_steps.promote_admin_from_patron"), url: admin_patrons_path } if needs_admin_promotion?
+      steps << { label: t("admin.dashboard.next_steps.manage_permissions"), url: admin_permissions_path } if should_review_permissions?
     end
+    steps
+  end
 
     def owner_account?
       current_admin&.admin_account&.owner_role?
@@ -30,8 +30,26 @@ module Admin
       current_temple.present? && !current_temple.profile_complete?
     end
 
-    def missing_offering_templates?
-      current_temple.present? && !current_temple.temple_offerings.exists?
-    end
+  def missing_offering_templates?
+    current_temple.present? && !current_temple.temple_offerings.exists?
+  end
+
+  def needs_admin_promotion?
+    current_temple.present? && !staff_admins_present?
+  end
+
+  def should_review_permissions?
+    current_temple.present? && staff_admins_present? && !permissions_reviewed?
+  end
+
+  def staff_admins_present?
+    return false unless current_temple.present?
+
+    @staff_admins_present ||= current_temple.admin_accounts.staff_role.exists?
+  end
+
+  def permissions_reviewed?
+    current_admin.admin_account.metadata["permissions_reviewed"].present?
+  end
   end
 end
