@@ -24,7 +24,7 @@
         </div>
       </dl>
       <div class="actions">
-        <%= link_to t("admin.offerings.show.manage_registrations"), admin_offering_offering_orders_path(@offering), class: "btn btn-primary" %>
+        <%= link_to t("admin.offerings.show.manage_registrations"), admin_offering_orders_path_for(@offering), class: "btn btn-primary" %>
         <% if current_admin_permissions&.allow?(:manage_offerings) %>
           <%= link_to t("admin.offerings.show.edit_offering"), edit_admin_offering_path(@offering), class: "btn btn-secondary" %>
         <% end %>

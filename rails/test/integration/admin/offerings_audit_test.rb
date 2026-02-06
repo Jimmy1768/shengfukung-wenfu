@@ -13,13 +13,15 @@ class AdminOfferingsAuditTest < ActionDispatch::IntegrationTest
 
     assert_difference -> { SystemAuditLog.where(action: "admin.offerings.create").count }, 1 do
       post admin_offerings_path, params: {
-        temple_offering: {
+        offering_kind: "service",
+        temple_service: {
           slug: "spring-festival",
-          offering_type: TempleOffering::OFFERING_TYPES.values.first,
-          title: "Spring Festival",
+          title: "Spring Service",
           description: "Test",
           price_cents: 1000,
-          currency: "TWD"
+          currency: "TWD",
+          status: "published",
+          active: true
         }
       }
     end
@@ -30,7 +32,7 @@ class AdminOfferingsAuditTest < ActionDispatch::IntegrationTest
   end
 
   test "updating an offering logs audit event" do
-    offering = TempleOffering.create!(
+    offering = TempleService.create!(
       temple: @temple,
       slug: "lantern",
       title: "Lantern",
@@ -41,8 +43,8 @@ class AdminOfferingsAuditTest < ActionDispatch::IntegrationTest
     sign_in_admin(@admin)
 
     assert_difference -> { SystemAuditLog.where(action: "admin.offerings.update").count }, 1 do
-      patch admin_offering_path(offering), params: {
-        temple_offering: {
+      patch admin_service_path(offering), params: {
+        temple_service: {
           title: "Lantern Deluxe"
         }
       }

@@ -14,12 +14,22 @@ class Temple < ApplicationRecord
     through: :admin_temple_memberships
   has_many :system_audit_logs,
     dependent: :nullify
+  has_many :temple_events,
+    dependent: :destroy
+  has_many :temple_services,
+    dependent: :destroy
+  has_many :temple_gatherings,
+    dependent: :destroy
   has_many :temple_offerings,
+    class_name: "TempleEvent",
+    dependent: :destroy
+  has_many :temple_registrations,
     dependent: :destroy
   has_many :temple_event_registrations,
+    class_name: "TempleEventRegistration",
     dependent: :destroy
   has_many :temple_payments,
-    through: :temple_event_registrations
+    through: :temple_registrations
   has_many :admin_permissions,
     dependent: :destroy
   has_many :temple_news_posts,

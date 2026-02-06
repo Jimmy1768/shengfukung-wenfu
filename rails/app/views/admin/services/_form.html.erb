@@ -1,0 +1,136 @@
+<% show_form_actions = local_assigns.fetch(:show_form_actions, true) %>
+<% validation_rule = local_assigns[:validation_rule] %>
+<% required_fields = validation_rule ? Forms::FieldValidation.required_fields(validation_rule) : [] %>
+<% form_scope = @offering.model_name.param_key %>
+<%
+  form_html_options = { id: "service-form" }
+  if required_fields.any?
+    form_html_options[:data] = {
+      form_validation: true,
+      required_fields: required_fields.join(","),
+      param_scope: form_scope,
+      validation_message: t("admin.offerings.validation.required_message", default: "請完整填寫所有欄位")
+    }
+  end
+%>
+<%
+  default_form_url =
+    if local_assigns[:form_url]
+      local_assigns[:form_url]
+    elsif @offering.persisted?
+      admin_service_path(@offering)
+    else
+      admin_services_path
+    end
+%>
+<%= form_with model: @offering, url: default_form_url, local: true, class: "form-stack", html: form_html_options do |form| %>
+  <% if @offering.errors.any? %>
+    <div class="alert alert-danger">
+      <h3><%= pluralize(@offering.errors.count, "error") %> prevented saving:</h3>
+      <ul>
+        <% @offering.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <% hidden_params = local_assigns[:hidden_params] || {} %>
+  <% hidden_params.each do |key, value| %>
+    <%= hidden_field_tag key, value %>
+  <% end %>
+
+  <% metadata = (@offering.metadata || {}).with_indifferent_access %>
+
+  <section class="card form-section">
+    <header>
+      <h2><%= t("admin.services.form.sections.basics") %></h2>
+      <p class="muted"><%= t("admin.services.form.sections.basics_hint") %></p>
+    </header>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :title, t("admin.offering_form.fields.title") %>
+        <%= form.text_field :title %>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :subtitle, t("admin.services.form.fields.subtitle") %>
+        <%= form.text_field :subtitle %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :hero_image_url, t("admin.services.form.fields.hero_image_url") %>
+        <%= form.text_field :hero_image_url %>
+      </div>
+    </div>
+    <div class="field">
+      <%= form.label :description, t("admin.offering_form.fields.description") %>
+      <%= form.text_area :description, rows: 3 %>
+    </div>
+  </section>
+
+  <section class="card form-section">
+    <header>
+      <h2><%= t("admin.services.form.sections.availability") %></h2>
+    </header>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :period_label, t("admin.services.form.fields.period_label") %>
+        <%= form.text_field :period_label %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :quantity_limit, t("admin.services.form.fields.quantity_limit") %>
+        <%= form.number_field :quantity_limit, min: 0 %>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :available_from, t("admin.services.form.fields.available_from") %>
+        <%= form.date_field :available_from, class: "admin-date-input" %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :available_until, t("admin.services.form.fields.available_until") %>
+        <%= form.date_field :available_until, class: "admin-date-input" %>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :default_location, t("admin.services.form.fields.default_location") %>
+        <%= form.text_field :default_location %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :fulfillment_notes, t("admin.services.form.fields.fulfillment_notes") %>
+        <%= form.text_area :fulfillment_notes, rows: 2 %>
+      </div>
+    </div>
+  </section>
+
+  <section class="card form-section">
+    <header>
+      <h2><%= t("admin.services.form.sections.pricing") %></h2>
+    </header>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :price_cents, t("admin.registration_form.fields.unit_price") %>
+        <%= form.number_field :price_cents, min: 0 %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :currency, t("admin.offering_form.fields.currency") %>
+        <%= form.select :currency, options_for_select(Currency::Symbols.options, @offering.currency || "TWD") %>
+      </div>
+    </div>
+    <div class="field">
+      <%= form.label :status, t("admin.services.form.fields.status") %>
+      <%= form.select :status, options_for_select([["Draft", "draft"], ["Published", "published"], ["Archived", "archived"]], @offering.status) %>
+    </div>
+  </section>
+
+  <div class="offering-form-grid">
+    <%= render_offering_sections(form, metadata) %>
+  </div>
+
+  <% if show_form_actions %>
+    <div class="form-actions">
+      <%= form.submit t("admin.offering_form.actions.save"), class: "btn btn-primary" %>
+    </div>
+  <% end %>
+<% end %>

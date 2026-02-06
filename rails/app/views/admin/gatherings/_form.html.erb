@@ -1,0 +1,118 @@
+<% form_action = gathering.persisted? ? admin_gathering_path(gathering) : admin_gatherings_path %>
+<%= form_with model: gathering, url: form_action, scope: :temple_gathering, class: "form-stack" do |form| %>
+  <% if gathering.errors.any? %>
+    <div class="inline-validation" data-inline-validation>
+      <strong><%= t("admin.gatherings.form.errors", count: gathering.errors.count) %></strong>
+      <ul>
+        <% gathering.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :title, t("admin.gatherings.fields.title") %>
+    <%= form.text_field :title, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :subtitle, t("admin.gatherings.fields.subtitle") %>
+    <%= form.text_field :subtitle %>
+  </div>
+
+  <div class="field">
+    <%= form.label :description, t("admin.gatherings.fields.description") %>
+    <%= form.text_area :description, rows: 5 %>
+  </div>
+
+  <div class="field">
+    <label><%= t("admin.gatherings.fields.hero_image_url") %></label>
+    <div class="media-upload"
+      data-media-upload
+      data-media-upload-context="gathering_hero"
+      data-media-upload-target-url="#gathering-hero-url"
+      data-media-upload-target-asset="#gathering-hero-asset"
+      data-media-upload-preview="#gathering-hero-preview">
+      <div class="media-upload__controls">
+        <input type="file" accept="image/*" data-media-upload-file class="media-upload__file-input">
+        <button type="button" class="btn btn-secondary" data-media-upload-button>
+          <%= t("admin.media_uploads.actions.upload") %>
+        </button>
+        <span class="media-upload__status" data-media-upload-status></span>
+      </div>
+      <div class="media-upload__preview">
+        <% preview_src = gathering.hero_image_url.presence || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" %>
+        <%= image_tag preview_src,
+          id: "gathering-hero-preview",
+          alt: t("admin.gatherings.fields.title"),
+          class: "media-upload__preview-image",
+          data: { media_upload_preview: true } %>
+      </div>
+    </div>
+    <%= hidden_field_tag "temple_gathering[hero_asset_id]",
+      gathering.hero_asset_id,
+      id: "gathering-hero-asset" %>
+    <%= form.url_field :hero_image_url, id: "gathering-hero-url" %>
+    <p class="muted"><%= t("admin.gatherings.hints.hero_image_url") %></p>
+  </div>
+
+  <div class="field">
+    <%= form.label :starts_on, t("admin.gatherings.fields.starts_on") %>
+    <%= form.date_field :starts_on %>
+  </div>
+
+  <div class="field">
+    <%= form.label :ends_on, t("admin.gatherings.fields.ends_on") %>
+    <%= form.date_field :ends_on %>
+  </div>
+
+  <div class="field">
+    <%= form.label :start_time, t("admin.gatherings.fields.start_time") %>
+    <%= form.time_field :start_time %>
+  </div>
+
+  <div class="field">
+    <%= form.label :end_time, t("admin.gatherings.fields.end_time") %>
+    <%= form.time_field :end_time %>
+  </div>
+
+  <div class="field">
+    <%= form.label :location_name, t("admin.gatherings.fields.location_name") %>
+    <%= form.text_field :location_name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :location_address, t("admin.gatherings.fields.location_address") %>
+    <%= form.text_field :location_address %>
+  </div>
+
+  <div class="field">
+    <%= form.label :location_notes, t("admin.gatherings.fields.location_notes") %>
+    <%= form.text_area :location_notes, rows: 3 %>
+  </div>
+
+  <div class="field">
+    <%= form.label :price_cents, t("admin.gatherings.fields.price_cents") %>
+    <%= form.number_field :price_cents, min: 0, step: 100 %>
+  </div>
+
+  <div class="field">
+    <%= form.label :currency, t("admin.gatherings.fields.currency") %>
+    <%= form.select :currency,
+      options_for_select(Currency::Symbols.options, gathering.currency || "TWD") %>
+  </div>
+
+  <div class="field">
+    <%= form.label :status, t("admin.gatherings.fields.status") %>
+    <% status_options = %w[draft published archived].map { |status| [t("admin.gatherings.statuses.#{status}"), status] } %>
+    <%= form.select :status, options_for_select(status_options, gathering.status || "draft") %>
+  </div>
+
+<div class="form-actions form-actions--centered">
+  <%= form.submit t("admin.gatherings.actions.save"), class: "btn btn-primary" %>
+  <%= link_to t("admin.gatherings.actions.cancel"), admin_gatherings_path, class: "btn btn-secondary" %>
+</div>
+<% end %>
+
+<%= render "admin/shared/media_upload_script" %>

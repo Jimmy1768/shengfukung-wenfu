@@ -15,12 +15,15 @@ class TemplePayment < ApplicationRecord
   }.freeze
 
   belongs_to :temple
-  belongs_to :temple_event_registration
+  belongs_to :temple_registration
+  belongs_to :temple_event_registration,
+    class_name: "TempleRegistration",
+    foreign_key: :temple_registration_id
   belongs_to :user, optional: true
   belongs_to :financial_ledger_entry, optional: true
   belongs_to :admin_account, optional: true
 
-  delegate :temple_offering, to: :temple_event_registration
+  delegate :registrable, to: :temple_registration, allow_nil: true
 
   validates :payment_method, inclusion: { in: PAYMENT_METHODS.values }
   validates :status, inclusion: { in: STATUSES.values }
@@ -33,18 +36,33 @@ class TemplePayment < ApplicationRecord
     payment_method == PAYMENT_METHODS[:cash]
   end
 
+  def offering_registration
+    temple_registration
+  end
+
+  def offering
+    registrable
+  end
+
   def self.admin_filtered(filters)
     filters ||= {}
-    scope = includes(:user, admin_account: :user, temple_event_registration: %i[user temple_offering])
+    scope = includes(:user, { admin_account: :user }, :temple_registration)
     scope = scope.where(payment_method: filters[:payment_method]) if filters[:payment_method].present?
-    if filters[:offering_id].present?
-      scope = scope.joins(:temple_event_registration)
-        .where(temple_event_registrations: { temple_offering_id: filters[:offering_id] })
+    if filters[:offering_id].present? && filters[:offering_type].present?
+      table = TempleRegistration.table_name
+      scope = scope.joins(:temple_registration)
+        .where(
+          table => {
+            registrable_id: filters[:offering_id],
+            registrable_type: TempleRegistration.offering_type_filter_values(filters[:offering_type])
+          }
+        )
     end
     if filters[:query].present?
       sanitized = ActiveRecord::Base.sanitize_sql_like(filters[:query])
-      scope = scope.left_outer_joins(temple_event_registration: :user).where(
-        "temple_event_registrations.reference_code ILIKE :query OR temple_payments.external_reference ILIKE :query OR users.english_name ILIKE :query OR users.email ILIKE :query OR (temple_event_registrations.contact_payload ->> 'name') ILIKE :query",
+      table = TempleRegistration.table_name
+      scope = scope.left_outer_joins(temple_registration: :user).where(
+        "#{table}.reference_code ILIKE :query OR temple_payments.external_reference ILIKE :query OR users.english_name ILIKE :query OR users.email ILIKE :query OR (#{table}.contact_payload ->> 'name') ILIKE :query",
         query: "%#{sanitized}%"
       )
     end

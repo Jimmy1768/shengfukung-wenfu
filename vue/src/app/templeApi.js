@@ -65,3 +65,19 @@ export function fetchTempleEvent(eventSlug, overrides = {}) {
   const safeSlug = encodeURIComponent(eventSlug);
   return request(`temples/${slug}/events/${safeSlug}`, overrides);
 }
+
+export function fetchTempleServices(options = {}) {
+  const { slug } = buildConfig(options);
+  const limit = Number(options.limit || 50);
+  const safeLimit = Number.isFinite(limit) ? limit : 50;
+  const query = new URLSearchParams({
+    limit: String(safeLimit)
+  });
+  return request(`temples/${slug}/services?${query.toString()}`, options);
+}
+
+export function fetchTempleService(serviceSlug, overrides = {}) {
+  const { slug } = buildConfig(overrides);
+  const safeSlug = encodeURIComponent(serviceSlug);
+  return request(`temples/${slug}/services/${safeSlug}`, overrides);
+}

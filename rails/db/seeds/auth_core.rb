@@ -10,6 +10,18 @@ module Seeds
     SECONDARY_EMAIL = ENV.fetch("PROJECT_SECONDARY_USER_EMAIL") do
       "guest@#{AppConstants::Project.slug}.local"
     end.freeze
+    OWNER_EMAIL = ENV.fetch("PROJECT_OWNER_USER_EMAIL") do
+      "owner@#{AppConstants::Project.slug}.local"
+    end.freeze
+    STAFF_ADMIN_EMAIL = ENV.fetch("PROJECT_STAFF_ADMIN_EMAIL") do
+      "admin@#{AppConstants::Project.slug}.local"
+    end.freeze
+    PATRON_EMAIL = ENV.fetch("PROJECT_PATRON_USER_EMAIL") do
+      "patron@#{AppConstants::Project.slug}.local"
+    end.freeze
+    DEV_SUPPORT_EMAIL = ENV.fetch("PROJECT_DEV_SUPPORT_EMAIL") do
+      "dev@#{AppConstants::Project.slug}.local"
+    end.freeze
     DEFAULT_PASSWORD = ENV.fetch("PROJECT_PRIMARY_USER_PASSWORD", "DemoPassword!23")
 
     SAMPLE_USERS = [
@@ -22,6 +34,26 @@ module Seeds
         email: SECONDARY_EMAIL,
         english_name: "Guest Operator",
         metadata: { demo_user: true, guest: true }
+      },
+      {
+        email: OWNER_EMAIL,
+        english_name: "Temple Owner",
+        metadata: { seed_role: "owner" }
+      },
+      {
+        email: STAFF_ADMIN_EMAIL,
+        english_name: "Temple Admin",
+        metadata: { seed_role: "staff_admin" }
+      },
+      {
+        email: PATRON_EMAIL,
+        english_name: "Temple Patron",
+        metadata: { seed_role: "patron_tester" }
+      },
+      {
+        email: DEV_SUPPORT_EMAIL,
+        english_name: "Dev Support",
+        metadata: { seed_role: "dev_support" }
       }
     ].freeze
 

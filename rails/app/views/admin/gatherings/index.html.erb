@@ -1,0 +1,74 @@
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide">
+      <header class="admin-section-header">
+        <div>
+          <h1><%= t("admin.gatherings.index.title") %></h1>
+          <p class="muted"><%= t("admin.gatherings.index.body") %></p>
+        </div>
+        <%= link_to t("admin.gatherings.actions.new"), new_admin_gathering_path, class: "btn btn-primary" %>
+      </header>
+
+      <% if @gatherings.any? %>
+        <div class="table-scroll">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th><%= t("admin.gatherings.table.title") %></th>
+                <th><%= t("admin.gatherings.table.schedule") %></th>
+                <th><%= t("admin.gatherings.table.location") %></th>
+                <th><%= t("admin.gatherings.table.price") %></th>
+                <th><%= t("admin.gatherings.table.status") %></th>
+                <th class="text-right"><%= t("admin.gatherings.table.actions") %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @gatherings.each do |gathering| %>
+                <tr>
+                  <td>
+                    <strong><%= gathering.title %></strong>
+                    <% if gathering.subtitle.present? %>
+                      <p class="muted"><%= gathering.subtitle %></p>
+                    <% end %>
+                  </td>
+                  <td>
+                    <% if gathering.starts_on.present? %>
+                      <% start_label = gathering.starts_on.strftime("%Y/%m/%d") %>
+                      <% end_label = gathering.ends_on.present? && gathering.ends_on != gathering.starts_on ? gathering.ends_on.strftime("%Y/%m/%d") : nil %>
+                      <div>
+                        <%= [start_label, end_label].compact.join(" – ") %>
+                      </div>
+                    <% else %>
+                      <span class="muted"><%= t("admin.gatherings.labels.unscheduled") %></span>
+                    <% end %>
+                    <% if gathering.start_time.present? || gathering.end_time.present? %>
+                      <div class="muted">
+                        <%= [gathering.start_time&.strftime("%H:%M"), gathering.end_time&.strftime("%H:%M")].compact.join(" – ") %>
+                      </div>
+                    <% end %>
+                  </td>
+                  <td>
+                    <%= gathering.location_name.presence || gathering.location_address.presence || t("admin.gatherings.labels.location_pending") %>
+                  </td>
+                  <td><%= Currency::Symbols.format_amount(gathering.price_cents, gathering.currency) %></td>
+                  <td><%= t("admin.gatherings.statuses.#{gathering.status}", default: gathering.status.to_s.titleize) %></td>
+                  <td class="text-right">
+                    <%= link_to t("admin.gatherings.actions.edit"), edit_admin_gathering_path(gathering), class: "pill-link" %>
+                    <%= button_to admin_gathering_path(gathering),
+                      method: :delete,
+                      data: { turbo_confirm: t("admin.gatherings.confirmations.delete") },
+                      form: { class: "pill-link danger delete-link" } do %>
+                      <span><%= t("admin.gatherings.actions.delete") %></span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="muted"><%= t("admin.gatherings.empty") %></p>
+      <% end %>
+    </section>
+  </div>
+</div>

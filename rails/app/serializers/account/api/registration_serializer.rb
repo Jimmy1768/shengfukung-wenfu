@@ -26,13 +26,13 @@ module Account
       attr_reader :registration
 
       def offering_payload
-        return {} unless registration.temple_offering
+        return {} unless registration.offering
 
         {
-          id: registration.temple_offering.id,
-          title: registration.temple_offering.title,
-          period: registration.temple_offering.period,
-          slug: registration.temple_offering.slug
+          id: registration.offering.id,
+          title: registration.offering.title,
+          period: registration.offering.try(:period) || registration.offering.try(:period_label),
+          slug: registration.offering.slug
         }
       end
     end

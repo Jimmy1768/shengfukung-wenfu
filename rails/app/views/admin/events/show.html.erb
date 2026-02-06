@@ -1,0 +1,97 @@
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide">
+      <header>
+        <h1><%= @offering.title %></h1>
+        <% if @offering.subtitle.present? %>
+          <p class="muted"><%= @offering.subtitle %></p>
+        <% end %>
+        <p class="muted"><%= @offering.description %></p>
+      </header>
+      <dl class="detail-grid">
+        <div>
+          <dt><%= t("admin.events.show.type") %></dt>
+          <dd><%= t("admin.offerings.types.#{@offering.offering_type}", default: @offering.offering_type.to_s.humanize) %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.events.show.price") %></dt>
+          <dd><%= Currency::Symbols.format_amount(@offering.price_cents, @offering.currency) %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.events.show.status") %></dt>
+          <dd><%= t("admin.events.statuses.#{@offering.status}", default: @offering.status.to_s.titleize) %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.events.show.schedule") %></dt>
+          <dd><%= [@offering.starts_on&.strftime("%Y/%m/%d"), @offering.ends_on&.strftime("%Y/%m/%d")].compact.join(" - ").presence || t("admin.events.index.table.schedule_flexible") %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.events.show.times") %></dt>
+          <dd>
+            <% if @offering.start_time.present? || @offering.end_time.present? %>
+              <%= [@offering.start_time&.strftime("%H:%M"), @offering.end_time&.strftime("%H:%M")].compact.join(" - ") %>
+            <% else %>
+              <span class="muted"><%= t("admin.events.show.times_flexible") %></span>
+            <% end %>
+          </dd>
+        </div>
+        <div>
+          <dt><%= t("admin.events.show.location") %></dt>
+          <dd>
+            <% location_details = [@offering.location_name, @offering.location_address, @offering.location_notes].compact_blank %>
+            <%= location_details.presence&.join(" / ") || "—" %>
+          </dd>
+        </div>
+        <div>
+          <dt><%= t("admin.events.show.capacity") %></dt>
+          <dd><%= @offering.capacity_total.presence || @offering.available_slots.presence || t("admin.events.show.capacity_open") %></dd>
+        </div>
+      </dl>
+      <div class="actions">
+        <%= link_to t("admin.events.show.manage_registrations"), admin_offering_orders_path_for(@offering), class: "btn btn-primary" %>
+        <% if current_admin_permissions&.allow?(:manage_offerings) %>
+          <%= link_to t("admin.events.show.edit_event"), edit_admin_event_path(@offering), class: "btn btn-secondary" %>
+        <% end %>
+      </div>
+    </section>
+  </div>
+
+  <% metadata = (@offering.metadata || {}).with_indifferent_access %>
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide">
+      <header>
+        <h2><%= t("admin.offering_form.sections.certificate") %></h2>
+        <p class="muted"><%= t("admin.offering_form.hints.certificate") %></p>
+      </header>
+      <dl class="detail-grid">
+        <div>
+          <dt><%= t("admin.offering_form.fields.certificate_prefix") %></dt>
+          <dd><%= metadata[:certificate_prefix].presence || "—" %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.offering_form.fields.certificate_hint") %></dt>
+          <dd><%= metadata[:certificate_hint].presence || "—" %></dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide">
+      <header>
+        <h2><%= t("admin.offering_form.sections.logistics") %></h2>
+        <p class="muted"><%= t("admin.offering_form.hints.logistics") %></p>
+      </header>
+      <dl class="detail-grid">
+        <div>
+          <dt><%= t("admin.offering_form.fields.ancestor_placard_hint") %></dt>
+          <dd><%= metadata[:ancestor_placard_hint].presence || "—" %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.offering_form.fields.logistics_notes") %></dt>
+          <dd><%= metadata[:logistics_notes].presence || "—" %></dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+</div>

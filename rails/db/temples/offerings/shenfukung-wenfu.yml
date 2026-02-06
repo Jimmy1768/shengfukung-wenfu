@@ -1,5 +1,6 @@
 offerings:
   - slug: incense-donation
+    kind: service
     label: "香油捐獻"
     defaults:
       offering_type: "donation"
@@ -31,6 +32,7 @@ offerings:
           allow_multiple: false
 
   - slug: family-peace
+    kind: event
     label: "平安戲丁口捐"
     defaults:
       offering_type: "ritual"
@@ -65,6 +67,7 @@ offerings:
           options: ["08:00-09:00", "09:00-10:00", "10:00-11:00"]
 
   - slug: lantern-lighting
+    kind: event
     label: "點燈作業"
     defaults:
       offering_type: "lamp"
@@ -81,7 +84,6 @@ offerings:
           - available_slots
           - starts_on
           - ends_on
-          - active
       description: true
     registration_form:
       sections:
@@ -100,6 +102,7 @@ offerings:
           allow_multiple: true
 
   - slug: ancestor-ritual
+    kind: event
     label: "祖先拔薦"
     defaults:
       offering_type: "ritual"
@@ -136,6 +139,7 @@ offerings:
           options: ["Three-stick set", "Five-stick set", "Ten-stick set"]
 
   - slug: pudu-table
+    kind: service
     label: "普渡供桌"
     defaults:
       offering_type: "table"
@@ -156,7 +160,6 @@ offerings:
           - starts_on
           - ends_on
           - available_slots
-          - active
       certificate:
         fields:
           - certificate_prefix

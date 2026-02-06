@@ -26,12 +26,48 @@
     <%= form.date_field :event_date %>
   </div>
 
+  <% asset_lookup = gallery_entry.temple.media_assets.where(id: gallery_entry.media_asset_ids).index_by(&:id) if gallery_entry.temple && gallery_entry.media_asset_ids.any? %>
+  <% asset_payload = if asset_lookup.present?
+      gallery_entry.media_asset_ids.filter_map do |asset_id|
+        asset = asset_lookup[asset_id.to_i]
+        asset.present? ? { id: asset.id, url: asset.url } : nil
+      end
+    else
+      []
+    end %>
+
+  <div class="field">
+    <label><%= t("admin.gallery_entries.fields.upload_media") %></label>
+    <div class="media-upload media-upload--gallery"
+      data-media-upload
+      data-media-upload-context="gallery"
+      data-media-upload-append="#gallery-photo-urls"
+      data-media-upload-assets="#gallery-uploaded-assets">
+      <div class="media-upload__controls">
+        <select data-media-upload-kind class="media-upload__select">
+          <option value="image"><%= t("admin.gallery_entries.fields.media_image") %></option>
+          <option value="video"><%= t("admin.gallery_entries.fields.media_video") %></option>
+        </select>
+        <input type="file" accept="image/*,video/*" data-media-upload-file class="media-upload__file-input">
+        <button type="button" class="btn btn-secondary" data-media-upload-button>
+          <%= t("admin.media_uploads.actions.upload") %>
+        </button>
+        <span class="media-upload__status" data-media-upload-status></span>
+      </div>
+      <p class="muted"><%= t("admin.gallery_entries.hints.upload_media") %></p>
+    </div>
+    <%= hidden_field_tag "temple_gallery_entry[uploaded_assets_payload]",
+      asset_payload.to_json,
+      id: "gallery-uploaded-assets" %>
+  </div>
+
   <div class="field">
     <%= form.label :photo_urls_raw, t("admin.gallery_entries.fields.photo_urls") %>
     <%= text_area_tag "temple_gallery_entry[photo_urls_raw]",
       gallery_entry.photo_urls.join("\n"),
       rows: 4,
-      class: "form-control" %>
+      class: "form-control",
+      id: "gallery-photo-urls" %>
     <p class="muted"><%= t("admin.gallery_entries.hints.photo_urls") %></p>
   </div>
 
@@ -40,3 +76,5 @@
     <%= link_to t("admin.gallery_entries.actions.cancel"), admin_gallery_entries_path, class: "btn btn-secondary" %>
   </div>
 <% end %>
+
+<%= render "admin/shared/media_upload_script" %>

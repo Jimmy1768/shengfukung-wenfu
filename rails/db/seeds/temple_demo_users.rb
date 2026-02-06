@@ -61,6 +61,56 @@ module Seeds
         dependents: [
           { english_name: "Lin Gui-ying", native_name: "林桂英", relationship_label: "Grandmother" }
         ]
+      },
+      {
+        email: Seeds::AuthCore::STAFF_ADMIN_EMAIL,
+        english_name: "Admin Ling",
+        native_name: "林管理",
+        birthdate: Date.parse("1988-08-08"),
+        phone: "0933-888-888",
+        notes: "想要先以信眾身份測試系統。",
+        temple_profile: {
+          household_reference: "林府管理戶",
+          preferred_language: "zh-TW",
+          preferred_branch: "本殿",
+          zodiac: "Dragon"
+        },
+        offerings: {
+          "lantern-lighting" => {
+            dedication_message: "為信眾示範報名流程",
+            quantity: 1
+          }
+        },
+        household_members: ["林依婷"],
+        dependents: [
+          { english_name: "Lin Yi-ting", native_name: "林依婷", relationship_label: "Sister" }
+        ]
+      },
+      {
+        email: Seeds::AuthCore::PATRON_EMAIL,
+        english_name: "Patron Kao",
+        native_name: "高信眾",
+        birthdate: Date.parse("1975-05-17"),
+        phone: "0911-555-777",
+        notes: "將用來測試家屬與報名流程。",
+        temple_profile: {
+          household_reference: "高家團圓",
+          preferred_language: "zh-TW",
+          preferred_branch: "天官殿",
+          zodiac: "Rabbit"
+        },
+        offerings: {
+          "ancestor-ritual" => {
+            ancestor_placard_name: "高府祖先",
+            dedication_message: "家族平安",
+            incense_option: "Three-stick set"
+          }
+        },
+        household_members: ["高雅琪", "高雅蘭"],
+        dependents: [
+          { english_name: "Kao Ya-chi", native_name: "高雅琪", relationship_label: "Mother" },
+          { english_name: "Kao Ya-lan", native_name: "高雅蘭", relationship_label: "Aunt" }
+        ]
       }
     ].freeze
 

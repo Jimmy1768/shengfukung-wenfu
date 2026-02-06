@@ -21,7 +21,7 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
     post admin_payments_path(registration_id: registration.id),
       params: { temple_payment: { amount_cents: 700, currency: "TWD" } }
 
-    assert_redirected_to admin_offering_offering_order_path(offering, registration)
+    assert_redirected_to admin_event_offering_order_path(offering, registration)
     assert_equal "paid", registration.reload.payment_status
     assert_equal 1, registration.temple_payments.count
   end

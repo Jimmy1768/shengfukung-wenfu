@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "temple profile backend and frontend consistent"
+git commit -m "created TempleGatherings and related files"
 git push
 
 git reset --hard HEAD
@@ -217,13 +217,13 @@ ssh jimmy1768_user@143.198.91.24
 ---
 
 # Dummy Logins
-```bash
-admin@shenfukung-wenfu.local
-GoldenTemplate!123
-
-demo@shenfukung-wenfu.local
-guest@shenfukung-wenfu.local
-DemoPassword!23
+```
+Owner Admin  – owner@shenfukung-wenfu.local  /  DemoPassword!23
+Staff Admin  – admin@shenfukung-wenfu.local  /  DemoPassword!23
+Patron Tester – patron@shenfukung-wenfu.local /  DemoPassword!23
+Dev Support  – dev@shenfukung-wenfu.local   /  DemoPassword!23
+Demo Client  – demo@shenfukung-wenfu.local  /  DemoPassword!23
+Guest Operator – guest@shenfukung-wenfu.local / DemoPassword!23
 ```
 
 cd Projects/sourcegrid-labs

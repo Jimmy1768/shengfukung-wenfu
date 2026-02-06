@@ -27,9 +27,21 @@
         class: "filter-input search-input" %>
     </div>
     <div class="filter-field">
-      <%= form.label :offering_id, t("admin.filters.offering.label"), class: "filter-label" %>
-      <%= form.select :offering_id,
-        options_from_collection_for_select(offerings, :id, :title, filters[:offering_id]),
+      <%= form.label :offering_reference, t("admin.filters.offering.label"), class: "filter-label" %>
+      <% offering_options = offerings.map do |offering|
+        prefix, type =
+          case offering
+          when TempleService
+            [t("admin.filters.offering.service_prefix"), TempleService.name]
+          when TempleGathering
+            [t("admin.filters.offering.gathering_prefix"), TempleGathering.name]
+          else
+            [t("admin.filters.offering.event_prefix"), TempleEvent.name]
+          end
+        ["#{prefix} · #{offering.title}", "#{type}:#{offering.id}"]
+      end %>
+      <%= form.select :offering_reference,
+        options_for_select(offering_options, filters[:offering_reference]),
         { include_blank: t("admin.filters.offering.all") },
         class: "filter-input" %>
     </div>

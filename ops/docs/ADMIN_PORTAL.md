@@ -12,7 +12,8 @@ Progress tracking: fill in each `Completed:` line once the section is implemente
 Completed:
 - Temple profile form now persists hero copy, per-tab hero images, contact/service/visit metadata, and validates Google Maps links via Places API.
 - Hero image uploads use the new AJAX uploader + fallback URL inputs; map_link automatically populates address + plus code fields.
-- News posts (`TempleNewsPost`) and gallery entries (`TempleGalleryEntry`) models/controllers in place with scoped seeds for each temple.
+- News posts (`TempleNewsPost`), gallery entries (`TempleGalleryEntry`), plus the split `TempleEvent` / `TempleService` models/controllers are in place with scoped seeds for each temple.
+- Financial stack now rides on `TempleRegistration` + `TemplePayment`, with `TempleGathering` covering non-offering community events so registrations/payments stay unified.
 
 ## Phase 2 – Admin UX Enhancements
 
@@ -23,7 +24,10 @@ Completed:
 
 Completed:
 - `/admin/temple/profile` redesigned with per-section cards, distinct hero image controls, inline validation, and map-link derived metadata display.
-- `/admin/news_posts` CRUD (list + form) + `/admin/gallery_entries` CRUD now use the shared admin card layout, localized copy, and stylized datetime pickers.
+- `/admin/news_posts`, `/admin/gallery_entries`, `/admin/events`, and `/admin/services` all use the shared admin card layout, localized copy, and stylized datetime pickers.
+- `/admin/gatherings` gives owners a lightweight CRUD for non-offering meetups (workshops, community circles) behind the `manage_offerings` permission, with quick links into the shared registrations/payments flow.
+- Event/service/gathering slugs now auto-generate per temple (and normalize on save) so admins no longer manage URL tokens manually.
+- Gatherings and gallery entries now support direct media uploads (photos or videos) via the shared MediaAsset/S3 pipeline, while still allowing manual URLs as a fallback.
 - Payments dashboard, archives filters, and ledger tables have localized copy + spacing fixes; metrics/pill cards match the latest visual system.
 - Added the patrons directory screen (owner-only) with search + table view as the precursor to the “promote patron to admin” flow.
 - Temple switcher allows admin owners to move between slugs locally (disabled in production environments).
@@ -36,6 +40,8 @@ Completed:
 - Add request specs covering all new endpoints and enforce slug scoping.
 
 Completed:
+- `/api/v1/temples/:slug` profile/news/archive endpoints landed alongside `/api/v1/temples/:slug/events` and `/api/v1/temples/:slug/services`.
+- Events/services APIs now serialize via `TempleEventSerializer` + `TempleServiceSerializer`, supplying metadata for Vue and Expo.
 
 ## Phase 4 – Vue Frontend Integration
 
@@ -46,6 +52,8 @@ Completed:
 - Keep cache payload generation on the Rails side for admin/account flows where larger datasets need preprocessing; Vue’s footprint is small enough to call APIs directly for now.
 
 Completed:
+- Vue bootstraps `useTempleContent` with profile/news/archive/events/services feeds; hero/tab components consume the API data instead of hardcoded placeholders.
+- Events page now reads from the new `/events` feed; Services page renders `/services` cards; home page highlights the first two events.
 
 ## Phase 5 – Deployment & Onboarding
 

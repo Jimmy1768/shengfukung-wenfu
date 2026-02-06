@@ -1,5 +1,11 @@
 en:
   admin:
+    nav:
+      items:
+        offerings:
+          label: "Offerings"
+        gatherings:
+          label: "Gatherings"
     navigation:
       dashboard: "Dashboard"
       temple_profile: "Temple Profile"
@@ -9,6 +15,7 @@ en:
       gallery_entries: "Gallery"
       gallery: "Gallery"
       offerings: "Offerings"
+      gatherings: "Gatherings"
       orders: "Orders"
       payments: "Payments"
       patrons: "Patrons"
@@ -21,6 +28,9 @@ en:
       offering:
         label: "Offering"
         all: "All offerings"
+        event_prefix: "Event"
+        service_prefix: "Service"
+        gathering_prefix: "Gathering"
       payment_method:
         label: "Payment method"
         all: "All methods"
@@ -174,8 +184,10 @@ en:
           label: "News"
         gallery_entries:
           label: "Gallery"
-        offerings:
-          label: "Offerings"
+        events:
+          label: "Events"
+        services:
+          label: "Services"
         orders:
           label: "Orders"
         payments:
@@ -253,7 +265,7 @@ en:
         title: "Next steps"
         subtitle: "Quick links to finish onboarding tasks."
         fill_profile: "Complete the temple profile →"
-        setup_offerings: "Create your first offering template"
+        setup_offerings: "Publish your first event or service"
         promote_admin_from_patron: "Promote a patron into the admin roster"
         manage_permissions: "Review and adjust admin permissions"
         complete_heading: "Congratulations!"
@@ -396,8 +408,12 @@ en:
         body: "Body"
         event_date: "Event date"
         photo_urls: "Photo URLs (one per line)"
+        upload_media: "Upload photos or videos"
+        media_image: "Photo"
+        media_video: "Video"
       hints:
         photo_urls: "Paste hosted image URLs, one per line. Leave blank if not available."
+        upload_media: "Upload files directly or keep pasting external links as a fallback."
       actions:
         new: "New entry"
         save: "Save"
@@ -413,18 +429,83 @@ en:
       form:
         errors: "%{count} issues prevented saving"
       empty: "No gallery entries yet."
+    gatherings:
+      index:
+        title: "Gatherings"
+        body: "Manage informal community gatherings that still use the onsite registration + payment flow."
+      new:
+        title: "New gathering"
+        body: "Describe the gathering, schedule, and onsite workflow."
+      edit:
+        title: "Edit gathering"
+        body: "Update the copy, schedule, price, or logistics."
+      table:
+        title: "Title"
+        schedule: "Schedule"
+        location: "Location"
+        price: "Price"
+        status: "Status"
+        actions: "Actions"
+      fields:
+        title: "Title"
+        subtitle: "Subtitle"
+        description: "Description"
+        hero_image_url: "Hero image URL"
+        starts_on: "Starts on"
+        ends_on: "Ends on"
+        start_time: "Start time"
+        end_time: "End time"
+        location_name: "Location name"
+        location_address: "Location address"
+        location_notes: "Location notes"
+        price_cents: "Price (cents)"
+        currency: "Currency"
+        status: "Status"
+      hints:
+        hero_image_url: "Optional. Surfaces on marketing cards if present."
+      labels:
+        unscheduled: "Schedule TBD"
+        location_pending: "Location TBD"
+      statuses:
+        draft: "Draft"
+        published: "Published"
+        archived: "Archived"
+      actions:
+        new: "New gathering"
+        save: "Save"
+        cancel: "Cancel"
+        edit: "Edit"
+        delete: "Delete"
+      notices:
+        created: "Gathering created."
+        updated: "Gathering updated."
+        deleted: "Gathering deleted."
+        delete_restricted: "Gathering cannot be deleted because registrations exist."
+      errors:
+        invalid_asset: "Unable to use the uploaded hero image. Please upload a new file."
+      confirmations:
+        delete: "Delete this gathering?"
+      form:
+        errors: "%{count} issues prevented saving"
+      empty: "No gatherings yet."
     offerings:
       index:
         title: "Temple Offerings"
         new_button: "New Offering"
+        view_archived: "View archived offerings"
+        view_active: "Back to current"
         table:
           title: "Title"
           type: "Type"
           price: "Price"
           status: "Status"
           view: "View"
+          orders: "Orders"
+        empty: "No offerings match the current filters."
+        archived_empty: "No archived offerings yet."
       statuses:
-        active: "Active"
+        draft: "Draft"
+        published: "Published"
         archived: "Archived"
       types:
         general: "General"
@@ -454,6 +535,122 @@ en:
         schedule_flexible: "Flexible"
         manage_registrations: "Manage registrations"
         edit_offering: "Edit offering"
+    events:
+      index:
+        title: "Temple Events"
+        body: "Set up upcoming ceremonies, retreats, and seasonal festivals."
+        new_button: "New Event"
+        table:
+          title: "Title"
+          schedule: "Schedule"
+          schedule_flexible: "Flexible"
+          location: "Location"
+          price: "Price"
+          status: "Status"
+          view: "View"
+      statuses:
+        draft: "Draft"
+        published: "Published"
+        archived: "Archived"
+      new:
+        title: "New Event"
+        body: "Load a template to keep certificate/logistics fields in sync with the YAML configs."
+        template_open: "Select event template"
+        template_change: "Change template"
+        template_modal_title: "Choose an event template"
+        template_close: "Close template picker"
+        template_use: "Use this template"
+        template_period: "Default period: %{period}"
+        template_selected: "Using template: %{name}"
+        template_prompt: "Select a template to load the form fields."
+      edit:
+        title: "Edit Event"
+      show:
+        type: "Type"
+        price: "Price"
+        status: "Status"
+        schedule: "Schedule"
+        times: "Event time"
+        times_flexible: "Flexible"
+        location: "Location"
+        capacity: "Capacity"
+        capacity_open: "Open registration"
+        manage_registrations: "Manage registrations"
+        edit_event: "Edit event"
+      form:
+        sections:
+          basics: "Basic details"
+          basics_hint: "Edit marketing copy and hero assets."
+          schedule: "Schedule & location"
+          pricing: "Pricing & status"
+        fields:
+          subtitle: "Subtitle"
+          hero_image_url: "Hero image URL"
+          poster_image_url: "Poster image URL"
+          start_time: "Start time"
+          end_time: "End time"
+          location_name: "Location name"
+          location_address: "Location address"
+          location_notes: "Location notes"
+          capacity_total: "Capacity"
+          status: "Status"
+    services:
+      index:
+        title: "Temple Services"
+        body: "Manage recurring lamp, table, and scripture services."
+        new_button: "New Service"
+        table:
+          title: "Title"
+          period: "Period"
+          period_flexible: "Flexible"
+          fulfillment: "Fulfillment"
+          price: "Price"
+          status: "Status"
+          view: "View"
+      statuses:
+        draft: "Draft"
+        published: "Published"
+        archived: "Archived"
+      new:
+        title: "New Service"
+        body: "Choose a template to preload the correct registration form fields."
+        template_open: "Select service template"
+        template_change: "Change template"
+        template_modal_title: "Choose a service template"
+        template_close: "Close template picker"
+        template_use: "Use this template"
+        template_period: "Default period: %{period}"
+        template_selected: "Using template: %{name}"
+        template_prompt: "Select a template to load the form fields."
+      edit:
+        title: "Edit Service"
+      show:
+        type: "Type"
+        price: "Price"
+        status: "Status"
+        period: "Period"
+        fulfillment: "Fulfillment"
+        default_location: "Default location"
+        quantity_limit: "Quantity limit"
+        quantity_unlimited: "Unlimited"
+        manage_registrations: "Manage registrations"
+        edit_service: "Edit service"
+      form:
+        sections:
+          basics: "Basic details"
+          basics_hint: "Describe the service for internal staff."
+          availability: "Availability & fulfillment"
+          pricing: "Pricing & status"
+        fields:
+          subtitle: "Subtitle"
+          hero_image_url: "Hero image URL"
+          period_label: "Period label"
+          quantity_limit: "Quantity limit"
+          available_from: "Available from"
+          available_until: "Available until"
+          default_location: "Default location"
+          fulfillment_notes: "Fulfillment notes"
+          status: "Status"
     orders:
       index:
         eyebrow: "Orders"
@@ -655,3 +852,11 @@ en:
         manage_gallery:
           label: "Manage gallery"
           hint: "Add or update gallery/event recap content."
+    media_uploads:
+      actions:
+        upload: "Upload file"
+        uploading: "Uploading..."
+      status:
+        success: "Uploaded successfully."
+        error: "Upload failed."
+        generic: "Unable to complete upload."

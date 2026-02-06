@@ -16,14 +16,18 @@ module Admin
         .limit(200)
       @payment_summary = Reporting::PaymentSummary.new(payments: scoped)
       @show_export = current_admin_permissions&.allow?(:export_financials)
-      @filter_offerings = current_temple.temple_offerings.order(:title)
+      @filter_offerings = [
+        current_temple.temple_events.order(:title),
+        current_temple.temple_services.order(:title),
+        current_temple.temple_gatherings.order(:title)
+      ].flat_map(&:to_a)
       @filter_payment_methods = TemplePayment::PAYMENT_METHODS.values
       @filter_hidden_fields = filter_hidden_params
     end
 
     def export
       exporter = Reporting::PaymentsCsvExporter.new(
-        payments: base_payment_scope.includes({ temple_event_registration: :temple_offering }, :user, admin_account: :user)
+        payments: base_payment_scope.includes(:temple_registration, :user, admin_account: :user)
       )
       send_data exporter.to_csv,
         filename: "payments-#{Time.current.strftime('%Y%m%d')}.csv",
@@ -48,7 +52,7 @@ module Admin
       )
       @payment = recorder.record!
 
-      redirect_to admin_offering_offering_order_path(@registration.temple_offering, @registration),
+      redirect_to offering_order_path(@registration.offering, @registration),
         notice: "Payment recorded."
     rescue ActiveRecord::RecordInvalid => e
       @payment = e.record
@@ -90,6 +94,14 @@ module Admin
 
     def filtered_payments_scope
       base_payment_scope.merge(TemplePayment.admin_filtered(@filters))
+    end
+
+    def offering_order_path(offering, registration)
+      return admin_event_offering_order_path(offering, registration) if offering.is_a?(TempleEvent)
+      return admin_service_offering_order_path(offering, registration) if offering.is_a?(TempleService)
+      return admin_gathering_offering_order_path(offering, registration) if offering.is_a?(TempleGathering)
+
+      admin_orders_path
     end
   end
 end

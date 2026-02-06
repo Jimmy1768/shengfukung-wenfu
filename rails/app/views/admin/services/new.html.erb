@@ -1,0 +1,96 @@
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="hero stack-item stack-item--hero">
+      <div class="hero-text">
+        <h1><%= t("admin.services.new.title") %></h1>
+        <p><%= t("admin.services.new.body", default: t("admin.dashboard.hero.body_html")) %></p>
+      </div>
+    </section>
+  </div>
+
+  <% loader = Offerings::TemplateLoader.new(current_temple.slug) %>
+  <% templates = loader.services %>
+  <% selected_template = params[:template_slug].presence %>
+  <% selected_template_entry = selected_template.present? ? loader.template_for(selected_template, kind: :services) : nil %>
+
+  <% if templates.any? %>
+    <div class="admin-stack__row">
+      <section class="card stack-item stack-item--wide">
+        <div class="template-picker">
+          <% if selected_template_entry.present? %>
+            <div class="template-picker__body">
+              <p class="muted">
+                <%= t("admin.services.new.template_selected", name: selected_template_entry[:label] || selected_template_entry[:slug]) %>
+              </p>
+              <div class="template-picker__actions">
+                <button type="button" class="btn btn-secondary" data-modal-trigger="service-template-modal">
+                  <%= t("admin.services.new.template_change") %>
+                </button>
+                <button type="submit" form="service-form" class="btn btn-primary">
+                  <%= t("admin.offering_form.actions.save") %>
+                </button>
+              </div>
+            </div>
+          <% else %>
+            <button type="button" class="btn btn-secondary" data-modal-trigger="service-template-modal">
+              <%= t("admin.services.new.template_open") %>
+            </button>
+          <% end %>
+        </div>
+
+        <%= render "shared/modal_panel",
+          modal_key: "service-template-modal",
+          title: t("admin.services.new.template_modal_title"),
+          close_label: t("admin.services.new.template_close") do %>
+          <div class="template-list">
+            <% templates.each do |template| %>
+              <% slug = template[:slug] %>
+              <% selected = slug == selected_template %>
+              <%= button_to new_admin_service_path,
+                method: :get,
+                params: { template_slug: slug },
+                class: ["btn", "template-card-button", ("is-selected" if selected)] do %>
+                <div class="template-card-body">
+                  <div>
+                    <h3><%= template[:label] || slug.titleize %></h3>
+                  </div>
+                  <% if template[:defaults]&.[](:period).present? %>
+                    <p class="template-meta"><%= t("admin.services.new.template_period", period: template[:defaults][:period]) %></p>
+                  <% end %>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+      </section>
+    </div>
+  <% end %>
+
+  <% if selected_template_entry.present? %>
+    <% template = selected_template_entry %>
+    <% @offering.metadata ||= {} %>
+    <% @offering.metadata["form_fields"] = template[:form_fields] %>
+    <% @offering.metadata["form_defaults"] = template[:defaults] %>
+    <% @offering.metadata["form_options"] = template[:options] %>
+    <% @offering.metadata["form_label"] = template[:label] %>
+    <% @offering.slug ||= template[:slug] %>
+    <% @offering.title ||= template[:label] %>
+    <% @offering.offering_type ||= template.dig(:defaults, :offering_type) %>
+  <% else %>
+    <div class="admin-stack__row">
+      <section class="card stack-item stack-item--wide">
+        <div class="alert alert-info">
+          <%= t("admin.services.new.template_prompt") %>
+        </div>
+      </section>
+    </div>
+  <% end %>
+
+  <% if selected_template_entry.present? %>
+    <div class="admin-stack__row">
+      <section class="card stack-item stack-item--fluid">
+        <%= render "form", show_form_actions: false, validation_rule: :offering %>
+      </section>
+    </div>
+  <% end %>
+</div>

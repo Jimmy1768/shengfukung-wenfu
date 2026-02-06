@@ -1,13 +1,13 @@
 require "test_helper"
 
 module Payments
-  class OfferingRegistrationBuilderTest < ActiveSupport::TestCase
+  class TempleRegistrationBuilderTest < ActiveSupport::TestCase
     test "creates registration with defaults" do
       temple = create_temple
       offering = TempleOffering.create!(temple:, slug: "lamp", title: "Lamp", currency: "TWD", price_cents: 400)
       admin = create_admin_user(temple:)
 
-      builder = OfferingRegistrationBuilder.new(
+      builder = TempleRegistrationBuilder.new(
         temple:,
         offering:,
         admin_user: admin,

@@ -34,8 +34,8 @@ module Reporting
     attr_reader :payments
 
     def build_row(payment)
-      registration = payment.temple_event_registration
-      offering_title = registration&.temple_offering&.title
+      registration = payment.offering_registration
+      offering_title = registration&.offering&.title
       patron_label = registration&.user&.english_name || registration&.user&.email || payment.user&.english_name || payment.user&.email
       recorded_by = payment.admin_account&.user&.english_name || payment.admin_account&.user&.email || "System"
 

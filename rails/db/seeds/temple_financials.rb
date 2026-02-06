@@ -10,6 +10,7 @@ module Seeds
       "shenfukung-wenfu" => [
         {
           slug: "lantern-lighting",
+          kind: :event,
           offering_type: TempleOffering::OFFERING_TYPES[:lamp],
           title: "祈福點燈",
           description: "每盞供燈代表一家平安，含安太歲與祈福卡片。",
@@ -32,6 +33,7 @@ module Seeds
         },
         {
           slug: "pudu-table",
+          kind: :service,
           offering_type: TempleOffering::OFFERING_TYPES[:table],
           title: "普渡供桌",
           description: "含水果、鮮花與供品，可於指定檔期代為佈置。",
@@ -55,6 +57,7 @@ module Seeds
       "demo-lotus" => [
         {
           slug: "meditation-retreat",
+          kind: :event,
           offering_type: TempleOffering::OFFERING_TYPES[:ritual],
           title: "蓮心靜觀禪修",
           description: "三日禪修課程，含手作香氛、音樂療癒。",
@@ -76,6 +79,7 @@ module Seeds
         },
         {
           slug: "lotus-light",
+          kind: :service,
           offering_type: TempleOffering::OFFERING_TYPES[:lamp],
           title: "蓮花光明燈",
           description: "全年供燈並附上書法祈願卡。",
@@ -87,8 +91,52 @@ module Seeds
       ]
     }.freeze
 
+    GATHERINGS = {
+      "shenfukung-wenfu" => [
+        {
+          slug: "first-aid-workshop",
+          title: "寺院急救工作坊",
+          subtitle: "與社區醫護合作的公益課程",
+          description: "邀請資深護理師分享最實用的急救步驟，課後提供認證。",
+          starts_on: Date.new(2026, 5, 10),
+          ends_on: Date.new(2026, 5, 10),
+          start_time: Time.zone.parse("09:00"),
+          end_time: Time.zone.parse("12:00"),
+          location_name: "大殿旁研習教室",
+          location_address: "新北市中和區福真街 108 號",
+          price_cents: 600,
+          currency: "TWD",
+          status: "published"
+        }
+      ],
+      "demo-lotus" => [
+        {
+          slug: "calligraphy-gathering",
+          title: "禪書共修聚會",
+          subtitle: "結合抄經與音樂療癒",
+          description: "抄寫蓮花祝福經文，包含香氛茶點與器材使用費。",
+          starts_on: Date.new(2026, 6, 2),
+          ends_on: Date.new(2026, 6, 2),
+          start_time: Time.zone.parse("19:00"),
+          end_time: Time.zone.parse("21:00"),
+          location_name: "蓮城慈航宮禪修室",
+          location_address: "新北市中和區蓮城路 88 號",
+          price_cents: 800,
+          currency: "TWD",
+          status: "published"
+        }
+      ]
+    }.freeze
+
     def seed
       puts "Seeding temple offerings/payments..." # rubocop:disable Rails/Output
+      seed_offerings
+      seed_gatherings
+    end
+
+    private
+
+    def seed_offerings
       OFFERINGS.each do |slug, entries|
         temple = Temple.find_by(slug:)
         next unless temple
@@ -102,25 +150,80 @@ module Seeds
       end
     end
 
-    private
+    def seed_gatherings
+      GATHERINGS.each do |slug, entries|
+        temple = Temple.find_by(slug:)
+        next unless temple
+
+        entries.each do |gathering_attrs|
+          ensure_gathering(temple, gathering_attrs)
+        end
+      end
+    end
 
     def ensure_offering(temple, attrs)
-      temple.temple_offerings.find_or_initialize_by(slug: attrs[:slug]).tap do |offering|
+      kind = (attrs[:kind] || :event).to_sym
+      scope =
+        case kind
+        when :service then temple.temple_services
+        else temple.temple_events
+        end
+      scope.find_or_initialize_by(slug: attrs[:slug]).tap do |offering|
+        starts_on = attrs[:starts_on] || Date.new(2026, 1, 1)
+        ends_on = attrs[:ends_on] || starts_on + 30
+        period = attrs[:period].presence || "#{starts_on.strftime('%Y/%m/%d')} – #{ends_on.strftime('%Y/%m/%d')}"
+
         offering.assign_attributes(
-          offering_type: attrs[:offering_type],
           title: attrs[:title],
           description: attrs[:description],
           price_cents: attrs[:price_cents],
           currency: attrs[:currency],
-          period: attrs[:period],
-          starts_on: attrs[:starts_on],
-          ends_on: attrs[:ends_on],
-          available_slots: attrs[:available_slots],
-          active: true,
+          status: attrs[:status] || "published",
           metadata: (offering.metadata || {}).merge(seed_metadata)
         )
+        if kind == :service
+          offering.period_label = period
+          offering.available_from = attrs[:available_from] || starts_on
+          offering.available_until = attrs[:available_until] || ends_on
+          offering.quantity_limit = attrs[:available_slots]
+          offering.default_location = attrs[:default_location]
+          offering.fulfillment_notes = attrs[:fulfillment_notes]
+        else
+          offering.assign_attributes(
+            starts_on: starts_on,
+            ends_on: ends_on,
+            location_name: attrs[:location_name],
+            location_address: attrs[:location_address],
+            location_notes: attrs[:location_notes],
+            capacity_total: attrs[:available_slots]
+          )
+          offering.period = period
+        end
+        offering.available_slots = attrs[:available_slots] if offering.respond_to?(:available_slots=)
         offering.temple = temple
         offering.save!
+      end
+    end
+
+    def ensure_gathering(temple, attrs)
+      TempleGathering.find_or_initialize_by(temple:, slug: attrs[:slug]).tap do |gathering|
+        gathering.assign_attributes(
+          title: attrs[:title],
+          subtitle: attrs[:subtitle],
+          description: attrs[:description],
+          starts_on: attrs[:starts_on],
+          ends_on: attrs[:ends_on] || attrs[:starts_on],
+          start_time: attrs[:start_time],
+          end_time: attrs[:end_time],
+          location_name: attrs[:location_name],
+          location_address: attrs[:location_address],
+          location_notes: attrs[:location_notes],
+          price_cents: attrs[:price_cents] || 0,
+          currency: attrs[:currency] || "TWD",
+          status: attrs[:status] || "draft",
+          metadata: (gathering.metadata || {}).merge(seed_metadata)
+        )
+        gathering.save!
       end
     end
 
@@ -136,26 +239,25 @@ module Seeds
       }.compact
 
       code = attrs[:reference_code].presence || generated_reference
-      registration = temple.temple_event_registrations.find_or_initialize_by(reference_code: code)
+      registration = TempleRegistration.find_or_initialize_by(reference_code: code, temple:)
       registration.assign_attributes(
-        temple_offering: offering,
+        registrable: offering,
         temple: temple,
         user: user,
-        event_slug: offering.slug,
         quantity: quantity,
         unit_price_cents: unit_price,
         total_price_cents: total_price,
         currency: currency,
         contact_payload: contact_payload,
-        payment_status: TempleEventRegistration::PAYMENT_STATUSES[:pending],
-        fulfillment_status: TempleEventRegistration::FULFILLMENT_STATUSES[:open],
-        metadata: (registration.metadata || {}).merge(seed_metadata)
+        payment_status: TempleRegistration::PAYMENT_STATUSES[:pending],
+        fulfillment_status: TempleRegistration::FULFILLMENT_STATUSES[:open],
+        metadata: (registration.metadata || {}).merge(seed_metadata).merge("event_slug" => offering.slug)
       )
       registration.save!
 
       if attrs[:payment_method]
         ensure_payment(registration, attrs)
-        registration.update!(payment_status: TempleEventRegistration::PAYMENT_STATUSES[:paid])
+        registration.update!(payment_status: TempleRegistration::PAYMENT_STATUSES[:paid])
       end
 
       registration
@@ -169,7 +271,10 @@ module Seeds
       payment.assign_attributes(
         temple: temple,
         user: registration.user,
-        temple_event_registration: registration,
+        temple_registration: registration,
+        provider: attrs[:provider] || "demo",
+        provider_account: attrs[:provider_account] || "temple",
+        provider_reference: attrs[:provider_reference],
         payment_method: attrs[:payment_method],
         status: TemplePayment::STATUSES[:completed],
         amount_cents: attrs[:amount_cents] || registration.total_price_cents,

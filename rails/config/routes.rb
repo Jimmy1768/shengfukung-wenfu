@@ -10,8 +10,10 @@ Rails.application.routes.draw do
       resources :temples, only: :show, param: :slug
       get "temples/:slug/news", to: "temple_news#index"
       get "temples/:slug/archive", to: "temple_galleries#index"
-      get "temples/:slug/events", to: "temple_offerings#index"
-      get "temples/:slug/events/:event_slug", to: "temple_offerings#show"
+      get "temples/:slug/events", to: "temple_events#index"
+      get "temples/:slug/events/:event_slug", to: "temple_events#show"
+      get "temples/:slug/services", to: "temple_services#index"
+      get "temples/:slug/services/:service_slug", to: "temple_services#show"
     end
   end
 
@@ -40,10 +42,26 @@ Rails.application.routes.draw do
     get "/temple/profile", to: "temples#edit", as: :temple_profile
     match "/temple/profile", to: "temples#update", via: %i[patch post]
 
-    resources :offerings do
+    resources :offerings, only: %i[index new create]
+    resources :events, controller: "events" do
       resources :offering_orders,
         path: "orders",
         controller: "offering_orders",
+        defaults: { offering_kind: "events" },
+        only: %i[index new create show]
+    end
+    resources :services, controller: "services" do
+      resources :offering_orders,
+        path: "orders",
+        controller: "offering_orders",
+        defaults: { offering_kind: "services" },
+        only: %i[index new create show]
+    end
+    resources :gatherings, controller: "gatherings", except: :show do
+      resources :offering_orders,
+        path: "orders",
+        controller: "offering_orders",
+        defaults: { offering_kind: "gatherings" },
         only: %i[index new create show]
     end
     resources :orders, only: :index
@@ -54,6 +72,7 @@ Rails.application.routes.draw do
     end
     resources :news_posts
     resources :gallery_entries
+    resources :media_uploads, only: :create
     get "/archives", to: "archives#index", as: :archives
     get "/archives/registrations", to: "archives#registrations_export", defaults: { format: :csv }, as: :archive_registrations_export
     get "/archives/payments", to: "archives#payments_export", defaults: { format: :csv }, as: :archive_payments_export

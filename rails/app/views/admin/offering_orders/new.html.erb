@@ -4,13 +4,13 @@
     <p class="muted"><%= t("admin.registration_form.subtitle", offering: @offering.title) %></p>
   </div>
   <div class="page-header-actions">
-    <%= link_to t("admin.registration_form.actions.back_to_orders"), admin_offering_offering_orders_path(@offering), class: "btn btn-secondary" %>
+    <%= link_to t("admin.registration_form.actions.back_to_orders"), admin_offering_orders_path_for(@offering), class: "btn btn-secondary" %>
   </div>
 </section>
 
 <section class="card form-card">
   <%= form_with model: [:admin, @offering, @registration],
-        url: admin_offering_offering_orders_path(@offering),
+        url: admin_offering_orders_path_for(@offering),
         local: true,
         data: { registration_form: true },
         class: "form-stack" do |form| %>
@@ -290,7 +290,7 @@
     <% end %>
 
     <div class="form-actions">
-      <%= link_to t("admin.registration_form.actions.cancel"), admin_offering_offering_orders_path(@offering), class: "btn btn-secondary" %>
+      <%= link_to t("admin.registration_form.actions.cancel"), admin_offering_orders_path_for(@offering), class: "btn btn-secondary" %>
       <%= form.submit t("admin.registration_form.actions.submit"), class: "btn btn-primary" %>
     </div>
   <% end %>

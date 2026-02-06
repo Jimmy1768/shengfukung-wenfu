@@ -1,0 +1,65 @@
+offerings:
+  - slug: meditation-retreat
+    kind: event
+    label: "蓮心靜觀禪修"
+    defaults:
+      offering_type: "ritual"
+      currency: "TWD"
+    form_fields:
+      basics:
+        fields:
+          - title
+          - period
+          - price_cents
+          - currency
+      schedule:
+        fields:
+          - starts_on
+          - ends_on
+      ritual:
+        fields:
+          - description
+    registration_form:
+      sections:
+        order:
+          fields: [quantity, unit_price_cents, currency, certificate_number]
+        contact:
+          fields: [primary_contact, phone, email, dependents_notes]
+        logistics:
+          fields: [preferred_date, preferred_slot, arrival_window]
+        ritual_metadata:
+          fields: [dedication_message, incense_option]
+      defaults:
+        order:
+          quantity: 1
+      field_settings:
+        preferred_slot:
+          options: ["上午", "下午", "晚上"]
+        arrival_window:
+          options: ["08:00-09:00", "10:00-11:00", "14:00-15:00"]
+
+  - slug: lotus-light
+    kind: service
+    label: "蓮花光明燈"
+    defaults:
+      offering_type: "lamp"
+      currency: "TWD"
+    form_fields:
+      basics:
+        fields:
+          - title
+          - price_cents
+          - currency
+      schedule:
+        fields:
+          - available_slots
+      description: true
+    registration_form:
+      sections:
+        order:
+          fields: [quantity, unit_price_cents, currency]
+        contact:
+          fields: [primary_contact, phone, email]
+        ritual_metadata:
+          fields: [dedication_message]
+*** End Patch

@@ -22,9 +22,11 @@ module Reporting
       return @totals_by_offering if defined?(@totals_by_offering)
 
       sums = scoped_payments
-        .joins(:temple_event_registration)
-        .joins("LEFT JOIN temple_offerings ON temple_offerings.id = temple_event_registrations.temple_offering_id")
-        .group("COALESCE(temple_offerings.title, 'Unassigned')")
+        .joins(:temple_registration)
+        .joins("LEFT JOIN temple_events ON temple_events.id = temple_registrations.registrable_id AND temple_registrations.registrable_type = 'TempleEvent'")
+        .joins("LEFT JOIN temple_services ON temple_services.id = temple_registrations.registrable_id AND temple_registrations.registrable_type = 'TempleService'")
+        .joins("LEFT JOIN temple_gatherings ON temple_gatherings.id = temple_registrations.registrable_id AND temple_registrations.registrable_type = 'TempleGathering'")
+        .group("COALESCE(temple_events.title, temple_services.title, temple_gatherings.title, 'Unassigned')")
         .sum(:amount_cents)
 
       @totals_by_offering = group_and_format(sums)

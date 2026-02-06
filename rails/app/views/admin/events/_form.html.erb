@@ -1,0 +1,148 @@
+<% show_form_actions = local_assigns.fetch(:show_form_actions, true) %>
+<% validation_rule = local_assigns[:validation_rule] %>
+<% required_fields = validation_rule ? Forms::FieldValidation.required_fields(validation_rule) : [] %>
+<% form_scope = @offering.model_name.param_key %>
+<%
+  form_html_options = { id: "event-form" }
+  if required_fields.any?
+    form_html_options[:data] = {
+      form_validation: true,
+      required_fields: required_fields.join(","),
+      param_scope: form_scope,
+      validation_message: t("admin.offerings.validation.required_message", default: "請完整填寫所有欄位")
+    }
+  end
+%>
+<%
+  default_form_url =
+    if local_assigns[:form_url]
+      local_assigns[:form_url]
+    elsif @offering.persisted?
+      admin_event_path(@offering)
+    else
+      admin_events_path
+    end
+%>
+<%= form_with model: @offering, url: default_form_url, local: true, class: "form-stack", html: form_html_options do |form| %>
+  <% if @offering.errors.any? %>
+    <div class="alert alert-danger">
+      <h3><%= pluralize(@offering.errors.count, "error") %> prevented saving:</h3>
+      <ul>
+        <% @offering.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <% hidden_params = local_assigns[:hidden_params] || {} %>
+  <% hidden_params.each do |key, value| %>
+    <%= hidden_field_tag key, value %>
+  <% end %>
+
+  <% metadata = (@offering.metadata || {}).with_indifferent_access %>
+
+  <section class="card form-section">
+    <header>
+      <h2><%= t("admin.events.form.sections.basics") %></h2>
+      <p class="muted"><%= t("admin.events.form.sections.basics_hint") %></p>
+    </header>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :title, t("admin.offering_form.fields.title") %>
+        <%= form.text_field :title %>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :subtitle, t("admin.events.form.fields.subtitle") %>
+        <%= form.text_field :subtitle %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :hero_image_url, t("admin.events.form.fields.hero_image_url") %>
+        <%= form.text_field :hero_image_url %>
+      </div>
+    </div>
+    <div class="field">
+      <%= form.label :poster_image_url, t("admin.events.form.fields.poster_image_url") %>
+      <%= form.text_field :poster_image_url %>
+    </div>
+    <div class="field">
+      <%= form.label :description, t("admin.offering_form.fields.description") %>
+      <%= form.text_area :description, rows: 3 %>
+    </div>
+  </section>
+
+  <section class="card form-section">
+    <header>
+      <h2><%= t("admin.events.form.sections.schedule") %></h2>
+    </header>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :starts_on, t("admin.offering_form.fields.starts_on") %>
+        <%= form.date_field :starts_on, class: "admin-date-input" %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :ends_on, t("admin.offering_form.fields.ends_on") %>
+        <%= form.date_field :ends_on, class: "admin-date-input" %>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :start_time, t("admin.events.form.fields.start_time") %>
+        <%= form.time_field :start_time %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :end_time, t("admin.events.form.fields.end_time") %>
+        <%= form.time_field :end_time %>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :location_name, t("admin.events.form.fields.location_name") %>
+        <%= form.text_field :location_name %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :location_address, t("admin.events.form.fields.location_address") %>
+        <%= form.text_field :location_address %>
+      </div>
+    </div>
+    <div class="field">
+      <%= form.label :location_notes, t("admin.events.form.fields.location_notes") %>
+      <%= form.text_area :location_notes, rows: 2 %>
+    </div>
+    <div class="field">
+      <%= form.label :capacity_total, t("admin.events.form.fields.capacity_total") %>
+      <%= form.number_field :capacity_total, min: 0 %>
+    </div>
+  </section>
+
+  <section class="card form-section">
+    <header>
+      <h2><%= t("admin.events.form.sections.pricing") %></h2>
+    </header>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :price_cents, t("admin.registration_form.fields.unit_price") %>
+        <%= form.number_field :price_cents, min: 0 %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :currency, t("admin.offering_form.fields.currency") %>
+        <%= form.select :currency, options_for_select(Currency::Symbols.options, @offering.currency || "TWD") %>
+      </div>
+    </div>
+    <div class="field">
+      <%= form.label :status, t("admin.events.form.fields.status") %>
+      <%= form.select :status, options_for_select([["Draft", "draft"], ["Published", "published"], ["Archived", "archived"]], @offering.status) %>
+    </div>
+  </section>
+
+  <div class="offering-form-grid">
+    <%= render_offering_sections(form, metadata) %>
+  </div>
+
+  <% if show_form_actions %>
+    <div class="form-actions">
+      <%= form.submit t("admin.offering_form.actions.save"), class: "btn btn-primary" %>
+    </div>
+  <% end %>
+<% end %>

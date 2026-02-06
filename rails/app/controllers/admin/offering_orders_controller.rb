@@ -3,6 +3,7 @@
 module Admin
   class OfferingOrdersController < BaseController
     before_action :require_manage_registrations!
+    before_action :set_offering_kind
     before_action :set_offering
     before_action :set_registration, only: :show
 
@@ -22,7 +23,7 @@ module Admin
     end
 
     def create
-      builder = Payments::OfferingRegistrationBuilder.new(
+      builder = Payments::TempleRegistrationBuilder.new(
         temple: current_temple,
         offering: @offering,
         admin_user: current_admin,
@@ -30,7 +31,7 @@ module Admin
       )
 
       @registration = builder.create
-      redirect_to admin_offering_offering_order_path(@offering, @registration), notice: "Registration created."
+      redirect_to offering_order_path(@offering, @registration), notice: "Registration created."
     rescue ActiveRecord::RecordInvalid => e
       @registration = e.record
       prepare_registration_payloads
@@ -42,8 +43,21 @@ module Admin
 
     private
 
+    def set_offering_kind
+      @offering_kind = params[:offering_kind]&.to_sym
+      @offering_kind = :events unless %i[events services gatherings].include?(@offering_kind)
+    end
+
     def set_offering
-      @offering = current_temple.temple_offerings.find(params[:offering_id])
+      @offering =
+        case @offering_kind
+        when :services
+          current_temple.temple_services.find(offering_id_param)
+        when :gatherings
+          current_temple.temple_gatherings.find(offering_id_param)
+        else
+          current_temple.temple_events.find(offering_id_param)
+        end
     end
 
     def set_registration
@@ -112,5 +126,20 @@ module Admin
       @registration_form_schema ||= Registrations::FormSchema.new(@offering.metadata["registration_form"])
     end
     helper_method :registration_form_schema
+
+    def offering_order_path(offering, registration)
+      case offering
+      when TempleService
+        admin_service_offering_order_path(offering, registration)
+      when TempleGathering
+        admin_gathering_offering_order_path(offering, registration)
+      else
+        admin_event_offering_order_path(offering, registration)
+      end
+    end
+
+    def offering_id_param
+      params[:offering_id] || params[:event_id] || params[:service_id] || params[:gathering_id]
+    end
   end
 end

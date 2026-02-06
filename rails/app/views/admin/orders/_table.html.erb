@@ -29,7 +29,7 @@
           end %>
           <tr class="<%= row_classes.join(" ") %>">
             <td><%= display_name %></td>
-            <td><%= registration.temple_offering&.title || "—" %></td>
+            <td><%= registration.offering&.title || "—" %></td>
             <td>
               <% if latest_payment.present? %>
                 <span class="payment-method-pill"><%= admin_filter_payment_label(latest_payment.payment_method) %></span>
@@ -49,9 +49,9 @@
                 <% if show_mark_button && registration.payment_status != TempleEventRegistration::PAYMENT_STATUSES[:paid] %>
                   <button type="button" class="btn btn-ghost" disabled>Mark as paid</button>
                 <% end %>
-                <% if registration.temple_offering.present? %>
+                <% if registration.offering.present? %>
                   <%= link_to t("admin.orders.index.table.view"),
-                    admin_offering_offering_order_path(registration.temple_offering, registration),
+                    admin_offering_order_path_for(registration.offering, registration),
                     class: "pill-link",
                     title: t("admin.orders.index.table.reference_hint", reference: registration.reference_code) %>
                 <% end %>

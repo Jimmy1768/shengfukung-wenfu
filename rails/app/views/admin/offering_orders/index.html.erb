@@ -7,8 +7,8 @@
           <p class="muted"><%= t("admin.offering_orders.index.body") %></p>
         </div>
         <div class="page-header-actions">
-          <%= link_to t("admin.offering_orders.index.view_offering"), admin_offering_path(@offering), class: "btn btn-secondary" %>
-          <%= link_to t("admin.offering_orders.index.new_registration"), new_admin_offering_offering_order_path(@offering), class: "btn btn-primary" %>
+          <%= link_to t("admin.offering_orders.index.view_offering"), admin_offering_path_for(@offering), class: "btn btn-secondary" %>
+          <%= link_to t("admin.offering_orders.index.new_registration"), new_admin_offering_order_path_for(@offering), class: "btn btn-primary" %>
         </div>
       </div>
     </section>
@@ -74,7 +74,7 @@
                   <td><%= Currency::Symbols.format_amount(registration.total_price_cents, registration.currency) %></td>
                   <td><%= l(registration.created_at, format: :short) %></td>
                   <td>
-                    <%= link_to t("admin.offering_orders.index.table.view"), admin_offering_offering_order_path(@offering, registration), class: "pill-link" %>
+                    <%= link_to t("admin.offering_orders.index.table.view"), admin_offering_order_path_for(@offering, registration), class: "pill-link" %>
                   </td>
                 </tr>
               <% end %>

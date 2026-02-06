@@ -4,7 +4,9 @@ import {
   fetchTempleEvent,
   fetchTempleEvents,
   fetchTempleNews,
-  fetchTempleProfile
+  fetchTempleProfile,
+  fetchTempleService,
+  fetchTempleServices
 } from '@/app/templeApi.js';
 
 const state = reactive({
@@ -13,7 +15,9 @@ const state = reactive({
   news: [],
   archive: [],
   events: [],
+  services: [],
   eventDetails: {},
+  serviceDetails: {},
   error: null
 });
 
@@ -22,11 +26,12 @@ export async function loadTempleContent() {
   state.error = null;
 
   try {
-    const [profile, news, archive, events] = await Promise.all([
+    const [profile, news, archive, events, services] = await Promise.all([
       fetchTempleProfile(),
       fetchTempleNews({ limit: 10 }),
       fetchTempleArchive(),
-      fetchTempleEvents({ limit: 25, status: 'upcoming' })
+      fetchTempleEvents({ limit: 25, status: 'upcoming' }),
+      fetchTempleServices({ limit: 100 })
     ]);
     state.data = profile;
     state.news = news?.news || [];
@@ -35,6 +40,12 @@ export async function loadTempleContent() {
     state.events.forEach((event) => {
       if (event?.slug) {
         state.eventDetails[event.slug] = event;
+      }
+    });
+    state.services = services?.services || [];
+    state.services.forEach((service) => {
+      if (service?.slug) {
+        state.serviceDetails[service.slug] = service;
       }
     });
     state.status = 'ready';
@@ -71,6 +82,10 @@ export function useTempleArchive() {
 
 export function useTempleEvents() {
   return computed(() => state.events || []);
+}
+
+export function useTempleServices() {
+  return computed(() => state.services || []);
 }
 
 export function useTempleEvent(slugRef) {
@@ -112,6 +127,25 @@ export async function loadTempleEvent(slug) {
     return event;
   } catch (error) {
     console.error('Temple event load failed', error);
+    throw error;
+  }
+}
+
+export async function loadTempleService(slug) {
+  if (!slug) return null;
+  if (state.serviceDetails[slug]) {
+    return state.serviceDetails[slug];
+  }
+
+  try {
+    const payload = await fetchTempleService(slug);
+    const service = payload?.service || payload;
+    if (service?.slug) {
+      state.serviceDetails[service.slug] = service;
+    }
+    return service;
+  } catch (error) {
+    console.error('Temple service load failed', error);
     throw error;
   }
 }

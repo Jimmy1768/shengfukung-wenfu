@@ -16,7 +16,11 @@ module Admin
         .where(payment_status: TempleEventRegistration::PAYMENT_STATUSES[:paid])
         .order(created_at: :desc)
         .limit(50)
-      @filter_offerings = current_temple.temple_offerings.order(:title)
+      @filter_offerings = [
+        current_temple.temple_events.order(:title),
+        current_temple.temple_services.order(:title),
+        current_temple.temple_gatherings.order(:title)
+      ].flat_map(&:to_a)
       @filter_payment_methods = TemplePayment::PAYMENT_METHODS.values
       @filter_hidden_fields = filter_hidden_params
     end

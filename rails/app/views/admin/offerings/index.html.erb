@@ -3,7 +3,7 @@
     <section class="card stack-item">
       <header>
         <h1><%= t("admin.offerings.index.title") %></h1>
-        <p class="muted"><%= t("admin.offerings.index.body", default: "") %></p>
+        <p class="muted"><%= t("admin.offerings.index.body", default: "管理法會、活動、供燈與供桌等所有供品。") %></p>
       </header>
 
       <% if current_admin_permissions&.allow?(:manage_offerings) %>
@@ -11,39 +11,68 @@
           <%= link_to t("admin.offerings.index.new_button"), new_admin_offering_path, class: "btn btn-primary" %>
         </p>
       <% end %>
+      <div class="offerings-toolbar">
+        <% if archived_view? %>
+          <%= link_to t("admin.offerings.index.view_active"), admin_offerings_path, class: "btn btn-secondary btn-small" %>
+        <% else %>
+          <%= link_to t("admin.offerings.index.view_archived"), admin_offerings_path(archived: true), class: "btn btn-ghost btn-small" %>
+        <% end %>
+      </div>
     </section>
   </div>
 
   <div class="admin-stack__row">
     <section class="card stack-item stack-item--wide">
-      <div class="table-scroll">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th><%= t("admin.offerings.index.table.title") %></th>
-              <th><%= t("admin.offerings.index.table.type") %></th>
-              <th><%= t("admin.offerings.index.table.price") %></th>
-              <th><%= t("admin.offerings.index.table.status") %></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @offerings.each do |offering| %>
+      <% if @offerings.any? %>
+        <div class="table-scroll">
+          <table class="admin-table">
+            <thead>
               <tr>
-                <td><%= offering.title %></td>
-                <td><%= t("admin.offerings.types.#{offering.offering_type}", default: offering.offering_type.humanize) %></td>
-                <td><%= Currency::Symbols.format_amount(offering.price_cents, offering.currency) %></td>
-                <td>
-                  <%= offering.active? ? t("admin.offerings.statuses.active") : t("admin.offerings.statuses.archived") %>
-                </td>
-                <td class="table-action">
-                  <%= link_to t("admin.offerings.index.table.view"), admin_offering_path(offering), class: "link" %>
-                </td>
+                <th><%= t("admin.offerings.index.table.title") %></th>
+                <th><%= t("admin.offerings.index.table.type") %></th>
+                <th><%= t("admin.offerings.index.table.price") %></th>
+                <th><%= t("admin.offerings.index.table.status") %></th>
+                <th><%= t("admin.offerings.index.table.updated", default: "Updated") %></th>
+                <th></th>
               </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              <% @offerings.each do |offering| %>
+                <tr>
+                  <td>
+                    <strong><%= offering.title %></strong>
+                    <% if offering.respond_to?(:subtitle) && offering.subtitle.present? %>
+                      <p class="muted"><%= offering.subtitle %></p>
+                    <% end %>
+                  </td>
+                  <% type_label =
+                    case offering
+                    when TempleService
+                      t("admin.filters.offering.service_prefix")
+                    when TempleGathering
+                      t("admin.filters.offering.gathering_prefix")
+                    else
+                      t("admin.filters.offering.event_prefix")
+                    end %>
+                  <td><%= type_label %></td>
+                  <td><%= Currency::Symbols.format_amount(offering.price_cents, offering.currency) %></td>
+                  <td>
+                  <%= t("admin.offerings.statuses.#{offering.status}", default: offering.status.to_s.titleize) %>
+                  </td>
+                  <td><%= l(offering.updated_at, format: :short) %></td>
+                  <td class="table-action">
+                    <%= link_to t("admin.offerings.index.table.view"), admin_offering_path_for(offering), class: "link" %>
+                    <%= link_to t("admin.offerings.index.table.orders"), admin_offering_orders_path_for(offering), class: "link" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <% empty_key = archived_view? ? "archived_empty" : "empty" %>
+        <p class="muted"><%= t("admin.offerings.index.#{empty_key}", default: "沒有符合條件的供品。") %></p>
+      <% end %>
     </section>
   </div>
 </div>

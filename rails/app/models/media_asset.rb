@@ -5,6 +5,7 @@ class MediaAsset < ApplicationRecord
 
   enum :role, {
     hero_image: "hero_image",
+    gathering_hero: "gathering_hero",
     gallery_image: "gallery_image",
     gallery_video: "gallery_video",
     attachment: "attachment"

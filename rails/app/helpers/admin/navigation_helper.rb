@@ -32,8 +32,15 @@ module Admin
       {
         key: :offerings,
         label: "Offerings",
-        description: "管理登記項目與檔期",
+        description: "管理活動與服務",
         path: -> { admin_offerings_path },
+        capabilities: :manage_offerings
+      },
+      {
+        key: :gatherings,
+        label: "Gatherings",
+        description: "社區聚會與交流活動",
+        path: -> { admin_gatherings_path },
         capabilities: :manage_offerings
       },
       {

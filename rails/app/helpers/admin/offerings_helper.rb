@@ -92,8 +92,6 @@ module Admin
         render_date_field(form, :ends_on, I18n.t("admin.offering_form.fields.ends_on"))
       when :available_slots, :quota
         render_number_field(form, :available_slots, I18n.t("admin.offering_form.fields.available_slots"))
-      when :active
-        render_checkbox_field(form, :active, I18n.t("admin.offering_form.fields.active"))
       when :lamp_type
         render_select_field(form, :lamp_type, "燈別", option_map[:lamp_type], defaults[:lamp_type])
       when :lamp_location
@@ -228,6 +226,50 @@ module Admin
 
     def currency_options
       Currency::Symbols.options
+    end
+
+    def admin_offering_path_for(offering)
+      case offering
+      when TempleService
+        admin_service_path(offering)
+      when TempleGathering
+        edit_admin_gathering_path(offering)
+      else
+        admin_event_path(offering)
+      end
+    end
+
+    def admin_offering_orders_path_for(offering)
+      case offering
+      when TempleService
+        admin_service_offering_orders_path(offering)
+      when TempleGathering
+        admin_gathering_offering_orders_path(offering)
+      else
+        admin_event_offering_orders_path(offering)
+      end
+    end
+
+    def new_admin_offering_order_path_for(offering)
+      case offering
+      when TempleService
+        new_admin_service_offering_order_path(offering)
+      when TempleGathering
+        new_admin_gathering_offering_order_path(offering)
+      else
+        new_admin_event_offering_order_path(offering)
+      end
+    end
+
+    def admin_offering_order_path_for(offering, registration)
+      case offering
+      when TempleService
+        admin_service_offering_order_path(offering, registration)
+      when TempleGathering
+        admin_gathering_offering_order_path(offering, registration)
+      else
+        admin_event_offering_order_path(offering, registration)
+      end
     end
   end
 end

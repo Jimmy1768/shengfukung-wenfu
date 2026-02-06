@@ -3,21 +3,21 @@ import { computed } from 'vue';
 import PageHero from '@/components/site/PageHero.vue';
 import SectionTitle from '@/components/site/SectionTitle.vue';
 import SimpleCard from '@/components/site/SimpleCard.vue';
-import { useHeroImage, useTempleEvents } from '@/app/siteContent.js';
-import { formatCurrency, formatDateRange, statusLabel } from '@/utils/events.js';
+import { useHeroImage, useTempleServices } from '@/app/siteContent.js';
+import { formatCurrency } from '@/utils/events.js';
 
 const heroImage = useHeroImage('services');
-const eventList = useTempleEvents();
+const serviceList = useTempleServices();
 
 const offerings = computed(() => {
-  if (!eventList.value?.length) return [];
-  return eventList.value.map((event) => ({
-    slug: event.slug,
-    title: event.title,
-    description: event.description || '從後台編輯的服務說明將顯示於此。',
-    price: formatCurrency(event.price_cents, event.currency),
-    schedule: formatDateRange(event.starts_on, event.ends_on),
-    status: statusLabel(event.timeline_status)
+  if (!serviceList.value?.length) return [];
+  return serviceList.value.map((service) => ({
+    slug: service.slug,
+    title: service.title,
+    description: service.description || '此服務的詳細說明將在近期更新。',
+    price: formatCurrency(service.price_cents, service.currency),
+    period: service.period_label || '長期服務',
+    status: service.available_from ? '開放中' : '常態服務'
   }));
 });
 
@@ -45,9 +45,9 @@ const hasOfferings = computed(() => offerings.value.length > 0);
             <div class="info">
               <div>狀態：{{ item.status }}</div>
               <div>費用：約 {{ item.price }}</div>
-              <div>期間：{{ item.schedule }}</div>
+              <div>期間：{{ item.period }}</div>
               <p>{{ item.description }}</p>
-              <router-link class="link" :to="`/events/${item.slug}`">查看詳情 →</router-link>
+              <router-link class="link" :to="`/services/${item.slug}`">查看詳情 →</router-link>
             </div>
           </SimpleCard>
         </div>

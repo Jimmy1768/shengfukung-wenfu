@@ -19,7 +19,8 @@ class AdminAccount < ApplicationRecord
 
   enum role: {
     staff: "staff",
-    owner: "owner"
+    owner: "owner",
+    support: "support"
   }, _suffix: true
 
   scope :active, -> { where(active: true) }
@@ -39,7 +40,7 @@ class AdminAccount < ApplicationRecord
 
   def default_permissions_for(temple)
     record = admin_permissions.build(temple:)
-    if owner_role?
+    if owner_role? || support_role?
       AdminPermission::CAPABILITIES.each do |capability|
         record[capability] = true if record.respond_to?(capability)
       end

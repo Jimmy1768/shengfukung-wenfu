@@ -1,0 +1,84 @@
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide">
+      <header>
+        <h1><%= @offering.title %></h1>
+        <% if @offering.subtitle.present? %>
+          <p class="muted"><%= @offering.subtitle %></p>
+        <% end %>
+        <p class="muted"><%= @offering.description %></p>
+      </header>
+      <dl class="detail-grid">
+        <div>
+          <dt><%= t("admin.services.show.type") %></dt>
+          <dd><%= t("admin.offerings.types.#{@offering.offering_type}", default: @offering.offering_type.to_s.humanize) %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.services.show.price") %></dt>
+          <dd><%= Currency::Symbols.format_amount(@offering.price_cents, @offering.currency) %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.services.show.status") %></dt>
+          <dd><%= t("admin.services.statuses.#{@offering.status}", default: @offering.status.to_s.titleize) %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.services.show.period") %></dt>
+          <dd><%= @offering.period_label.presence || [@offering.available_from&.strftime("%Y/%m/%d"), @offering.available_until&.strftime("%Y/%m/%d")].compact.join(" - ").presence || t("admin.services.index.table.period_flexible") %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.services.show.fulfillment") %></dt>
+          <dd><%= @offering.fulfillment_notes.presence || "—" %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.services.show.default_location") %></dt>
+          <dd><%= @offering.default_location.presence || "—" %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.services.show.quantity_limit") %></dt>
+          <dd><%= @offering.quantity_limit.presence || t("admin.services.show.quantity_unlimited") %></dd>
+        </div>
+      </dl>
+      <div class="actions">
+        <%= link_to t("admin.services.show.manage_registrations"), admin_offering_orders_path_for(@offering), class: "btn btn-primary" %>
+        <% if current_admin_permissions&.allow?(:manage_offerings) %>
+          <%= link_to t("admin.services.show.edit_service"), edit_admin_service_path(@offering), class: "btn btn-secondary" %>
+        <% end %>
+      </div>
+    </section>
+  </div>
+
+  <% metadata = (@offering.metadata || {}).with_indifferent_access %>
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide">
+      <header>
+        <h2><%= t("admin.offering_form.sections.certificate") %></h2>
+        <p class="muted"><%= t("admin.offering_form.hints.certificate") %></p>
+      </header>
+      <dl class="detail-grid">
+        <div>
+          <dt><%= t("admin.offering_form.fields.certificate_prefix") %></dt>
+          <dd><%= metadata[:certificate_prefix].presence || "—" %></dd>
+        </div>
+        <div>
+          <dt><%= t("admin.offering_form.fields.certificate_hint") %></dt>
+          <dd><%= metadata[:certificate_hint].presence || "—" %></dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide">
+      <header>
+        <h2><%= t("admin.offering_form.sections.logistics") %></h2>
+        <p class="muted"><%= t("admin.offering_form.hints.logistics") %></p>
+      </header>
+      <dl class="detail-grid">
+        <div>
+          <dt><%= t("admin.offering_form.fields.logistics_notes") %></dt>
+          <dd><%= metadata[:logistics_notes].presence || "—" %></dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+</div>

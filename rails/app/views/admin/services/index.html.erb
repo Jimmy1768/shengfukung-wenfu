@@ -1,0 +1,64 @@
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item">
+      <header>
+        <h1><%= t("admin.services.index.title") %></h1>
+        <p class="muted"><%= t("admin.services.index.body", default: "") %></p>
+      </header>
+
+      <% if current_admin_permissions&.allow?(:manage_offerings) %>
+        <p>
+          <%= link_to t("admin.services.index.new_button"), new_admin_service_path, class: "btn btn-primary" %>
+        </p>
+      <% end %>
+    </section>
+  </div>
+
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide">
+      <div class="table-scroll">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th><%= t("admin.services.index.table.title") %></th>
+              <th><%= t("admin.services.index.table.period") %></th>
+              <th><%= t("admin.services.index.table.fulfillment") %></th>
+              <th><%= t("admin.services.index.table.price") %></th>
+              <th><%= t("admin.services.index.table.status") %></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @offerings.each do |service| %>
+              <tr>
+                <td>
+                  <strong><%= service.title %></strong>
+                  <% if service.subtitle.present? %>
+                    <p class="muted"><%= service.subtitle %></p>
+                  <% end %>
+                </td>
+                <td>
+                  <% if service.period_label.present? %>
+                    <%= service.period_label %>
+                  <% elsif service.available_from.present? || service.available_until.present? %>
+                    <%= [service.available_from&.strftime("%Y/%m/%d"), service.available_until&.strftime("%Y/%m/%d")].compact.join(" - ") %>
+                  <% else %>
+                    <span class="muted"><%= t("admin.services.index.table.period_flexible") %></span>
+                  <% end %>
+                </td>
+                <td><%= service.fulfillment_notes.presence || "—" %></td>
+                <td><%= Currency::Symbols.format_amount(service.price_cents, service.currency) %></td>
+                <td>
+                  <%= t("admin.services.statuses.#{service.status}", default: service.status.to_s.titleize) %>
+                </td>
+                <td class="table-action">
+                  <%= link_to t("admin.services.index.table.view"), admin_service_path(service), class: "link" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>

@@ -14,7 +14,7 @@ module Admin
     def build_next_steps
       steps = []
       steps << { label: t("admin.dashboard.next_steps.fill_profile"), url: admin_temple_profile_path } if profile_incomplete?
-      steps << { label: t("admin.dashboard.next_steps.setup_offerings"), url: new_admin_offering_path } if missing_offering_templates?
+      steps << { label: t("admin.dashboard.next_steps.setup_offerings"), url: new_admin_event_path } if missing_offering_templates?
       if owner_account?
       steps << { label: t("admin.dashboard.next_steps.promote_admin_from_patron"), url: admin_patrons_path } if needs_admin_promotion?
       steps << { label: t("admin.dashboard.next_steps.manage_permissions"), url: admin_permissions_path } if should_review_permissions?
@@ -30,9 +30,10 @@ module Admin
       current_temple.present? && !current_temple.profile_complete?
     end
 
-  def missing_offering_templates?
-    current_temple.present? && !current_temple.temple_offerings.exists?
-  end
+    def missing_offering_templates?
+      return true unless current_temple.present?
+      !current_temple.temple_events.exists? && !current_temple.temple_services.exists?
+    end
 
   def needs_admin_promotion?
     current_temple.present? && !staff_admins_present?

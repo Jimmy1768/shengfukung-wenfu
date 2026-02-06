@@ -5,8 +5,10 @@ This file documents how we bring a new temple onto the Shenfukung Wenfu stack. I
 ## Vocabulary
 
 - **Profile YAML** – `rails/db/temples/<slug>.yml`. Source of truth for public copy (name, tagline, contact, service times, about text, metadata). Required before seeding anything.
-- **Owner admin** – first administrator for the temple. Gets elevated privileges (manage admins, upload payment QR). Stored as a `User` + `AdminAccount` + `AdminTempleMembership(role: owner)`.
-- **Placeholder QR** – temporary `media_assets` row pointing at a static file so the admin UI/API can render a LINE Pay QR until uploads are wired.
+- **Owner admin** – first administrator for the temple. Gets elevated privileges (manage admins, manage other admins, payment routing). Stored as a `User` + `AdminAccount(role: owner)` + `AdminTempleMembership`.
+- **Events vs Services** – events (`TempleEvent`) are in-person programs with schedules/capacity; services (`TempleService`) cover proxy rituals (lanterns, placards, etc.). Both are configured from the per-temple YAML templates and seeded through `Seeds::TempleFinancials`. Each template must declare a `kind` (`event`/`service`) so the admin UI knows which controller/model to use.
+- **TempleRegistration** – unified polymorphic registration model (table: `temple_registrations`). Every onsite order/payment flows through this table regardless of whether the source is an event, service, or gathering.
+- **Gatherings** – `TempleGathering` records for non-offering community events (e.g., workshops). They share the registration/payment stack but are managed separately from offerings.
 
 ## Dev / Staging Flow
 
@@ -25,43 +27,44 @@ Use this when you need representative data locally or on staging:
 2. **Seed the temple**
    - Run `bin/rails temples:seed[slug]`.
    - The task creates/updates the `Temple`, `TemplePage`, and `TempleSection` records.
-3. **Seed the owner admin (dev helper)**
-   - Run the Rake task with shell quoting so zsh doesn’t glob the brackets:
-     ```bash
-     bin/rails "admin_controls:seed_owner[shenfukung-wenfu,admin@shenfukung-wenfu.local]"
-     ```
-   - The task creates a `User` with deterministic credentials, an `AdminAccount (role: owner)`, and an `AdminTempleMembership` linking the admin to the temple.
-   - Credentials default to `admin@<slug>.local` / `GoldenTemplate!123` unless you pass overrides.
+3. **Seed baseline accounts**
+   - `bin/rails db:seed` now provisions:
+     - Owner admin: `owner@<slug>.local`
+     - Staff admin (promoted patron): `admin@<slug>.local`
+     - Patron tester: `patron@<slug>.local`
+     - Dev support admin: `dev@<slug>.local`
+     - Demo client + guest operator for account portal flows
+   - All default to `DemoPassword!23` (override via `PROJECT_*_EMAIL`/`PROJECT_PRIMARY_USER_PASSWORD` env vars).
 4. **Smoke test**
    - Sign in at `/admin`.
    - Use the email/password you passed to `admin_controls:seed_owner` (these accounts are stored in the `users` table; the marketing demo credentials no longer apply here).
    - Verify the temple profile shows the placeholder QR and owner-only panels.
    - Ensure audit logs are written when editing basic fields.
-5. **Seed financial offerings + permissions (new subsystem)**
-   - Preload the five legacy offerings (incense donation, family peace, lantern, ancestor ritual, pudu tables):
+5. **Seed financial events + services**
+   - `Seeds::TempleFinancials` now hydrates `temple_events`, `temple_services`, `temple_gatherings`, and corresponding `temple_registrations` + payments. After editing the YAML or gathering seeds, run:
      ```bash
      bin/rails "temple_financial:seed_offerings[shenfukung-wenfu]"
      ```
-   - Grant the owner or staffer financial permissions (repeat per admin):
+   - Grant staff financial permissions (owner already has them):
      ```bash
      bin/rails "temple_financial:grant_permissions[shenfukung-wenfu,admin@shenfukung-wenfu.local]"
      ```
-   - Cash-only pipeline: use `/admin/offerings/<id>/orders` to create registrations, then “Record cash payment” to log receipts + ledger entries. LINE Pay arrives after onsite validation.
-   - Cash-only pipeline: use `/admin/offerings/<id>/orders` to create registrations, then “Record cash payment” to log receipts + ledger entries. LINE Pay arrives after onsite validation.
-6. **Customize product lines / offerings per temple**
-   - Each `TempleOffering` stores a JSONB `metadata` column. Use the `form_fields` key to describe which inputs should render for that offering (e.g., `sections`, `fields`, `required`, custom labels/hints).
-   - During onboarding, create a config file under `rails/db/temples/offerings/<slug>.yml`. Suggested structure:
+   - Cash-only pipeline: use `/admin/events/...`, `/admin/services/...`, or `/admin/gatherings/...` → Orders to capture registrations, then “Record cash payment” to log receipts + ledger entries. LINE Pay arrives after onsite validation.
+6. **Customize product templates per temple**
+   - Each offering entry stores its form definition in metadata. Use the `form_fields` key to describe which inputs should render for that offering (e.g., `sections`, `fields`, `required`, custom labels/hints).
+   - During onboarding, create a config file under `rails/db/temples/offerings/<slug>.yml`. Every entry must include `kind:` (`event` or `service`) so the loader can route to the correct model. Suggested structure:
      ```yaml
      offerings:
        - slug: pudu-table
+         kind: service
          form_fields:
            basics: [title, slug, offering_type, period, price_cents, currency]
-           schedule: [starts_on, ends_on, available_slots, active]
+           schedule: [starts_on, ends_on, available_slots]
            certificate: [certificate_prefix, certificate_hint]
            logistics: [ancestor_placard_hint, logistics_notes]
            description: true
      ```
-   - Extend the seed task (or run a one-off script) to load this YAML and merge `form_fields` into each offering’s `metadata`. The admin `_form.html.erb` partial will read `@offering.metadata['form_fields']` and only render the listed sections/inputs, so each temple sees a tailored form without separate partials.
+   - Extend the seed task (or run a one-off script) to load this YAML and merge `form_fields` + `kind` into each offering’s `metadata`. The admin `_form.html.erb` partial reads `@offering.metadata['form_fields']` and only renders the listed sections/inputs, so each temple sees a tailored form without separate partials.
    - Store the YAML in Git so the config remains the source of truth. When a temple needs tweaks, edit the YAML, rerun the sync task, and the form will update automatically.
    - `registration_form.field_settings` unlocks richer controls:
      - `options` (array or `{ value: label }`) renders a `<select>` so staff pick from approved values instead of typing.
@@ -85,9 +88,12 @@ Use this when you need representative data locally or on staging:
    - Date/time-ish logistics keys are treated as transient and skipped.
    - JSON endpoints (`/admin/patrons/:id/metadata_values`) exist for future UI that lists/removes multi-value entries; wire a modal when needed.
 8. **In-tower workflow summary**
-   - **Product line (template)** – defined in `rails/db/temples/offerings/<slug>.yml` + merged into `temple_offerings.metadata`. Requires dev support to add new slugs/sections.
-   - **Offering (event instance)** – admins use `/admin/offerings/new` to create/edit/delete instances of those product lines (set price, dates, copy). No code change required.
-   - **Registration / payment** – staff use `/admin/offerings/<id>/orders` to capture onsite registrations, then record payments. Ledger/history sits at this level.
+   - **Product templates** – defined in `rails/db/temples/offerings/<slug>.yml` under `events:` and `services:`. Devs sync them into each temple’s metadata via `Offerings::TemplateLoader`.
+   - **Event/Service instances** – admins use `/admin/events` or `/admin/services` to create/edit/delete instances (set price, dates, copy). No code change required.
+   - **Gatherings** – `/admin/gatherings` lets staff publish ad-hoc meetups (calligraphy class, volunteer briefing, etc.) without wiring a template. They still funnel into `TempleRegistration` + `/admin/offerings` order management, so reporting and payments stay unified.
+   - **Media uploads** – Gatherings (hero image) and gallery entries (photos/video) can now upload files directly via the shared MediaAsset/S3 pipeline; the forms still accept manually pasted URLs as a fallback.
+- **Registration / payment** – staff use `/admin/events/:id/orders`, `/admin/services/:id/orders`, or `/admin/gatherings/:id/orders` to capture registrations, then record payments. Ledger/history sits at this level.
+- **Slugs** – admins no longer edit slugs manually; events/services/gatherings auto-generate and normalize slugs per temple, keeping URLs stable without exposing the field in forms.
 
 ## Production Flow
 

@@ -1,5 +1,11 @@
 zh-TW:
   admin:
+    nav:
+      items:
+        offerings:
+          label: "供品管理"
+        gatherings:
+          label: "社群聚會"
     navigation:
       dashboard: "儀表板"
       temple_profile: "宮廟資料"
@@ -9,6 +15,7 @@ zh-TW:
       gallery_entries: "活動回顧"
       gallery: "活動回顧"
       offerings: "供品管理"
+      gatherings: "社群聚會"
       orders: "報名 / 訂單"
       payments: "收款資料"
       patrons: "信眾與管理員"
@@ -21,6 +28,10 @@ zh-TW:
       offering:
         label: "供品"
         all: "全部供品"
+        event_prefix: "活動"
+        service_prefix: "服務"
+        gathering_prefix: "聚會"
+        gathering_prefix: "聚會"
       payment_method:
         label: "付款方式"
         all: "全部方式"
@@ -174,8 +185,10 @@ zh-TW:
           label: "最新消息"
         gallery_entries:
           label: "活動回顧"
-        offerings:
-          label: "供品管理"
+        events:
+          label: "活動管理"
+        services:
+          label: "服務管理"
         orders:
           label: "報名 / 訂單"
         payments:
@@ -253,7 +266,7 @@ zh-TW:
         title: "下一步"
         subtitle: "快速完成宮廟上線時會用到的幾個任務。"
         fill_profile: "前往填寫宮廟資料 →"
-        setup_offerings: "建立第一個供品模板"
+        setup_offerings: "發佈第一個活動或服務"
         promote_admin_from_patron: "從信眾名單挑選並建立管理員"
         manage_permissions: "檢視並調整管理員權限"
         complete_heading: "恭喜！"
@@ -378,14 +391,20 @@ zh-TW:
       index:
         title: "供品管理"
         new_button: "新增供品"
+        view_archived: "查看封存供品"
+        view_active: "返回現用供品"
         table:
           title: "名稱"
           type: "類別"
           price: "金額"
           status: "狀態"
           view: "檢視"
+          orders: "訂單"
+        empty: "尚未建立任何供品，請點選上方按鈕建立。"
+        archived_empty: "目前沒有封存的供品。"
       statuses:
-        active: "上架"
+        draft: "草稿"
+        published: "已發布"
         archived: "封存"
       types:
         general: "一般"
@@ -415,6 +434,122 @@ zh-TW:
         schedule_flexible: "彈性"
         manage_registrations: "管理報名"
         edit_offering: "編輯供品"
+    events:
+      index:
+        title: "法會 / 活動"
+        body: "設定即將到來的法會、禮懺、共修與節慶。"
+        new_button: "建立活動"
+        table:
+          title: "名稱"
+          schedule: "檔期"
+          schedule_flexible: "彈性"
+          location: "地點"
+          price: "金額"
+          status: "狀態"
+          view: "檢視"
+      statuses:
+        draft: "草稿"
+        published: "已發布"
+        archived: "封存"
+      new:
+        title: "建立活動"
+        body: "從模板載入欄位，保持證書／物流設定一致。"
+        template_open: "選擇活動模板"
+        template_change: "更換模板"
+        template_modal_title: "選擇活動模板"
+        template_close: "關閉"
+        template_use: "使用此模板"
+        template_period: "預設檔期：%{period}"
+        template_selected: "已選擇：%{name}"
+        template_prompt: "請先挑選模板再開始編輯。"
+      edit:
+        title: "編輯活動"
+      show:
+        type: "類型"
+        price: "金額"
+        status: "狀態"
+        schedule: "檔期"
+        times: "時間"
+        times_flexible: "彈性安排"
+        location: "地點"
+        capacity: "名額"
+        capacity_open: "不限名額"
+        manage_registrations: "管理報名"
+        edit_event: "編輯活動"
+      form:
+        sections:
+          basics: "基本資訊"
+          basics_hint: "設定標題、副標與主視覺。"
+          schedule: "檔期 / 地點"
+          pricing: "價格與狀態"
+        fields:
+          subtitle: "副標題"
+          hero_image_url: "主視覺網址"
+          poster_image_url: "海報網址"
+          start_time: "開始時間"
+          end_time: "結束時間"
+          location_name: "地點名稱"
+          location_address: "地點地址"
+          location_notes: "地點備註"
+          capacity_total: "名額上限"
+          status: "狀態"
+    services:
+      index:
+        title: "供燈 / 供桌 / 祈福服務"
+        body: "管理常態性服務，如點燈、供桌、疏文或代念。"
+        new_button: "建立服務"
+        table:
+          title: "名稱"
+          period: "檔期"
+          period_flexible: "彈性"
+          fulfillment: "作業方式"
+          price: "金額"
+          status: "狀態"
+          view: "檢視"
+      statuses:
+        draft: "草稿"
+        published: "已發布"
+        archived: "封存"
+      new:
+        title: "建立服務"
+        body: "從模板載入欄位，保持表單設定一致。"
+        template_open: "選擇服務模板"
+        template_change: "更換模板"
+        template_modal_title: "選擇服務模板"
+        template_close: "關閉"
+        template_use: "使用此模板"
+        template_period: "預設檔期：%{period}"
+        template_selected: "已選擇：%{name}"
+        template_prompt: "請先挑選模板再開始編輯。"
+      edit:
+        title: "編輯服務"
+      show:
+        type: "類型"
+        price: "金額"
+        status: "狀態"
+        period: "檔期"
+        fulfillment: "作業方式"
+        default_location: "預設地點"
+        quantity_limit: "數量限制"
+        quantity_unlimited: "不限數量"
+        manage_registrations: "管理訂單"
+        edit_service: "編輯服務"
+      form:
+        sections:
+          basics: "基本資訊"
+          basics_hint: "設定網站顯示與對內說明。"
+          availability: "檔期 / 作業"
+          pricing: "價格與狀態"
+        fields:
+          subtitle: "副標題"
+          hero_image_url: "主視覺網址"
+          period_label: "檔期標籤"
+          quantity_limit: "數量限制"
+          available_from: "開始日期"
+          available_until: "結束日期"
+          default_location: "預設地點"
+          fulfillment_notes: "作業備註"
+          status: "狀態"
     orders:
       index:
         eyebrow: "訂單"
@@ -468,8 +603,87 @@ zh-TW:
           created: "建立時間"
           view: "檢視"
     gallery_entries:
+      index:
+        title: "活動回顧"
+        body: "於此紀錄過往大型活動與聚會，方便分享照片或影片。"
+      new:
+        title: "新增活動回顧"
+        body: "輸入標題、簡介與照片 / 影片。"
+      edit:
+        title: "編輯活動回顧"
+        body: "更新文案或補充媒體。"
+      fields:
+        title: "標題"
+        body: "敘述"
+        event_date: "活動日期"
+        photo_urls: "照片 / 影片網址（每行一筆）"
+        upload_media: "上傳照片或影片"
+        media_image: "照片"
+        media_video: "影片"
+      hints:
+        photo_urls: "貼上已上傳的圖片網址，每行一個。如尚未整理，可留白。"
+        upload_media: "可直接上傳檔案，或維持貼網址的方式。"
       actions:
         save: "儲存"
+    gatherings:
+      index:
+        title: "社群聚會"
+        body: "管理未套用供品模板、但仍需運用報名與收款流程的交流聚會。"
+      new:
+        title: "新增聚會"
+        body: "輸入聚會主題、時間與現場備註。"
+      edit:
+        title: "編輯聚會"
+        body: "更新聚會文案、時程、費用或地點。"
+      table:
+        title: "標題"
+        schedule: "時程"
+        location: "地點"
+        price: "金額"
+        status: "狀態"
+        actions: "操作"
+      fields:
+        title: "標題"
+        subtitle: "副標題"
+        description: "敘述"
+        hero_image_url: "主視覺網址"
+        starts_on: "開始日期"
+        ends_on: "結束日期"
+        start_time: "開始時間"
+        end_time: "結束時間"
+        location_name: "地點名稱"
+        location_address: "地址"
+        location_notes: "地點備註"
+        price_cents: "費用（分）"
+        currency: "幣別"
+        status: "狀態"
+      hints:
+        hero_image_url: "可選填，供行銷頁面或分享預覽顯示。"
+      labels:
+        unscheduled: "待定"
+        location_pending: "地點待公布"
+      statuses:
+        draft: "草稿"
+        published: "已發布"
+        archived: "封存"
+      actions:
+        new: "新增聚會"
+        save: "儲存"
+        cancel: "取消"
+        edit: "編輯"
+        delete: "刪除"
+      notices:
+        created: "聚會已建立。"
+        updated: "聚會已更新。"
+        deleted: "聚會已刪除。"
+        delete_restricted: "此聚會已有報名紀錄，無法刪除。"
+      errors:
+        invalid_asset: "無法使用這個上傳檔案，請重新上傳。"
+      confirmations:
+        delete: "確定要刪除這個聚會嗎？"
+      form:
+        errors: "%{count} 項問題需要修正"
+      empty: "尚未建立任何聚會。"
     payments:
       index:
         eyebrow: "收款"
@@ -619,3 +833,11 @@ zh-TW:
         manage_gallery:
           label: "管理活動回顧"
           hint: "新增或編輯活動回顧與相簿內容。"
+    media_uploads:
+      actions:
+        upload: "上傳檔案"
+        uploading: "上傳中..."
+      status:
+        success: "上傳完成。"
+        error: "上傳失敗。"
+        generic: "目前無法上傳，請稍後再試。"

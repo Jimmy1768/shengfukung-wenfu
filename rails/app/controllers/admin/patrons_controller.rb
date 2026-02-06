@@ -52,7 +52,7 @@ module Admin
 
     def records
       require_patron_access!
-      @registrations = patron_registrations.includes(:temple_offering, :temple_payments).order(created_at: :desc)
+      @registrations = patron_registrations.includes(:offering, :temple_payments).order(created_at: :desc)
     end
 
     private
@@ -125,9 +125,9 @@ module Admin
     end
 
     def patron_registrations
-      TempleEventRegistration
-        .includes(:temple_offering, :temple_payments)
-        .where(user: @patron, temple_offering: current_temple.temple_offerings.select(:id))
+      current_temple
+        .temple_registrations
+        .where(user: @patron)
     end
 
     def manager

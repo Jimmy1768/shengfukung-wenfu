@@ -9,7 +9,6 @@ module Seeds
     PROFILE_DIR = Rails.root.join("db", "temples")
     DEFAULT_PAGES = %w[home about events services contact].freeze
     DEFAULT_HERO_COPY = "用簡潔的段落說明本廟的宗旨、服務與交通資訊。"
-    PLACEHOLDER_QR_PATH = "system/placeholders/line-pay-qr.png"
     DEFAULT_HERO_IMAGE = "https://placehold.co/1600x900/111827/FFFFFF?text=Temple+Hero"
 
     def seed(slug: AppConstants::Project.slug)

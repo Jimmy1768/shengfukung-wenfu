@@ -15,7 +15,6 @@ module Forms
         starts_on
         ends_on
         available_slots
-        active
       ].freeze
     }.freeze
 

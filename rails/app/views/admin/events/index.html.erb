@@ -1,0 +1,62 @@
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item">
+      <header>
+        <h1><%= t("admin.events.index.title") %></h1>
+        <p class="muted"><%= t("admin.events.index.body", default: "") %></p>
+      </header>
+
+      <% if current_admin_permissions&.allow?(:manage_offerings) %>
+        <p>
+          <%= link_to t("admin.events.index.new_button"), new_admin_event_path, class: "btn btn-primary" %>
+        </p>
+      <% end %>
+    </section>
+  </div>
+
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide">
+      <div class="table-scroll">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th><%= t("admin.events.index.table.title") %></th>
+              <th><%= t("admin.events.index.table.schedule") %></th>
+              <th><%= t("admin.events.index.table.location") %></th>
+              <th><%= t("admin.events.index.table.price") %></th>
+              <th><%= t("admin.events.index.table.status") %></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @offerings.each do |event| %>
+              <tr>
+                <td>
+                  <strong><%= event.title %></strong>
+                  <% if event.subtitle.present? %>
+                    <p class="muted"><%= event.subtitle %></p>
+                  <% end %>
+                </td>
+                <td>
+                  <% if event.starts_on.present? || event.ends_on.present? %>
+                    <%= [event.starts_on&.strftime("%Y/%m/%d"), event.ends_on&.strftime("%Y/%m/%d")].compact.join(" - ") %>
+                  <% else %>
+                    <span class="muted"><%= t("admin.events.index.table.schedule_flexible") %></span>
+                  <% end %>
+                </td>
+                <td><%= event.location_label.presence || "—" %></td>
+                <td><%= Currency::Symbols.format_amount(event.price_cents, event.currency) %></td>
+                <td>
+                  <%= t("admin.events.statuses.#{event.status}", default: event.status.to_s.titleize) %>
+                </td>
+                <td class="table-action">
+                  <%= link_to t("admin.events.index.table.view"), admin_event_path(event), class: "link" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>

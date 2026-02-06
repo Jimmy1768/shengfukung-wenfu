@@ -30,7 +30,7 @@
             </thead>
             <tbody>
               <% @registrations.each do |registration| %>
-                <% offering = registration.temple_offering %>
+                <% offering = registration.offering %>
                 <tr>
                   <td><%= offering&.title || "—" %></td>
                   <td><%= registration.payment_status.to_s.titleize %></td>
