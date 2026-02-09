@@ -4,7 +4,7 @@
       <thead>
         <tr>
           <th><%= t("admin.orders.index.table.patron") %></th>
-          <th><%= t("admin.orders.index.table.offering") %></th>
+          <th><%= t("admin.orders.index.table.source") %></th>
           <th><%= t("admin.orders.index.table.payment_method") %></th>
           <th><%= t("admin.orders.index.table.amount") %></th>
           <th class="orders-created"><%= t("admin.orders.index.table.created") %></th>
@@ -16,6 +16,7 @@
         <% orders.each do |registration| %>
           <% latest_payment = registration.temple_payments.max_by { |payment| payment.processed_at || payment.created_at } %>
           <% status_key = registration.payment_status %>
+          <% no_payment_required = registration.total_price_cents.to_i.zero? %>
           <% row_classes = ["orders-row"] %>
           <% row_classes << "is-unpaid" unless registration.payment_status == TempleEventRegistration::PAYMENT_STATUSES[:paid] %>
           <% native_name = registration.user&.native_name.presence %>
@@ -29,7 +30,26 @@
           end %>
           <tr class="<%= row_classes.join(" ") %>">
             <td><%= display_name %></td>
-            <td><%= registration.offering&.title || "—" %></td>
+            <td>
+              <% offering = registration.offering %>
+              <% if offering.present? %>
+                <% type_label =
+                  case offering
+                  when TempleService
+                    t("admin.filters.offering.service_prefix")
+                  when TempleGathering
+                    t("admin.filters.offering.gathering_prefix")
+                  else
+                    t("admin.filters.offering.event_prefix")
+                  end %>
+                <div class="orders-source">
+                  <span class="orders-source__type"><%= type_label %></span>
+                  <span class="orders-source__title"><%= offering.title %></span>
+                </div>
+              <% else %>
+                —
+              <% end %>
+            </td>
             <td>
               <% if latest_payment.present? %>
                 <span class="payment-method-pill"><%= admin_filter_payment_label(latest_payment.payment_method) %></span>
@@ -43,16 +63,19 @@
               <span class="status-pill status-<%= status_key %>">
                 <%= t("admin.orders.statuses.#{status_key}", default: status_key.humanize) %>
               </span>
+              <% if no_payment_required %>
+                <span class="status-note status-note--info"><%= t("admin.orders.index.table.no_payment_required") %></span>
+              <% end %>
             </td>
-            <td class="actions-cell">
-              <div class="order-actions">
+            <td class="table-actions">
+              <div class="table-actions__buttons">
                 <% if show_mark_button && registration.payment_status != TempleEventRegistration::PAYMENT_STATUSES[:paid] %>
-                  <button type="button" class="btn btn-ghost" disabled>Mark as paid</button>
+                  <button type="button" class="btn btn-ghost btn-small" disabled>Mark as paid</button>
                 <% end %>
                 <% if registration.offering.present? %>
                   <%= link_to t("admin.orders.index.table.view"),
                     admin_offering_order_path_for(registration.offering, registration),
-                    class: "pill-link",
+                    class: "btn btn-secondary btn-small",
                     title: t("admin.orders.index.table.reference_hint", reference: registration.reference_code) %>
                 <% end %>
               </div>

@@ -25,12 +25,14 @@
                 <td><%= entry.title %></td>
                 <td><%= entry.event_date&.strftime("%Y/%m/%d") %></td>
                 <td><%= entry.photo_urls.count %></td>
-                <td class="text-right">
-                  <%= link_to t("admin.gallery_entries.actions.edit"), edit_admin_gallery_entry_path(entry), class: "pill-link" %>
-                  <%= link_to t("admin.gallery_entries.actions.delete"), admin_gallery_entry_path(entry),
-                    method: :delete,
-                    data: { confirm: t("admin.gallery_entries.confirmations.delete") },
-                    class: "pill-link danger" %>
+                <td class="table-actions">
+                  <div class="table-actions__buttons">
+                    <%= link_to t("admin.gallery_entries.actions.edit"), edit_admin_gallery_entry_path(entry), class: "btn btn-ghost btn-small" %>
+                    <%= link_to t("admin.gallery_entries.actions.delete"), admin_gallery_entry_path(entry),
+                      method: :delete,
+                      data: { confirm: t("admin.gallery_entries.confirmations.delete") },
+                      class: "btn btn-ghost btn-small btn-danger" %>
+                  </div>
                 </td>
               </tr>
             <% end %>

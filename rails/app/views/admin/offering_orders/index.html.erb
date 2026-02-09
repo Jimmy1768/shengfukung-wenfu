@@ -74,7 +74,7 @@
                   <td><%= Currency::Symbols.format_amount(registration.total_price_cents, registration.currency) %></td>
                   <td><%= l(registration.created_at, format: :short) %></td>
                   <td>
-                    <%= link_to t("admin.offering_orders.index.table.view"), admin_offering_order_path_for(@offering, registration), class: "pill-link" %>
+                    <%= link_to t("admin.offering_orders.index.table.view"), admin_offering_order_path_for(@offering, registration), class: "btn btn-ghost btn-small" %>
                   </td>
                 </tr>
               <% end %>

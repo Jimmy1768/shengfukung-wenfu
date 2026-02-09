@@ -20,6 +20,14 @@ class TempleGathering < ApplicationRecord
     location_name.presence || location_address.presence
   end
 
+  def free_gathering_enabled?
+    meta = (metadata || {})
+    return ActiveModel::Type::Boolean.new.cast(meta["free_gathering"]) if meta.key?("free_gathering")
+    return false if new_record?
+
+    price_cents.to_i.zero?
+  end
+
   def hero_asset_id
     metadata_value("hero_asset_id")
   end

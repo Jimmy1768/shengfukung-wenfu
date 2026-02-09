@@ -838,31 +838,36 @@ body.admin-body input[type=datetime-local]::placeholder {
   gap: var(--spacing-md);
 }
 
+.actions--inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+}
+.actions--inline .btn {
+  white-space: nowrap;
+}
+
 .orders-row.is-unpaid {
   background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
-.order-actions {
-  display: flex;
-  gap: 0.35rem;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.actions-cell {
+.table-actions {
   text-align: right;
 }
 
-.btn-ghost {
-  border: 1px dashed var(--border);
-  background: transparent;
-  color: var(--text-muted);
-  border-radius: var(--radius-sm);
-  padding: 0.4rem 0.8rem;
-  font-size: 0.85rem;
-  cursor: not-allowed;
+.table-actions__buttons {
+  display: inline-flex;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  flex-wrap: nowrap;
 }
 
+@media (max-width: 640px) {
+  .table-actions__buttons {
+    flex-wrap: wrap;
+  }
+}
 .payment-method-pill {
   display: inline-flex;
   padding: 0.15rem 0.6rem;
@@ -1415,6 +1420,17 @@ body.admin-body input[type=datetime-local]::placeholder {
   font-size: 0.95rem;
   color: var(--text);
   background: rgba(255, 255, 255, 0.02);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-small {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.82rem;
 }
 
 .btn-primary {
@@ -1430,12 +1446,29 @@ body.admin-body input[type=datetime-local]::placeholder {
   border-color: color-mix(in srgb, var(--text) 16%, transparent);
 }
 
+.btn-ghost {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--text) 18%, transparent);
+  color: var(--text-muted);
+}
+
+.btn-danger {
+  border-color: color-mix(in srgb, var(--danger, #d1452f) 40%, transparent);
+  color: var(--danger, #d1452f);
+}
+
 .btn:hover {
   transform: translateY(-1px);
 }
 
 .btn-secondary:hover {
   background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.btn-ghost:hover {
+  border-color: color-mix(in srgb, var(--text) 30%, transparent);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--text);
 }
 
 .badge {
@@ -1871,6 +1904,100 @@ body.admin-body input[type=datetime-local]::placeholder {
   white-space: nowrap;
 }
 
+.admin-list {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--card-bg, #fff);
+}
+
+.admin-list__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+
+.admin-list__row:last-child {
+  border-bottom: none;
+}
+
+.admin-list__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin-list__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  margin-bottom: 0;
+}
+
+.admin-list__meta,
+.admin-list__meta-item {
+  padding: 0;
+}
+
+.admin-list__meta dt,
+.admin-list__meta dd {
+  margin: 0;
+}
+
+.admin-list__meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.9rem;
+}
+
+.admin-list__meta-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.admin-list__meta-value {
+  color: var(--text);
+}
+
+.admin-list__meta--columns-4 {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(140px, max-content));
+  justify-content: start;
+  justify-items: start;
+}
+
+.admin-list__actions {
+  text-align: right;
+}
+
+.admin-list__actions .table-actions__buttons {
+  justify-content: flex-end;
+}
+
+@media (max-width: 720px) {
+  .admin-list__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin-list__actions {
+    text-align: left;
+  }
+  .admin-list__actions .table-actions__buttons {
+    justify-content: flex-start;
+  }
+}
+@media (min-width: 640px) {
+  .admin-list__meta--columns-4 {
+    grid-template-columns: repeat(4, minmax(140px, max-content));
+  }
+}
 .form-card {
   display: flex;
   flex-direction: column;

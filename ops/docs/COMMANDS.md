@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "created TempleGatherings and related files"
+git commit -m "completed events, services, gatherings systems"
 git push
 
 git reset --hard HEAD

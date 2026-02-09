@@ -25,14 +25,17 @@
                 <td><%= post.title %></td>
                 <td><%= post.published? ? t("admin.news_posts.labels.published") : t("admin.news_posts.labels.draft") %></td>
                 <td><%= post.published_at&.strftime("%Y/%m/%d %H:%M") %></td>
-                <td class="text-right">
-                  <%= link_to t("admin.news_posts.actions.edit"), edit_admin_news_post_path(post), class: "pill-link" %>
-                  <%= button_to admin_news_post_path(post),
-                    method: :delete,
-                    data: { turbo_confirm: t("admin.news_posts.confirmations.delete") },
-                    form: { class: "pill-link danger delete-link" } do %>
-                    <span><%= t("admin.news_posts.actions.delete") %></span>
-                  <% end %>
+                <td class="table-actions">
+                  <div class="table-actions__buttons">
+                    <%= link_to t("admin.news_posts.actions.edit"), edit_admin_news_post_path(post), class: "btn btn-ghost btn-small" %>
+                    <%= button_to admin_news_post_path(post),
+                      method: :delete,
+                      data: { turbo_confirm: t("admin.news_posts.confirmations.delete") },
+                      class: "btn btn-ghost btn-small btn-danger",
+                      form: { class: "inline-delete-form" } do %>
+                      <span><%= t("admin.news_posts.actions.delete") %></span>
+                    <% end %>
+                  </div>
                 </td>
               </tr>
             <% end %>

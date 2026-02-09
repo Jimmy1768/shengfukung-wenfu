@@ -26,11 +26,10 @@ zh-TW:
         label: "搜尋"
         placeholder: "輸入信眾姓名、Email 或訂單編號"
       offering:
-        label: "供品"
+        label: "供品 / 聚會"
         all: "全部供品"
         event_prefix: "活動"
         service_prefix: "服務"
-        gathering_prefix: "聚會"
         gathering_prefix: "聚會"
       payment_method:
         label: "付款方式"
@@ -400,6 +399,7 @@ zh-TW:
           status: "狀態"
           view: "檢視"
           orders: "訂單"
+          actions: "操作"
         empty: "尚未建立任何供品，請點選上方按鈕建立。"
         archived_empty: "目前沒有封存的供品。"
       statuses:
@@ -559,7 +559,7 @@ zh-TW:
         guest_fallback: "訪客"
         table:
           patron: "申請人"
-          offering: "供品"
+          source: "來源"
           payment_method: "付款方式"
           amount: "金額"
           created: "建立時間"
@@ -567,6 +567,7 @@ zh-TW:
           actions: "操作"
           view: "檢視"
           unpaid_payment: "未付款"
+          no_payment_required: "無需付款"
           reference_hint: "訂單編號 %{reference}"
       statuses:
         pending: "待付款"
@@ -578,7 +579,7 @@ zh-TW:
         eyebrow: "現場報到"
         title: "%{offering} 的報名紀錄"
         body: "集中管理現場報名、面談紀錄與繳費狀態。"
-        view_offering: "供品設定"
+        view_offering: "檢視詳情"
         new_registration: "新增報名"
         guest_fallback: "現場來賓"
         metrics:
@@ -647,6 +648,7 @@ zh-TW:
         subtitle: "副標題"
         description: "敘述"
         hero_image_url: "主視覺網址"
+        free_gathering: "此聚會免費參加"
         starts_on: "開始日期"
         ends_on: "結束日期"
         start_time: "開始時間"
@@ -659,6 +661,7 @@ zh-TW:
         status: "狀態"
       hints:
         hero_image_url: "可選填，供行銷頁面或分享預覽顯示。"
+        free_gathering: "勾選後將價格設為 0，並標註所有報名為「無需付款」。依然會在訂單列表顯示以方便統計。"
       labels:
         unscheduled: "待定"
         location_pending: "地點待公布"
@@ -670,17 +673,24 @@ zh-TW:
         new: "新增聚會"
         save: "儲存"
         cancel: "取消"
+        view: "檢視"
+        view_orders: "查看報名"
+        view_archived: "封存紀錄"
+        view_active: "返回現用"
+        archive: "封存"
         edit: "編輯"
         delete: "刪除"
       notices:
         created: "聚會已建立。"
         updated: "聚會已更新。"
         deleted: "聚會已刪除。"
+        archived: "聚會已封存。"
         delete_restricted: "此聚會已有報名紀錄，無法刪除。"
       errors:
         invalid_asset: "無法使用這個上傳檔案，請重新上傳。"
       confirmations:
         delete: "確定要刪除這個聚會嗎？"
+        archive: "確定要封存這個聚會嗎？（原有報名仍保留於報表）"
       form:
         errors: "%{count} 項問題需要修正"
       empty: "尚未建立任何聚會。"

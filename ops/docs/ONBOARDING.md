@@ -89,10 +89,11 @@ Use this when you need representative data locally or on staging:
    - JSON endpoints (`/admin/patrons/:id/metadata_values`) exist for future UI that lists/removes multi-value entries; wire a modal when needed.
 8. **In-tower workflow summary**
    - **Product templates** – defined in `rails/db/temples/offerings/<slug>.yml` under `events:` and `services:`. Devs sync them into each temple’s metadata via `Offerings::TemplateLoader`.
-   - **Event/Service instances** – admins use `/admin/events` or `/admin/services` to create/edit/delete instances (set price, dates, copy). No code change required.
-   - **Gatherings** – `/admin/gatherings` lets staff publish ad-hoc meetups (calligraphy class, volunteer briefing, etc.) without wiring a template. They still funnel into `TempleRegistration` + `/admin/offerings` order management, so reporting and payments stay unified.
+   - **Unified offerings index** – `/admin/offerings` is now the primary list for events *and* services. Each row renders a card with title/subtitle, type, price, status, and last update plus inline “View” / “Orders” buttons. Draft + published offerings show by default; the archived toggle flips `status` to `archived` for historical reference without deleting data.
+   - **Event/Service instances** – editing still occurs under `/admin/events/:id` or `/admin/services/:id`, but creation always starts from `/admin/offerings` so the template picker can auto-select the correct form partial based on `kind`.
+   - **Gatherings** – `/admin/gatherings` now mirrors the same card layout (schedule, location, price, status) so staff have a consistent experience whether they manage templated offerings or one-off community meetups. They still funnel into `TempleRegistration` + `/admin/offerings` order management, keeping reporting and payments unified.
    - **Media uploads** – Gatherings (hero image) and gallery entries (photos/video) can now upload files directly via the shared MediaAsset/S3 pipeline; the forms still accept manually pasted URLs as a fallback.
-- **Registration / payment** – staff use `/admin/events/:id/orders`, `/admin/services/:id/orders`, or `/admin/gatherings/:id/orders` to capture registrations, then record payments. Ledger/history sits at this level.
+- **Registration / payment** – staff use `/admin/events/:id/orders`, `/admin/services/:id/orders`, or `/admin/gatherings/:id/orders` to capture registrations, then record payments. Ledger/history sits at this level. The Orders list now labels each entry’s “Source” with `Event`, `Service`, or `Gathering`, and free gatherings automatically show the “No payment required” badge next to the status pill.
 - **Slugs** – admins no longer edit slugs manually; events/services/gatherings auto-generate and normalize slugs per temple, keeping URLs stable without exposing the field in forms.
 
 ## Production Flow

@@ -26,7 +26,7 @@ en:
         label: "Search"
         placeholder: "Search by patron name, email, or reference"
       offering:
-        label: "Offering"
+        label: "Offering / Gathering"
         all: "All offerings"
         event_prefix: "Event"
         service_prefix: "Service"
@@ -451,6 +451,7 @@ en:
         subtitle: "Subtitle"
         description: "Description"
         hero_image_url: "Hero image URL"
+        free_gathering: "This gathering is free"
         starts_on: "Starts on"
         ends_on: "Ends on"
         start_time: "Start time"
@@ -463,6 +464,7 @@ en:
         status: "Status"
       hints:
         hero_image_url: "Optional. Surfaces on marketing cards if present."
+        free_gathering: "Disable the price field and mark every registration as no-payment-required. Orders still appear for headcount/logistics."
       labels:
         unscheduled: "Schedule TBD"
         location_pending: "Location TBD"
@@ -474,17 +476,24 @@ en:
         new: "New gathering"
         save: "Save"
         cancel: "Cancel"
+        view: "View"
+        view_orders: "Orders"
+        view_archived: "View archived"
+        view_active: "Back to active"
+        archive: "Archive"
         edit: "Edit"
         delete: "Delete"
       notices:
         created: "Gathering created."
         updated: "Gathering updated."
         deleted: "Gathering deleted."
+        archived: "Gathering archived."
         delete_restricted: "Gathering cannot be deleted because registrations exist."
       errors:
         invalid_asset: "Unable to use the uploaded hero image. Please upload a new file."
       confirmations:
         delete: "Delete this gathering?"
+        archive: "Archive this gathering? Registrations remain for reporting."
       form:
         errors: "%{count} issues prevented saving"
       empty: "No gatherings yet."
@@ -501,6 +510,7 @@ en:
           status: "Status"
           view: "View"
           orders: "Orders"
+          actions: "Actions"
         empty: "No offerings match the current filters."
         archived_empty: "No archived offerings yet."
       statuses:
@@ -660,7 +670,7 @@ en:
         guest_fallback: "Guest"
         table:
           patron: "Patron"
-          offering: "Offering"
+          source: "Source"
           payment_method: "Method"
           amount: "Amount"
           created: "Created"
@@ -668,6 +678,7 @@ en:
           actions: "Actions"
           view: "View"
           unpaid_payment: "Unpaid"
+          no_payment_required: "No payment required"
           reference_hint: "Reference %{reference}"
       statuses:
         pending: "Pending"
@@ -679,7 +690,7 @@ en:
         eyebrow: "Onsite desk"
         title: "Registrations for %{offering}"
         body: "Track onsite registrations, reference interview notes, and keep finance synced."
-        view_offering: "Offering settings"
+        view_offering: "View details"
         new_registration: "New Registration"
         guest_fallback: "Guest"
         metrics:

@@ -26,6 +26,17 @@
     <%= form.text_area :description, rows: 5 %>
   </div>
 
+  <div class="field checkbox-field">
+    <label>
+      <%= check_box_tag "temple_gathering[free_gathering]",
+        "1",
+        gathering.free_gathering_enabled?,
+        data: { free_gathering_toggle: true } %>
+      <span><%= t("admin.gatherings.fields.free_gathering") %></span>
+    </label>
+    <p class="muted"><%= t("admin.gatherings.hints.free_gathering") %></p>
+  </div>
+
   <div class="field">
     <label><%= t("admin.gatherings.fields.hero_image_url") %></label>
     <div class="media-upload"
@@ -94,7 +105,11 @@
 
   <div class="field">
     <%= form.label :price_cents, t("admin.gatherings.fields.price_cents") %>
-    <%= form.number_field :price_cents, min: 0, step: 100 %>
+    <%= form.number_field :price_cents,
+      min: 0,
+      step: 100,
+      data: { free_gathering_price: true },
+      value: gathering.price_cents %>
   </div>
 
   <div class="field">
@@ -116,3 +131,48 @@
 <% end %>
 
 <%= render "admin/shared/media_upload_script" %>
+<script>
+  (() => {
+    const ready = (fn) => {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", fn);
+      } else {
+        fn();
+      }
+    };
+
+    ready(() => {
+      const toggle = document.querySelector("[data-free-gathering-toggle]");
+      const priceField = document.querySelector("[data-free-gathering-price]");
+      if (!toggle || !priceField) return;
+
+      let previousValue = priceField.value;
+
+      const syncState = () => {
+        if (toggle.checked) {
+          if (priceField.value && priceField.value !== "0") {
+            previousValue = priceField.value;
+          }
+          priceField.value = 0;
+          priceField.readOnly = true;
+          priceField.classList.add("is-readonly");
+        } else {
+          priceField.readOnly = false;
+          priceField.classList.remove("is-readonly");
+          if (priceField.value === "0" && previousValue && previousValue !== "0") {
+            priceField.value = previousValue;
+          }
+        }
+      };
+
+      priceField.addEventListener("input", () => {
+        if (!toggle.checked) {
+          previousValue = priceField.value;
+        }
+      });
+
+      toggle.addEventListener("change", syncState);
+      syncState();
+    });
+  })();
+</script>

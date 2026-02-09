@@ -6,9 +6,16 @@ module Admin
     before_action :set_gathering, only: %i[edit update destroy]
 
     def index
-      @gatherings = current_temple.temple_gatherings.order(
+      @show_archived = ActiveModel::Type::Boolean.new.cast(params[:archived])
+      scope = current_temple.temple_gatherings.order(
         Arel.sql("COALESCE(temple_gatherings.starts_on, DATE(temple_gatherings.created_at)) DESC, temple_gatherings.created_at DESC")
       )
+      @gatherings =
+        if @show_archived
+          scope.where(status: "archived")
+        else
+          scope.where.not(status: "archived")
+        end
     end
 
     def new
@@ -18,6 +25,7 @@ module Admin
     def create
       reset_detached_assets
       @gathering = current_temple.temple_gatherings.new(gathering_params)
+      apply_free_pricing(@gathering)
       apply_hero_asset(@gathering, hero_asset_param)
       if @gathering.save
         cleanup_detached_assets
@@ -32,6 +40,7 @@ module Admin
     def update
       reset_detached_assets
       @gathering.assign_attributes(gathering_params)
+      apply_free_pricing(@gathering)
       apply_hero_asset(@gathering, hero_asset_param)
       if @gathering.errors.empty? && @gathering.save
         cleanup_detached_assets
@@ -42,10 +51,11 @@ module Admin
     end
 
     def destroy
-      @gathering.destroy!
-      redirect_to admin_gatherings_path, notice: t("admin.gatherings.notices.deleted")
-    rescue ActiveRecord::DeleteRestrictionError
-      redirect_to admin_gatherings_path, alert: t("admin.gatherings.notices.delete_restricted")
+      if @gathering.update(status: "archived")
+        redirect_to admin_gatherings_path, notice: t("admin.gatherings.notices.archived")
+      else
+        redirect_to admin_gatherings_path, alert: t("admin.gatherings.notices.delete_restricted")
+      end
     end
 
     private
@@ -69,7 +79,9 @@ module Admin
         :status,
         :price_cents,
         :currency,
-        :hero_image_url
+        :hero_image_url,
+        :hero_asset_id,
+        :free_gathering
       )
       permitted[:currency] = permitted[:currency].presence || "TWD"
       permitted[:price_cents] = permitted[:price_cents].presence&.to_i || 0
@@ -82,6 +94,23 @@ module Admin
 
     def hero_asset_param
       params.dig(:temple_gathering, :hero_asset_id)
+    end
+
+    def free_gathering_param
+      value = params.dig(:temple_gathering, :free_gathering)
+      ActiveModel::Type::Boolean.new.cast(value)
+    end
+
+    def apply_free_pricing(record)
+      meta = (record.metadata || {}).with_indifferent_access
+      if free_gathering_param
+        record.price_cents = 0
+        meta["free_gathering"] = true
+        record.metadata = meta
+      else
+        meta.delete("free_gathering")
+        record.metadata = meta
+      end
     end
 
     def apply_hero_asset(record, asset_id)

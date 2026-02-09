@@ -14,14 +14,12 @@ module Admin
         if @show_archived
           [
             current_temple.temple_events.where(status: "archived"),
-            current_temple.temple_services.where(status: "archived"),
-            current_temple.temple_gatherings.where(status: "archived")
+            current_temple.temple_services.where(status: "archived")
           ]
         else
           [
             current_temple.temple_events.where(status: %w[draft published]),
-            current_temple.temple_services.where(status: %w[draft published]),
-            current_temple.temple_gatherings.where(status: %w[draft published])
+            current_temple.temple_services.where(status: %w[draft published])
           ]
         end
       @offerings = collections.flat_map(&:to_a).sort_by(&:updated_at).reverse
