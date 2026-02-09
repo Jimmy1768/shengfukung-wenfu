@@ -2,6 +2,7 @@ module Account
   class SessionsController < BaseController
     skip_before_action :authenticate_user!, only: %i[new create destroy]
     skip_before_action :verify_authenticity_token, only: %i[create destroy]
+    before_action :capture_entry_intent_from_params!, only: :new
 
     def new
       @registration_form = Account::RegistrationForm.new
@@ -12,7 +13,7 @@ module Account
       if valid_credentials?
         user = User.find_by(email: session_params[:email].to_s.downcase.strip)
         establish_user_session!(user)
-        redirect_to account_dashboard_path, notice: "Signed in."
+        redirect_to resolve_post_login_path, notice: "Signed in."
       else
         flash.now[:alert] = "Those credentials did not match."
         @registration_form ||= Account::RegistrationForm.new
@@ -52,5 +53,12 @@ module Account
       ActiveSupport::SecurityUtils.secure_compare(value, other)
     end
 
+    def resolve_post_login_path
+      intent = account_entry_intent
+      clear_account_entry_intent!
+
+      # TODO: route to registration detail or intake once those flows exist.
+      account_dashboard_path
+    end
   end
 end

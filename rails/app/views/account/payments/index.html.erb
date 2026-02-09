@@ -18,6 +18,7 @@
             <th>狀態</th>
             <th>日期</th>
             <th>方式</th>
+            <th>報名人</th>
           </tr>
         </thead>
         <tbody>
@@ -29,6 +30,7 @@
               <td><span class="status-pill status-<%= payment.status %>"><%= payment.status %></span></td>
               <td><%= (payment.processed_at || payment.created_at).strftime("%Y/%m/%d") %></td>
               <td><%= payment.payment_method.titleize %></td>
+              <td><%= payment.temple_event_registration&.registrant_name || current_user.english_name %></td>
             </tr>
           <% end %>
         </tbody>

@@ -8,15 +8,12 @@
     <link rel="stylesheet" href="/backend/assets/account.css" />
   </head>
   <body class="account-body account-theme-<%= @active_theme_key %>">
-    <% if Rails.env.development? %>
-      <%= render "account/themes/dev_toggle" %>
-    <% end %>
     <div class="account-shell">
       <header class="account-hero">
         <div class="account-hero-inner">
           <div class="account-brand">
-            <p class="account-eyebrow">Dev preview</p>
-            <h1><%= AppConstants::Project.name %></h1>
+            <p class="account-eyebrow">TempleMate</p>
+            <h1>會員專區</h1>
             <p class="account-blurb">會員專區：查看活動、付款記錄，更新個人資料。</p>
           </div>
           <% if user_signed_in? %>

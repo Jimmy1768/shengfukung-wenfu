@@ -24,7 +24,7 @@ module Archives
     end
 
     def certificates
-      @certificates ||= registrations.where.not(certificate_number: [nil, ""])
+      @certificates ||= registrations.with_certificate_number
     end
 
     def available_years

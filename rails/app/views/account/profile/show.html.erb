@@ -32,3 +32,40 @@
     <p><%= current_user.metadata&.dig("notes").presence || "尚無備註。" %></p>
   </div>
 </section>
+
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow">家屬 / 受照護者</p>
+      <h2>管理家屬資料</h2>
+      <p>新增或更新無法自行登入的成員資訊。</p>
+    </div>
+    <%= link_to "新增家屬", new_account_dependent_path, class: "pill-link primary" %>
+  </header>
+
+  <% if @dependents.any? %>
+    <div class="dependent-grid">
+      <% @dependents.each do |link| %>
+        <% dependent = link.dependent %>
+        <article class="dependent-card">
+          <div>
+            <h3><%= dependent.english_name %></h3>
+            <% if dependent.native_name.present? %>
+              <p class="muted"><%= dependent.native_name %></p>
+            <% end %>
+            <p class="muted">關係：<%= link.relationship_label.presence || dependent.relationship_label || "—" %></p>
+            <p class="muted">生日：<%= dependent.birthdate&.strftime("%Y/%m/%d") || "—" %></p>
+            <p class="muted">電話：<%= dependent.metadata["phone"].presence || "—" %></p>
+            <p class="muted">Email：<%= dependent.metadata["email"].presence || "—" %></p>
+          </div>
+          <div class="dependent-actions">
+            <%= link_to "編輯", edit_account_dependent_path(link), class: "pill-link secondary" %>
+            <%= button_to "刪除", account_dependent_path(link), method: :delete, data: { turbo_confirm: "確定刪除此家屬？" }, class: "pill-link danger" %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="muted">尚未建立任何家屬資料。</p>
+  <% end %>
+</section>

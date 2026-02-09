@@ -1,0 +1,25 @@
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <h2>選擇要登入的寺廟</h2>
+      <p>請先挑選要管理的寺廟，再登入會員專區進行報名與付款。</p>
+    </div>
+  </header>
+
+  <div class="temple-selector">
+    <% @temples.each do |temple| %>
+      <%= link_to account_login_path(temple: temple["slug"]), class: "temple-card" do %>
+        <% hero_url = temple["hero_image_url"].presence %>
+        <div class="temple-card__hero" style="background-image: url('<%= hero_url.presence || asset_path("temple-placeholder.png") %>');"></div>
+        <div class="temple-card__body">
+          <h3>
+            <span><%= temple["display_name"] %></span>
+            <% if temple["public_url"].present? %>
+              <span class="temple-card__url"><%= temple["public_url"].sub(%r{^https?://}, "") %></span>
+            <% end %>
+          </h3>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</section>

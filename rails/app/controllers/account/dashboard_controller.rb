@@ -6,7 +6,7 @@ module Account
         .order(created_at: :desc)
         .limit(3)
       @certificates = current_user.temple_event_registrations
-        .where.not(certificate_number: [nil, ""])
+        .with_certificate_number
         .includes(:temple_offering)
         .order(updated_at: :desc)
         .limit(3)

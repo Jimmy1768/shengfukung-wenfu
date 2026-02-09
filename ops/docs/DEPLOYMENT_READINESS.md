@@ -6,7 +6,7 @@ This checklist covers the steps needed to move TempleMate (shenfukung-wenfu) ont
 
 ## 1. Finalize nginx template
 
-- Update `ops/nginx/shenfukung-wenfu.conf` with separate `server` blocks for staging (`shenfukungwenfu.com.tw`) and the eventual production domain (placeholder for `.org.tw`).
+- Update `ops/nginx/shenfukung-wenfu.conf` with separate `server` blocks for staging (`shenfukung.com.tw`) and the eventual production domain (placeholder for `.org.tw`).
 - Document upstreams, asset roots, and where certbot paths will be inserted. Add comments describing how to append additional temple domains later.
 
 ## 2. Provision TempleMate droplet
@@ -23,10 +23,10 @@ This checklist covers the steps needed to move TempleMate (shenfukung-wenfu) ont
 
 ## 3. Point staging DNS + issue TLS cert
 
-- Update DNS so `shenfukungwenfu.com.tw` points to the new droplet.
+- Update DNS so `shenfukung.com.tw` points to the new droplet.
 - Once DNS propagates, run certbot:
   ```bash
-  sudo certbot --nginx -d shenfukungwenfu.com.tw
+  sudo certbot --nginx -d shenfukung.com.tw
   ```
 - Capture the live nginx config + cert paths back into the repo:
   ```bash
@@ -36,7 +36,7 @@ This checklist covers the steps needed to move TempleMate (shenfukung-wenfu) ont
 
 ## 4. Deploy + smoke test staging
 
-- Update `rails/app/lib/temples/manifest.yml` so the `shenfukung-wenfu` entry lists `https://shenfukungwenfu.com.tw` as `public_url`.
+- Update `rails/app/lib/temples/manifest.yml` so the `shenfukung-wenfu` entry lists `https://shenfukung.com.tw` as `public_url`.
 - Deploy the Vue site + Expo app (if needed):
   ```bash
   bin/deploy_vue shenfukung-wenfu
@@ -44,7 +44,7 @@ This checklist covers the steps needed to move TempleMate (shenfukung-wenfu) ont
   ```
 - Run smoke tests to confirm `/api/v1/temples/:slug` responds with 200:
   ```bash
-  SMOKE_BASE_URL=https://shenfukungwenfu.com.tw bin/run_smoke_tests
+  SMOKE_BASE_URL=https://shenfukung.com.tw bin/run_smoke_tests
   ```
 - Document results (success/failure, follow-up tasks).
 

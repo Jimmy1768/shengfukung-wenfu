@@ -4,6 +4,7 @@ module Account
     skip_before_action :verify_authenticity_token, only: :create
 
     before_action :redirect_if_signed_in, only: :new
+    before_action :capture_entry_intent_from_params!, only: :new
 
     def new
       redirect_to account_login_path(register: "email")

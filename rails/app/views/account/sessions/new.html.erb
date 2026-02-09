@@ -3,9 +3,8 @@
 
 <section class="card login-card">
   <header>
-    <p class="eyebrow">Account</p>
-    <h1>Welcome back</h1>
-    <p>Choose a connected provider or continue with email.</p>
+    <h1>歡迎回到 <%= current_temple&.name || AppConstants::Project.name %></h1>
+    <p>請選擇社群登入或使用電子郵件登入。</p>
   </header>
 
   <div class="login-grid">

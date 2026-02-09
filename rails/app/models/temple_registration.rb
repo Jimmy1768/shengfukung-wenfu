@@ -35,6 +35,12 @@ class TempleRegistration < ApplicationRecord
 
   scope :recent, -> { order(created_at: :desc) }
   scope :with_status, ->(status) { where(payment_status: status) }
+  scope :with_certificate_number, lambda {
+    where(Arel.sql("#{certificate_number_sql} <> ''"))
+  }
+  scope :without_certificate_number, lambda {
+    where(Arel.sql("#{certificate_number_sql} = ''"))
+  }
 
   def self.admin_filtered(filters)
     filters ||= {}
@@ -106,6 +112,15 @@ class TempleRegistration < ApplicationRecord
     registrable
   end
 
+  def registrant_name
+    payload = contact_payload || {}
+    user&.english_name ||
+      payload["primary_contact"] ||
+      payload["contact_name"] ||
+      payload["name"] ||
+      "訪客"
+  end
+
   private
 
   def assign_reference_code
@@ -155,5 +170,9 @@ class TempleRegistration < ApplicationRecord
   def write_metadata_value(key, value)
     merged = (metadata || {}).with_indifferent_access.merge(key => value)
     self.metadata = merged
+  end
+
+  def self.certificate_number_sql
+    "COALESCE((#{table_name}.metadata ->> 'certificate_number'), '')"
   end
 end

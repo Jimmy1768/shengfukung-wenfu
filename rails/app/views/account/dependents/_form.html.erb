@@ -1,0 +1,37 @@
+<%= form_with model: @form, url: request.path, scope: :account_dependent_form, local: true, class: "account-form" do |f| %>
+  <%= render "shared/form_errors", form: @form %>
+  <div class="form-grid">
+    <div class="form-field">
+      <%= f.label :english_name, "姓名（必填）" %>
+      <%= f.text_field :english_name, required: true %>
+    </div>
+    <div class="form-field">
+      <%= f.label :native_name, "中文姓名" %>
+      <%= f.text_field :native_name %>
+    </div>
+    <div class="form-field">
+      <%= f.label :relationship_label, "關係" %>
+      <%= f.text_field :relationship_label %>
+    </div>
+    <div class="form-field">
+      <%= f.label :birthdate, "生日" %>
+      <%= f.date_field :birthdate %>
+    </div>
+    <div class="form-field">
+      <%= f.label :phone, "電話" %>
+      <%= f.text_field :phone %>
+    </div>
+    <div class="form-field">
+      <%= f.label :email, "Email" %>
+      <%= f.email_field :email %>
+    </div>
+  </div>
+  <div class="form-field">
+    <%= f.label :notes, "備註" %>
+    <%= f.text_area :notes, rows: 3 %>
+  </div>
+  <div class="form-actions">
+    <%= f.submit class: "btn btn-primary" %>
+    <%= link_to "取消", account_profile_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

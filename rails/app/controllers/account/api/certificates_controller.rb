@@ -5,7 +5,7 @@ module Account
     class CertificatesController < BaseController
       def index
         registrations = default_registration_scope
-          .where.not(certificate_number: [nil, ""])
+          .with_certificate_number
           .includes(:temple_offering)
           .order(updated_at: :desc)
         render json: {

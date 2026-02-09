@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "docs: capture deployment + account portal plans"
+git commit -m "feat(account): add temple selector and dependent management"
 git push
 
 git reset --hard HEAD

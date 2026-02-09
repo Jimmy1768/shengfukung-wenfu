@@ -14,6 +14,7 @@
           <tr>
             <th>編號</th>
             <th>項目</th>
+            <th>報名人</th>
             <th>狀態</th>
             <th>證書</th>
             <th></th>
@@ -24,6 +25,7 @@
             <tr>
               <td><%= registration.reference_code %></td>
               <td><%= registration.temple_offering&.title || "—" %></td>
+              <td><%= registration.registrant_name %></td>
               <td><span class="status-pill status-<%= registration.payment_status %>"><%= registration.payment_status %></span></td>
               <td><%= registration.certificate_number.presence || "未出證" %></td>
               <td>

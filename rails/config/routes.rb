@@ -99,9 +99,11 @@ Rails.application.routes.draw do
     match "/logout", to: "sessions#destroy", via: %i[delete post], as: :logout
     get "/register", to: "signups#new", as: :register
     post "/register", to: "signups#create"
+    resources :temples, only: :index
 
     get "/dashboard", to: "dashboard#index", as: :dashboard
     resource :profile, only: %i[show edit update], controller: "profile"
+    resources :dependents, except: :show
     resources :registrations, only: %i[index show edit update]
     resources :events, only: :index
     resources :payments, only: :index

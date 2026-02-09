@@ -4,6 +4,7 @@ module Account
   class ProfileController < BaseController
     def show
       @form = Account::ProfileForm.new(user: current_user)
+      @dependents = current_user.user_dependents.includes(:dependent)
     end
 
     def edit

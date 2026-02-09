@@ -2,8 +2,8 @@ temples:
   - slug: shenfukung-wenfu
     label: "Shenfukung Wenfu"
     domains:
-      - "shenfukungwenfu.tw"
-    public_url: "https://shenfukungwenfu.tw"
+      - "shenfukung.com.tw"
+    public_url: "https://shenfukung.com.tw"
     deploy:
       vue_dir: "/var/www/shenfukung-wenfu"
     expo:

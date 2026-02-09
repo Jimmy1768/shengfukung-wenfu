@@ -36,7 +36,7 @@ module Archives
 
     def certificate_counts
       @certificate_counts ||= grouped_year_counts(
-        temple.temple_event_registrations.where.not(certificate_number: [nil, ""])
+        temple.temple_event_registrations.with_certificate_number
       )
     end
 
