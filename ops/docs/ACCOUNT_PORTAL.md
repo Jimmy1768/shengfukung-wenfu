@@ -7,6 +7,7 @@ Progress tracking: fill in each `Completed:` line after the section ships and is
 - Keep `/account` aligned with the shared design system: palettes live in `shared/design-system/themes.json` and require `node bin/sync_design_system.js` after edits.
 - Ensure each temple’s default theme key lives in `shared/app_constants/project.json` (override via `PROJECT_DEFAULT_THEME_KEY`) so the portal + marketing site stay in sync.
 - Maintain the dev-only theme toggle (cookie-driven) so designers can preview alternate looks locally while production locks to the configured theme.
+- Use the shared design tokens (colors, typography, spacing, button styles) but build dedicated `/account` layouts/components on top so patron-facing pages aren’t constrained by the admin UI grid.
 
 Completed:
 
@@ -20,10 +21,15 @@ Completed:
 
 ## Phase 3 – Member Surfaces
 
-- Flesh out the `/account` sections: Dashboard (quick links + upcoming cards), Profile (read/edit), Events (upcoming grid + past timeline), and Payments (LINE Pay history placeholder until the pipeline is ready).
-- Replace placeholder data with real services once offerings + payments APIs are available, ensuring each section reads the active temple slug.
-- Keep future enhancements (offerings, LINE Pay) scoped behind feature flags so the shell can ship incrementally.
-- Generate cache payloads on Rails for account experiences where pre-processed data (upcoming events, payment summaries) avoids heavy client-side logic; Vue marketing pages can continue consuming APIs directly without a cache layer.
+- Scope `/account` to authenticated workflows only. Offerings (events/services/gatherings) remain on the public Vue site; patrons tap “Register” there and deep-link into `/account` with the offering slug in tow.
+- Sections to implement:
+  - **Dashboard** – show the next registration + quick links to profile/orders.
+  - **Registrations** – list active orders (status, payment, actions like cancel/request help).
+  - **History** – past orders/payments with PDF receipt/LINE Pay reference download.
+  - **Profile & Settings** – read/edit contact info, privacy, QR code for switching temples.
+- For the registration flow, accept offering references from Vue, prefill the form for logged-in patrons, and fall back to guided login if they arrive without a session.
+- Use existing account APIs (`/account/api/registrations`, `/account/api/payment_statuses/:reference`, etc.); add endpoints only if gaps appear (e.g., certificate downloads).
+- Keep future enhancements (LINE Pay, certificate requests) behind feature flags so the portal shell can ship incrementally.
 
 Completed:
 

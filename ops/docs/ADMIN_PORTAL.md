@@ -57,12 +57,14 @@ Completed:
 
 ## Phase 5 – Deployment & Onboarding
 
-- Document the per-temple `.env` (Rails + Vue + Expo) requirements and update `bin/deploy_vue <slug>` to read them automatically.
-- Update nginx templates so every new domain/slugs shares the same Rails upstream while serving the correct Vue dist.
-- Capture a runbook for seeding temples, syncing offering YAML, uploading baseline imagery, and verifying each surface.
-- Add smoke tests (system + frontend) to confirm the full stack works for a given slug before flipping DNS.
+- **Slug-scoped env + services** – ✅ Every temple now owns `<slug>.env` + matching systemd units, and `bin/load_temple_env` is the canonical wrapper for any command that needs those credentials.
+- **Deploy scripts** – ✅ `bin/deploy_vue`, `bin/deploy_vue_all`, `bin/expo_prebuild`, and `bin/expo_build` all source the slug env automatically and cover the standard deploy/build workflows.
+- **Runbook** – ⏳ Expand onboarding docs with a production checklist (which commands to run, who owns each step) once the `DEPLOYMENT_READINESS.md` tasks land.
+- **Smoke tests** – ✅ `bin/run_smoke_tests` performs the per-slug API checks; extend later with Rails system specs if needed.
+- _(Upload pipeline / S3 provisioning is intentionally deferred until buckets are ready.)_
 
 Completed:
+- Manifest + tooling landed (deploy scripts, Expo wrappers, smoke tests, and documentation updates). See `DEPLOYMENT_READINESS.md` for the droplet/nginx rollout plan that follows.
 
 ## Mobile Alignment Notes
 
@@ -70,8 +72,6 @@ Completed:
 - Treat Expo as a convenience client (push notifications, quick updates) while leaving heavy admin tasks (accounting, large tables) to the web portals.
 - When designing payloads for Vue, ensure the cache serialization can also satisfy Expo so future mobile work is purely UI.
 - Expo endpoints should mirror Rails cache payloads 1:1, omitting only the datasets intentionally excluded from mobile to keep screens lightweight.
-
-Completed:
 
 ## Upcoming Enhancements / Notes for Codex
 

@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+MANIFEST_FILE="$ROOT_DIR/rails/app/lib/temples/manifest.yml"
+MOBILE_DIR="$ROOT_DIR/mobile"
+
+if [ ! -d "$MOBILE_DIR" ]; then
+  echo "Expo workspace not found at $MOBILE_DIR" >&2
+  exit 1
+fi
+
+if [ ! -f "$MANIFEST_FILE" ]; then
+  echo "Manifest not found at $MANIFEST_FILE" >&2
+  exit 1
+fi
+
+read_default_slug() {
+  ruby <<'RUBY' "$MANIFEST_FILE"
+require "yaml"
+data = YAML.safe_load_file(ARGV.first).fetch("temples")
+puts data.first.fetch("slug")
+RUBY
+}
+
+DEFAULT_SLUG="$(read_default_slug)"
+
+usage() {
+  cat <<'USAGE'
+Usage: bin/expo_build <preset|custom> [-- additional EAS args]
+
+Presets:
+  dev-client  -> eas build --platform android --local --profile development-client
+  apk         -> eas build --platform android --local --profile production
+  aab         -> eas build --platform android --profile production-aab
+  ipa         -> eas build --platform ios --profile production
+  custom      -> provide your own EAS args after `--`
+USAGE
+  exit 1
+}
+
+PRESET="${1:-}"
+if [ -z "$PRESET" ]; then
+  usage
+fi
+shift
+
+EXTRA_ARGS=()
+if [[ "$PRESET" != "custom" ]]; then
+  if [[ $# -gt 0 && "$1" == "--" ]]; then
+    shift
+  fi
+  EXTRA_ARGS=("$@")
+else
+  if [[ $# -gt 0 && "$1" == "--" ]]; then
+    shift
+  fi
+  EXTRA_ARGS=("$@")
+fi
+
+case "$PRESET" in
+  dev-client)
+    BUILD_ARGS=(--platform android --local --profile development-client)
+    ;;
+  apk)
+    BUILD_ARGS=(--platform android --local --profile production)
+    ;;
+  aab)
+    BUILD_ARGS=(--platform android --profile production-aab)
+    ;;
+  ipa)
+    BUILD_ARGS=(--platform ios --profile production)
+    ;;
+  custom)
+    if [ "${#EXTRA_ARGS[@]}" -eq 0 ]; then
+      echo "Provide EAS args after 'custom -- ...'." >&2
+      exit 1
+    fi
+    BUILD_ARGS=("${EXTRA_ARGS[@]}")
+    EXTRA_ARGS=()
+    ;;
+  *)
+    echo "Unknown preset: ${PRESET}" >&2
+    usage
+    ;;
+esac
+
+BUILD_ARGS+=("${EXTRA_ARGS[@]}")
+
+if [ "${#BUILD_ARGS[@]}" -eq 0 ]; then
+  echo "No EAS build arguments resolved." >&2
+  exit 1
+fi
+
+echo "Running EAS build for ${DEFAULT_SLUG} (${PRESET}) → eas build ${BUILD_ARGS[*]}"
+"$ROOT_DIR/bin/load_temple_env" "$DEFAULT_SLUG" -- bash -c '
+  set -euo pipefail
+  MOBILE_DIR="$1"
+  shift
+  cd "$MOBILE_DIR"
+  eas build "$@"
+' bash "$MOBILE_DIR" "${BUILD_ARGS[@]}"

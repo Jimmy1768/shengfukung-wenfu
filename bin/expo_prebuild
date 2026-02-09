@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+MANIFEST_FILE="$ROOT_DIR/rails/app/lib/temples/manifest.yml"
+MOBILE_DIR="$ROOT_DIR/mobile"
+
+if [ ! -d "$MOBILE_DIR" ]; then
+  echo "Expo workspace not found at $MOBILE_DIR" >&2
+  exit 1
+fi
+
+if [ ! -f "$MANIFEST_FILE" ]; then
+  echo "Manifest not found at $MANIFEST_FILE" >&2
+  exit 1
+fi
+
+read_default_slug() {
+  ruby <<'RUBY' "$MANIFEST_FILE"
+require "yaml"
+data = YAML.safe_load_file(ARGV.first).fetch("temples")
+puts data.first.fetch("slug")
+RUBY
+}
+
+DEFAULT_SLUG="$(read_default_slug)"
+
+PRESET="${1:-}"
+
+usage() {
+  cat <<'USAGE'
+Usage: bin/expo_prebuild <dev|prod> [-- <extra expo prebuild args>]
+
+Runs `npx expo prebuild --clean` with the correct APP_ENV/BUILD_MODE for the target preset,
+then launches `npx expo start -c` so you can flush Metro's cache (Ctrl+C when done).
+Pass additional Expo arguments after `--` if you need to limit platforms, etc.
+USAGE
+  exit 1
+}
+
+if [ -z "$PRESET" ]; then
+  usage
+fi
+
+shift
+if [[ $# -gt 0 && "$1" == "--" ]]; then
+  shift
+fi
+EXTRA_ARGS=("$@")
+
+case "$PRESET" in
+  dev|development)
+    APP_ENV_VALUE="dropletDev"
+    BUILD_MODE_VALUE="development"
+    ;;
+  prod|production)
+    APP_ENV_VALUE="production"
+    BUILD_MODE_VALUE="production"
+    ;;
+  *)
+    echo "Unknown preset: ${PRESET}. Use 'dev' or 'prod'." >&2
+    exit 1
+    ;;
+esac
+
+echo "Running Expo prebuild for ${DEFAULT_SLUG} (${PRESET})"
+
+"$ROOT_DIR/bin/load_temple_env" "$DEFAULT_SLUG" -- env APP_ENV="$APP_ENV_VALUE" BUILD_MODE="$BUILD_MODE_VALUE" bash -c '
+  set -euo pipefail
+  MOBILE_DIR="$1"
+  shift
+  cd "$MOBILE_DIR"
+  echo " -> npx expo prebuild --clean $*"
+  npx expo prebuild --clean "$@"
+  echo " -> npx expo start -c (press Ctrl+C once cache is flushed)"
+  npx expo start -c
+' bash "$MOBILE_DIR" "${EXTRA_ARGS[@]}"

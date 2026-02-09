@@ -2,14 +2,45 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PROJECT_CONFIG="$ROOT_DIR/shared/app_constants/project.json"
-read_project_slug() {
-  if [ -f "$PROJECT_CONFIG" ]; then
-    ruby -rjson -e 'print JSON.parse(File.read(ARGV[0]))["slug"]' "$PROJECT_CONFIG"
-  fi
+MANIFEST_FILE="$ROOT_DIR/rails/app/lib/temples/manifest.yml"
+
+if [ ! -f "$MANIFEST_FILE" ]; then
+  echo "Manifest not found at $MANIFEST_FILE" >&2
+  exit 1
+fi
+
+read_manifest_field() {
+  local slug="$1"
+  local path="$2"
+  ruby <<'RUBY' "$MANIFEST_FILE" "$slug" "$path"
+require "yaml"
+file, slug, path = ARGV
+data = YAML.safe_load_file(file).fetch("temples")
+entry = data.find { |t| t["slug"] == slug }
+unless entry
+  warn "Unknown temple slug: #{slug}"
+  exit 1
+end
+if path && !path.empty?
+  value = path.split(".").reduce(entry) { |acc, key| acc.is_a?(Hash) ? acc[key] : nil }
+  puts value.to_s
+else
+  require "json"
+  puts JSON.dump(entry)
+end
+RUBY
 }
 
-DEFAULT_SLUG="$(read_project_slug)"
+read_default_slug() {
+  ruby <<'RUBY' "$MANIFEST_FILE"
+require "yaml"
+file = ARGV.first
+data = YAML.safe_load_file(file).fetch("temples")
+puts data.first.fetch("slug") if data.any?
+RUBY
+}
+
+DEFAULT_SLUG="$(read_default_slug)"
 DEPLOY_SLUG="${1:-${DEPLOY_DOMAIN:-$DEFAULT_SLUG}}"
 
 if [ -z "$DEPLOY_SLUG" ]; then
@@ -17,11 +48,14 @@ if [ -z "$DEPLOY_SLUG" ]; then
   exit 1
 fi
 
-DEFAULT_DIR="/var/www/${DEPLOY_SLUG}"
-TARGET_DIR="${DEPLOY_DIR:-$DEFAULT_DIR}"
+VUE_DIR_OVERRIDE="${DEPLOY_DIR:-}"
+if [ -z "$VUE_DIR_OVERRIDE" ]; then
+  VUE_DIR_OVERRIDE="$(read_manifest_field "$DEPLOY_SLUG" "deploy.vue_dir")"
+fi
+TARGET_DIR="${VUE_DIR_OVERRIDE:-/var/www/${DEPLOY_SLUG}}"
 
 echo "Deploying Vue build for ${DEPLOY_SLUG}"
-"$ROOT_DIR/ops/scripts/deploy_vue_build.sh" "$TARGET_DIR"
+"$ROOT_DIR/bin/load_temple_env" "$DEPLOY_SLUG" -- "$ROOT_DIR/ops/scripts/deploy_vue_build.sh" "$TARGET_DIR"
 
 cat <<EOF
 

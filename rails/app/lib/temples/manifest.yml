@@ -1,0 +1,11 @@
+temples:
+  - slug: shenfukung-wenfu
+    label: "Shenfukung Wenfu"
+    domains:
+      - "shenfukungwenfu.tw"
+    public_url: "https://shenfukungwenfu.tw"
+    deploy:
+      vue_dir: "/var/www/shenfukung-wenfu"
+    expo:
+      app_id: "com.jimmy1768.Mnemosyne"
+      dev_app_id: "com.jimmy1768.Mnemosyne.dev"

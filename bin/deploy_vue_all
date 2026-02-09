@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+MANIFEST_FILE="$ROOT_DIR/rails/app/lib/temples/manifest.yml"
+
+if [ ! -f "$MANIFEST_FILE" ]; then
+  echo "Manifest not found at $MANIFEST_FILE" >&2
+  exit 1
+fi
+
+mapfile -t TEMPLE_SLUGS < <(ruby <<'RUBY' "$MANIFEST_FILE"
+require "yaml"
+file = ARGV.first
+data = YAML.safe_load_file(file).fetch("temples")
+data.each { |entry| puts entry.fetch("slug") }
+RUBY
+)
+
+if [ "${#TEMPLE_SLUGS[@]}" -eq 0 ]; then
+  echo "No temples defined in manifest." >&2
+  exit 1
+fi
+
+for slug in "${TEMPLE_SLUGS[@]}"; do
+  echo "=== Deploying Vue build for ${slug} ==="
+  "$ROOT_DIR/bin/deploy_vue" "$slug"
+done

@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "completed events, services, gatherings systems"
+git commit -m "docs: capture deployment + account portal plans"
 git push
 
 git reset --hard HEAD
@@ -36,35 +36,55 @@ bin/project_info
 
 ## Ops + deployment helpers
 
+_The following commands mirror the production checklist: render configs, apply them on the droplet, deploy builds, and verify with smoke tests. When working on the server, run them in order._
+
 ```bash
-# Render nginx/systemd configs from templates
+# 1) Render nginx/systemd configs from templates
 bin/stage_ops_configs
 
-# Copy rendered systemd units to /etc/systemd/system + restart services
+# 2) Copy rendered systemd units to /etc/systemd/system + restart services
 sudo bin/apply_systemd_units
 
-# Copy rendered nginx config to /etc/nginx + run nginx -t && reload
+# 3) Copy rendered nginx config to /etc/nginx + run nginx -t && reload
 sudo bin/apply_nginx_config
 
-# After certbot/manual edits on the droplet, capture the live configs back into ops/
+# 4) After certbot/manual edits on the droplet, capture the live configs back into ops/
 sudo bin/capture_live_configs
 
-# After pulling those changes locally, update nginx templates from the rendered files
+# 5) After pulling those changes locally, update nginx templates from the rendered files
 bin/update_conf_template_after_certbot
 
-# First-time Rails setup (bundle install + db:setup + Vue deps + template rename)
+# One-time Rails setup on a new droplet (bundle install + db:setup + Vue deps)
 bin/setup_backend_once --force
 
-# Reset the Rails DB (drop/create/migrate/seed)
+# Reset the Rails DB (drop/create/migrate/seed) when needed
 bin/reset_backend
 
-# Targeted subsystem reset (auth_core, session_preferences, messaging, admin_controls, cache_control, record_archives, config_entries, background_tasks, api_protection, compliance, analytics_exports)
+# Targeted subsystem reset (auth_core, session_preferences, messaging, admin_controls, cache_control,
+# record_archives, config_entries, background_tasks, api_protection, compliance, analytics_exports)
 bin/reset_subsystem <name>
 
-> Each subsystem reset now seeds representative records (e.g., a cache state/metric, archived records, a config entry + feature flag, background task stub, API logs + blacklist entry, compliance artifacts, analytics job/payload) so you can inspect the schema in development. `bin/reset_subsystem config_entries` in particular now guarantees a default feature flag rollout record.
+> Each subsystem reset now seeds representative records (e.g., cache state, archived records, feature flag,
+> background task stub, API logs, compliance artifacts, analytics payload). `bin/reset_subsystem config_entries`
+> guarantees a default feature flag rollout record.
 
 # Initialize Expo/EAS once (creates project + records projectId)
 bin/setup_expo_once
+
+# Vue deploy: builds + syncs dist for a single slug (loads etc/default/<slug>.env)
+bin/deploy_vue <slug>
+
+# Vue deploy for every slug listed in rails/app/lib/temples/manifest.yml
+bin/deploy_vue_all
+
+# Expo prebuild wrapper (loads env for the shared app, runs dev/prod presets, then flushes Metro cache)
+bin/expo_prebuild <dev|prod> [-- --platform android]
+
+# Expo/EAS build wrapper with presets (dev-client/apk/aab/ipa/custom)
+bin/expo_build <preset> [-- extra eas args]
+
+# Smoke tests: curl /api/v1/temples/:slug for every manifest entry (set SMOKE_BASE_URL for staging/prod)
+bin/run_smoke_tests
 ```
 
 ---
@@ -142,7 +162,8 @@ bin/local-only/sync_expo_plugins ../expo-config-plugins
 npm run ios
 npm run android
 
-# Load the right env file before prebuild/EAS so the slug/bundle IDs match the build target
+# Prefer `bin/expo_prebuild <dev|prod>` to handle env + cache flush automatically.
+# Manual reference: load the right env file before prebuild/EAS so the slug/bundle IDs match.
 source .env.development && (cd mobile && npx expo prebuild --platform android)
 source .env.production && (cd mobile && npx expo prebuild --platform android)
 ```
@@ -169,6 +190,8 @@ npx expo start -c
 ## 📦 Build Commands
 
 ```bash
+
+# Prefer `bin/expo_build <preset>` for builds that already load the shared app env.
 
 # Android .apk (Development)
 eas build --platform android --local --profile development
