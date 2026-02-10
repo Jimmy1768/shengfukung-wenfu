@@ -1,6 +1,7 @@
 module Account
   class BaseController < ApplicationController
     include TempleContext
+    include Account::RegistrationIntent
     layout "account"
 
     helper Forms::LayoutHelper
@@ -128,13 +129,52 @@ module Account
     end
 
     def capture_entry_intent_from_params!
+      registration_ref = params[:registration]
+      registration_ref = nil unless registration_ref.is_a?(String)
+
       intent = {
         temple: params[:temple].presence,
         account_action: params[:account_action].presence,
         offering_slug: params[:offering].presence,
-        registration_reference: params[:registration].presence
+        registration_reference: registration_ref
       }.compact
       store_account_entry_intent!(intent) if intent.present?
+    end
+
+    def find_registration_by_reference(reference_code)
+      return nil if reference_code.blank?
+
+      registration_search_scope.find_by(reference_code:)
+    end
+
+    def resolve_post_login_path
+      intent = (account_entry_intent || {}).deep_symbolize_keys
+      clear_account_entry_intent!
+
+      return account_dashboard_path if intent.blank?
+
+      if intent[:registration_reference].present?
+        if (registration = find_registration_by_reference(intent[:registration_reference]))
+          return account_registration_path(registration)
+        end
+      end
+
+      offering = find_offering_for_intent(intent[:offering_slug], intent[:account_action])
+
+      if offering.present?
+        if (registration = find_registration_for_offering(offering))
+          return account_registration_path(registration)
+        end
+
+        intent_path = new_account_registration_path(
+          temple: intent[:temple].presence || current_temple&.slug,
+          account_action: account_action_for(offering),
+          offering: offering.slug
+        )
+        return intent_path if intent_path
+      end
+
+      account_dashboard_path
     end
   end
 end

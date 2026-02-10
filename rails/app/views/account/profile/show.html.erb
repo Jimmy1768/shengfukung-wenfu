@@ -41,6 +41,7 @@
       <p>新增或更新無法自行登入的成員資訊。</p>
     </div>
     <%= link_to "新增家屬", new_account_dependent_path, class: "pill-link primary" %>
+    <%= link_to "建立支援請求", "#", class: "pill-link secondary", data: { turbo_confirm: "此功能即將推出，請洽寺方。" } %>
   </header>
 
   <% if @dependents.any? %>

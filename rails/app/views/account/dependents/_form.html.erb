@@ -1,4 +1,4 @@
-<%= form_with model: @form, url: request.path, scope: :account_dependent_form, local: true, class: "account-form" do |f| %>
+<%= form_with model: @form, url: request.path, scope: :account_dependent_form, local: true, class: "account-form", builder: Account::DependentForm::DependentFormBuilder do |f| %>
   <%= render "shared/form_errors", form: @form %>
   <div class="form-grid">
     <div class="form-field">

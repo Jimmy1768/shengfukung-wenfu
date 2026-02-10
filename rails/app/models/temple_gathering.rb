@@ -36,6 +36,14 @@ class TempleGathering < ApplicationRecord
     write_metadata_value("hero_asset_id", value.presence)
   end
 
+  def timeline_status
+    today = Date.current
+    return :past if ends_on.present? && ends_on < today
+    return :upcoming if starts_on.present? && starts_on > today
+
+    :ongoing
+  end
+
   private
 
   def metadata_value(key)

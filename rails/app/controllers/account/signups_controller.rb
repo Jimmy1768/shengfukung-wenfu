@@ -4,7 +4,7 @@ module Account
     skip_before_action :verify_authenticity_token, only: :create
 
     before_action :redirect_if_signed_in, only: :new
-    before_action :capture_entry_intent_from_params!, only: :new
+    before_action :capture_entry_intent_from_params!, only: %i[new create]
 
     def new
       redirect_to account_login_path(register: "email")
@@ -14,7 +14,7 @@ module Account
       @registration_form = Account::RegistrationForm.new(registration_params)
       if @registration_form.save
         establish_user_session!(@registration_form.user)
-        redirect_to account_dashboard_path, notice: "Account created."
+        redirect_to resolve_post_login_path, notice: "Account created."
       else
         flash.now[:alert] = "We couldn't create your account yet."
         @show_registration_modal = true

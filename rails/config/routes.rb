@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       get "temples/:slug/events/:event_slug", to: "temple_events#show"
       get "temples/:slug/services", to: "temple_services#index"
       get "temples/:slug/services/:service_slug", to: "temple_services#show"
+      get "temples/:slug/gatherings", to: "temple_gatherings#index"
     end
   end
 
@@ -104,7 +105,7 @@ Rails.application.routes.draw do
     get "/dashboard", to: "dashboard#index", as: :dashboard
     resource :profile, only: %i[show edit update], controller: "profile"
     resources :dependents, except: :show
-    resources :registrations, only: %i[index show edit update]
+    resources :registrations, only: %i[index show edit update new create]
     resources :events, only: :index
     resources :payments, only: :index
 

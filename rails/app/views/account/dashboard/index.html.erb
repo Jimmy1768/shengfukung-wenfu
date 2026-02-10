@@ -11,6 +11,7 @@
     <% @quick_actions.each do |action| %>
       <%= link_to action[:label], action[:url], class: "quick-link-card" %>
     <% end %>
+    <%= link_to "聯絡寺廟", "#", class: "quick-link-card support-link", data: { turbo_confirm: "此功能即將推出，請洽寺廟服務台。" } %>
   </div>
 </section>
 
@@ -28,10 +29,11 @@
     <div class="event-grid">
       <% @registrations.each do |registration| %>
         <article class="event-card">
-          <p class="event-date"><%= l(registration.created_at, format: :short) rescue registration.created_at.strftime("%Y/%m/%d") %></p>
-          <h3><%= registration.temple_offering&.title || registration.reference_code %></h3>
+            <p class="event-date"><%= l(registration.created_at, format: :short) rescue registration.created_at.strftime("%Y/%m/%d") %></p>
+            <h3><%= registration.temple_offering&.title || registration.reference_code %></h3>
           <p class="event-meta"><%= registration.payment_status %></p>
-          <p class="event-notes">證書：<%= registration.certificate_number.presence || "製作中" %></p>
+          <p class="event-notes">報名人：<%= registration.registrant_name %></p>
+          <p class="event-notes">證書：<%= registration.certificate_number.presence || "尚未發放" %></p>
         </article>
       <% end %>
     </div>
@@ -86,6 +88,8 @@
             <th>項目</th>
             <th>金額</th>
             <th>方式</th>
+            <th>狀態</th>
+            <th>下載</th>
           </tr>
         </thead>
         <tbody>
@@ -95,6 +99,14 @@
               <td><%= payment.temple_event_registration&.temple_offering&.title || "—" %></td>
               <td><%= Currency::Symbols.format_amount(payment.amount_cents, payment.currency) %></td>
               <td><%= payment.payment_method.titleize %></td>
+              <td><span class="status-pill status-<%= payment.status %>"><%= payment.status %></span></td>
+              <td>
+                <% if payment.payment_method == "line_pay" %>
+                  <span class="line-pay-placeholder" title="LINE Pay 收據即將推出">收據整理中</span>
+                <% else %>
+                  <span class="muted">紙本支援</span>
+                <% end %>
+              </td>
             </tr>
           <% end %>
         </tbody>

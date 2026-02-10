@@ -5,7 +5,7 @@ module Account
     class RegistrationsController < BaseController
       def index
         registrations = default_registration_scope
-          .includes(:temple_offering)
+          .includes(:registrable)
           .order(created_at: :desc)
           .limit(limit_param)
         render json: {

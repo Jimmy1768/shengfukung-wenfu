@@ -74,5 +74,19 @@ module Account
         "notes" => notes
       }.compact
     end
+
+    class DependentFormBuilder < ActionView::Helpers::FormBuilder
+      def human_attribute_name(attr)
+        {
+          english_name: "姓名",
+          native_name: "中文姓名",
+          relationship_label: "關係",
+          birthdate: "生日",
+          phone: "電話",
+          email: "Email",
+          notes: "備註"
+        }[attr.to_sym] || super
+      end
+    end
   end
 end

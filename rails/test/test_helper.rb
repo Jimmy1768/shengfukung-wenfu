@@ -48,6 +48,8 @@ module TestDataHelpers
         slug: "offering-#{SecureRandom.hex(2)}",
         title: "Test Offering",
         offering_type: "general",
+        starts_on: Date.current,
+        ends_on: Date.current + 1.day,
         price_cents:,
         currency:
       }.merge(attrs)
@@ -58,7 +60,7 @@ module TestDataHelpers
     TempleEventRegistration.create!(
       {
         temple: offering.temple,
-        temple_offering: offering,
+        registrable: offering,
         user:,
         reference_code: "REG-#{SecureRandom.hex(2).upcase}",
         quantity: 1,
@@ -107,8 +109,11 @@ class ActionDispatch::IntegrationTest
     follow_redirect! if response.redirect?
   end
 
-  def sign_in_account(user, password: "Password123!")
-    post account_sessions_path, params: { session: { email: user.email, password: } }
+  def sign_in_account(user, password: "Password123!", temple_slug: nil)
+    request_params = {}
+    request_params[:temple] = temple_slug if temple_slug.present?
+    request_params[:session] = { email: user.email, password: }
+    post account_sessions_path, params: request_params
     follow_redirect! if response.redirect?
   end
 end

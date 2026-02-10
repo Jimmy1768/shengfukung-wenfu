@@ -1,0 +1,69 @@
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow">新增報名</p>
+      <h2><%= @offering.title %></h2>
+      <p>請確認聯絡方式後送出報名，後續可在「我的報名」中更新細節。</p>
+    </div>
+  </header>
+
+  <article class="card">
+    <dl class="detail-list">
+      <div>
+        <dt>寺廟</dt>
+        <dd><%= @offering.temple.name %></dd>
+      </div>
+      <div>
+        <dt>費用</dt>
+        <dd><%= Currency::Symbols.format_amount(@offering.price_cents, @offering.currency) %></dd>
+      </div>
+      <% if @offering.respond_to?(:starts_on) && @offering.starts_on.present? %>
+        <div>
+          <dt>日期</dt>
+          <dd><%= @offering.starts_on %></dd>
+        </div>
+      <% end %>
+    </dl>
+  </article>
+
+  <%= render "shared/form_errors", form: @form %>
+
+  <%= form_with model: @form,
+    url: account_registrations_path(offering: @offering.slug, account_action: @account_action),
+    local: true,
+    class: "form-stack" do |f| %>
+    <div class="field-panel">
+      <%= f.label :quantity, "數量" %>
+      <%= f.number_field :quantity, min: 1, max: 10, required: true %>
+    </div>
+    <div class="field-panel">
+      <%= f.label :contact_name, "聯絡人" %>
+      <%= f.text_field :contact_name, required: true %>
+    </div>
+    <div class="field-panel">
+      <%= f.label :contact_phone, "電話" %>
+      <%= f.telephone_field :contact_phone %>
+    </div>
+    <div class="field-panel">
+      <%= f.label :contact_email, "Email" %>
+      <%= f.email_field :contact_email %>
+    </div>
+    <div class="field-panel">
+      <%= f.label :household_notes, "家庭/同行備註" %>
+      <%= f.text_area :household_notes, rows: 2 %>
+    </div>
+    <div class="field-panel">
+      <%= f.label :arrival_window, "預計抵達時間" %>
+      <%= f.text_field :arrival_window, placeholder: "09:00" %>
+    </div>
+    <div class="field-panel">
+      <%= f.label :ceremony_notes, "其他備註" %>
+      <%= f.text_area :ceremony_notes, rows: 3 %>
+    </div>
+    <%= f.submit "送出報名", class: "btn btn-primary" %>
+  <% end %>
+
+  <p class="muted">
+    送出後可在 <%= link_to "我的報名", account_registrations_path %> 查看狀態或取消。
+  </p>
+</section>

@@ -11,7 +11,7 @@ module Archives
 
     def registrations
       @registrations ||= temple.temple_event_registrations
-        .includes(:temple_offering, :user)
+        .includes(:registrable, :user)
         .where(created_at: year_range)
         .order(created_at: :desc)
     end

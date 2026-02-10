@@ -13,7 +13,7 @@ module Account
       def find_registration
         reference = params[:reference].to_s.upcase
         default_registration_scope
-          .includes(:temple_offering, :temple_payments)
+          .includes(:registrable, :temple_payments)
           .find_by!(reference_code: reference)
       end
     end

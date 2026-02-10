@@ -8,6 +8,7 @@ class TempleEventSerializer
   def as_json(*)
     {
       id: event.id,
+      kind: "event",
       slug: event.slug,
       title: event.title,
       subtitle: event.subtitle,

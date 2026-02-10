@@ -75,9 +75,11 @@ class Temple < ApplicationRecord
 
   def hero_image_for(tab)
     tab_key = tab.to_s
-    hero_media_asset_for(tab_key)&.metadata&.dig("url") ||
-      hero_images[tab_key].presence ||
-      hero_images["home"].presence
+    image_from_map = sanitized_hero_source(hero_images[tab_key], allow_placeholder: tab_key == "home")
+    return image_from_map if image_from_map.present?
+
+    hero_media_asset_for(tab_key)&.metadata&.dig("url").presence ||
+      sanitized_hero_source(hero_images["home"], allow_placeholder: true)
   end
 
   def hero_images_with_fallback
@@ -93,5 +95,15 @@ class Temple < ApplicationRecord
 
   def hero_media_asset_for(tab)
     media_assets.hero.where("metadata ->> 'hero_tab' = ?", tab.to_s).first
+  end
+
+  def sanitized_hero_source(value, allow_placeholder: false)
+    return nil if value.blank?
+    return value if allow_placeholder
+    placeholder_hero?(value) ? nil : value
+  end
+
+  def placeholder_hero?(value)
+    value.to_s.match?(/placehold\.co/i)
   end
 end
