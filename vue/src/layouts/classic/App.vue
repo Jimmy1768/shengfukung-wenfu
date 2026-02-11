@@ -4,19 +4,12 @@ import { useRoute } from 'vue-router';
 
 import SiteHeader from '@/components/site/SiteHeader.vue';
 import SiteFooter from '@/components/site/SiteFooter.vue';
+import DevThemeToggle from '@/components/dev/DevThemeToggle.vue';
 import { useTempleContent } from '@/app/siteContent.js';
-
-const SITE_THEME_ID = 'temple-1';
-
-const applySiteTheme = () => {
-  if (typeof document === 'undefined') return;
-  document.documentElement.dataset.theme = SITE_THEME_ID;
-};
-
-applySiteTheme();
 
 const route = useRoute();
 const siteContent = useTempleContent();
+const isDev = import.meta.env.DEV;
 
 const activeKey = computed(() => {
   // highlight by top-level segment
@@ -45,6 +38,7 @@ const hasError = computed(() => siteContent.status === 'error');
     </main>
 
     <SiteFooter />
+    <DevThemeToggle v-if="isDev" />
   </div>
 </template>
 

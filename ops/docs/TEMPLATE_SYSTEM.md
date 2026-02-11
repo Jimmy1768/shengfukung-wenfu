@@ -6,6 +6,8 @@ This note tracks the plan for supporting multiple Vue layouts + themes per templ
 
 ## Phase 1 – Foundation
 
+**Status:** ✅ Completed – Vue now compiles a single layout per build (`VITE_TEMPLE_LAYOUT`) and locks palette selection via `VITE_TEMPLE_THEME`/`project.defaultThemeKey`. Classic layout + shared components live under `src/layouts/classic`, giving us a concrete template to fork from.
+
 ### Purpose & Scope
 
 - Provide a shared vocabulary for “layout”, “theme”, and “template” so engineering, design, and onboarding refer to the same primitives.
@@ -48,12 +50,35 @@ This note tracks the plan for supporting multiple Vue layouts + themes per templ
 
 ### Phase 1 Checklist
 
-- [ ] Refactor current pages into `src/layouts/classic` + shared components.
-- [ ] Introduce `VITE_TEMPLE_LAYOUT`/`VITE_TEMPLE_THEME` support in the Vue entry point.
-- [ ] Add per-temple layout/theme fields to YAML/env (seed defaults for existing temples).
-- [ ] Document the onboarding flow: choose layout + theme, run `bin/deploy_vue <slug>`, capture screenshots.
-- [ ] (Later) Build a showcase script + account portal UI for requesting layout/theme changes.
-- [ ] Split template tokens from palette tokens so spacing/typography is reusable across themes.
+- [x] Refactor current pages into `src/layouts/classic` + shared components.
+- [x] Introduce `VITE_TEMPLE_LAYOUT`/`VITE_TEMPLE_THEME` support in the Vue entry point.
+- [x] Add per-temple layout/theme fields to `.env`/YAML defaults (documented in `vue/.env.example`).
+
+> Follow-up work on onboarding docs, showcase builds, and token split has moved to Phase 2 so the completed foundation stays focused on structure + build wiring.
+
+---
+
+## Phase 2 – Core Mechanics
+
+### Purpose & Scope
+
+- Describe how templates consume shared assets (design tokens, favicons, localization) so new layouts can be scaffolded without spelunking through the repo.
+- Capture the rendering pipeline from env resolution → `bin/deploy_vue` → CDN assets, including where `sync_design_system.js` and `sync-favicons.mjs` fit in.
+- Provide an end-to-end onboarding recipe (choose layout/theme, update YAML/env, deploy, capture screenshots) for Ops + Design.
+
+### Focus Areas
+
+1. **Template directory shape** – document the layout folder contract (`src/layouts/<id>/App.vue`, `pages/`, shared components) plus guidance on when to fork vs. extend the classic template.
+2. **Rendering + data flow** – illustrate how `useTempleContent`, `project.json`, and localized copy (`rails/config/locales/admin.en.yml`) feed layouts so content stays consistent across templates.
+3. **Build + sync tooling** – outline how `bin/sync_design_system.js` refreshes tokens (`shared/design-system/themes.json`, `vue/src/styles/tokens.css`) and how favicons/demo assets sync before a deploy.
+
+### Phase 2 Checklist
+
+- [x] Write the onboarding flow doc (layout/theme selection, `bin/load_temple_env`, `bin/deploy_vue`, screenshots for approval). (See `ops/docs/ONBOARDING.md` → “Template + Theme selection”.)
+- [ ] Build a showcase/build script that compiles each layout against demo data for marketing previews.
+- [x] Split template tokens (spacing/typography/radius) from palette tokens so layouts can mix/match without duplicating color files. (`shared/design-system/templates.json` + updated `bin/sync_design_system.js`.)
+- [ ] Gate Dev Theme Toggle + layout previews so they only surface template-ready palettes (keep marketing palettes hidden from real builds).
+- [ ] Draft acceptance criteria for adding layout choices to the account portal (handoff to Phase 3 once API/UI scope is ready).
 
 ---
 

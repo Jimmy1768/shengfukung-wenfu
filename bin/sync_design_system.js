@@ -12,19 +12,34 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
-const CONFIG_PATH = path.join(ROOT, 'shared', 'design-system', 'themes.json');
+const THEME_CONFIG_PATH = path.join(ROOT, 'shared', 'design-system', 'themes.json');
+const TEMPLATE_CONFIG_PATH = path.join(ROOT, 'shared', 'design-system', 'templates.json');
 
-if (!fs.existsSync(CONFIG_PATH)) {
-  console.error(`Theme config not found at ${CONFIG_PATH}`);
+if (!fs.existsSync(THEME_CONFIG_PATH)) {
+  console.error(`Theme config not found at ${THEME_CONFIG_PATH}`);
   process.exit(1);
 }
 
-const config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
-const { defaultTheme, themes } = config;
+if (!fs.existsSync(TEMPLATE_CONFIG_PATH)) {
+  console.error(`Template config not found at ${TEMPLATE_CONFIG_PATH}`);
+  process.exit(1);
+}
+
+const themeConfig = JSON.parse(fs.readFileSync(THEME_CONFIG_PATH, 'utf8'));
+const templateConfig = JSON.parse(fs.readFileSync(TEMPLATE_CONFIG_PATH, 'utf8'));
+const { defaultTheme, themes } = themeConfig;
+const { defaultTemplate, templates } = templateConfig;
 
 if (!defaultTheme || !themes[defaultTheme]) {
   console.error(
     `defaultTheme "${defaultTheme}" is missing or not defined inside shared/design-system/themes.json`
+  );
+  process.exit(1);
+}
+
+if (!defaultTemplate || !templates[defaultTemplate]) {
+  console.error(
+    `defaultTemplate "${defaultTemplate}" is missing or not defined inside shared/design-system/templates.json`
   );
   process.exit(1);
 }
@@ -56,12 +71,31 @@ const renderThemeCss = (id, themeConfig) => {
   return `${selectors.join(', ')} {\n${lines.join('\n')}\n}\n`;
 };
 
+const renderTemplateCss = (id, templateConfig) => {
+  const selectors = [`:root[data-template="${id}"]`, `[data-template="${id}"]`];
+  if (id === defaultTemplate) {
+    selectors.unshift(':root');
+  }
+
+  const lines = Object.entries(templateConfig.tokens).map(
+    ([key, value]) => `  ${toCssVar(key)}: ${value};`
+  );
+
+  return `${selectors.join(', ')} {\n${lines.join('\n')}\n}\n`;
+};
+
 const cssHeader =
   '/* Auto-generated via bin/sync_design_system.js. Do not edit directly. */\n\n';
 
-const cssBody = Object.entries(themes)
-  .map(([id, themeConfig]) => renderThemeCss(id, themeConfig))
+const cssThemeBody = Object.entries(themes)
+  .map(([id, cfg]) => renderThemeCss(id, cfg))
   .join('\n');
+
+const cssTemplateBody = Object.entries(templates)
+  .map(([id, cfg]) => renderTemplateCss(id, cfg))
+  .join('\n');
+
+const cssBody = `${cssThemeBody}\n/* Template tokens */\n\n${cssTemplateBody}`;
 
 const cssTargets = [
   path.join(ROOT, 'vue', 'src', 'styles', 'tokens.css'),

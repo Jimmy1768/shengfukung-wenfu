@@ -66,7 +66,7 @@ function handleSelect(id) {
 }
 
 .dev-theme-button.active {
-  background: #d39b39;
+  background: #b87a1a;
   color: #fff;
   border-color: transparent;
 }

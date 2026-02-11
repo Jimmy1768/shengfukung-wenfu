@@ -186,7 +186,8 @@ const accountLoginUrl = buildAccountLoginUrl();
 }
 
 .nav-link.on {
-  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+  color: var(--accent);
   opacity: 1;
   font-weight: 700;
 }

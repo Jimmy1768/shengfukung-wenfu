@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "refactor theme/template system"
+git commit -m "refactor theme/template system complete"
 git push
 
 git reset --hard HEAD

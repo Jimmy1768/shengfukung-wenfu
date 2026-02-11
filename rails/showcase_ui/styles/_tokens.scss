@@ -17,27 +17,18 @@
   --warning: #f3a712;
   --success: #3b7f4e;
   --shadow-soft: 0 18px 40px rgba(88, 54, 25, 0.15);
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 0.85rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2.5rem;
-  --font-family-sans: "Noto Sans TC", "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 :root[data-theme="temple-2"], [data-theme="temple-2"] {
   color-scheme: light;
   --theme-id: "temple-2";
-  --surface: #f7f3eb;
+  --surface: #fffefa;
   --surface-raised: #ffffff;
-  --surface-muted: #e8e2d6;
-  --border: #d7cbb6;
-  --text: #0f172a;
-  --text-muted: #4c536c;
-  --primary: #d39b39;
+  --surface-muted: #f3ead8;
+  --border: #d3c0a3;
+  --text: #070c14;
+  --text-muted: #3f4656;
+  --primary: #f5c15f;
   --primary-foreground: #0b0f1d;
   --accent: #153252;
   --accent-foreground: #f6f1e3;
@@ -45,15 +36,6 @@
   --warning: #fbbf24;
   --success: #10b981;
   --shadow-soft: 0 20px 60px rgba(15, 23, 42, 0.12);
-  --radius-sm: 8px;
-  --radius-md: 18px;
-  --radius-lg: 26px;
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 0.75rem;
-  --spacing-lg: 1.25rem;
-  --spacing-xl: 2rem;
-  --font-family-sans: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 :root[data-theme="golden-default"], [data-theme="golden-default"] {
@@ -73,15 +55,6 @@
   --warning: #facc15;
   --success: #4ade80;
   --shadow-soft: 0 35px 90px rgba(4, 12, 24, 0.65);
-  --radius-sm: 8px;
-  --radius-md: 18px;
-  --radius-lg: 26px;
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 0.75rem;
-  --spacing-lg: 1.25rem;
-  --spacing-xl: 2rem;
-  --font-family-sans: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 :root[data-theme="golden-light"], [data-theme="golden-light"] {
@@ -101,15 +74,6 @@
   --warning: #fbbf24;
   --success: #10b981;
   --shadow-soft: 0 20px 60px rgba(15, 23, 42, 0.12);
-  --radius-sm: 8px;
-  --radius-md: 18px;
-  --radius-lg: 26px;
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 0.75rem;
-  --spacing-lg: 1.25rem;
-  --spacing-xl: 2rem;
-  --font-family-sans: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 :root[data-theme="golden-dark"], [data-theme="golden-dark"] {
@@ -129,13 +93,18 @@
   --warning: #facc15;
   --success: #34d399;
   --shadow-soft: 0 35px 90px rgba(1, 8, 18, 0.75);
+}
+
+/* Template tokens */
+
+:root, :root[data-template="classic"], [data-template="classic"] {
   --radius-sm: 8px;
-  --radius-md: 18px;
-  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
-  --spacing-md: 0.75rem;
-  --spacing-lg: 1.25rem;
-  --spacing-xl: 2rem;
-  --font-family-sans: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --spacing-md: 0.85rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2.5rem;
+  --font-family-sans: "Noto Sans TC", "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }

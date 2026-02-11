@@ -1,15 +1,21 @@
 import { defaultThemeId, themes } from '@/theme/themes.js';
+import project from '@/app/project.js';
 
 const THEME_COOKIE = 'temple_theme';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 1 week
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') || 'http://localhost:3001';
 
-let activeThemeKey = defaultThemeId;
+const BUILD_THEME_KEY =
+  import.meta.env.VITE_TEMPLE_THEME ||
+  project.defaultThemeKey ||
+  defaultThemeId;
+
+let activeThemeKey = BUILD_THEME_KEY;
 
 export function initTheme() {
-  const stored = readThemeCookie();
-  const resolved = themes[stored] ? stored : defaultThemeId;
+  const stored = import.meta.env.DEV ? readThemeCookie() : null;
+  const resolved = themes[stored] ? stored : BUILD_THEME_KEY;
   applyTheme(resolved);
 }
 
@@ -18,9 +24,11 @@ export function getActiveThemeKey() {
 }
 
 export function setThemeKey(themeKey) {
-  const resolved = themes[themeKey] ? themeKey : defaultThemeId;
+  const resolved = themes[themeKey] ? themeKey : BUILD_THEME_KEY;
   applyTheme(resolved);
-  writeThemeCookie(resolved);
+  if (import.meta.env.DEV) {
+    writeThemeCookie(resolved);
+  }
 }
 
 export function availableThemes() {

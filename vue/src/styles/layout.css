@@ -8,9 +8,9 @@
 
 .section.alt,
 .section.section-alt {
-  background: color-mix(in srgb, var(--surface-muted) 75%, transparent);
-  border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  background: color-mix(in srgb, var(--surface-muted) 35%, var(--surface));
+  border-top: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
 }
 
 .wrap {

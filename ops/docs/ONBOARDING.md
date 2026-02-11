@@ -20,6 +20,22 @@ Use this when you need representative data locally or on staging:
 > - Load a specific temple’s secrets by prefixing any command with `bin/load_temple_env <slug> -- <command>`. Example: `bin/load_temple_env shenfukung-wenfu -- (cd rails && bundle exec rails server -p 3001)`.
 > - The loader sources `.env`, `.env.<env>`, then `etc/default/<slug>.env` (falling back to `.env.development`), so Vue/Expo builds and Rails share the exact same credential set for the active temple.
 
+### Template + Theme selection
+
+- Create `etc/default/<slug>.env` from your local `.env.development` and set the following keys before any build:
+  ```
+  VITE_TEMPLE_SLUG=<slug>
+  VITE_TEMPLE_LAYOUT=classic
+  VITE_TEMPLE_THEME=temple-1
+  ```
+  Layout defaults to `classic` until new templates are shipped; themes map to palette IDs defined in `shared/design-system/themes.json`.
+- Run Vue/Rails/Expo commands through `bin/load_temple_env <slug> -- …` so the same env file powers every surface. Example: `bin/load_temple_env shenfukung-wenfu -- (cd vue && npm run build)`.
+- When onboarding a new temple, confirm the slug + theme combo works locally:
+  1. `bin/load_temple_env <slug> -- (cd vue && npm install && npm run dev)`
+  2. Visit `http://localhost:5173` and verify copy/assets match the expected temple.
+  3. Repeat with another palette (`VITE_TEMPLE_THEME=temple-2`) to capture approval screenshots. Layout should remain identical; only tokens change.
+- Document the chosen layout/theme in the temple’s YAML or ops checklist so future deploys keep the same combo.
+
 1. **Author profile YAML**
    - Copy `rails/db/temples/shenfukung-wenfu.yml` as a starting point.
    - Set `slug`, `name`, `contact`, `service_times`, and optional hero/about/meta copy.
