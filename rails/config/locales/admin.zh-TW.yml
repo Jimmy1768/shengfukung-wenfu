@@ -1,11 +1,5 @@
 zh-TW:
   admin:
-    nav:
-      items:
-        offerings:
-          label: "供品管理"
-        gatherings:
-          label: "社群聚會"
     navigation:
       dashboard: "儀表板"
       temple_profile: "宮廟資料"
@@ -184,10 +178,10 @@ zh-TW:
           label: "最新消息"
         gallery_entries:
           label: "活動回顧"
-        events:
-          label: "活動管理"
-        services:
-          label: "服務管理"
+        gatherings:
+          label: "社群聚會"
+        offerings:
+          label: "供品管理"
         orders:
           label: "報名 / 訂單"
         payments:

@@ -26,8 +26,8 @@ const englishName = computed(() => siteContent.data?.englishName || project.engl
 
         <div class="col">
           <div class="title">快速連結</div>
-          <router-link class="link" to="/events">近期活動</router-link>
-          <router-link class="link" to="/services">參拜 / 服務</router-link>
+          <router-link class="link" to="/events">法會供品</router-link>
+          <router-link class="link" to="/services">祈福供品</router-link>
           <router-link class="link" to="/contact">交通 / 聯絡</router-link>
         </div>
 

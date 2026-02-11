@@ -15,10 +15,10 @@ const offerings = computed(() => {
   return serviceList.value.map((service) => ({
     slug: service.slug,
     title: service.title,
-    description: service.description || '此服務的詳細說明將在近期更新。',
+    description: service.description || '祈福供品的詳細說明將在近期更新。',
     price: formatCurrency(service.price_cents, service.currency),
-    period: service.period_label || '長期服務',
-    status: service.available_from ? '開放中' : '常態服務',
+    period: service.period_label || '長期祈福',
+    status: service.available_from ? '開放中' : '常態祈福',
     ctaHref: buildRegistrationLink('service', service.slug)
   }));
 });
@@ -29,14 +29,14 @@ const hasOfferings = computed(() => offerings.value.length > 0);
 <template>
   <div>
     <PageHero
-      title="參拜 / 服務"
-      subtitle="展示目前開放的 offerings（線上或現場服務），含檔期與費用。"
+      title="祈福供品"
+      subtitle="展示目前開放的祈福供品（線上或現場服務），含檔期與費用。"
       :image-url="heroImage"
     />
 
     <section class="section">
       <div class="wrap">
-        <SectionTitle title="服務項目" subtitle="由後台 offerings 管理，可依檔期即時更新。" />
+        <SectionTitle title="祈福供品" subtitle="由後台供奉項目管理，可依檔期即時更新。" />
 
         <div v-if="hasOfferings" class="grid">
           <SimpleCard
@@ -54,7 +54,7 @@ const hasOfferings = computed(() => offerings.value.length > 0);
           </SimpleCard>
         </div>
         <div v-else class="empty">
-          目前沒有公開的服務項目，請稍後再查看或直接聯絡廟方。
+          目前沒有公開的祈福供品，請稍後再查看或直接聯絡廟方。
         </div>
       </div>
     </section>

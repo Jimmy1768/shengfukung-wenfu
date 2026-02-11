@@ -1,11 +1,5 @@
 en:
   admin:
-    nav:
-      items:
-        offerings:
-          label: "Offerings"
-        gatherings:
-          label: "Gatherings"
     navigation:
       dashboard: "Dashboard"
       temple_profile: "Temple Profile"
@@ -184,10 +178,10 @@ en:
           label: "News"
         gallery_entries:
           label: "Gallery"
-        events:
-          label: "Events"
-        services:
-          label: "Services"
+        gatherings:
+          label: "Gatherings"
+        offerings:
+          label: "Offerings"
         orders:
           label: "Orders"
         payments:

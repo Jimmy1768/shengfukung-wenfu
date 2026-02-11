@@ -29,30 +29,30 @@ const eventCount = computed(() => eventList.value?.length || 0);
 const emptyStateMessage = computed(() =>
   eventCount.value
     ? ''
-    : '目前沒有開放的活動，請稍後再查看或關注最新消息。'
+    : '目前沒有開放的法會供品，請稍後再查看或關注最新消息。'
 );
 
 const hintMessage = computed(() => {
   if (!eventCount.value) {
     return statusLabel('upcoming');
   }
-  return `共有 ${eventCount.value} 檔活動進行中或即將開始。`;
+  return `共有 ${eventCount.value} 檔法會供品進行中或即將開始。`;
 });
 </script>
 
 <template>
   <div>
     <PageHero
-      title="活動 / 法會"
-      subtitle="未登入也能瀏覽活動；登入後可報名與付款（稍後接 Rails）。"
+      title="法會供品"
+      subtitle="未登入也能瀏覽法會供品；登入後可報名與付款（稍後接 Rails）。"
       :image-url="heroImage"
     />
 
     <section class="section">
       <div class="wrap">
         <SectionTitle
-          title="近期活動"
-          subtitle="活動資訊由後台 offerings 管理，顯示目前開放或即將開放的檔期。"
+          title="近期法會供品"
+          subtitle="法會供品資訊由後台供奉項目管理，顯示目前開放或即將開放的檔期。"
         />
         <div v-if="normalizedEvents.length" class="grid">
           <EventCard v-for="event in normalizedEvents" :key="event.slug" :item="event" />
@@ -60,7 +60,7 @@ const hintMessage = computed(() => {
         <div v-else class="empty">{{ emptyStateMessage }}</div>
 
         <div class="hint">
-          活動進度：{{ hintMessage }}
+          法會供品進度：{{ hintMessage }}
         </div>
       </div>
     </section>

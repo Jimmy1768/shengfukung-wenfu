@@ -31,12 +31,12 @@ const defaultLocation = computed(
 );
 
 const title = computed(
-  () => eventData.value?.title || `活動詳情（${slug.value}）`
+  () => eventData.value?.title || `法會供品詳情（${slug.value}）`
 );
 const summary = computed(
   () =>
     eventData.value?.description ||
-    '這裡會顯示活動內容、名額與聯絡方式。'
+    '這裡會顯示法會供品的內容、名額與聯絡方式。'
 );
 
 const schedule = computed(() =>
@@ -122,16 +122,16 @@ watch(
 
     <section class="section">
       <div class="wrap">
-        <div v-if="loading" class="event-state">載入活動資訊中…</div>
+        <div v-if="loading" class="event-state">載入法會供品資訊中…</div>
         <div v-else-if="loadError" class="event-state error">
-          取得活動資料時發生錯誤，請稍後再試。
+          取得法會供品資料時發生錯誤，請稍後再試。
         </div>
         <div v-else-if="!eventData" class="event-state">
-          找不到此活動，請返回活動列表。
+          找不到此法會供品，請返回列表。
         </div>
         <template v-else>
           <div class="grid">
-            <SimpleCard title="活動資訊">
+            <SimpleCard title="法會供品資訊">
               <div class="kv">
                 <template v-for="item in detailsList" :key="item.label">
                   <div class="k">{{ item.label }}</div>
@@ -139,9 +139,9 @@ watch(
                 </template>
               </div>
             </SimpleCard>
-            <SimpleCard title="報名 / 服務">
+            <SimpleCard title="報名 / 供奉指引">
               <div class="info">
-                <p>此頁面展示 offerings（服務/檔期）資訊，線上報名與付款將在下一階段開放。</p>
+                <p>此頁面展示法會供品資訊，線上報名與付款將在下一階段開放。</p>
                 <p v-if="metadataNotes">{{ metadataNotes }}</p>
                 <router-link class="link" to="/contact">聯絡廟方 / 交通資訊 →</router-link>
               </div>
@@ -150,7 +150,7 @@ watch(
 
           <div class="sp" />
 
-          <SectionTitle title="活動內容" subtitle="文字說明與注意事項將同步後台設定。" />
+          <SectionTitle title="供品內容" subtitle="文字說明與注意事項將同步後台設定。" />
           <div class="article">
             <p>{{ summary }}</p>
             <p v-if="metadataNotes">{{ metadataNotes }}</p>

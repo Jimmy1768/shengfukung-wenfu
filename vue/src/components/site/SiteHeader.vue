@@ -25,10 +25,10 @@ watch(active, () => closeMenu());
 const navItems = [
   { key: 'home', label: '首頁', to: '/' },
   { key: 'about', label: '關於', to: '/about' },
-  { key: 'events', label: '活動', to: '/events' },
-  { key: 'archive', label: '回顧', to: '/archive' },
+  { key: 'events', label: '法會供品', to: '/events' },
+  { key: 'archive', label: '供品回顧', to: '/archive' },
   { key: 'news', label: '消息', to: '/news' },
-  { key: 'services', label: '服務', to: '/services' },
+  { key: 'services', label: '祈福供品', to: '/services' },
   { key: 'contact', label: '聯絡', to: '/contact' },
 ];
 
@@ -80,7 +80,7 @@ const brandTagline = computed(
       </nav>
 
       <div class="actions">
-        <router-link class="btn cta" to="/events">活動報名</router-link>
+        <router-link class="btn cta" to="/events">法會供品報名</router-link>
       </div>
     </div>
   </header>

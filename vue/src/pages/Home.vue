@@ -27,7 +27,7 @@ const heroTitle = computed(
 const heroSubtitle = computed(
   () =>
     siteContent.data?.hero_copy ||
-    `用清楚的方式呈現 ${project.name} 的活動、服務與公告；讓長輩也能快速找到時間、地點、方式。`
+    `用清楚的方式呈現 ${project.name} 的法會供品、祈福供品與公告；讓長輩也能快速找到時間、地點、方式。`
 );
 
 const contactInfo = computed(
@@ -94,15 +94,15 @@ const latestNews = computed(() =>
       :title="heroTitle"
       :subtitle="heroSubtitle"
       :image-url="heroImage"
-      ctaText="查看近期活動"
+      ctaText="查看法會供品"
       ctaTo="/events"
     />
 
     <section class="section">
       <div class="wrap">
         <SectionTitle
-          title="近期活動 / 法會"
-          subtitle="活動列表公開可見；登入後可報名（之後接 OAuth + Rails）。"
+          title="法會供品速覽"
+          subtitle="列表公開可見；登入後可報名（之後接 OAuth + Rails）。"
         />
 
         <div class="grid">
@@ -110,7 +110,7 @@ const latestNews = computed(() =>
         </div>
 
         <div class="more">
-          <router-link class="link" to="/events">查看全部活動 →</router-link>
+          <router-link class="link" to="/events">查看全部法會供品 →</router-link>
         </div>
       </div>
     </section>
