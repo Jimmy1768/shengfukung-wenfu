@@ -2,35 +2,38 @@ zh-TW:
   admin:
     nav:
       items:
+        dashboard:
+          label: "儀表板"
+        temple_profile:
+          label: "宮廟資料"
+        news_posts:
+          label: "最新消息"
+        gallery_entries:
+          label: "活動回顧"
         offerings:
-          label: "供品管理"
+          label: "供奉項目"
         gatherings:
-          label: "社群聚會"
-    navigation:
-      dashboard: "儀表板"
-      temple_profile: "宮廟資料"
-      profile: "宮廟資料"
-      news_posts: "最新消息"
-      news: "最新消息"
-      gallery_entries: "活動回顧"
-      gallery: "活動回顧"
-      offerings: "供品管理"
-      gatherings: "社群聚會"
-      orders: "報名 / 訂單"
-      payments: "收款資料"
-      patrons: "信眾與管理員"
-      archives: "封存 / 年度資料"
-      permissions: "管理員權限"
+          label: "社群活動"
+        orders:
+          label: "報名 / 訂單"
+        payments:
+          label: "收款資料"
+        patrons:
+          label: "信眾與管理員"
+        archives:
+          label: "封存 / 年度資料"
+        permissions:
+          label: "管理員權限"
     filters:
       search:
         label: "搜尋"
         placeholder: "輸入信眾姓名、Email 或訂單編號"
       offering:
-        label: "供品 / 聚會"
-        all: "全部供品"
-        event_prefix: "活動"
-        service_prefix: "服務"
-        gathering_prefix: "聚會"
+        label: "供奉項目 / 社群活動"
+        all: "全部供奉項目"
+        event_prefix: "法會供品"
+        service_prefix: "祈福供品"
+        gathering_prefix: "社群活動"
       payment_method:
         label: "付款方式"
         all: "全部方式"
@@ -74,7 +77,7 @@ zh-TW:
         created_patron: "已建立 %{name} 並選取。"
         no_patron: "尚未選擇信眾。"
         dependents: "列出同戶成員或關係說明。"
-        unit_price: "若留白即使用供品預設金額。"
+        unit_price: "若留白即使用供奉項目預設金額。"
         manual_user_id: "若無法使用搜尋，可輸入信眾 ID。"
         save_additional: "保留原本預設值，並把此輸入存成另一個可選項。"
       fields:
@@ -143,7 +146,7 @@ zh-TW:
       fields:
         title: "名稱"
         slug: "識別碼"
-        offering_type: "供品類別"
+        offering_type: "供奉項目類別"
         period: "檔期"
         certificate_prefix: "證書字首"
         certificate_hint: "證書說明"
@@ -159,7 +162,7 @@ zh-TW:
         certificate: "設定證書的編碼邏輯與標籤。"
         logistics: "這些指引會顯示在工作人員的報名表上。"
       actions:
-        save: "儲存供品"
+        save: "儲存供奉項目"
     language_selector:
       label: "介面語言"
       apply: "套用"
@@ -184,10 +187,14 @@ zh-TW:
           label: "最新消息"
         gallery_entries:
           label: "活動回顧"
+        offerings:
+          label: "供奉項目"
+        gatherings:
+          label: "社群活動"
         events:
-          label: "活動管理"
+          label: "法會供品"
         services:
-          label: "服務管理"
+          label: "祈福供品"
         orders:
           label: "報名 / 訂單"
         payments:
@@ -244,7 +251,7 @@ zh-TW:
         back_to_list: "回到信眾名單"
         print: "列印"
         table:
-          offering: "供品 / 活動"
+          offering: "供奉項目 / 社群活動"
           status: "狀態"
           amount: "金額"
           created: "建立時間"
@@ -265,7 +272,7 @@ zh-TW:
         title: "下一步"
         subtitle: "快速完成宮廟上線時會用到的幾個任務。"
         fill_profile: "前往填寫宮廟資料 →"
-        setup_offerings: "發佈第一個活動或服務"
+        setup_offerings: "發佈第一個法會供品或祈福供品"
         promote_admin_from_patron: "從信眾名單挑選並建立管理員"
         manage_permissions: "檢視並調整管理員權限"
         complete_heading: "恭喜！"
@@ -278,7 +285,7 @@ zh-TW:
       sections:
         basics:
           title: "基本資訊"
-          subtitle: "顯示在 Vue 首頁的抬頭與頁尾。"
+          subtitle: "顯示在官網首頁與頁尾的基本資訊。"
         about:
           title: "關於本廟內容"
           subtitle: "設定關於頁的副標與沿革、主祀、參拜禮儀說明。"
@@ -388,44 +395,45 @@ zh-TW:
       empty: "尚未建立任何公告。"
     offerings:
       index:
-        title: "供品管理"
-        new_button: "新增供品"
-        view_archived: "查看封存供品"
-        view_active: "返回現用供品"
+        title: "供奉項目管理"
+        new_button: "新增供奉項目"
+        view_archived: "查看封存供奉項目"
+        view_active: "返回現用供奉項目"
         table:
           title: "名稱"
           type: "類別"
           price: "金額"
           status: "狀態"
+          updated: "更新時間"
           view: "檢視"
           orders: "訂單"
           actions: "操作"
-        empty: "尚未建立任何供品，請點選上方按鈕建立。"
-        archived_empty: "目前沒有封存的供品。"
+        empty: "尚未建立任何供奉項目，請點選上方按鈕建立。"
+        archived_empty: "目前沒有封存的供奉項目。"
       statuses:
         draft: "草稿"
         published: "已發布"
         archived: "封存"
       types:
-        general: "一般"
+        general: "一般供奉"
         lamp: "點燈"
-        ritual: "法會"
+        ritual: "法會供品"
         donation: "捐獻"
         table: "供桌"
       new:
-        title: "新增供品"
-        template_open: "挑選供品模板"
+        title: "新增供奉項目"
+        template_open: "挑選供奉項目模板"
         template_change: "更換模板"
-        template_modal_title: "選擇供品模板"
+        template_modal_title: "選擇供奉項目模板"
         template_close: "關閉模板清單"
         template_use: "套用此模板"
         template_period: "預設檔期：%{period}"
         template_selected: "目前使用模板：%{name}"
-        template_prompt: "請先選擇模板再填寫供品欄位。"
+        template_prompt: "請先選擇模板再填寫供奉項目欄位。"
       validation:
         required_message: "請填寫此欄位。"
       edit:
-        title: "編輯供品"
+        title: "編輯供奉項目"
       show:
         type: "類別"
         period: "檔期"
@@ -433,12 +441,12 @@ zh-TW:
         schedule: "時程"
         schedule_flexible: "彈性"
         manage_registrations: "管理報名"
-        edit_offering: "編輯供品"
+        edit_offering: "編輯供奉項目"
     events:
       index:
-        title: "法會 / 活動"
-        body: "設定即將到來的法會、禮懺、共修與節慶。"
-        new_button: "建立活動"
+        title: "法會供品"
+        body: "設定即將到來的法會供品，如禮懺、共修與節慶。"
+        new_button: "建立法會供品"
         table:
           title: "名稱"
           schedule: "檔期"
@@ -452,18 +460,18 @@ zh-TW:
         published: "已發布"
         archived: "封存"
       new:
-        title: "建立活動"
+        title: "建立法會供品"
         body: "從模板載入欄位，保持證書／物流設定一致。"
-        template_open: "選擇活動模板"
+        template_open: "選擇法會供品模板"
         template_change: "更換模板"
-        template_modal_title: "選擇活動模板"
+        template_modal_title: "選擇法會供品模板"
         template_close: "關閉"
         template_use: "使用此模板"
         template_period: "預設檔期：%{period}"
         template_selected: "已選擇：%{name}"
         template_prompt: "請先挑選模板再開始編輯。"
       edit:
-        title: "編輯活動"
+        title: "編輯法會供品"
       show:
         type: "類型"
         price: "金額"
@@ -475,7 +483,7 @@ zh-TW:
         capacity: "名額"
         capacity_open: "不限名額"
         manage_registrations: "管理報名"
-        edit_event: "編輯活動"
+        edit_event: "編輯法會供品"
       form:
         sections:
           basics: "基本資訊"
@@ -495,9 +503,9 @@ zh-TW:
           status: "狀態"
     services:
       index:
-        title: "供燈 / 供桌 / 祈福服務"
-        body: "管理常態性服務，如點燈、供桌、疏文或代念。"
-        new_button: "建立服務"
+        title: "祈福供品"
+        body: "管理常態性祈福供品，如點燈、供桌、疏文或代念。"
+        new_button: "建立祈福供品"
         table:
           title: "名稱"
           period: "檔期"
@@ -511,18 +519,18 @@ zh-TW:
         published: "已發布"
         archived: "封存"
       new:
-        title: "建立服務"
+        title: "建立祈福供品"
         body: "從模板載入欄位，保持表單設定一致。"
-        template_open: "選擇服務模板"
+        template_open: "選擇祈福供品模板"
         template_change: "更換模板"
-        template_modal_title: "選擇服務模板"
+        template_modal_title: "選擇祈福供品模板"
         template_close: "關閉"
         template_use: "使用此模板"
         template_period: "預設檔期：%{period}"
         template_selected: "已選擇：%{name}"
         template_prompt: "請先挑選模板再開始編輯。"
       edit:
-        title: "編輯服務"
+        title: "編輯祈福供品"
       show:
         type: "類型"
         price: "金額"
@@ -533,7 +541,7 @@ zh-TW:
         quantity_limit: "數量限制"
         quantity_unlimited: "不限數量"
         manage_registrations: "管理訂單"
-        edit_service: "編輯服務"
+        edit_service: "編輯祈福供品"
       form:
         sections:
           basics: "基本資訊"
@@ -594,7 +602,7 @@ zh-TW:
         table_title: "最新紀錄"
         table_heading: "現場報名列表"
         table_body: "最新填報會列在這裡，方便稽核。"
-        empty: "這個供品尚未建立現場報名。"
+        empty: "這個供奉項目尚未建立現場報名。"
         table:
           reference: "編號"
           user: "信眾"
@@ -606,7 +614,7 @@ zh-TW:
     gallery_entries:
       index:
         title: "活動回顧"
-        body: "於此紀錄過往大型活動與聚會，方便分享照片或影片。"
+        body: "於此紀錄過往大型法會與社群活動，方便分享照片或影片。"
       new:
         title: "新增活動回顧"
         body: "輸入標題、簡介與照片 / 影片。"
@@ -628,14 +636,14 @@ zh-TW:
         save: "儲存"
     gatherings:
       index:
-        title: "社群聚會"
-        body: "管理未套用供品模板、但仍需運用報名與收款流程的交流聚會。"
+        title: "社群活動"
+        body: "管理未套用供奉項目模板、但仍需運用報名與收款流程的社群活動。"
       new:
-        title: "新增聚會"
-        body: "輸入聚會主題、時間與現場備註。"
+        title: "新增社群活動"
+        body: "輸入社群活動主題、時間與現場備註。"
       edit:
-        title: "編輯聚會"
-        body: "更新聚會文案、時程、費用或地點。"
+        title: "編輯社群活動"
+        body: "更新社群活動文案、時程、費用或地點。"
       table:
         title: "標題"
         schedule: "時程"
@@ -648,7 +656,7 @@ zh-TW:
         subtitle: "副標題"
         description: "敘述"
         hero_image_url: "主視覺網址"
-        free_gathering: "此聚會免費參加"
+        free_gathering: "此社群活動免費參加"
         starts_on: "開始日期"
         ends_on: "結束日期"
         start_time: "開始時間"
@@ -670,7 +678,7 @@ zh-TW:
         published: "已發布"
         archived: "封存"
       actions:
-        new: "新增聚會"
+        new: "新增社群活動"
         save: "儲存"
         cancel: "取消"
         view: "檢視"
@@ -681,19 +689,19 @@ zh-TW:
         edit: "編輯"
         delete: "刪除"
       notices:
-        created: "聚會已建立。"
-        updated: "聚會已更新。"
-        deleted: "聚會已刪除。"
-        archived: "聚會已封存。"
-        delete_restricted: "此聚會已有報名紀錄，無法刪除。"
+        created: "社群活動已建立。"
+        updated: "社群活動已更新。"
+        deleted: "社群活動已刪除。"
+        archived: "社群活動已封存。"
+        delete_restricted: "此社群活動已有報名紀錄，無法刪除。"
       errors:
         invalid_asset: "無法使用這個上傳檔案，請重新上傳。"
       confirmations:
-        delete: "確定要刪除這個聚會嗎？"
-        archive: "確定要封存這個聚會嗎？（原有報名仍保留於報表）"
+        delete: "確定要刪除這個社群活動嗎？"
+        archive: "確定要封存這個社群活動嗎？（原有報名仍保留於報表）"
       form:
         errors: "%{count} 項問題需要修正"
-      empty: "尚未建立任何聚會。"
+      empty: "尚未建立任何社群活動。"
     payments:
       index:
         eyebrow: "收款"
@@ -707,9 +715,9 @@ zh-TW:
           payments_logged: "紀錄筆數"
         breakdowns:
           eyebrow: "分類總覽"
-          title: "依付款方式／供品／日期"
+          title: "依付款方式／供奉項目／日期"
           by_method: "依付款方式"
-          by_offering: "依供品"
+          by_offering: "依供奉項目"
           by_date: "依日期"
         recent:
           eyebrow: "最新紀錄"
@@ -717,7 +725,7 @@ zh-TW:
         table:
           reference: "編號"
           patron: "信眾"
-          offering: "供品"
+          offering: "供奉項目"
           method: "付款方式"
           amount: "金額"
           status: "狀態"
@@ -727,7 +735,7 @@ zh-TW:
           view: "檢視"
       filters:
         title: "篩選付款"
-        subtitle: "可依信眾、供品、付款方式或自訂日期區間搜尋。"
+        subtitle: "可依信眾、供奉項目、付款方式或自訂日期區間搜尋。"
         default_window_hint: "預設僅顯示最近 90 天，如需查看更多請輸入日期區間。"
       statuses:
         pending: "待處理"
@@ -769,7 +777,7 @@ zh-TW:
           table:
             date: "日期"
             reference: "編號"
-            offering: "供品"
+            offering: "供奉項目"
             patron: "信眾"
             status: "狀態"
             certificate: "證書"
@@ -792,7 +800,7 @@ zh-TW:
             certificate: "證書"
             issued: "發放日期"
             reference: "報名編號"
-            offering: "供品"
+            offering: "供奉項目"
             patron: "信眾"
       guest_fallback: "訪客"
       limited:
@@ -809,13 +817,13 @@ zh-TW:
       index:
         eyebrow: "權限"
         title: "管理員權限"
-        body: "只有宮廟擁有者可以調整這些權限，請依供品、現場人員與財務審核的需求配置。"
+        body: "只有宮廟擁有者可以調整這些權限，請依供奉項目、現場人員與財務審核的需求配置。"
         save: "儲存"
         empty: "尚未邀請任何工作管理員，請在使用者頁面發送邀請並授權。"
       capabilities:
         manage_offerings:
-          label: "管理供品"
-          hint: "建立或編輯官網上的供品。"
+          label: "管理供奉項目"
+          hint: "建立或編輯官網上的供奉項目。"
         manage_registrations:
           label: "管理報名"
           hint: "存取報名紀錄與現場訂單。"

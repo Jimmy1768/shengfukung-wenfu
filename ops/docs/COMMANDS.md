@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "fixed favicon sync script"
+git commit -m "fixed admin copy"
 git push
 
 git reset --hard HEAD

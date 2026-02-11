@@ -1,6 +1,6 @@
 <div class="admin-stack">
   <div class="admin-stack__row">
-    <section class="card stack-item stack-item--wide">
+    <section class="card stack-item">
       <header class="admin-section-header">
         <div>
           <h1><%= t("admin.gatherings.index.title") %></h1>
@@ -15,7 +15,11 @@
           <% end %>
         </div>
       </header>
+    </section>
+  </div>
 
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide">
       <% if @gatherings.any? %>
         <div class="admin-list">
           <% @gatherings.each do |gathering| %>

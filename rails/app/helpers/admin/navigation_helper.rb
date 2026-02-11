@@ -30,17 +30,17 @@ module Admin
         capabilities: :manage_gallery
       },
       {
-        key: :offerings,
-        label: "Offerings",
-        description: "管理活動與服務",
-        path: -> { admin_offerings_path },
+        key: :gatherings,
+        label: "Gatherings",
+        description: "社群活動與交流場次",
+        path: -> { admin_gatherings_path },
         capabilities: :manage_offerings
       },
       {
-        key: :gatherings,
-        label: "Gatherings",
-        description: "社區聚會與交流活動",
-        path: -> { admin_gatherings_path },
+        key: :offerings,
+        label: "Offerings",
+        description: "管理法會供品與祈福供品",
+        path: -> { admin_offerings_path },
         capabilities: :manage_offerings
       },
       {
@@ -111,7 +111,6 @@ module Admin
       default_label = item[:label] || item[:key].to_s.humanize
       fallback_chain = []
       fallback_chain << item[:label_key] if item[:label_key]
-      fallback_chain << :"admin.navigation.#{item[:key]}"
       I18n.t("admin.nav.items.#{item[:key]}.label", default: fallback_chain + [default_label])
     end
   end

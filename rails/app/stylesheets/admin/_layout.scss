@@ -393,13 +393,23 @@ body.admin-body input[type="datetime-local"]::placeholder {
   justify-content: space-between;
   align-items: flex-start;
   gap: var(--spacing-md);
+  flex-wrap: wrap;
+
+  > div:first-child {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .actions {
+    flex-shrink: 0;
+  }
 }
 
 .actions--inline {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-sm);
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--spacing-xs);
 
   .btn {
     white-space: nowrap;

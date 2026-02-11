@@ -20,7 +20,7 @@
     <div>
       <p class="eyebrow">My registrations</p>
       <h2>近期報名</h2>
-      <p>追蹤每個供奉的處理進度與證書進度。</p>
+      <p>追蹤每個供奉項目的處理進度與證書進度。</p>
     </div>
     <%= link_to "全部報名", account_registrations_path, class: "pill-link secondary" %>
   </header>
@@ -38,7 +38,7 @@
       <% end %>
     </div>
   <% else %>
-    <p class="muted">尚未報名任何活動。</p>
+    <p class="muted">尚未報名任何供奉項目或社群活動。</p>
   <% end %>
 </section>
 
@@ -58,7 +58,7 @@
           <div class="timeline-dot"></div>
           <div>
             <p class="timeline-date"><%= registration.updated_at.strftime("%Y/%m/%d") %></p>
-            <h3><%= registration.temple_offering&.title || "供奉" %></h3>
+            <h3><%= registration.temple_offering&.title || "供奉項目" %></h3>
             <p class="muted">證書號碼：<%= registration.certificate_number %></p>
           </div>
         </div>
