@@ -2,9 +2,7 @@
 import { ref } from 'vue';
 import { availableThemes, getActiveThemeKey, setThemeKey } from '@/app/theme.js';
 
-const themes = availableThemes().filter((theme) =>
-  ['temple-1', 'golden-light'].includes(theme.id)
-);
+const themes = availableThemes().filter((theme) => theme.id.startsWith('temple-'));
 const selected = ref(getActiveThemeKey());
 
 function handleSelect(id) {

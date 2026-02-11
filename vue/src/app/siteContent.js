@@ -104,6 +104,14 @@ export function useTempleEvents() {
   });
 }
 
+export function useTempleOfferings() {
+  return computed(() => state.events || []);
+}
+
+export function useTempleGatherings() {
+  return computed(() => state.gatherings || []);
+}
+
 export function useTempleServices() {
   return computed(() => state.services || []);
 }

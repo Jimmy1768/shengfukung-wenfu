@@ -31,6 +31,36 @@
         "fontFamilySans": "\"Noto Sans TC\", \"Inter\", \"SF Pro Display\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif"
       }
     },
+    "temple-2": {
+      "label": "Gold Lantern",
+      "mode": "light",
+      "description": "Sunlit ivory palette inspired by lantern offerings and brass ornaments.",
+      "tokens": {
+        "surface": "#f7f3eb",
+        "surfaceRaised": "#ffffff",
+        "surfaceMuted": "#e8e2d6",
+        "border": "#d7cbb6",
+        "text": "#0f172a",
+        "textMuted": "#4c536c",
+        "primary": "#d39b39",
+        "primaryForeground": "#0b0f1d",
+        "accent": "#153252",
+        "accentForeground": "#f6f1e3",
+        "danger": "#dc2626",
+        "warning": "#fbbf24",
+        "success": "#10b981",
+        "shadowSoft": "0 20px 60px rgba(15, 23, 42, 0.12)",
+        "radiusSm": "8px",
+        "radiusMd": "18px",
+        "radiusLg": "26px",
+        "spacingXs": "0.25rem",
+        "spacingSm": "0.5rem",
+        "spacingMd": "0.75rem",
+        "spacingLg": "1.25rem",
+        "spacingXl": "2rem",
+        "fontFamilySans": "\"Inter\", \"SF Pro Display\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif"
+      }
+    },
     "golden-default": {
       "label": "Golden Default",
       "mode": "dark",

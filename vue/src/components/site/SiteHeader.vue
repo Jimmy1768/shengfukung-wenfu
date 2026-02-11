@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue';
 
 import project from '@/app/project.js';
 import { useTempleContent } from '@/app/siteContent.js';
+import { buildAccountLoginUrl } from '@/utils/accountLinks.js';
 
 const props = defineProps({
   activeKey: { type: [String, Object], default: 'home' },
@@ -25,10 +26,10 @@ watch(active, () => closeMenu());
 const navItems = [
   { key: 'home', label: '首頁', to: '/' },
   { key: 'about', label: '關於', to: '/about' },
-  { key: 'events', label: '法會供品', to: '/events' },
-  { key: 'archive', label: '供品回顧', to: '/archive' },
-  { key: 'news', label: '消息', to: '/news' },
-  { key: 'services', label: '祈福供品', to: '/services' },
+  { key: 'news', label: '最新消息', to: '/news' },
+  { key: 'services', label: '祈福服務', to: '/services' },
+  { key: 'events', label: '活動資訊', to: '/events' },
+  { key: 'archive', label: '活動回顧', to: '/archive' },
   { key: 'contact', label: '聯絡', to: '/contact' },
 ];
 
@@ -37,6 +38,7 @@ const brandName = computed(() => siteContent.data?.name || project.name);
 const brandTagline = computed(
   () => siteContent.data?.tagline || project.tagline || project.englishName
 );
+const accountLoginUrl = buildAccountLoginUrl();
 </script>
 
 <template>
@@ -80,7 +82,7 @@ const brandTagline = computed(
       </nav>
 
       <div class="actions">
-        <router-link class="btn cta" to="/events">法會供品報名</router-link>
+        <a class="btn cta" :href="accountLoginUrl">登入 / 報名</a>
       </div>
     </div>
   </header>

@@ -25,15 +25,15 @@ const hasEntries = computed(() => entries.value.length > 0);
 <template>
   <div>
     <PageHero
-      title="法會供品回顧"
-      subtitle="過往法會供品做成『可被搜尋 / 可被分享』的圖文頁面（SEO + slug）。"
+      title="活動回顧"
+      subtitle="過往法會或社群活動的圖文記錄，方便重溫與分享。"
       :image-url="heroImage"
     />
 
     <section class="section">
       <div class="wrap">
         <SectionTitle
-          title="過往供奉"
+          title="過往活動"
           subtitle="從後台新增的圖文記錄會顯示在這裡。"
         />
         <div v-if="hasEntries" class="stack">
@@ -43,7 +43,7 @@ const hasEntries = computed(() => entries.value.length > 0);
             :title="entry.title"
             :body="entry.body"
           >
-            <div class="meta">供奉日期：{{ formatEventDate(entry.event_date) }}</div>
+            <div class="meta">活動日期：{{ formatEventDate(entry.event_date) }}</div>
             <div
               v-if="entry.photo_urls?.length"
               class="photos"
@@ -60,7 +60,7 @@ const hasEntries = computed(() => entries.value.length > 0);
           </SimpleCard>
         </div>
         <div v-else class="empty">
-          目前尚未發布供奉回顧，請稍後再查看。
+          目前尚未發布活動回顧，請稍後再查看。
         </div>
       </div>
     </section>

@@ -21,9 +21,6 @@ export function setThemeKey(themeKey) {
   const resolved = themes[themeKey] ? themeKey : defaultThemeId;
   applyTheme(resolved);
   writeThemeCookie(resolved);
-  if (import.meta.env.DEV) {
-    persistThemeSelection(resolved);
-  }
 }
 
 export function availableThemes() {

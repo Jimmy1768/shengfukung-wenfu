@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "updated vue copy"
+git commit -m "refactor theme/template system"
 git push
 
 git reset --hard HEAD
