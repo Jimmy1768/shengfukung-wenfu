@@ -1,3 +1,5 @@
+import { buildRegistrationLink } from '@/utils/accountLinks.js';
+
 const monthFormatter = new Intl.DateTimeFormat('en-US', {
   month: 'short'
 });
@@ -54,6 +56,8 @@ export function formatEventCard(event, options = {}) {
     options.statusLabels?.[event.timeline_status] ||
     statusLabel(event.timeline_status);
 
+  const action = options.registrationAction || event.kind || 'event';
+
   return {
     slug: event.slug,
     month: formatMonth(start),
@@ -62,7 +66,8 @@ export function formatEventCard(event, options = {}) {
     when: formatDateRange(event.starts_on, event.ends_on),
     where: location,
     summary,
-    badge
+    badge,
+    ctaHref: buildRegistrationLink(action, event.slug)
   };
 }
 

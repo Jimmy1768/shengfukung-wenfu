@@ -60,6 +60,11 @@ export function fetchTempleEvents(options = {}) {
   return request(`temples/${slug}/events?${query.toString()}`, options);
 }
 
+export function fetchTempleGatherings(options = {}) {
+  const { slug } = buildConfig(options);
+  return request(`temples/${slug}/gatherings`, options);
+}
+
 export function fetchTempleEvent(eventSlug, overrides = {}) {
   const { slug } = buildConfig(overrides);
   const safeSlug = encodeURIComponent(eventSlug);

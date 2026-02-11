@@ -12,6 +12,7 @@ import {
   useTempleNews
 } from '@/app/siteContent.js';
 import { formatEventCard } from '@/utils/events.js';
+import { buildRegistrationLink } from '@/utils/accountLinks.js';
 import placeholders from '@shared/app_constants/temple_profile_placeholders.json';
 
 const siteContent = useTempleContent();
@@ -58,12 +59,16 @@ const upcoming = computed(() => {
         summary: '用清楚的條列與流程頁面會更適合。',
         badge: '名額有限'
       }
-    ];
+    ].map((item) => ({
+      ...item,
+      ctaHref: buildRegistrationLink('event', item.slug)
+    }));
   }
 
   return events.value.slice(0, 2).map((event) =>
     formatEventCard(event, {
-      defaultLocation: defaultLocation.value
+      defaultLocation: defaultLocation.value,
+      registrationAction: 'event'
     })
   );
 });

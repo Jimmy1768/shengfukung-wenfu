@@ -12,6 +12,12 @@ const directTargets = [
   { label: 'Rails public assets', dir: path.join(repoRoot, 'rails', 'public') }
 ];
 
+const legacyEntries = [
+  'favicon-96x96.png',
+  'web-app-manifest-192x192.png',
+  'web-app-manifest-512x512.png'
+];
+
 async function assertSourceExists() {
   try {
     await stat(sourceDir);
@@ -29,6 +35,10 @@ async function syncDirectTargets(entries) {
       const to = path.join(target.dir, entry);
       await rm(to, { recursive: true, force: true });
       await cp(from, to, { recursive: true });
+    }
+    for (const legacy of legacyEntries) {
+      const legacyPath = path.join(target.dir, legacy);
+      await rm(legacyPath, { recursive: true, force: true });
     }
     console.log(`✔ Synced ${target.label}`);
   }

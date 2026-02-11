@@ -18,7 +18,8 @@ const normalizedEvents = computed(() => {
   if (!eventList.value?.length) return [];
   return eventList.value.map((event) =>
     formatEventCard(event, {
-      defaultLocation: defaultLocation.value
+      defaultLocation: defaultLocation.value,
+      registrationAction: 'event'
     })
   );
 });

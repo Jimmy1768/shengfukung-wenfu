@@ -1,11 +1,20 @@
 <script setup>
-defineProps({
-  item: { type: Object, required: true },
+import { computed } from 'vue';
+
+const props = defineProps({
+  item: { type: Object, required: true }
 });
+
+const linkTag = computed(() => (props.item.ctaHref ? 'a' : 'router-link'));
+const linkAttrs = computed(() =>
+  props.item.ctaHref
+    ? { href: props.item.ctaHref }
+    : { to: `/events/${props.item.slug}` }
+);
 </script>
 
 <template>
-  <router-link class="card" :to="`/events/${item.slug}`">
+  <component :is="linkTag" class="card" v-bind="linkAttrs">
     <div class="row">
       <div class="date">
         <div class="m">{{ item.month }}</div>
@@ -18,7 +27,7 @@ defineProps({
       </div>
     </div>
     <div class="badge" v-if="item.badge">{{ item.badge }}</div>
-  </router-link>
+  </component>
 </template>
 
 <style scoped>

@@ -3,11 +3,14 @@ import {
   fetchTempleArchive,
   fetchTempleEvent,
   fetchTempleEvents,
+  fetchTempleGatherings,
   fetchTempleNews,
   fetchTempleProfile,
   fetchTempleService,
   fetchTempleServices
 } from '@/app/templeApi.js';
+
+const PLACEHOLDER_IMG_PATTERN = /placehold\.co/i;
 
 const state = reactive({
   status: 'idle',
@@ -15,6 +18,7 @@ const state = reactive({
   news: [],
   archive: [],
   events: [],
+  gatherings: [],
   services: [],
   eventDetails: {},
   serviceDetails: {},
@@ -26,11 +30,12 @@ export async function loadTempleContent() {
   state.error = null;
 
   try {
-    const [profile, news, archive, events, services] = await Promise.all([
+    const [profile, news, archive, events, gatherings, services] = await Promise.all([
       fetchTempleProfile(),
       fetchTempleNews({ limit: 10 }),
       fetchTempleArchive(),
       fetchTempleEvents({ limit: 25, status: 'upcoming' }),
+      fetchTempleGatherings(),
       fetchTempleServices({ limit: 100 })
     ]);
     state.data = profile;
@@ -40,6 +45,12 @@ export async function loadTempleContent() {
     state.events.forEach((event) => {
       if (event?.slug) {
         state.eventDetails[event.slug] = event;
+      }
+    });
+    state.gatherings = gatherings?.gatherings || [];
+    state.gatherings.forEach((gathering) => {
+      if (gathering?.slug) {
+        state.eventDetails[gathering.slug] = gathering;
       }
     });
     state.services = services?.services || [];
@@ -81,7 +92,16 @@ export function useTempleArchive() {
 }
 
 export function useTempleEvents() {
-  return computed(() => state.events || []);
+  return computed(() => {
+    const events = state.events || [];
+    const gatherings = state.gatherings || [];
+    const combined = [...events, ...gatherings];
+    return combined.sort((a, b) => {
+      const aTime = a.starts_on ? new Date(a.starts_on).getTime() : Infinity;
+      const bTime = b.starts_on ? new Date(b.starts_on).getTime() : Infinity;
+      return aTime - bTime;
+    });
+  });
 }
 
 export function useTempleServices() {
@@ -104,12 +124,25 @@ export function useTempleEvent(slugRef) {
 export function useHeroImage(tab) {
   return computed(() => {
     const heroImages = state.data?.hero_images || {};
-    return (
-      heroImages[tab] ||
-      heroImages.home ||
-      null
-    );
+    const tabKey = tab?.toString() || 'home';
+    const tabImage = resolveHeroImage(heroImages[tabKey], { allowPlaceholder: tabKey === 'home' });
+    if (tabImage) return tabImage;
+
+    return resolveHeroImage(heroImages.home, { allowPlaceholder: true });
   });
+}
+
+function resolveHeroImage(value, options = {}) {
+  if (typeof value !== 'string' || !value.trim()) {
+    return null;
+  }
+
+  const { allowPlaceholder = false } = options;
+  if (!allowPlaceholder && PLACEHOLDER_IMG_PATTERN.test(value)) {
+    return null;
+  }
+
+  return value;
 }
 
 export async function loadTempleEvent(slug) {

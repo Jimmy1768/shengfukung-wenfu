@@ -5,6 +5,7 @@ import SectionTitle from '@/components/site/SectionTitle.vue';
 import SimpleCard from '@/components/site/SimpleCard.vue';
 import { useHeroImage, useTempleServices } from '@/app/siteContent.js';
 import { formatCurrency } from '@/utils/events.js';
+import { buildRegistrationLink } from '@/utils/accountLinks.js';
 
 const heroImage = useHeroImage('services');
 const serviceList = useTempleServices();
@@ -17,7 +18,8 @@ const offerings = computed(() => {
     description: service.description || '此服務的詳細說明將在近期更新。',
     price: formatCurrency(service.price_cents, service.currency),
     period: service.period_label || '長期服務',
-    status: service.available_from ? '開放中' : '常態服務'
+    status: service.available_from ? '開放中' : '常態服務',
+    ctaHref: buildRegistrationLink('service', service.slug)
   }));
 });
 
@@ -47,7 +49,7 @@ const hasOfferings = computed(() => offerings.value.length > 0);
               <div>費用：約 {{ item.price }}</div>
               <div>期間：{{ item.period }}</div>
               <p>{{ item.description }}</p>
-              <router-link class="link" :to="`/services/${item.slug}`">查看詳情 →</router-link>
+              <a class="link" :href="item.ctaHref">登入並報名 →</a>
             </div>
           </SimpleCard>
         </div>

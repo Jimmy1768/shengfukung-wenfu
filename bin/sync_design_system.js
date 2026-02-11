@@ -120,6 +120,11 @@ if (fs.existsSync(faviconScript)) {
     console.error('Sync favicons script failed. See logs above.');
     process.exit(result.status || 1);
   }
+  const legacySvg = path.join(ROOT, 'vue', 'public', 'favicon.svg');
+  if (fs.existsSync(legacySvg)) {
+    fs.unlinkSync(legacySvg);
+    console.log(`Removed legacy favicon ${path.relative(ROOT, legacySvg)}`);
+  }
 } else {
   console.warn(`Skipping favicon sync. Script missing at ${faviconScript}`);
 }

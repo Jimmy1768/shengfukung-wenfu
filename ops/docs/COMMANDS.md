@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "feat(account): add temple selector and dependent management"
+git commit -m "fixed favicon sync script"
 git push
 
 git reset --hard HEAD
