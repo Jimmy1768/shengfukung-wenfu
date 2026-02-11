@@ -1,28 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import MarketingLanding from '../views/MarketingLanding.vue';
-import DemoShowcase from '../views/DemoShowcase.vue';
 import project from '@/app/project.js';
 import { useTempleContent } from '@/app/siteContent.js';
 import { resolveSiteLayoutRoute } from '@/layouts/index.js';
 
-const routes = [
-  resolveSiteLayoutRoute(),
-  {
-    path: '/marketing',
-    name: 'marketing',
-    component: MarketingLanding
-  },
-  {
-    path: '/marketing/demo',
-    name: 'marketing-demo',
-    component: DemoShowcase
-  },
-  {
-    path: '/demo',
-    redirect: '/marketing/demo'
-  }
-];
+const routes = [resolveSiteLayoutRoute()];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
