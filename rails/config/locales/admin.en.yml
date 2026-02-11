@@ -2,28 +2,25 @@ en:
   admin:
     nav:
       items:
-        dashboard:
-          label: "Dashboard"
-        temple_profile:
-          label: "Temple Profile"
-        news_posts:
-          label: "News"
-        gallery_entries:
-          label: "Gallery"
         offerings:
           label: "Offerings"
         gatherings:
           label: "Gatherings"
-        orders:
-          label: "Orders"
-        payments:
-          label: "Payments"
-        patrons:
-          label: "Patrons"
-        archives:
-          label: "Archives"
-        permissions:
-          label: "Permissions"
+    navigation:
+      dashboard: "Dashboard"
+      temple_profile: "Temple Profile"
+      profile: "Temple Profile"
+      news_posts: "News"
+      news: "News"
+      gallery_entries: "Gallery"
+      gallery: "Gallery"
+      offerings: "Offerings"
+      gatherings: "Gatherings"
+      orders: "Orders"
+      payments: "Payments"
+      patrons: "Patrons"
+      archives: "Archives"
+      permissions: "Permissions"
     filters:
       search:
         label: "Search"
@@ -187,10 +184,6 @@ en:
           label: "News"
         gallery_entries:
           label: "Gallery"
-        offerings:
-          label: "Offerings"
-        gatherings:
-          label: "Gatherings"
         events:
           label: "Events"
         services:
@@ -285,7 +278,7 @@ en:
       sections:
         basics:
           title: "Basic details"
-          subtitle: "Displayed in the public homepage header and footer."
+          subtitle: "Displayed in the Vue header/footer."
         about:
           title: "About content"
           subtitle: "Controls the About page hero subtitle and the three info cards."
@@ -300,6 +293,7 @@ en:
           subtitle: "Provide an image URL for each tab. Leave blank to fall back to the home hero."
           fallback_hint: "Pages without a custom URL reuse the Home hero image automatically."
           row_hint: "Optional — inherits the Home image when left blank."
+          save_hint: "Saving here updates every tab with the latest imagery."
           choose_file: "Choose file"
           upload_button: "Upload"
           uploading_label: "Uploading..."
@@ -346,6 +340,7 @@ en:
         parking: "e.g., Limited onsite parking; use civic lot on Gongjiao Rd."
       actions:
         save: "Save profile"
+        save_hero_images: "Save hero images"
       hero_tabs:
         home: "Home"
         about: "About"
@@ -441,7 +436,7 @@ en:
         title: "Gatherings"
         body: "Manage informal community gatherings that still use the onsite registration + payment flow."
       new:
-        title: "New Gathering"
+        title: "New gathering"
         body: "Describe the gathering, schedule, and onsite workflow."
       edit:
         title: "Edit gathering"
@@ -480,12 +475,12 @@ en:
         published: "Published"
         archived: "Archived"
       actions:
-        new: "New Gathering"
+        new: "New gathering"
         save: "Save"
         cancel: "Cancel"
         view: "View"
         view_orders: "Orders"
-        view_archived: "View Archived"
+        view_archived: "View archived"
         view_active: "Back to active"
         archive: "Archive"
         edit: "Edit"
@@ -507,9 +502,8 @@ en:
     offerings:
       index:
         title: "Temple Offerings"
-        body: "Manage ceremonies, services, and donation tables offered by the temple."
         new_button: "New Offering"
-        view_archived: "View Archived"
+        view_archived: "View archived offerings"
         view_active: "Back to current"
         table:
           title: "Title"
@@ -533,7 +527,6 @@ en:
         table: "Table"
       new:
         title: "New Offering"
-        body: "Choose a template, then adjust copy, pricing, and logistics as needed."
         template_open: "Select offering template"
         template_change: "Change template"
         template_modal_title: "Choose an offering template"
@@ -546,7 +539,6 @@ en:
         required_message: "Please enter a value for this field."
       edit:
         title: "Edit Offering"
-        body: "Refresh the copy, schedule, or pricing for this offering."
       show:
         type: "Type"
         period: "Period"
@@ -831,7 +823,7 @@ en:
       payments:
         title: "Search payment archives"
         subtitle: "Use a date range to audit historical ledger entries across offerings and payment methods."
-        awaiting_range: "Select a date range to View Archived payments."
+        awaiting_range: "Select a date range to view archived payments."
         range_heading: "Payments from %{start} to %{end}"
         range_hint: "No default window is applied here—archives return everything in the selected range."
         empty_range: "No archived payments for this range."

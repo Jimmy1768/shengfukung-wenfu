@@ -2334,6 +2334,27 @@ body.admin-body input[type=datetime-local]::placeholder {
   color: var(--accent);
 }
 
+.hero-floating-save {
+  position: fixed;
+  left: var(--spacing-xl);
+  bottom: var(--spacing-xl);
+  display: none;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  width: auto;
+  max-width: none;
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  box-shadow: 0 18px 40px color-mix(in srgb, var(--shadow) 20%, transparent);
+  z-index: 6;
+}
+
+.hero-floating-save.is-visible {
+  display: flex;
+}
+
 @media (max-width: 960px) {
   .hero-image-grid {
     grid-template-columns: minmax(0, 1fr);

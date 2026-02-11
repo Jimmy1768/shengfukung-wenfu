@@ -31,6 +31,7 @@ Completed:
 - Payments dashboard, archives filters, and ledger tables have localized copy + spacing fixes; metrics/pill cards match the latest visual system.
 - Added the patrons directory screen (owner-only) with search + table view as the precursor to the “promote patron to admin” flow.
 - Temple switcher allows admin owners to move between slugs locally (disabled in production environments).
+- Hero image section now presents a floating bottom-left “Save hero images” button when scrolled into view so admins can persist uploads without hunting for the main save CTA (backend still skips no-op writes as before).
 
 ## Phase 3 – Public API Surface
 

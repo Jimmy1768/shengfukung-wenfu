@@ -170,7 +170,7 @@
       </section>
     </div>
 
-    <div class="admin-stack__row admin-stack__row--hero">
+    <div class="admin-stack__row admin-stack__row--hero" data-hero-images-section>
       <section class="card stack-item stack-item--xl stack-item--with-gutter card--hero-images">
         <section class="card form-card hero-image-card">
           <header class="hero-image-header">
@@ -234,6 +234,16 @@
           </div>
         </section>
       </section>
+    </div>
+
+    <div class="hero-floating-save" data-hero-floating-panel>
+      <button type="submit"
+        name="temple_profile_save_scope"
+        value="hero_images"
+        class="btn btn-primary">
+        <%= t("admin.temple_profile.actions.save_hero_images", default: "Save hero images") %>
+      </button>
+      <p class="muted"><%= t("admin.temple_profile.sections.hero_images.save_hint", default: "Changes apply to every tab once you save.") %></p>
     </div>
   <% end %>
 </div>
@@ -341,5 +351,53 @@
 
     ready(initHeroImageUploads);
     document.addEventListener("turbo:load", initHeroImageUploads);
+  })();
+
+  (() => {
+    const ready = (fn) => {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", fn);
+      } else {
+        fn();
+      }
+    };
+
+    const initFloatingHeroSave = () => {
+      const panel = document.querySelector("[data-hero-floating-panel]");
+      const section = document.querySelector("[data-hero-images-section]");
+      const sidebar = document.querySelector(".admin-sidebar");
+      if (!panel) return;
+
+      const syncPosition = () => {
+        if (!sidebar) return;
+        const rect = sidebar.getBoundingClientRect();
+        const width = rect.width * 0.85;
+        panel.style.left = `${rect.left}px`;
+        panel.style.width = `${width}px`;
+      };
+
+      syncPosition();
+      window.addEventListener("resize", syncPosition);
+
+      if (!section || typeof IntersectionObserver === "undefined") {
+        panel.classList.add("is-visible");
+        return;
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        if (entry.isIntersecting) {
+          panel.classList.add("is-visible");
+        } else {
+          panel.classList.remove("is-visible");
+        }
+      }, { threshold: 0, rootMargin: "0px" });
+
+      observer.observe(section);
+    };
+
+    ready(initFloatingHeroSave);
+    document.addEventListener("turbo:load", initFloatingHeroSave);
   })();
 </script>
