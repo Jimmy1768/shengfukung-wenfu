@@ -1,40 +1,40 @@
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow">會員資料</p>
-      <h2>編輯個人資料</h2>
-      <p>這些資訊僅提供寺廟工作人員聯繫之用，不會對外公開。</p>
+      <p class="eyebrow"><%= t("account.profile.edit.eyebrow") %></p>
+      <h2><%= t("account.profile.edit.title") %></h2>
+      <p><%= t("account.profile.edit.subtitle") %></p>
     </div>
   </header>
 
   <%= form_with model: @form, url: account_profile_path, method: :put, class: "profile-form" do |f| %>
-    <div class="form-grid">
+    <div class="single-row-grid">
       <div class="field">
-        <%= f.label :english_name, "姓名" %>
+        <%= f.label :english_name, t("account.profile.summary.english_name") %>
         <%= f.text_field :english_name, required: true %>
       </div>
       <div class="field">
-        <%= f.label :native_name, "中文姓名" %>
+        <%= f.label :native_name, t("account.profile.summary.native_name") %>
         <%= f.text_field :native_name %>
       </div>
       <div class="field">
-        <%= f.label :phone, "電話" %>
+        <%= f.label :phone, t("account.profile.summary.phone") %>
         <%= f.text_field :phone %>
       </div>
       <div class="field">
-        <%= f.label :city, "居住區" %>
+        <%= f.label :city, t("account.profile.summary.city") %>
         <%= f.text_field :city %>
       </div>
     </div>
 
     <div class="field">
-      <%= f.label :notes, "備註" %>
+      <%= f.label :notes, t("account.profile.summary.notes") %>
       <%= f.text_area :notes, rows: 3 %>
     </div>
 
     <div class="form-actions">
-      <%= f.submit "儲存", class: "pill-link primary" %>
-      <%= link_to "取消", account_profile_path, class: "pill-link" %>
+      <%= f.submit t("account.profile.edit.save"), class: "pill-link primary" %>
+      <%= link_to t("account.profile.edit.cancel"), account_profile_path, class: "pill-link" %>
     </div>
   <% end %>
 </section>

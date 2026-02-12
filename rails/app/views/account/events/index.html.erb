@@ -1,9 +1,9 @@
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow">活動與法會</p>
-      <h2>即將到來</h2>
-      <p>查看已報名的服務與法會，掌握集合時間與注意事項。</p>
+      <p class="eyebrow"><%= t("account.events.upcoming.eyebrow") %></p>
+      <h2><%= t("account.events.upcoming.title") %></h2>
+      <p><%= t("account.events.upcoming.subtitle") %></p>
     </div>
   </header>
 
@@ -22,9 +22,9 @@
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow">活動與法會</p>
-      <h2>活動回顧</h2>
-      <p>查看過往參與紀錄，若有相簿可直接開啟。</p>
+      <p class="eyebrow"><%= t("account.events.past.eyebrow") %></p>
+      <h2><%= t("account.events.past.title") %></h2>
+      <p><%= t("account.events.past.subtitle") %></p>
     </div>
   </header>
 
@@ -36,9 +36,9 @@
           <p class="timeline-date"><%= event[:date] %></p>
           <h3><%= event[:title] %></h3>
           <% if event[:gallery] %>
-            <%= link_to "查看相簿", "#", class: "pill-link secondary" %>
+            <%= link_to t("account.events.past.gallery_link"), "#", class: "pill-link secondary" %>
           <% else %>
-            <p class="muted">相簿整理中。</p>
+            <p class="muted"><%= t("account.events.past.gallery_pending") %></p>
           <% end %>
         </div>
       </div>

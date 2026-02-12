@@ -1,0 +1,242 @@
+zh-TW:
+  account:
+    language_selector:
+      flash: "已更新顯示語言。"
+    layout:
+      hero:
+        title: "會員專區"
+        subtitle: "查看活動、付款紀錄，並隨時更新個人資料。"
+      nav:
+        dashboard: "儀表板"
+        profile: "個人資料"
+        events: "活動"
+        payments: "付款紀錄"
+        sign_out: "登出"
+    dashboard:
+      intro:
+        eyebrow: "會員概況"
+        greeting: "%{name} 您好"
+        body: "追蹤最新報名與付款狀態，並立即更新個人資料。"
+      quick_actions:
+        profile: "更新個人資料"
+        registrations: "查看報名"
+        payments: "付款紀錄"
+        contact: "聯絡寺廟"
+        contact_confirm: "此功能即將推出，請洽寺廟服務台。"
+      registrations:
+        eyebrow: "我的報名"
+        title: "近期活動"
+        subtitle: "掌握供奉項目的處理狀態與證書進度。"
+        link: "全部報名"
+        registrant_label: "報名人"
+        certificate_label: "證書"
+        certificate_pending: "尚未發放"
+        empty: "尚未報名任何供奉項目或社群活動。"
+      certificates:
+        eyebrow: "憑證"
+        title: "憑證與收據"
+        subtitle: "已發放的證書會列在這裡，若需紙本可洽客服。"
+        number_label: "證書號碼"
+        offering_fallback: "供奉項目"
+        empty: "證書尚未發放。"
+      payments:
+        eyebrow: "付款"
+        title: "最近付款"
+        subtitle: "快速確認付款方式與狀態。"
+        link: "更多明細"
+        table_headers:
+          reference: "編號"
+          offering: "項目"
+          amount: "金額"
+          method: "方式"
+          status: "狀態"
+          download: "下載"
+        line_pay_label: "收據整理中"
+        line_pay_title: "LINE Pay 收據即將推出"
+        paper_hint: "紙本收據"
+        empty: "尚無付款。"
+      payment_methods:
+        line_pay: "LINE Pay"
+        cash: "現金"
+        bank: "匯款"
+      payment_statuses:
+        paid: "已付款"
+        pending: "待處理"
+        refunded: "已退款"
+        failed: "失敗"
+    profile:
+      header:
+        eyebrow: "會員資料"
+        title: "個人資料"
+        subtitle: "更新聯絡方式與備註，方便寺廟聯繫。"
+        edit: "編輯資料"
+      edit:
+        eyebrow: "會員資料"
+        title: "編輯個人資料"
+        subtitle: "這些資訊僅提供寺廟工作人員聯繫之用，不會對外公開。"
+        save: "儲存"
+        cancel: "取消"
+      summary:
+        english_name: "姓名"
+        native_name: "中文姓名"
+        phone: "電話"
+        city: "居住區"
+        notes: "備註"
+        not_provided: "尚未填寫"
+        no_notes: "尚無備註。"
+      dependents:
+        eyebrow: "家屬 / 受照護者"
+        title: "管理家屬資料"
+        subtitle: "新增或更新無法自行登入的成員資訊。"
+        add: "新增家屬"
+        support: "建立支援請求"
+        support_confirm: "此功能即將推出，請洽寺方。"
+        relationship: "關係"
+        birthdate: "生日"
+        phone: "電話"
+        email: "Email"
+        edit: "編輯"
+        delete: "刪除"
+        delete_confirm: "確定刪除此家屬？"
+        empty: "尚未建立任何家屬資料。"
+    events:
+      upcoming:
+        eyebrow: "活動與法會"
+        title: "即將到來"
+        subtitle: "查看已報名的服務與法會，掌握集合時間與注意事項。"
+      past:
+        eyebrow: "活動與法會"
+        title: "活動回顧"
+        subtitle: "查看過往參與紀錄，若有相簿可直接開啟。"
+        gallery_link: "查看相簿"
+        gallery_pending: "相簿整理中。"
+    payments_index:
+      header:
+        eyebrow: "付款紀錄"
+        title: "交易明細"
+        subtitle: "查看所有線上／現場付款紀錄與狀態。"
+      table_headers:
+        reference: "編號"
+        offering: "項目"
+        amount: "金額"
+        status: "狀態"
+        date: "日期"
+        method: "方式"
+        registrant: "報名人"
+      empty: "尚無付款紀錄。"
+    registrations:
+      index:
+        eyebrow: "我的報名"
+        title: "參與紀錄"
+        subtitle: "檢視每個法會供品、祈福供品或社群活動的狀態與憑證。"
+        table:
+          reference: "編號"
+          offering: "項目"
+          registrant: "報名人"
+          status: "狀態"
+          certificate: "證書"
+          certificate_pending: "未出證"
+        actions:
+          view: "查看"
+          edit: "編輯"
+        empty: "尚未有報名紀錄。"
+      show:
+        eyebrow: "報名資料"
+        subtitle: "更新聯絡方式或檢視憑證資訊。"
+        edit: "編輯資料"
+        registrant: "報名人"
+        certificate: "證書號碼"
+        certificate_pending: "處理中"
+        status: "報名狀態"
+        totals: "數量／金額"
+        contact:
+          title: "聯絡資訊"
+          primary: "聯絡人"
+          phone: "電話"
+          dependents: "家庭／隨行"
+        logistics:
+          title: "行程與儀式備註"
+          arrival: "到場時間"
+          notes: "儀式備註"
+    sessions:
+      new:
+        heading: "歡迎回到 %{temple}"
+        subtitle: "選擇社群登入或使用電子郵件登入。"
+        social:
+          title: "社群登入"
+          subtitle: "點選授權的帳號即可快速登入。"
+          empty: "尚未設定社群登入選項。"
+        email:
+          title: "電子郵件登入"
+          subtitle: "輸入註冊時的電子郵件與密碼。"
+          email_label: "電子郵件"
+          password_label: "密碼"
+          submit: "登入"
+        forgot_password: "忘記密碼？"
+        register_prompt: "想透過電子郵件註冊？"
+        register_button: "建立帳號"
+      flash:
+        invalid_credentials: "帳號或密碼不正確。"
+        signed_in: "已成功登入。"
+        sign_in_required: "請先登入以繼續。"
+        signed_out: "已成功登出。"
+    signups:
+      modal:
+        title: "建立帳號"
+        close_label: "關閉建立帳號視窗"
+      form:
+        email_label: "電子郵件"
+        password_label: "密碼"
+        password_confirmation_label: "再次輸入密碼"
+        submit: "建立帳號"
+    passwords:
+      request:
+        eyebrow: "安全"
+        title: "重設密碼"
+        subtitle: "輸入綁定帳號的電子郵件，我們會寄出重設連結。"
+        email_label: "電子郵件"
+        submit: "寄送重設連結"
+      reset:
+        eyebrow: "安全"
+        title: "設定新密碼"
+        subtitle: "請輸入至少八個字元並具安全性的密碼。"
+        password_label: "新密碼"
+        password_confirmation_label: "再次輸入新密碼"
+        submit: "儲存密碼"
+      links:
+        back_to_login_html: "想起密碼了？%{link}"
+        login_text: "返回登入頁面"
+        start_over_html: "需要新連結？%{link}"
+        request_new: "重新寄送重設信"
+      flash:
+        sent: "若該電子郵件存在，我們已寄出重設密碼的說明。"
+        invalid_token: "此重設連結無效或已過期，請重新索取。"
+        updated: "密碼已更新，請重新登入。"
+      errors:
+        invalid_token: "此重設連結無效或已過期。"
+        invalid_password: "請輸入符合強度要求的密碼。"
+        update_failed: "無法更新密碼，請稍後再試。"
+        unknown: "重設密碼時發生錯誤，請稍後再試。"
+      mailer:
+        subject: "%{brand}：重設密碼"
+        greeting: "%{name} 您好"
+        intro: "我們收到您重設密碼的請求，請使用下方按鈕設定新密碼。"
+        cta: "重設密碼"
+        spam_hint: "若沒收到郵件，請檢查垃圾信件匣，或重新索取。"
+        copy_hint: "若按鈕無法使用，請複製上方連結到瀏覽器開啟。"
+        ignore_notice: "若您沒有發出重設請求，可忽略此封郵件。"
+        signoff_html: "感謝您，<br />%{brand} 團隊"
+    dependents:
+      edit_header:
+        eyebrow: "編輯家屬"
+        subtitle: "更新聯絡方式與備註。"
+      form:
+        english_name: "姓名（必填）"
+        native_name: "中文姓名"
+        relationship: "關係"
+        birthdate: "生日"
+        phone: "電話"
+        email: "Email"
+        notes: "備註"
+        submit: "儲存"
+        cancel: "取消"

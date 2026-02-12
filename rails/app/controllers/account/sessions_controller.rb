@@ -14,9 +14,9 @@ module Account
       if valid_credentials?
         user = User.find_by(email: session_params[:email].to_s.downcase.strip)
         establish_user_session!(user)
-        redirect_to resolve_post_login_path, notice: "Signed in."
+        redirect_to resolve_post_login_path, notice: I18n.t("account.sessions.flash.signed_in")
       else
-        flash.now[:alert] = "Those credentials did not match."
+        flash.now[:alert] = I18n.t("account.sessions.flash.invalid_credentials")
         @registration_form ||= Account::RegistrationForm.new
         render :new, status: :unprocessable_entity
       end
@@ -24,7 +24,7 @@ module Account
 
     def destroy
       destroy_user_session!
-      redirect_to account_login_path, notice: "Signed out."
+      redirect_to account_login_path, notice: I18n.t("account.sessions.flash.signed_out")
     end
 
     private

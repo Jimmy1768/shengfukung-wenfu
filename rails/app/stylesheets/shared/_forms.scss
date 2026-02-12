@@ -1,47 +1,158 @@
 
 // app/stylesheets/shared/_forms.scss
 //
-// Baseline form controls and layout.
+// Shared buttons, badges, and input controls used across Admin + Account.
 
-@use "variables" as *;
+@use "tokens" as *;
+
+%form-control {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.85rem;
+  font: inherit;
+  color: var(--text);
+  line-height: 1.4;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+
+  &:read-only {
+    cursor: not-allowed;
+    opacity: 0.85;
+  }
+}
 
 label {
   display: block;
-  margin-bottom: $space-1;
-  font-size: $font-size-sm;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-transform: none;
 }
 
 input[type="text"],
 input[type="email"],
 input[type="password"],
 input[type="number"],
+input[type="tel"],
 textarea,
-select {
-  width: 100%;
-  padding: $space-2 $space-3;
-  border-radius: $radius-sm;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  font-family: inherit;
-  font-size: $font-size-md;
-  line-height: $line-height-normal;
-  box-sizing: border-box;
+select,
+.form-control {
+  @extend %form-control;
 }
 
-input:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  border-color: rgba(0, 0, 0, 0.28);
-  box-shadow: $shadow-subtle;
+textarea {
+  min-height: 6rem;
+  resize: vertical;
 }
 
 .form-row {
-  margin-bottom: $space-4;
+  margin-bottom: 1.5rem;
 }
 
 .form-actions {
-  margin-top: $space-4;
+  margin-top: 1.5rem;
   display: flex;
-  gap: $space-3;
-  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, border-color 120ms ease;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.02);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-small {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.82rem;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-foreground, #111a2c);
+  border-color: transparent;
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--text) 16%, transparent);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--text) 18%, transparent);
+  color: var(--text-muted);
+}
+
+.btn-danger {
+  border-color: color-mix(in srgb, var(--danger, #d1452f) 40%, transparent);
+  color: var(--danger, #d1452f);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-secondary:hover {
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.btn-ghost:hover {
+  border-color: color-mix(in srgb, var(--text) 30%, transparent);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--text);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  background: rgba(148, 163, 184, 0.25);
+  color: var(--text);
+}
+
+.badge-accent {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--accent);
+}
+
+.flash {
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.flash-notice {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success);
+}
+
+.flash-alert {
+  background: rgba(220, 38, 38, 0.15);
+  color: var(--danger);
 }

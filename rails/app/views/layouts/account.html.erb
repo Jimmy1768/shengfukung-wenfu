@@ -10,19 +10,38 @@
   <body class="account-body account-theme-<%= @active_theme_key %>">
     <div class="account-shell">
       <header class="account-hero">
+        <div class="account-language-selector">
+          <%= form_with url: account_locale_path,
+                        scope: :locale_switch,
+                        method: :post,
+                        data: { turbo: false },
+                        local: true,
+                        html: { class: "language-selector-form" } do |form| %>
+            <% account_locale_options.each do |option| %>
+              <% value = option[:value].to_s %>
+              <button
+                type="submit"
+                name="locale_switch[locale]"
+                value="<%= value %>"
+                class="language-switch-button <%= 'is-active' if value == current_account_locale.to_s %>">
+                <%= option[:label] %>
+              </button>
+            <% end %>
+          <% end %>
+        </div>
         <div class="account-hero-inner">
           <div class="account-brand">
-            <p class="account-eyebrow">TempleMate</p>
-            <h1>會員專區</h1>
-            <p class="account-blurb">會員專區：查看活動、付款記錄，更新個人資料。</p>
+            <p class="account-eyebrow">TEMPLEMATE</p>
+            <h1><%= t("account.layout.hero.title") %></h1>
+            <p class="account-blurb"><%= t("account.layout.hero.subtitle") %></p>
           </div>
           <% if user_signed_in? %>
             <nav class="account-hero-actions">
-              <%= link_to "儀表板", account_dashboard_path, class: "pill-link #{active_nav?(account_dashboard_path) ? "active" : ""}" %>
-              <%= link_to "個人資料", account_profile_path, class: "pill-link #{active_nav?(account_profile_path) ? "active" : ""}" %>
-              <%= link_to "活動", account_events_path, class: "pill-link #{active_nav?(account_events_path) ? "active" : ""}" %>
-              <%= link_to "付款紀錄", account_payments_path, class: "pill-link #{active_nav?(account_payments_path) ? "active" : ""}" %>
-              <%= button_to "登出", account_logout_path, method: :delete, class: "pill-link danger" %>
+              <%= link_to t("account.layout.nav.dashboard"), account_dashboard_path, class: "pill-link #{active_nav?(account_dashboard_path) ? "active" : ""}" %>
+              <%= link_to t("account.layout.nav.profile"), account_profile_path, class: "pill-link #{active_nav?(account_profile_path) ? "active" : ""}" %>
+              <%= link_to t("account.layout.nav.events"), account_events_path, class: "pill-link #{active_nav?(account_events_path) ? "active" : ""}" %>
+              <%= link_to t("account.layout.nav.payments"), account_payments_path, class: "pill-link #{active_nav?(account_payments_path) ? "active" : ""}" %>
+              <%= button_to t("account.layout.nav.sign_out"), account_logout_path, method: :delete, class: "pill-link danger" %>
             </nav>
           <% end %>
         </div>

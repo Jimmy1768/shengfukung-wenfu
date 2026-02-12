@@ -1,9 +1,9 @@
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow">我的報名</p>
-      <h2>參與紀錄</h2>
-      <p>檢視每個法會供品、祈福供品或社群活動的狀態與憑證。</p>
+      <p class="eyebrow"><%= t("account.registrations.index.eyebrow") %></p>
+      <h2><%= t("account.registrations.index.title") %></h2>
+      <p><%= t("account.registrations.index.subtitle") %></p>
     </div>
   </header>
 
@@ -12,11 +12,11 @@
       <table class="payment-table">
         <thead>
           <tr>
-            <th>編號</th>
-            <th>項目</th>
-            <th>報名人</th>
-            <th>狀態</th>
-            <th>證書</th>
+            <th><%= t("account.registrations.index.table.reference") %></th>
+            <th><%= t("account.registrations.index.table.offering") %></th>
+            <th><%= t("account.registrations.index.table.registrant") %></th>
+            <th><%= t("account.registrations.index.table.status") %></th>
+            <th><%= t("account.registrations.index.table.certificate") %></th>
             <th></th>
           </tr>
         </thead>
@@ -26,11 +26,11 @@
               <td><%= registration.reference_code %></td>
               <td><%= registration.temple_offering&.title || "—" %></td>
               <td><%= registration.registrant_name %></td>
-              <td><span class="status-pill status-<%= registration.payment_status %>"><%= registration.payment_status %></span></td>
-              <td><%= registration.certificate_number.presence || "未出證" %></td>
+              <td><span class="status-pill status-<%= registration.payment_status %>"><%= t("account.dashboard.payment_statuses.#{registration.payment_status}", default: registration.payment_status) %></span></td>
+              <td><%= registration.certificate_number.presence || t("account.registrations.index.table.certificate_pending") %></td>
               <td>
-                <%= link_to "查看", account_registration_path(registration), class: "pill-link" %>
-                <%= link_to "編輯", edit_account_registration_path(registration), class: "pill-link secondary" %>
+                <%= link_to t("account.registrations.index.actions.view"), account_registration_path(registration), class: "pill-link" %>
+                <%= link_to t("account.registrations.index.actions.edit"), edit_account_registration_path(registration), class: "pill-link secondary" %>
               </td>
             </tr>
           <% end %>
@@ -38,6 +38,6 @@
       </table>
     </div>
   <% else %>
-    <p class="muted">尚未有報名紀錄。</p>
+    <p class="muted"><%= t("account.registrations.index.empty") %></p>
   <% end %>
 </section>

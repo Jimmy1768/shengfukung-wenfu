@@ -9,11 +9,14 @@ module Account
       :user_signed_in?,
       :account_theme_options,
       :active_nav?,
-      :active_temple_slug
+      :active_temple_slug,
+      :current_account_locale,
+      :account_locale_options
 
     before_action :assign_active_temple_slug
     before_action :ensure_temple_context
     before_action :assign_account_theme
+    before_action :apply_account_locale
     before_action :authenticate_user!
 
     private
@@ -21,6 +24,7 @@ module Account
     ACCOUNT_THEME_CHOICES = %w[temple-1 golden-light].freeze
     ACCOUNT_TEMPLE_SESSION_KEY = "account_active_temple_slug"
     ACCOUNT_ENTRY_INTENT_SESSION_KEY = "account_entry_intent"
+    ACCOUNT_LOCALE_SESSION_KEY = AppConstants::Sessions.key(:account_locale)
 
     def assign_account_theme
       key = if allow_theme_override?
@@ -55,7 +59,7 @@ module Account
     def authenticate_user!
       return if user_signed_in?
 
-      redirect_to account_login_path, alert: "Please sign in to continue."
+      redirect_to account_login_path, alert: I18n.t("account.sessions.flash.sign_in_required")
     end
 
     def user_signed_in?
@@ -108,6 +112,13 @@ module Account
       end
     end
 
+    def account_locale_options
+      [
+        { label: "English", value: :en },
+        { label: "繁體中文", value: :"zh-TW" }
+      ]
+    end
+
     def active_nav?(path)
       request.path == path
     end
@@ -126,6 +137,25 @@ module Account
 
     def account_entry_intent
       session[ACCOUNT_ENTRY_INTENT_SESSION_KEY] || {}
+    end
+
+    def current_account_locale
+      @current_account_locale ||= begin
+        stored = session[ACCOUNT_LOCALE_SESSION_KEY]
+        locale = stored.presence || I18n.default_locale
+        normalize_account_locale(locale)
+      end
+    end
+
+    def normalize_account_locale(locale)
+      locale_sym = locale&.to_sym
+      return I18n.default_locale unless I18n.available_locales.include?(locale_sym)
+
+      locale_sym
+    end
+
+    def apply_account_locale
+      I18n.locale = current_account_locale
     end
 
     def capture_entry_intent_from_params!

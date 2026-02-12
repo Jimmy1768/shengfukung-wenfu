@@ -108,6 +108,7 @@ Rails.application.routes.draw do
     resources :registrations, only: %i[index show edit update new create]
     resources :events, only: :index
     resources :payments, only: :index
+    resource :locale, only: :create, controller: "locales"
 
     namespace :api, defaults: { format: :json } do
       resources :registrations, only: :index

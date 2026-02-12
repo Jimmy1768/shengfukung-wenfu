@@ -1,9 +1,9 @@
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow">付款紀錄</p>
-      <h2>交易明細</h2>
-      <p>查看所有線上/現場付款紀錄與狀態。</p>
+      <p class="eyebrow"><%= t("account.payments_index.header.eyebrow") %></p>
+      <h2><%= t("account.payments_index.header.title") %></h2>
+      <p><%= t("account.payments_index.header.subtitle") %></p>
     </div>
   </header>
 
@@ -12,13 +12,13 @@
       <table class="payment-table">
         <thead>
           <tr>
-            <th>編號</th>
-            <th>項目</th>
-            <th>金額</th>
-            <th>狀態</th>
-            <th>日期</th>
-            <th>方式</th>
-            <th>報名人</th>
+            <th><%= t("account.payments_index.table_headers.reference") %></th>
+            <th><%= t("account.payments_index.table_headers.offering") %></th>
+            <th><%= t("account.payments_index.table_headers.amount") %></th>
+            <th><%= t("account.payments_index.table_headers.status") %></th>
+            <th><%= t("account.payments_index.table_headers.date") %></th>
+            <th><%= t("account.payments_index.table_headers.method") %></th>
+            <th><%= t("account.payments_index.table_headers.registrant") %></th>
           </tr>
         </thead>
         <tbody>
@@ -27,12 +27,12 @@
               <td><%= payment.external_reference.presence || payment.temple_event_registration&.reference_code || payment.id %></td>
               <td><%= payment.temple_event_registration&.temple_offering&.title || "—" %></td>
               <td><%= Currency::Symbols.format_amount(payment.amount_cents, payment.currency) %></td>
-              <td><span class="status-pill status-<%= payment.status %>"><%= payment.status %></span></td>
+              <td><span class="status-pill status-<%= payment.status %>"><%= t("account.dashboard.payment_statuses.#{payment.status}", default: payment.status) %></span></td>
               <td><%= (payment.processed_at || payment.created_at).strftime("%Y/%m/%d") %></td>
               <td>
-                <span><%= payment.payment_method.titleize %></span>
+                <span><%= t("account.dashboard.payment_methods.#{payment.payment_method}", default: payment.payment_method.titleize) %></span>
                 <% if payment.payment_method == "line_pay" %>
-                  <span class="line-pay-placeholder" title="LINE Pay 收據即將推出">收據整理中</span>
+                  <span class="line-pay-placeholder" title="<%= t("account.dashboard.payments.line_pay_title") %>"><%= t("account.dashboard.payments.line_pay_label") %></span>
                 <% end %>
               </td>
               <td><%= payment.temple_event_registration&.registrant_name || current_user.english_name %></td>
@@ -42,6 +42,6 @@
       </table>
     </div>
   <% else %>
-    <p class="muted">尚無付款紀錄。</p>
+    <p class="muted"><%= t("account.payments_index.empty") %></p>
   <% end %>
 </section>

@@ -1,5 +1,194 @@
 en:
   account:
+    language_selector:
+      flash: "Language updated."
+    layout:
+      hero:
+        title: "Member Portal"
+        subtitle: "Review upcoming events, payments, and keep your profile current."
+      nav:
+        dashboard: "Dashboard"
+        profile: "Profile"
+        events: "Events"
+        payments: "Payments"
+        sign_out: "Sign out"
+    dashboard:
+      intro:
+        eyebrow: "Member overview"
+        greeting: "Hi, %{name}"
+        body: "Check registrations, payments, and update your details anytime."
+      quick_actions:
+        profile: "Update profile"
+        registrations: "View registrations"
+        payments: "Payment history"
+        contact: "Contact temple"
+        contact_confirm: "This feature is coming soon. Please contact the temple desk for help."
+      registrations:
+        eyebrow: "My registrations"
+        title: "Recent activity"
+        subtitle: "Track each offering's status and certificate progress."
+        link: "View all registrations"
+        registrant_label: "Registrant"
+        certificate_label: "Certificate"
+        certificate_pending: "Not issued yet"
+        empty: "No offerings have been booked yet."
+      certificates:
+        eyebrow: "Certificates"
+        title: "Certificates & receipts"
+        subtitle: "Issued certificates appear here."
+        number_label: "Certificate number"
+        offering_fallback: "Offering"
+        empty: "No certificates have been issued."
+      payments:
+        eyebrow: "Payments"
+        title: "Latest payments"
+        subtitle: "Quickly confirm payment method and status."
+        link: "See more details"
+        table_headers:
+          reference: "Reference"
+          offering: "Offering"
+          amount: "Amount"
+          method: "Method"
+          status: "Status"
+          download: "Download"
+        line_pay_label: "Receipt in progress"
+        line_pay_title: "LINE Pay receipts are coming soon"
+        paper_hint: "Paper copy provided"
+        empty: "No payments yet."
+      payment_methods:
+        line_pay: "LINE Pay"
+        cash: "Cash"
+        bank: "Bank transfer"
+      payment_statuses:
+        paid: "Paid"
+        pending: "Pending"
+        refunded: "Refunded"
+        failed: "Failed"
+    profile:
+      header:
+        eyebrow: "Profile"
+        title: "Personal details"
+        subtitle: "Update contact info and service notes so the temple can reach you."
+        edit: "Edit profile"
+      edit:
+        eyebrow: "Profile"
+        title: "Edit personal details"
+        subtitle: "This information is only shared with temple staff and will not be public."
+        save: "Save"
+        cancel: "Cancel"
+      summary:
+        english_name: "Name"
+        native_name: "Chinese name"
+        phone: "Phone"
+        city: "City/Region"
+        notes: "Notes"
+        not_provided: "Not provided"
+        no_notes: "No notes yet."
+      dependents:
+        eyebrow: "Family / caretakers"
+        title: "Manage dependent profiles"
+        subtitle: "Add or update members who cannot log in themselves."
+        add: "Add dependent"
+        support: "Request assistance"
+        support_confirm: "This feature is coming soon. Please contact the temple."
+        relationship: "Relationship"
+        birthdate: "Birthdate"
+        phone: "Phone"
+        email: "Email"
+        edit: "Edit"
+        delete: "Remove"
+        delete_confirm: "Remove this dependent?"
+        empty: "No dependent profiles yet."
+    events:
+      upcoming:
+        eyebrow: "Events"
+        title: "Upcoming"
+        subtitle: "Review schedules and reminders for your registrations."
+      past:
+        eyebrow: "Events"
+        title: "Past events"
+        subtitle: "Browse previous gatherings; photo galleries appear when available."
+        gallery_link: "View gallery"
+        gallery_pending: "Gallery coming soon."
+    payments_index:
+      header:
+        eyebrow: "Payments"
+        title: "Transaction history"
+        subtitle: "See every online or on-site payment and its status."
+      table_headers:
+        reference: "Reference"
+        offering: "Offering"
+        amount: "Amount"
+        status: "Status"
+        date: "Date"
+        method: "Method"
+        registrant: "Registrant"
+      empty: "No payment history yet."
+    registrations:
+      index:
+        eyebrow: "My registrations"
+        title: "Participation history"
+        subtitle: "Review each offering or gathering along with certificates."
+        table:
+          reference: "Reference"
+          offering: "Offering"
+          registrant: "Registrant"
+          status: "Status"
+          certificate: "Certificate"
+          certificate_pending: "Not issued"
+        actions:
+          view: "View"
+          edit: "Edit"
+        empty: "No registrations recorded."
+      show:
+        eyebrow: "Registration details"
+        subtitle: "Update contact info or view certificate status."
+        edit: "Edit registration"
+        registrant: "Registrant"
+        certificate: "Certificate number"
+        certificate_pending: "Pending"
+        status: "Status"
+        totals: "Quantity / amount"
+        contact:
+          title: "Contact information"
+          primary: "Contact"
+          phone: "Phone"
+          dependents: "Family / companions"
+        logistics:
+          title: "Schedule & notes"
+          arrival: "Arrival window"
+          notes: "Ceremony notes"
+    sessions:
+      new:
+        heading: "Welcome back to %{temple}"
+        subtitle: "Choose a connected provider or sign in with email."
+        social:
+          title: "Social sign in"
+          subtitle: "Tap a provider to continue instantly."
+          empty: "OAuth providers are not configured yet."
+        email:
+          title: "Email sign in"
+          subtitle: "Use your password to continue."
+          email_label: "Email"
+          password_label: "Password"
+          submit: "Sign in"
+        forgot_password: "Forgot your password?"
+        register_prompt: "Prefer email onboarding?"
+        register_button: "Create account"
+      flash:
+        invalid_credentials: "Those credentials did not match."
+        signed_in: "Signed in."
+        sign_in_required: "Please sign in to continue."
+        signed_out: "Signed out."
+    signups:
+      modal:
+        title: "Create your account"
+        close_label: "Close create account modal"
+      form:
+        email_label: "Email"
+        password_label: "Password"
+        password_confirmation_label: "Confirm password"
+        submit: "Create account"
     passwords:
       request:
         eyebrow: "Security"
@@ -37,3 +226,17 @@ en:
         copy_hint: "If the button does not work, copy and paste the link above into your browser."
         ignore_notice: "If you did not request a reset, you can safely ignore this email."
         signoff_html: "Thanks,<br />The %{brand} team"
+    dependents:
+      edit_header:
+        eyebrow: "Edit dependent"
+        subtitle: "Update contact details and notes."
+      form:
+        english_name: "Name (required)"
+        native_name: "Chinese name"
+        relationship: "Relationship"
+        birthdate: "Birthdate"
+        phone: "Phone"
+        email: "Email"
+        notes: "Notes"
+        submit: "Save"
+        cancel: "Cancel"

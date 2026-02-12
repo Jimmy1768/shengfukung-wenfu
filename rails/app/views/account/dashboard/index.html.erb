@@ -1,9 +1,9 @@
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow">會員專區</p>
-      <h2>Hi, <%= current_user.english_name.presence || current_user.email %></h2>
-      <p>檢視最新的報名資訊與付款紀錄，若資料需調整可立即更新。</p>
+      <p class="eyebrow"><%= t("account.dashboard.intro.eyebrow") %></p>
+      <h2><%= t("account.dashboard.intro.greeting", name: current_user.english_name.presence || current_user.email) %></h2>
+      <p><%= t("account.dashboard.intro.body") %></p>
     </div>
   </header>
 
@@ -11,18 +11,18 @@
     <% @quick_actions.each do |action| %>
       <%= link_to action[:label], action[:url], class: "quick-link-card" %>
     <% end %>
-    <%= link_to "聯絡寺廟", "#", class: "quick-link-card support-link", data: { turbo_confirm: "此功能即將推出，請洽寺廟服務台。" } %>
+    <%= link_to t("account.dashboard.quick_actions.contact"), "#", class: "quick-link-card support-link", data: { turbo_confirm: t("account.dashboard.quick_actions.contact_confirm") } %>
   </div>
 </section>
 
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow">My registrations</p>
-      <h2>近期報名</h2>
-      <p>追蹤每個供奉項目的處理進度與證書進度。</p>
+      <p class="eyebrow"><%= t("account.dashboard.registrations.eyebrow") %></p>
+      <h2><%= t("account.dashboard.registrations.title") %></h2>
+      <p><%= t("account.dashboard.registrations.subtitle") %></p>
     </div>
-    <%= link_to "全部報名", account_registrations_path, class: "pill-link secondary" %>
+    <%= link_to t("account.dashboard.registrations.link"), account_registrations_path, class: "pill-link secondary" %>
   </header>
 
   <% if @registrations.any? %>
@@ -31,23 +31,23 @@
         <article class="event-card">
             <p class="event-date"><%= l(registration.created_at, format: :short) rescue registration.created_at.strftime("%Y/%m/%d") %></p>
             <h3><%= registration.temple_offering&.title || registration.reference_code %></h3>
-          <p class="event-meta"><%= registration.payment_status %></p>
-          <p class="event-notes">報名人：<%= registration.registrant_name %></p>
-          <p class="event-notes">證書：<%= registration.certificate_number.presence || "尚未發放" %></p>
+            <p class="event-meta"><%= t("account.dashboard.payment_statuses.#{registration.payment_status}", default: registration.payment_status) %></p>
+          <p class="event-notes"><%= t("account.dashboard.registrations.registrant_label") %>：<%= registration.registrant_name %></p>
+          <p class="event-notes"><%= t("account.dashboard.registrations.certificate_label") %>：<%= registration.certificate_number.presence || t("account.dashboard.registrations.certificate_pending") %></p>
         </article>
       <% end %>
     </div>
   <% else %>
-    <p class="muted">尚未報名任何供奉項目或社群活動。</p>
+    <p class="muted"><%= t("account.dashboard.registrations.empty") %></p>
   <% end %>
 </section>
 
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow">Certificates</p>
-      <h2>憑證與收據</h2>
-      <p>已發放的證書會列在這裡，若需紙本可洽客服。</p>
+      <p class="eyebrow"><%= t("account.dashboard.certificates.eyebrow") %></p>
+      <h2><%= t("account.dashboard.certificates.title") %></h2>
+      <p><%= t("account.dashboard.certificates.subtitle") %></p>
     </div>
   </header>
 
@@ -58,25 +58,25 @@
           <div class="timeline-dot"></div>
           <div>
             <p class="timeline-date"><%= registration.updated_at.strftime("%Y/%m/%d") %></p>
-            <h3><%= registration.temple_offering&.title || "供奉項目" %></h3>
-            <p class="muted">證書號碼：<%= registration.certificate_number %></p>
+            <h3><%= registration.temple_offering&.title || t("account.dashboard.certificates.offering_fallback") %></h3>
+            <p class="muted"><%= t("account.dashboard.certificates.number_label") %>：<%= registration.certificate_number %></p>
           </div>
         </div>
       <% end %>
     </div>
   <% else %>
-    <p class="muted">證書尚未發放。</p>
+    <p class="muted"><%= t("account.dashboard.certificates.empty") %></p>
   <% end %>
 </section>
 
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow">Payments</p>
-      <h2>最近付款</h2>
-      <p>快速確認付款方式與狀態。</p>
+      <p class="eyebrow"><%= t("account.dashboard.payments.eyebrow") %></p>
+      <h2><%= t("account.dashboard.payments.title") %></h2>
+      <p><%= t("account.dashboard.payments.subtitle") %></p>
     </div>
-    <%= link_to "更多明細", account_payments_path, class: "pill-link secondary" %>
+    <%= link_to t("account.dashboard.payments.link"), account_payments_path, class: "pill-link secondary" %>
   </header>
 
   <% if @recent_payments.any? %>
@@ -84,12 +84,12 @@
       <table class="payment-table">
         <thead>
           <tr>
-            <th>編號</th>
-            <th>項目</th>
-            <th>金額</th>
-            <th>方式</th>
-            <th>狀態</th>
-            <th>下載</th>
+            <th><%= t("account.dashboard.payments.table_headers.reference") %></th>
+            <th><%= t("account.dashboard.payments.table_headers.offering") %></th>
+            <th><%= t("account.dashboard.payments.table_headers.amount") %></th>
+            <th><%= t("account.dashboard.payments.table_headers.method") %></th>
+            <th><%= t("account.dashboard.payments.table_headers.status") %></th>
+            <th><%= t("account.dashboard.payments.table_headers.download") %></th>
           </tr>
         </thead>
         <tbody>
@@ -98,13 +98,13 @@
               <td><%= payment.external_reference.presence || payment.temple_event_registration&.reference_code || payment.id %></td>
               <td><%= payment.temple_event_registration&.temple_offering&.title || "—" %></td>
               <td><%= Currency::Symbols.format_amount(payment.amount_cents, payment.currency) %></td>
-              <td><%= payment.payment_method.titleize %></td>
-              <td><span class="status-pill status-<%= payment.status %>"><%= payment.status %></span></td>
+              <td><%= t("account.dashboard.payment_methods.#{payment.payment_method}", default: payment.payment_method.titleize) %></td>
+              <td><span class="status-pill status-<%= payment.status %>"><%= t("account.dashboard.payment_statuses.#{payment.status}", default: payment.status) %></span></td>
               <td>
                 <% if payment.payment_method == "line_pay" %>
-                  <span class="line-pay-placeholder" title="LINE Pay 收據即將推出">收據整理中</span>
+                  <span class="line-pay-placeholder" title="<%= t("account.dashboard.payments.line_pay_title") %>"><%= t("account.dashboard.payments.line_pay_label") %></span>
                 <% else %>
-                  <span class="muted">紙本支援</span>
+                  <span class="muted"><%= t("account.dashboard.payments.paper_hint") %></span>
                 <% end %>
               </td>
             </tr>
@@ -113,6 +113,6 @@
       </table>
     </div>
   <% else %>
-    <p class="muted">尚無付款。</p>
+    <p class="muted"><%= t("account.dashboard.payments.empty") %></p>
   <% end %>
 </section>

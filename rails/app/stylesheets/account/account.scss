@@ -4,6 +4,8 @@
 // design-system tokens.
 
 @use "../shared/tokens" as *;
+@use "../shared/forms";
+@use "../shared/modal";
 
 body.account-body {
   background: var(--surface-muted);
@@ -25,6 +27,34 @@ body.account-body {
   padding: 2.5rem;
   box-shadow: var(--shadow-soft);
   margin-bottom: 2rem;
+}
+
+.account-language-selector {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+
+  .language-selector-form {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .language-switch-button {
+    border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
+    background: transparent;
+    color: var(--text);
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &.is-active {
+      background: var(--accent);
+      color: var(--accent-foreground);
+      border-color: transparent;
+    }
+  }
 }
 
 .account-hero-inner {
@@ -81,6 +111,13 @@ body.account-body {
   border: 1px solid var(--border);
   padding: 2rem;
   box-shadow: var(--shadow-soft);
+}
+
+.login-form {
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .account-section {
@@ -177,7 +214,56 @@ body.account-body {
 .profile-form .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-form .single-row-grid,
+.profile-form .form-grid.single-row-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 200px);
+  column-gap: 1.25rem;
+  grid-auto-flow: row;
+  justify-content: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.profile-form .single-row-grid .field,
+.profile-form .form-grid.single-row-grid .field {
+  min-width: 0;
+  max-width: 200px;
+}
+
+.profile-form .single-row-grid input,
+.profile-form .single-row-grid select,
+.profile-form .single-row-grid textarea,
+.profile-form .form-grid.single-row-grid input,
+.profile-form .form-grid.single-row-grid select,
+.profile-form .form-grid.single-row-grid textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.profile-form {
+  max-width: 900px;
+  margin: 0;
+}
+.single-row-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 200px);
+  column-gap: 1rem;
+  grid-auto-flow: row;
+  justify-content: flex-start;
+  margin-bottom: 1.5rem;
+}
+.single-row-grid .field {
+  min-width: 0;
+}
+.single-row-grid input,
+.single-row-grid select,
+.single-row-grid textarea {
+  width: 100%;
+  min-width: 0;
 }
 
 .profile-form .field {
@@ -185,6 +271,32 @@ body.account-body {
   flex-direction: column;
   gap: 0.4rem;
 }
+
+
+.account-form .form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 200px));
+  column-gap: 1.25rem;
+  row-gap: 1rem;
+  grid-auto-flow: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.account-form .form-grid > .form-field {
+  min-width: 0;
+  max-width: 200px;
+}
+
+.account-form .form-grid input,
+.account-form .form-grid select,
+.account-form .form-grid textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 
 .profile-form input,
 .profile-form textarea {
@@ -360,21 +472,6 @@ body.account-body {
   color: var(--danger);
 }
 
-.flash {
-  border-radius: 16px;
-  padding: 0.85rem 1rem;
-  margin-bottom: 1rem;
-}
-
-.flash-notice {
-  background: rgba(16, 185, 129, 0.15);
-  color: var(--success);
-}
-
-.flash-alert {
-  background: rgba(220, 38, 38, 0.15);
-  color: var(--danger);
-}
 
 .dev-theme-toggle {
   position: fixed;
@@ -423,4 +520,37 @@ body.account-body {
   border: 1px dashed var(--border);
   font-size: 0.85rem;
   color: var(--text-muted);
+}
+.account-form {
+  max-width: 720px;
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.account-form .form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.account-form .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.account-form input,
+.account-form textarea,
+.account-form select {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.65rem 0.85rem;
+  font-size: 1rem;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.account-form textarea {
+  min-height: 6rem;
+  resize: vertical;
 }

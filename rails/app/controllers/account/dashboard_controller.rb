@@ -15,9 +15,9 @@ module Account
         .order(Arel.sql("COALESCE(temple_payments.processed_at, temple_payments.created_at) DESC"))
         .limit(3)
       @quick_actions = [
-        { label: "更新個人資料", url: account_profile_path },
-        { label: "查看報名", url: account_registrations_path },
-        { label: "付款紀錄", url: account_payments_path }
+        { label: I18n.t("account.dashboard.quick_actions.profile"), url: account_profile_path },
+        { label: I18n.t("account.dashboard.quick_actions.registrations"), url: account_registrations_path },
+        { label: I18n.t("account.dashboard.quick_actions.payments"), url: account_payments_path }
       ]
     end
   end

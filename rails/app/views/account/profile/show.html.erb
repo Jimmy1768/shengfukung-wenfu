@@ -1,47 +1,47 @@
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow">會員資料</p>
-      <h2>個人資料</h2>
-      <p>更新聯絡方式、服務備註，方便寺廟聯繫。</p>
+      <p class="eyebrow"><%= t("account.profile.header.eyebrow") %></p>
+      <h2><%= t("account.profile.header.title") %></h2>
+      <p><%= t("account.profile.header.subtitle") %></p>
     </div>
-    <%= link_to "編輯資料", edit_account_profile_path, class: "pill-link primary" %>
+    <%= link_to t("account.profile.header.edit"), edit_account_profile_path, class: "pill-link primary" %>
   </header>
 
   <div class="profile-summary">
     <div>
-      <span class="label">姓名</span>
-      <p><%= current_user.english_name.presence || "尚未填寫" %></p>
+      <span class="label"><%= t("account.profile.summary.english_name") %></span>
+      <p><%= current_user.english_name.presence || t("account.profile.summary.not_provided") %></p>
     </div>
     <div>
-      <span class="label">中文姓名</span>
-      <p><%= current_user.native_name.presence || "尚未填寫" %></p>
+      <span class="label"><%= t("account.profile.summary.native_name") %></span>
+      <p><%= current_user.native_name.presence || t("account.profile.summary.not_provided") %></p>
     </div>
     <div>
-      <span class="label">電話</span>
-      <p><%= current_user.metadata&.dig("phone") || "尚未填寫" %></p>
+      <span class="label"><%= t("account.profile.summary.phone") %></span>
+      <p><%= current_user.metadata&.dig("phone") || t("account.profile.summary.not_provided") %></p>
     </div>
     <div>
-      <span class="label">居住區</span>
-      <p><%= current_user.metadata&.dig("city") || "尚未填寫" %></p>
+      <span class="label"><%= t("account.profile.summary.city") %></span>
+      <p><%= current_user.metadata&.dig("city") || t("account.profile.summary.not_provided") %></p>
     </div>
   </div>
 
   <div class="profile-notes">
-    <span class="label">備註</span>
-    <p><%= current_user.metadata&.dig("notes").presence || "尚無備註。" %></p>
+    <span class="label"><%= t("account.profile.summary.notes") %></span>
+    <p><%= current_user.metadata&.dig("notes").presence || t("account.profile.summary.no_notes") %></p>
   </div>
 </section>
 
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow">家屬 / 受照護者</p>
-      <h2>管理家屬資料</h2>
-      <p>新增或更新無法自行登入的成員資訊。</p>
+      <p class="eyebrow"><%= t("account.profile.dependents.eyebrow") %></p>
+      <h2><%= t("account.profile.dependents.title") %></h2>
+      <p><%= t("account.profile.dependents.subtitle") %></p>
     </div>
-    <%= link_to "新增家屬", new_account_dependent_path, class: "pill-link primary" %>
-    <%= link_to "建立支援請求", "#", class: "pill-link secondary", data: { turbo_confirm: "此功能即將推出，請洽寺方。" } %>
+    <%= link_to t("account.profile.dependents.add"), new_account_dependent_path, class: "pill-link primary" %>
+    <%= link_to t("account.profile.dependents.support"), "#", class: "pill-link secondary", data: { turbo_confirm: t("account.profile.dependents.support_confirm") } %>
   </header>
 
   <% if @dependents.any? %>
@@ -54,19 +54,19 @@
             <% if dependent.native_name.present? %>
               <p class="muted"><%= dependent.native_name %></p>
             <% end %>
-            <p class="muted">關係：<%= link.relationship_label.presence || dependent.relationship_label || "—" %></p>
-            <p class="muted">生日：<%= dependent.birthdate&.strftime("%Y/%m/%d") || "—" %></p>
-            <p class="muted">電話：<%= dependent.metadata["phone"].presence || "—" %></p>
-            <p class="muted">Email：<%= dependent.metadata["email"].presence || "—" %></p>
+            <p class="muted"><%= t("account.profile.dependents.relationship") %>：<%= link.relationship_label.presence || dependent.relationship_label || "—" %></p>
+            <p class="muted"><%= t("account.profile.dependents.birthdate") %>：<%= dependent.birthdate&.strftime("%Y/%m/%d") || "—" %></p>
+            <p class="muted"><%= t("account.profile.dependents.phone") %>：<%= dependent.metadata["phone"].presence || "—" %></p>
+            <p class="muted"><%= t("account.profile.dependents.email") %>：<%= dependent.metadata["email"].presence || "—" %></p>
           </div>
           <div class="dependent-actions">
-            <%= link_to "編輯", edit_account_dependent_path(link), class: "pill-link secondary" %>
-            <%= button_to "刪除", account_dependent_path(link), method: :delete, data: { turbo_confirm: "確定刪除此家屬？" }, class: "pill-link danger" %>
+            <%= link_to t("account.profile.dependents.edit"), edit_account_dependent_path(link), class: "pill-link secondary" %>
+            <%= button_to t("account.profile.dependents.delete"), account_dependent_path(link), method: :delete, data: { turbo_confirm: t("account.profile.dependents.delete_confirm") }, class: "pill-link danger" %>
           </div>
         </article>
       <% end %>
     </div>
   <% else %>
-    <p class="muted">尚未建立任何家屬資料。</p>
+    <p class="muted"><%= t("account.profile.dependents.empty") %></p>
   <% end %>
 </section>

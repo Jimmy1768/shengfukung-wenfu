@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "reorganized docs"
+git commit -m "completed account layout plan"
 git push
 
 git reset --hard HEAD
