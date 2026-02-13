@@ -143,6 +143,8 @@ zh-TW:
         subtitle: "%{date} 的現場紀錄"
         back: "回到回顧列表"
         empty_media: "照片整理中，稍後補上。"
+        open_image: "開啟大圖"
+        close: "關閉大圖"
       card:
         photo_count:
           one: "%{count} 張照片"
@@ -163,6 +165,24 @@ zh-TW:
         registrant: "報名人"
       empty: "尚無付款紀錄。"
     registrations:
+      new:
+        eyebrow: "報名資料"
+        subtitle: "請確認聯絡方式與人數，送出後廟方會與您聯繫。"
+        details:
+          temple: "寺廟"
+          price: "費用"
+          date: "日期"
+        fields:
+          quantity: "數量"
+          contact_name: "聯絡人"
+          contact_phone: "電話"
+          contact_email: "Email"
+          household_notes: "家庭／同行備註"
+          arrival_window: "預計抵達時間"
+          ceremony_notes: "其他備註"
+        submit: "送出報名"
+        after_submit_html: "送出後可在 %{link} 查看或取消。"
+        after_submit_link: "我的報名"
       index:
         eyebrow: "我的報名"
         title: "參與紀錄"

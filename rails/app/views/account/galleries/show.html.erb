@@ -16,12 +16,48 @@
 
   <% if @entry.photo_urls.any? %>
     <div class="gallery-media-grid">
-      <% @entry.photo_urls.each do |url| %>
+      <% @entry.photo_urls.each_with_index do |url, index| %>
+        <% lightbox_key = "gallery-lightbox-#{index}" %>
         <figure class="gallery-media">
-          <%= image_tag url, alt: @entry.title %>
+          <button
+            type="button"
+            class="gallery-thumbnail"
+            data-modal-trigger="<%= lightbox_key %>"
+            aria-label="<%= t("account.galleries.show.open_image") %>">
+            <%= image_tag url,
+              alt: @entry.title,
+              width: 360,
+              height: 220,
+              loading: "lazy",
+              class: "gallery-thumbnail__image" %>
+          </button>
         </figure>
       <% end %>
     </div>
+
+    <% @entry.photo_urls.each_with_index do |url, index| %>
+      <% lightbox_key = "gallery-lightbox-#{index}" %>
+      <div
+        class="modal-overlay gallery-lightbox is-hidden"
+        data-modal-key="<%= lightbox_key %>"
+        aria-hidden="true"
+        hidden>
+        <button type="button" class="gallery-lightbox__scrim" data-modal-close="<%= lightbox_key %>"></button>
+        <div class="gallery-lightbox__dialog" role="dialog" aria-modal="true">
+          <button
+            type="button"
+            class="gallery-lightbox__close"
+            data-modal-close="<%= lightbox_key %>"
+            aria-label="<%= t("account.galleries.show.close") %>">
+            &times;
+          </button>
+          <%= image_tag url,
+            alt: @entry.title,
+            class: "gallery-lightbox__image",
+            loading: "lazy" %>
+        </div>
+      </div>
+    <% end %>
   <% else %>
     <div class="account-empty"><%= t("account.galleries.show.empty_media") %></div>
   <% end %>

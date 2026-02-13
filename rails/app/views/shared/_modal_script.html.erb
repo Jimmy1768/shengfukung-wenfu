@@ -9,9 +9,12 @@
     };
 
     const hideModal = (modal) => {
-      if (modal && !modal.classList.contains('is-hidden')) {
+      if (!modal) return;
+      if (!modal.classList.contains('is-hidden')) {
         modal.classList.add('is-hidden');
       }
+      modal.setAttribute('aria-hidden', 'true');
+      modal.setAttribute('hidden', 'hidden');
     };
 
     const toggleModal = (key, show) => {
@@ -20,6 +23,8 @@
       if (!modal) return;
       if (show) {
         modal.classList.remove('is-hidden');
+        modal.removeAttribute('hidden');
+        modal.setAttribute('aria-hidden', 'false');
       } else {
         hideModal(modal);
       }

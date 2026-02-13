@@ -136,6 +136,8 @@ en:
         subtitle: "Captured on %{date}"
         back: "Back to gallery"
         empty_media: "Photos are still being organized for this story."
+        open_image: "Open image preview"
+        close: "Close image"
       card:
         photo_count:
           one: "%{count} photo"
@@ -156,6 +158,24 @@ en:
         registrant: "Registrant"
       empty: "No payment history yet."
     registrations:
+      new:
+        eyebrow: "Registration"
+        subtitle: "Confirm contact details so the temple can reach you."
+        details:
+          temple: "Temple"
+          price: "Price"
+          date: "Date"
+        fields:
+          quantity: "Quantity"
+          contact_name: "Contact name"
+          contact_phone: "Phone"
+          contact_email: "Email"
+          household_notes: "Household / companions"
+          arrival_window: "Arrival window"
+          ceremony_notes: "Notes"
+        submit: "Submit registration"
+        after_submit_html: "After submitting, visit %{link} to review or cancel."
+        after_submit_link: "My registrations"
       index:
         eyebrow: "My registrations"
         title: "Participation history"

@@ -1,25 +1,25 @@
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow">新增報名</p>
+      <p class="eyebrow"><%= t("account.registrations.new.eyebrow") %></p>
       <h2><%= @offering.title %></h2>
-      <p>請確認聯絡方式後送出報名，後續可在「我的報名」中更新細節。</p>
+      <p><%= t("account.registrations.new.subtitle") %></p>
     </div>
   </header>
 
   <article class="card">
     <dl class="detail-list">
       <div>
-        <dt>寺廟</dt>
+        <dt><%= t("account.registrations.new.details.temple") %></dt>
         <dd><%= @offering.temple.name %></dd>
       </div>
       <div>
-        <dt>費用</dt>
+        <dt><%= t("account.registrations.new.details.price") %></dt>
         <dd><%= Currency::Symbols.format_amount(@offering.price_cents, @offering.currency) %></dd>
       </div>
       <% if @offering.respond_to?(:starts_on) && @offering.starts_on.present? %>
         <div>
-          <dt>日期</dt>
+          <dt><%= t("account.registrations.new.details.date") %></dt>
           <dd><%= @offering.starts_on %></dd>
         </div>
       <% end %>
@@ -31,39 +31,44 @@
   <%= form_with model: @form,
     url: account_registrations_path(offering: @offering.slug, account_action: @account_action),
     local: true,
-    class: "form-stack" do |f| %>
-    <div class="field-panel">
-      <%= f.label :quantity, "數量" %>
-      <%= f.number_field :quantity, min: 1, max: 10, required: true %>
+    class: "account-form account-registration-form" do |f| %>
+    <div class="form-grid">
+      <div class="form-field">
+        <%= f.label :quantity, t("account.registrations.new.fields.quantity") %>
+        <%= f.number_field :quantity, min: 1, max: 10, required: true %>
+      </div>
+      <div class="form-field">
+        <%= f.label :contact_name, t("account.registrations.new.fields.contact_name") %>
+        <%= f.text_field :contact_name, required: true %>
+      </div>
+      <div class="form-field">
+        <%= f.label :contact_phone, t("account.registrations.new.fields.contact_phone") %>
+        <%= f.telephone_field :contact_phone %>
+      </div>
+      <div class="form-field">
+        <%= f.label :contact_email, t("account.registrations.new.fields.contact_email") %>
+        <%= f.email_field :contact_email %>
+      </div>
+      <div class="form-field form-field--full">
+        <%= f.label :household_notes, t("account.registrations.new.fields.household_notes") %>
+        <%= f.text_area :household_notes, rows: 2 %>
+      </div>
+      <div class="form-field">
+        <%= f.label :arrival_window, t("account.registrations.new.fields.arrival_window") %>
+        <%= f.text_field :arrival_window, placeholder: "09:00" %>
+      </div>
+      <div class="form-field form-field--full">
+        <%= f.label :ceremony_notes, t("account.registrations.new.fields.ceremony_notes") %>
+        <%= f.text_area :ceremony_notes, rows: 3 %>
+      </div>
     </div>
-    <div class="field-panel">
-      <%= f.label :contact_name, "聯絡人" %>
-      <%= f.text_field :contact_name, required: true %>
-    </div>
-    <div class="field-panel">
-      <%= f.label :contact_phone, "電話" %>
-      <%= f.telephone_field :contact_phone %>
-    </div>
-    <div class="field-panel">
-      <%= f.label :contact_email, "Email" %>
-      <%= f.email_field :contact_email %>
-    </div>
-    <div class="field-panel">
-      <%= f.label :household_notes, "家庭/同行備註" %>
-      <%= f.text_area :household_notes, rows: 2 %>
-    </div>
-    <div class="field-panel">
-      <%= f.label :arrival_window, "預計抵達時間" %>
-      <%= f.text_field :arrival_window, placeholder: "09:00" %>
-    </div>
-    <div class="field-panel">
-      <%= f.label :ceremony_notes, "其他備註" %>
-      <%= f.text_area :ceremony_notes, rows: 3 %>
-    </div>
-    <%= f.submit "送出報名", class: "btn btn-primary" %>
+    <%= f.submit t("account.registrations.new.submit"), class: "btn btn-primary" %>
   <% end %>
 
   <p class="muted">
-    送出後可在 <%= link_to "我的報名", account_registrations_path %> 查看狀態或取消。
+    <%= t(
+      "account.registrations.new.after_submit_html",
+      link: link_to(t("account.registrations.new.after_submit_link"), account_registrations_path)
+    ).html_safe %>
   </p>
 </section>

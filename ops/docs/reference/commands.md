@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "completed account events services"
+git commit -m "registration copy fixed"
 git push
 
 git reset --hard HEAD
@@ -117,7 +117,7 @@ bundle install
 bin/rails db:setup
 
 # Run Rails server (defaults to http://localhost:3001)
-bundle exec rails server -p 3001 -b 0.0.0.0
+bundle exec rails server -p 3002 -b 0.0.0.0
 
 # Run any pending migrations
 bin/rails db:migrate

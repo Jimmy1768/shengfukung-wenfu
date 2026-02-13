@@ -13,7 +13,9 @@
 
 3. **Registration payment flow**
    - After a user submits a registration, there is no payment handoff screen.
-   - Need an account-side payment endpoint/view that can later integrate Line Pay; for now it should show registration summary, amount due, and a placeholder “Complete payment” action.
+   - Workflow: patron completes registration (event, service, or free/paid gathering). Successful save should redirect to `/account/registrations/:id/payment` (or similar) that shows the registration summary, amount due, and payment method selector.
+   - The payment view should accept the registration ID/reference via params, render a “Complete payment” CTA (stub for Line Pay), and a “Pay later” link that returns to the registration detail.
+   - For free registrations, the payment screen should short-circuit with a confirmation message but still live at the same route so the UX is consistent.
 
 4. **Gallery section**
    - “View gallery” buttons on past events do nothing because the gallery section/API is missing from account portal.
