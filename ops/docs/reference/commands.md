@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "completed account layout plan"
+git commit -m "completed account events services"
 git push
 
 git reset --hard HEAD

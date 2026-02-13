@@ -107,6 +107,7 @@ Rails.application.routes.draw do
     resources :dependents, except: :show
     resources :registrations, only: %i[index show edit update new create]
     resources :events, only: :index
+    resources :services, only: :index
     resources :payments, only: :index
     resource :locale, only: :create, controller: "locales"
 

@@ -10,6 +10,7 @@ en:
         dashboard: "Dashboard"
         profile: "Profile"
         events: "Events"
+        services: "Services"
         payments: "Payments"
         sign_out: "Sign out"
     dashboard:
@@ -100,16 +101,23 @@ en:
         delete_confirm: "Remove this dependent?"
         empty: "No dependent profiles yet."
     events:
-      upcoming:
+      offerings:
         eyebrow: "Events"
-        title: "Upcoming"
-        subtitle: "Review schedules and reminders for your registrations."
-      past:
+        title: "Offerings"
+        subtitle: "Published temple offerings scheduled for the coming weeks."
+        empty: "No offerings are currently open for registration."
+      gatherings:
         eyebrow: "Events"
-        title: "Past events"
-        subtitle: "Browse previous gatherings; photo galleries appear when available."
-        gallery_link: "View gallery"
-        gallery_pending: "Gallery coming soon."
+        title: "Community gatherings"
+        subtitle: "Talks, workshops, and community meetups hosted by the temple."
+        empty: "No gatherings have been announced yet."
+      statuses:
+        upcoming: "Upcoming"
+        ongoing: "In progress"
+        past: "Completed"
+      date_tbd: "Date to be announced"
+      default_location: "Temple"
+      empty_state: "There are no active offerings or gatherings right now. Please check back soon."
     payments_index:
       header:
         eyebrow: "Payments"
@@ -240,3 +248,19 @@ en:
         notes: "Notes"
         submit: "Save"
         cancel: "Cancel"
+    services:
+      header:
+        eyebrow: "Services"
+        title: "Blessing services"
+        subtitle: "Long-term offerings (lamps, tables, rituals) available to members."
+      card:
+        status_label: "Status"
+        price_label: "Price"
+        period_label: "Period"
+        statuses:
+          open: "Open now"
+          closed: "Closed"
+        description_fallback: "Service details will be published soon."
+        period_default: "Ongoing blessing"
+        cta: "Register this service"
+      empty: "No services are currently published. Please check back later."

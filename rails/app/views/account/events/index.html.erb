@@ -1,47 +1,65 @@
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow"><%= t("account.events.upcoming.eyebrow") %></p>
-      <h2><%= t("account.events.upcoming.title") %></h2>
-      <p><%= t("account.events.upcoming.subtitle") %></p>
+      <p class="eyebrow"><%= t("account.events.offerings.eyebrow") %></p>
+      <h2><%= t("account.events.offerings.title") %></h2>
+      <p><%= t("account.events.offerings.subtitle") %></p>
     </div>
   </header>
 
-  <div class="event-grid">
-    <% @upcoming_events.each do |event| %>
-      <article class="event-card">
-        <p class="event-date"><%= event[:date] %></p>
-        <h3><%= event[:title] %></h3>
-        <p class="event-meta"><%= event[:location] %> · <%= event[:status] %></p>
-        <p class="event-notes"><%= event[:description] || event[:notes] %></p>
-      </article>
-    <% end %>
-  </div>
+  <% if @offerings.any? %>
+    <div class="event-grid">
+      <% @offerings.each do |event| %>
+        <article class="event-card">
+          <p class="event-date"><%= event[:date] %></p>
+          <h3><%= event[:title] %></h3>
+          <p class="event-meta">
+            <%= event[:location] %> ·
+            <%= t("account.events.statuses.#{event[:status]}", default: event[:status].to_s.humanize) %>
+          </p>
+          <% if event[:description].present? %>
+            <p class="event-notes"><%= event[:description] %></p>
+          <% end %>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="account-empty"><%= t("account.events.offerings.empty") %></div>
+  <% end %>
 </section>
 
 <section class="account-section">
   <header class="section-header">
     <div>
-      <p class="eyebrow"><%= t("account.events.past.eyebrow") %></p>
-      <h2><%= t("account.events.past.title") %></h2>
-      <p><%= t("account.events.past.subtitle") %></p>
+      <p class="eyebrow"><%= t("account.events.gatherings.eyebrow") %></p>
+      <h2><%= t("account.events.gatherings.title") %></h2>
+      <p><%= t("account.events.gatherings.subtitle") %></p>
     </div>
   </header>
 
-  <div class="timeline">
-    <% @past_events.each do |event| %>
-      <div class="timeline-entry">
-        <div class="timeline-dot"></div>
-        <div>
-          <p class="timeline-date"><%= event[:date] %></p>
+  <% if @gatherings.any? %>
+    <div class="event-grid">
+      <% @gatherings.each do |event| %>
+        <article class="event-card">
+          <p class="event-date"><%= event[:date] %></p>
           <h3><%= event[:title] %></h3>
-          <% if event[:gallery] %>
-            <%= link_to t("account.events.past.gallery_link"), "#", class: "pill-link secondary" %>
-          <% else %>
-            <p class="muted"><%= t("account.events.past.gallery_pending") %></p>
+          <p class="event-meta">
+            <%= event[:location] %> ·
+            <%= t("account.events.statuses.#{event[:status]}", default: event[:status].to_s.humanize) %>
+          </p>
+          <% if event[:description].present? %>
+            <p class="event-notes"><%= event[:description] %></p>
           <% end %>
-        </div>
-      </div>
-    <% end %>
-  </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="account-empty"><%= t("account.events.gatherings.empty") %></div>
+  <% end %>
 </section>
+
+<% if @offerings.blank? && @gatherings.blank? %>
+  <section class="account-section">
+    <div class="account-empty"><%= t("account.events.empty_state") %></div>
+  </section>
+<% end %>

@@ -1,0 +1,37 @@
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow"><%= t("account.services.header.eyebrow") %></p>
+      <h2><%= t("account.services.header.title") %></h2>
+      <p><%= t("account.services.header.subtitle") %></p>
+    </div>
+  </header>
+
+  <% if @services.any? %>
+    <div class="service-grid">
+      <% @services.each do |service| %>
+        <article class="service-card">
+          <h3><%= service[:title] %></h3>
+          <dl>
+            <div>
+              <dt><%= t("account.services.card.status_label") %></dt>
+              <dd><%= t("account.services.card.statuses.#{service[:status]}") %></dd>
+            </div>
+            <div>
+              <dt><%= t("account.services.card.price_label") %></dt>
+              <dd><%= service[:price] %></dd>
+            </div>
+            <div>
+              <dt><%= t("account.services.card.period_label") %></dt>
+              <dd><%= service[:period] %></dd>
+            </div>
+          </dl>
+          <p class="service-description"><%= service[:description] %></p>
+          <%= link_to t("account.services.card.cta"), new_account_registration_path(offering: service[:slug], account_action: "service"), class: "pill-link" %>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="account-empty"><%= t("account.services.empty") %></div>
+  <% end %>
+</section>

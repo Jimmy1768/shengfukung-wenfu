@@ -1,4 +1,7 @@
 zh-TW:
+  date:
+    formats:
+      short: "%Y/%m/%d"
   account:
     language_selector:
       flash: "已更新顯示語言。"
@@ -9,7 +12,8 @@ zh-TW:
       nav:
         dashboard: "儀表板"
         profile: "個人資料"
-        events: "活動"
+        events: "活動資訊"
+        services: "祈福服務"
         payments: "付款紀錄"
         sign_out: "登出"
     dashboard:
@@ -100,16 +104,23 @@ zh-TW:
         delete_confirm: "確定刪除此家屬？"
         empty: "尚未建立任何家屬資料。"
     events:
-      upcoming:
+      offerings:
         eyebrow: "活動與法會"
-        title: "即將到來"
-        subtitle: "查看已報名的服務與法會，掌握集合時間與注意事項。"
-      past:
+        title: "法會供品"
+        subtitle: "列出近期開放的法會供品，方便提前規劃與報名。"
+        empty: "目前沒有開放的法會供品。"
+      gatherings:
         eyebrow: "活動與法會"
-        title: "活動回顧"
-        subtitle: "查看過往參與紀錄，若有相簿可直接開啟。"
-        gallery_link: "查看相簿"
-        gallery_pending: "相簿整理中。"
+        title: "社群活動"
+        subtitle: "分享講座、祈福聚會與社區活動資訊。"
+        empty: "目前尚無社群活動公告。"
+      statuses:
+        upcoming: "即將開始"
+        ongoing: "進行中"
+        past: "已結束"
+      date_tbd: "日期待定"
+      default_location: "本廟"
+      empty_state: "目前尚未公布活動資訊，可稍後再回來查看。"
     payments_index:
       header:
         eyebrow: "付款紀錄"
@@ -240,3 +251,19 @@ zh-TW:
         notes: "備註"
         submit: "儲存"
         cancel: "取消"
+    services:
+      header:
+        eyebrow: "祈福服務"
+        title: "祈福服務"
+        subtitle: "列出長期供燈、供桌與祈福項目，方便線上了解費用與備註。"
+      card:
+        status_label: "狀態"
+        price_label: "費用"
+        period_label: "期間"
+        statuses:
+          open: "開放中"
+          closed: "暫停"
+        description_fallback: "祈福服務說明即將更新。"
+        period_default: "長期祈福"
+        cta: "登入並報名"
+      empty: "目前沒有公開的祈福服務。"

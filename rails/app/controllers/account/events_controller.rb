@@ -3,24 +3,53 @@
 module Account
   class EventsController < BaseController
     def index
-      @upcoming_events = mock_upcoming_events
-      @past_events = mock_past_events
+      @offerings = offerings_scope.map { |offering| build_event_card(offering) }
+      @gatherings = gatherings_scope.map { |gathering| build_event_card(gathering) }
     end
 
     private
 
-    def mock_upcoming_events
-      [
-        { title: "新春點燈", date: "2026/02/01", status: "已報名", location: "主殿", notes: "九點報到" },
-        { title: "祈福法會", date: "2026/03/15", status: "報名中", location: "禮堂", notes: "家人可同行" }
-      ]
+    def offerings_scope
+      current_temple.temple_events
+        .upcoming_or_active
+        .order_for_marketing
     end
 
-    def mock_past_events
-      [
-        { title: "歲末感恩", date: "2025/12/20", gallery: true },
-        { title: "祖師聖誕", date: "2025/09/05", gallery: false }
-      ]
+    def gatherings_scope
+      current_temple.temple_gatherings
+        .where(status: "published")
+        .order(
+          Arel.sql(
+            "COALESCE(temple_gatherings.starts_on, DATE(temple_gatherings.created_at)) ASC"
+          )
+        )
+    end
+
+    def build_event_card(record)
+      {
+        id: record.id,
+        title: record.title,
+        date: formatted_date(record.starts_on),
+        location: record_location(record),
+        status: record.timeline_status,
+        description: record.try(:subtitle).presence || record.try(:description)
+      }
+    end
+
+    def formatted_date(date)
+      return I18n.t("account.events.date_tbd") if date.blank?
+
+      I18n.l(date, format: :short)
+    end
+
+    def record_location(record)
+      return record.location_label if record.respond_to?(:location_label) && record.location_label.present?
+
+      if record.respond_to?(:location_address) && record.location_address.present?
+        record.location_address
+      else
+        current_temple.contact_details&.dig("addressZh") || I18n.t("account.events.default_location")
+      end
     end
   end
 end
