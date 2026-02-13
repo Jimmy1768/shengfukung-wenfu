@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "registration copy fixed"
+git commit -m "built account portal v3"
 git push
 
 git reset --hard HEAD

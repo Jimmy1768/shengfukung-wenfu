@@ -19,6 +19,7 @@ zh-TW:
         events: "活動資訊"
         gallery: "活動回顧"
         services: "祈福服務"
+        registrations: "報名紀錄"
         payments: "付款紀錄"
         sign_out: "登出"
     dashboard:
@@ -126,6 +127,7 @@ zh-TW:
       date_tbd: "日期待定"
       default_location: "本廟"
       empty_state: "目前尚未公布活動資訊，可稍後再回來查看。"
+      register_cta: "我要報名"
     galleries:
       preview:
         eyebrow: "活動回顧"

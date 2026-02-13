@@ -33,7 +33,8 @@ module Account
         date: formatted_date(record.starts_on),
         location: record_location(record),
         status: record.timeline_status,
-        description: record.try(:subtitle).presence || record.try(:description)
+        description: record.try(:subtitle).presence || record.try(:description),
+        cta_path: registration_cta_path(record)
       }
     end
 
@@ -65,6 +66,17 @@ module Account
 
     def gallery_preview_scope
       current_temple.temple_gallery_entries.recent_first.limit(3)
+    end
+
+    def registration_cta_path(record)
+      return unless record.respond_to?(:slug) && record.slug.present?
+
+      new_account_registration_path(
+        account_action: account_action_for(record),
+        offering: record.slug
+      )
+    rescue ActionController::UrlGenerationError
+      nil
     end
   end
 end

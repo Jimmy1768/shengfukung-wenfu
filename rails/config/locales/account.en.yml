@@ -12,8 +12,9 @@ en:
         events: "Events"
         gallery: "Gallery"
         services: "Services"
+        registrations: "Registrations"
         payments: "Payments"
-        sign_out: "Sign out"
+        sign_out: "Sign Out"
     dashboard:
       intro:
         eyebrow: "Member overview"
@@ -119,6 +120,7 @@ en:
       date_tbd: "Date to be announced"
       default_location: "Temple"
       empty_state: "There are no active offerings or gatherings right now. Please check back soon."
+      register_cta: "Register"
     galleries:
       preview:
         eyebrow: "Gallery"

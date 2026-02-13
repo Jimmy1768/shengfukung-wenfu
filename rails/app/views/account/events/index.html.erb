@@ -20,6 +20,9 @@
           <% if event[:description].present? %>
             <p class="event-notes"><%= event[:description] %></p>
           <% end %>
+          <% if event[:cta_path].present? %>
+            <%= link_to t("account.events.register_cta"), event[:cta_path], class: "pill-link pill-link--inline" %>
+          <% end %>
         </article>
       <% end %>
     </div>
@@ -49,6 +52,9 @@
           </p>
           <% if event[:description].present? %>
             <p class="event-notes"><%= event[:description] %></p>
+          <% end %>
+          <% if event[:cta_path].present? %>
+            <%= link_to t("account.events.register_cta"), event[:cta_path], class: "pill-link pill-link--inline" %>
           <% end %>
         </article>
       <% end %>
