@@ -5,6 +5,7 @@ module Account
     def index
       @offerings = offerings_scope.map { |offering| build_event_card(offering) }
       @gatherings = gatherings_scope.map { |gathering| build_event_card(gathering) }
+      @gallery_entries = gallery_preview_scope.map { |entry| build_gallery_card(entry) }
     end
 
     private
@@ -36,6 +37,16 @@ module Account
       }
     end
 
+    def build_gallery_card(entry)
+      {
+        id: entry.id,
+        title: entry.title,
+        date: formatted_date(entry.event_date),
+        description: entry.body.to_s,
+        photo_count: entry.photo_urls.count
+      }
+    end
+
     def formatted_date(date)
       return I18n.t("account.events.date_tbd") if date.blank?
 
@@ -50,6 +61,10 @@ module Account
       else
         current_temple.contact_details&.dig("addressZh") || I18n.t("account.events.default_location")
       end
+    end
+
+    def gallery_preview_scope
+      current_temple.temple_gallery_entries.recent_first.limit(3)
     end
   end
 end

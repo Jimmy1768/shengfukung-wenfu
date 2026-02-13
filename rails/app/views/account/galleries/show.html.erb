@@ -1,0 +1,28 @@
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow"><%= t("account.galleries.show.eyebrow") %></p>
+      <h2><%= @entry.title %></h2>
+      <p><%= t("account.galleries.show.subtitle", date: I18n.l(@entry.event_date, format: :long)) %></p>
+    </div>
+    <%= link_to t("account.galleries.show.back"), account_galleries_path, class: "pill-link" %>
+  </header>
+
+  <% if @entry.body.present? %>
+    <article class="card">
+      <p><%= @entry.body %></p>
+    </article>
+  <% end %>
+
+  <% if @entry.photo_urls.any? %>
+    <div class="gallery-media-grid">
+      <% @entry.photo_urls.each do |url| %>
+        <figure class="gallery-media">
+          <%= image_tag url, alt: @entry.title %>
+        </figure>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="account-empty"><%= t("account.galleries.show.empty_media") %></div>
+  <% end %>
+</section>

@@ -1,0 +1,75 @@
+<% offering_name = @registration.registrable&.try(:title) || @registration.temple_offering&.title || @registration.reference_code %>
+<% amount_label = Currency::Symbols.format_amount(@registration.total_price_cents, @registration.currency) %>
+<% amount_zero = @registration.total_price_cents.to_i.zero? %>
+<% status_key = @registration.payment_status %>
+
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow"><%= t("account.registrations.payment.eyebrow") %></p>
+      <h2><%= t("account.registrations.payment.title", offering: offering_name) %></h2>
+      <p><%= t("account.registrations.payment.subtitle") %></p>
+    </div>
+    <%= link_to t("account.registrations.payment.view_registration"), account_registration_path(@registration), class: "pill-link" %>
+  </header>
+
+  <article class="card">
+    <dl class="detail-list">
+      <div>
+        <dt><%= t("account.registrations.payment.summary.reference") %></dt>
+        <dd><%= @registration.reference_code %></dd>
+      </div>
+      <div>
+        <dt><%= t("account.registrations.payment.summary.offering") %></dt>
+        <dd><%= offering_name %></dd>
+      </div>
+      <div>
+        <dt><%= t("account.registrations.payment.summary.registrant") %></dt>
+        <dd><%= @registration.registrant_name %></dd>
+      </div>
+      <div>
+        <dt><%= t("account.registrations.payment.summary.quantity") %></dt>
+        <dd><%= @registration.quantity %></dd>
+      </div>
+      <div>
+        <dt><%= t("account.registrations.payment.summary.amount") %></dt>
+        <dd><%= amount_label %></dd>
+      </div>
+      <div>
+        <dt><%= t("account.registrations.payment.summary.status") %></dt>
+        <dd>
+          <span class="status-pill status-<%= status_key %>">
+            <%= t("account.dashboard.payment_statuses.#{status_key}", default: status_key.to_s.humanize) %>
+          </span>
+        </dd>
+      </div>
+    </dl>
+  </article>
+
+  <% if amount_zero %>
+    <article class="card payment-callout is-free">
+      <p><%= t("account.registrations.payment.free_notice") %></p>
+      <%= link_to t("account.registrations.payment.back_to_registration"), account_registration_path(@registration), class: "pill-link secondary" %>
+    </article>
+  <% elsif @registration.paid? %>
+    <article class="card payment-callout is-paid">
+      <div class="payment-amount">
+        <p class="eyebrow"><%= t("account.registrations.payment.amount_label") %></p>
+        <strong><%= amount_label %></strong>
+      </div>
+      <p><%= t("account.registrations.payment.paid_notice") %></p>
+      <%= link_to t("account.registrations.payment.back_to_registration"), account_registration_path(@registration), class: "pill-link secondary" %>
+    </article>
+  <% else %>
+    <article class="card payment-callout is-pending">
+      <div class="payment-amount">
+        <p class="eyebrow"><%= t("account.registrations.payment.amount_label") %></p>
+        <strong><%= amount_label %></strong>
+      </div>
+      <p class="payment-message"><%= t("account.registrations.payment.pending_notice") %></p>
+      <button type="button" class="btn btn-primary payment-cta"><%= t("account.registrations.payment.line_pay_cta") %></button>
+      <p class="muted"><%= t("account.registrations.payment.line_pay_hint") %></p>
+      <%= link_to t("account.registrations.payment.pay_later"), account_registration_path(@registration), class: "pill-link secondary" %>
+    </article>
+  <% end %>
+</section>

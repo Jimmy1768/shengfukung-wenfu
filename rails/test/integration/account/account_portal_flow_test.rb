@@ -3,11 +3,10 @@ require "test_helper"
 class AccountPortalFlowTest < ActionDispatch::IntegrationTest
   test "member sees registrations and payments and can update metadata" do
     temple = create_temple
-    offering = TempleOffering.create!(
+    offering = create_offering(
       temple:,
       slug: "spring-lights",
       title: "新春點燈",
-      currency: "TWD",
       price_cents: 800
     )
     user = User.create!(
@@ -15,30 +14,28 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
       english_name: "Member",
       encrypted_password: User.password_hash("Password123!")
     )
-    registration = TempleEventRegistration.create!(
-      temple:,
-      temple_offering: offering,
+    registration = create_registration(
       user:,
+      offering:,
       quantity: 1,
       contact_payload: { "primary_contact" => "Member" },
       logistics_payload: {},
-      metadata: {},
       certificate_number: "CERT-001"
     )
-    TemplePayment.create!(
-      temple:,
-      temple_event_registration: registration,
-      user:,
-      payment_method: TemplePayment::PAYMENT_METHODS[:line_pay],
-      status: TemplePayment::STATUSES[:completed],
-      amount_cents: 800,
-      currency: "TWD",
-      processed_at: Time.current,
-      metadata: {},
-      payment_payload: {}
+    create_payment(
+      registration:,
+      method: TemplePayment::PAYMENT_METHODS[:line_pay],
+      provider: "line_pay"
     )
 
-    sign_in_account(user)
+    gallery_entry = temple.temple_gallery_entries.create!(
+      title: "Lantern Parade",
+      body: "Volunteers gathered at dusk.",
+      event_date: Date.current,
+      photo_urls: ["https://placehold.co/1200x800/f97316/ffffff?text=Gallery"]
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
 
     get account_dashboard_path
     assert_response :success
@@ -47,7 +44,7 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
 
     get account_payments_path
     assert_response :success
-    assert_includes response.body, "Line Pay"
+    assert_includes response.body, "LINE Pay"
 
     get account_registrations_path
     assert_response :success
@@ -71,5 +68,13 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
     registration.reload
     assert_equal "0912-000-000", registration.contact_payload["phone"]
     assert_equal "Need seating", registration.metadata["ceremony_notes"]
+
+    get account_galleries_path
+    assert_response :success
+    assert_includes response.body, gallery_entry.title
+
+    get account_gallery_path(gallery_entry)
+    assert_response :success
+    assert_includes response.body, gallery_entry.title
   end
 end

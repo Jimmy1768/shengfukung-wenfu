@@ -105,9 +105,14 @@ Rails.application.routes.draw do
     get "/dashboard", to: "dashboard#index", as: :dashboard
     resource :profile, only: %i[show edit update], controller: "profile"
     resources :dependents, except: :show
-    resources :registrations, only: %i[index show edit update new create]
+    resources :registrations, only: %i[index show edit update new create] do
+      member do
+        get :payment
+      end
+    end
     resources :events, only: :index
     resources :services, only: :index
+    resources :galleries, only: %i[index show]
     resources :payments, only: :index
     resource :locale, only: :create, controller: "locales"
 

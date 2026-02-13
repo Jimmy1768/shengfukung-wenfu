@@ -2,7 +2,7 @@
 
 module Account
   class RegistrationsController < BaseController
-    before_action :set_registration, only: %i[show edit update]
+    before_action :set_registration, only: %i[show edit update payment]
     before_action :assign_offering_from_params, only: %i[new create]
     before_action :redirect_existing_registration!, only: %i[new create]
 
@@ -27,7 +27,7 @@ module Account
       )
 
       if @form.save
-        redirect_to account_registration_path(@form.registration),
+        redirect_to payment_account_registration_path(@form.registration),
           notice: "Registration submitted."
       else
         flash.now[:alert] = "Please review the errors below."
@@ -52,6 +52,8 @@ module Account
         render :edit, status: :unprocessable_content
       end
     end
+
+    def payment; end
 
     private
 

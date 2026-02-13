@@ -10,6 +10,7 @@ en:
         dashboard: "Dashboard"
         profile: "Profile"
         events: "Events"
+        gallery: "Gallery"
         services: "Services"
         payments: "Payments"
         sign_out: "Sign out"
@@ -118,6 +119,28 @@ en:
       date_tbd: "Date to be announced"
       default_location: "Temple"
       empty_state: "There are no active offerings or gatherings right now. Please check back soon."
+    galleries:
+      preview:
+        eyebrow: "Gallery"
+        title: "Event highlights"
+        subtitle: "See recaps from recent offerings and temple gatherings."
+        empty: "Gallery stories will appear here after the next event."
+        view_all: "View all"
+      index:
+        eyebrow: "Gallery"
+        title: "Event recaps"
+        subtitle: "Browse temple highlights and download your favorite shots."
+        empty: "No gallery stories have been published yet."
+      show:
+        eyebrow: "Gallery story"
+        subtitle: "Captured on %{date}"
+        back: "Back to gallery"
+        empty_media: "Photos are still being organized for this story."
+      card:
+        photo_count:
+          one: "%{count} photo"
+          other: "%{count} photos"
+        view_gallery: "View gallery"
     payments_index:
       header:
         eyebrow: "Payments"
@@ -166,6 +189,26 @@ en:
           title: "Schedule & notes"
           arrival: "Arrival window"
           notes: "Ceremony notes"
+      payment:
+        eyebrow: "Payment"
+        title: "Complete payment for %{offering}"
+        subtitle: "Review your registration summary and finish payment via LINE Pay."
+        view_registration: "Registration details"
+        amount_label: "Amount due"
+        free_notice: "This registration is free. You're all set!"
+        paid_notice: "Payment already completed."
+        pending_notice: "Continue with LINE Pay to confirm your spot."
+        line_pay_cta: "Pay with LINE Pay"
+        line_pay_hint: "LINE Pay checkout will open in a new window. Temple staff can also assist at the service desk."
+        pay_later: "Pay later"
+        back_to_registration: "Back to registration"
+        summary:
+          reference: "Reference"
+          offering: "Offering"
+          registrant: "Registrant"
+          quantity: "Quantity"
+          amount: "Total amount"
+          status: "Status"
     sessions:
       new:
         heading: "Welcome back to %{temple}"

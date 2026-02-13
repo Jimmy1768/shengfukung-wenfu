@@ -2,6 +2,10 @@ zh-TW:
   date:
     formats:
       short: "%Y/%m/%d"
+      long: "%Y/%m/%d"
+  time:
+    formats:
+      long: "%Y/%m/%d"
   account:
     language_selector:
       flash: "已更新顯示語言。"
@@ -13,6 +17,7 @@ zh-TW:
         dashboard: "儀表板"
         profile: "個人資料"
         events: "活動資訊"
+        gallery: "活動回顧"
         services: "祈福服務"
         payments: "付款紀錄"
         sign_out: "登出"
@@ -121,6 +126,28 @@ zh-TW:
       date_tbd: "日期待定"
       default_location: "本廟"
       empty_state: "目前尚未公布活動資訊，可稍後再回來查看。"
+    galleries:
+      preview:
+        eyebrow: "活動回顧"
+        title: "近期回顧"
+        subtitle: "快速回顧近期法會與社群活動的剪影。"
+        empty: "活動回顧整理中，敬請期待。"
+        view_all: "更多回顧"
+      index:
+        eyebrow: "活動回顧"
+        title: "法會紀實"
+        subtitle: "瀏覽寺方整理的活動紀錄與照片。"
+        empty: "尚未發布任何活動回顧。"
+      show:
+        eyebrow: "活動回顧"
+        subtitle: "%{date} 的現場紀錄"
+        back: "回到回顧列表"
+        empty_media: "照片整理中，稍後補上。"
+      card:
+        photo_count:
+          one: "%{count} 張照片"
+          other: "%{count} 張照片"
+        view_gallery: "查看回顧"
     payments_index:
       header:
         eyebrow: "付款紀錄"
@@ -169,6 +196,26 @@ zh-TW:
           title: "行程與儀式備註"
           arrival: "到場時間"
           notes: "儀式備註"
+      payment:
+        eyebrow: "付款"
+        title: "完成 %{offering} 的付款"
+        subtitle: "確認報名摘要並透過 LINE Pay 完成付款。"
+        view_registration: "查看報名資料"
+        amount_label: "應付金額"
+        free_notice: "此報名不需付費，已完成。"
+        paid_notice: "已完成付款。"
+        pending_notice: "透過 LINE Pay 完成付款即可保留名額。"
+        line_pay_cta: "使用 LINE Pay 付款"
+        line_pay_hint: "LINE Pay 將於新視窗開啟，如需協助可洽寺廟服務台。"
+        pay_later: "稍後再付"
+        back_to_registration: "回到報名"
+        summary:
+          reference: "編號"
+          offering: "項目"
+          registrant: "報名人"
+          quantity: "數量"
+          amount: "總金額"
+          status: "狀態"
     sessions:
       new:
         heading: "歡迎回到 %{temple}"

@@ -58,6 +58,37 @@
   <% end %>
 </section>
 
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow"><%= t("account.galleries.preview.eyebrow") %></p>
+      <h2><%= t("account.galleries.preview.title") %></h2>
+      <p><%= t("account.galleries.preview.subtitle") %></p>
+    </div>
+    <% if @gallery_entries.any? %>
+      <%= link_to t("account.galleries.preview.view_all"), account_galleries_path, class: "pill-link" %>
+    <% end %>
+  </header>
+
+  <% if @gallery_entries.any? %>
+    <div class="event-grid">
+      <% @gallery_entries.each do |entry| %>
+        <article class="event-card">
+          <p class="event-date"><%= entry[:date] %></p>
+          <h3><%= entry[:title] %></h3>
+          <p class="event-meta"><%= t("account.galleries.card.photo_count", count: entry[:photo_count]) %></p>
+          <% if entry[:description].present? %>
+            <p class="event-notes"><%= entry[:description] %></p>
+          <% end %>
+          <%= link_to t("account.galleries.card.view_gallery"), account_gallery_path(entry[:id]), class: "pill-link" %>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="account-empty"><%= t("account.galleries.preview.empty") %></div>
+  <% end %>
+</section>
+
 <% if @offerings.blank? && @gatherings.blank? %>
   <section class="account-section">
     <div class="account-empty"><%= t("account.events.empty_state") %></div>

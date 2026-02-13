@@ -75,18 +75,21 @@ module TestDataHelpers
   end
 
   def create_payment(registration:, amount_cents: registration.total_price_cents, status: TemplePayment::STATUSES[:completed], method: TemplePayment::PAYMENT_METHODS[:cash], **attrs)
-    TemplePayment.create!(
-      {
-        temple: registration.temple,
-        temple_event_registration: registration,
-        user: registration.user,
-        amount_cents:,
-        currency: registration.currency,
-        payment_method: method,
-        status:,
-        processed_at: Time.current
-      }.merge(attrs)
-    )
+    defaults = {
+      temple: registration.temple,
+      temple_event_registration: registration,
+      user: registration.user,
+      amount_cents:,
+      currency: registration.currency,
+      payment_method: method,
+      status:,
+      processed_at: Time.current,
+      provider: "demo",
+      provider_account: "temple",
+      payment_payload: {},
+      metadata: {}
+    }
+    TemplePayment.create!(defaults.merge(attrs))
   end
 end
 
