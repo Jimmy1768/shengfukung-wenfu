@@ -1,81 +1,50 @@
-# Admin Portal Build Plan
+# Admin Portal Reference
 
-Progress tracking: fill in each `Completed:` line once the section is implemented and tested.
+This document captures what exists in the admin portal today so future work can plug into the right layers without re-discovering prior decisions.
 
-## Phase 1 – Content & Data Foundations
+## Temple Content & Media Management
 
-- Extend the Temple profile schema + `/admin/temple/profile` so admins can manage hero copy, shared imagery (single hero or per-tab), and any marketing copy surfaced on the Vue site.
-- Introduce `TempleNewsPost` and `TempleGalleryEntry` (or equivalent) scoped by temple slug to store news updates, event recaps, and gallery assets.
-- Ensure offerings endpoints clearly separate future vs. past events and expose the necessary metadata for Vue/Expo.
-- Add Active Storage + S3 plumbing for hero images, archive galleries, and news thumbnails (placeholders acceptable until uploads are ready).
+- `/admin/temple/profile` persists hero copy, per-tab hero images, contact/service/visit metadata, and validates map links. Hero uploads use the AJAX uploader with fallback URL inputs, and a floating save CTA appears when media sections are in view.
+- News (`TempleNewsPost`) and gallery (`TempleGalleryEntry`) entries live under `/admin/news_posts` and `/admin/gallery_entries`. Each supports localized copy, publish toggles, and optional recap uploads via the shared MediaAsset/S3 pipeline.
+- Event/service/gathering CRUD screens share the same card layout, localized labels, and datetime pickers; slugs auto-generate per temple so admins never manage URL tokens manually.
+- Gatherings cover non-offering meetups but still flow through the unified registrations/payments stack so reporting stays consistent.
 
-Completed:
-- Temple profile form now persists hero copy, per-tab hero images, contact/service/visit metadata, and validates Google Maps links via Places API.
-- Hero image uploads use the new AJAX uploader + fallback URL inputs; map_link automatically populates address + plus code fields.
-- News posts (`TempleNewsPost`), gallery entries (`TempleGalleryEntry`), plus the split `TempleEvent` / `TempleService` models/controllers are in place with scoped seeds for each temple.
-- Financial stack now rides on `TempleRegistration` + `TemplePayment`, with `TempleGathering` covering non-offering community events so registrations/payments stay unified.
+## Offerings, Registrations & Period Keys
 
-## Phase 2 – Admin UX Enhancements
+- Offerings are defined by YAML under `rails/db/temples/offerings/<slug>.yml`. Templates include `form_fields`, registration form schema, and optional `attributes` that prefill base model columns (e.g., price, description, currency).
+- A template picker on `/admin/offerings/new` lets admins start from those configs. Selecting a template copies metadata, defaults, and prefilled attributes into the new event/service record before validations run.
+- Temple profile YAML now declares `registration_periods` (`{ key, label_zh, label_en }`). `/admin/services/:id` surfaces these keys in a dropdown (with an “Other” escape hatch) and persists the selection as `registration_period_key`. Service cards and order lists display the chosen label for quick context.
+- Registrations copy the service’s `registration_period_key` into `metadata["period_key"]`. Duplicate detection enforces one active registration per `(registrant_scope, service.slug, period_key)` so recurring services (lanterns, tables, donations) cannot be double-booked.
+- Admin filters and CSV exports accept `period_key`, enabling per-period audits without custom SQL.
 
-- Polish `/admin/temple/profile` to label hero image slots per tab, preview uploads, and keep copy + metadata editing intuitive.
-- Build `/admin/news` CRUD for `TempleNewsPost`, including publish toggles and optional “push to Expo” flags.
-- Build `/admin/galleries` (or similar) that lists past offerings and lets admins upload recap photos + text per event.
-- Lock down permissions so only authorized owner/staff accounts can access the new sections.
+## Admin UX Enhancements
 
-Completed:
-- `/admin/temple/profile` redesigned with per-section cards, distinct hero image controls, inline validation, and map-link derived metadata display.
-- `/admin/news_posts`, `/admin/gallery_entries`, `/admin/events`, and `/admin/services` all use the shared admin card layout, localized copy, and stylized datetime pickers.
-- `/admin/gatherings` gives owners a lightweight CRUD for non-offering meetups (workshops, community circles) behind the `manage_offerings` permission, with quick links into the shared registrations/payments flow.
-- Event/service/gathering slugs now auto-generate per temple (and normalize on save) so admins no longer manage URL tokens manually.
-- Gatherings and gallery entries now support direct media uploads (photos or videos) via the shared MediaAsset/S3 pipeline, while still allowing manual URLs as a fallback.
-- Payments dashboard, archives filters, and ledger tables have localized copy + spacing fixes; metrics/pill cards match the latest visual system.
-- Added the patrons directory screen (owner-only) with search + table view as the precursor to the “promote patron to admin” flow.
-- Temple switcher allows admin owners to move between slugs locally (disabled in production environments).
-- Hero image section now presents a floating bottom-left “Save hero images” button when scrolled into view so admins can persist uploads without hunting for the main save CTA (backend still skips no-op writes as before).
+- All admin sections use localized copy, improved spacing, and consistent card scaffolding. Payments dashboards, ledger tables, and archive filters adopt the latest visual system.
+- The patrons directory (owner-only) adds search and table views plus actions that serve as the precursor to the “promote patron to admin” workflow.
+- The temple switcher lets owners jump between slugs locally while remaining disabled in production.
 
-## Phase 3 – Public API Surface
+## Public API Surface
 
-- Expose `/api/v1/temples/:slug/profile` returning hero copy, imagery, and marketing text for Vue and Expo.
-- Add `/api/v1/temples/:slug/news` (latest 10 posts) and `/api/v1/temples/:slug/archives` (past offerings with recap assets).
-- Ensure offerings endpoints already used by the events page include all required fields (status, schedule, CTA URLs).
-- Add request specs covering all new endpoints and enforce slug scoping.
+- `/api/v1/temples/:slug` exposes profile, news, archive, events, and services payloads. Serializers (`TempleEventSerializer`, `TempleServiceSerializer`) include the metadata Vue/Expo require.
+- These endpoints mirror what the cache payloads provide for admin/account flows, keeping mobile/web consumers in sync.
 
-Completed:
-- `/api/v1/temples/:slug` profile/news/archive endpoints landed alongside `/api/v1/temples/:slug/events` and `/api/v1/temples/:slug/services`.
-- Events/services APIs now serialize via `TempleEventSerializer` + `TempleServiceSerializer`, supplying metadata for Vue and Expo.
+## Vue Frontend Integration
 
-## Phase 4 – Vue Frontend Integration
+- The Vue app reads `VITE_TEMPLE_SLUG`, bootstraps `useTempleContent`, and hydrates hero/news/archive/events/services views from the Rails APIs.
+- Events and Services pages now consume the new feeds, while the home page highlights the first two upcoming events instead of hardcoded placeholders.
 
-- Update the Vue app to read `VITE_TEMPLE_SLUG`, fetch the profile/news/archive endpoints on boot, and hydrate a shared store.
-- Build dynamic hero + tab components that reuse the fetched imagery/copy rather than hardcoded placeholders.
-- Wire the Events page to the offerings endpoint, Archives page to the archive API, and News page to the news API (with loading/error states).
-- Ensure routing + SEO tags use per-temple data and that all assets gracefully fallback if optional fields are missing.
-- Keep cache payload generation on the Rails side for admin/account flows where larger datasets need preprocessing; Vue’s footprint is small enough to call APIs directly for now.
+## Deployment & Onboarding
 
-Completed:
-- Vue bootstraps `useTempleContent` with profile/news/archive/events/services feeds; hero/tab components consume the API data instead of hardcoded placeholders.
-- Events page now reads from the new `/events` feed; Services page renders `/services` cards; home page highlights the first two events.
+- Each temple ships with its own `<slug>.env`, systemd units, and `bin/load_temple_env` helper so scripts/deployments run with the right credentials.
+- Deploy helpers (`bin/deploy_vue`, `bin/deploy_vue_all`, `bin/expo_prebuild`, `bin/expo_build`) automatically source the slug env. Smoke tests (`bin/run_smoke_tests`) hit the per-slug API to verify deployments.
+- `DEPLOYMENT_READINESS.md` outlines the droplet/nginx rollout plan once a temple graduates to production.
 
-## Phase 5 – Deployment & Onboarding
+## Mobile Alignment
 
-- **Slug-scoped env + services** – ✅ Every temple now owns `<slug>.env` + matching systemd units, and `bin/load_temple_env` is the canonical wrapper for any command that needs those credentials.
-- **Deploy scripts** – ✅ `bin/deploy_vue`, `bin/deploy_vue_all`, `bin/expo_prebuild`, and `bin/expo_build` all source the slug env automatically and cover the standard deploy/build workflows.
-- **Runbook** – ⏳ Expand onboarding docs with a production checklist (which commands to run, who owns each step) once the `DEPLOYMENT_READINESS.md` tasks land.
-- **Smoke tests** – ✅ `bin/run_smoke_tests` performs the per-slug API checks; extend later with Rails system specs if needed.
-- _(Upload pipeline / S3 provisioning is intentionally deferred until buckets are ready.)_
+- Expo reuses the same APIs/cache payloads as Vue, keeping the slug-driven framework authoritative. Mobile remains a convenience client while heavy admin flows live on the web.
 
-Completed:
-- Manifest + tooling landed (deploy scripts, Expo wrappers, smoke tests, and documentation updates). See `DEPLOYMENT_READINESS.md` for the droplet/nginx rollout plan that follows.
+## Future Enhancements / Notes
 
-## Mobile Alignment Notes
-
-- Keep the slug-driven framework authoritative; Expo should reuse the same APIs and cache payloads as Vue so no new endpoints or business logic drift.
-- Treat Expo as a convenience client (push notifications, quick updates) while leaving heavy admin tasks (accounting, large tables) to the web portals.
-- When designing payloads for Vue, ensure the cache serialization can also satisfy Expo so future mobile work is purely UI.
-- Expo endpoints should mirror Rails cache payloads 1:1, omitting only the datasets intentionally excluded from mobile to keep screens lightweight.
-
-## Upcoming Enhancements / Notes for Codex
-
-- Patron → Admin workflow: owners need UI actions to promote patrons into admin accounts and revoke access, plus filters for viewing current admins only.
-- Owner-only tasks on the dashboard should continue to drive these workflows (temple profile completeness, missing offerings, patron promotions, permission review).
-- Future documentation updates should track any new service objects or endpoints introduced for admin promotion/removal.
+- Patron → Admin promotions need a full UI plus owner-only filters for current admins.
+- Rolling offerings Phase B (dependents) will introduce “Who is this for?” selectors, dependent metadata storage, and per-dependent duplicate enforcement.
+- Consider scripts for advancing all services to the next `registration_period_key` and tooling for renewal reminders once temples request it.

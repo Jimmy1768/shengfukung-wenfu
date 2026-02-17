@@ -91,6 +91,8 @@ Use this when you need representative data locally or on staging:
    - Use the optional `attributes` block to pre-fill core event/service columns (e.g., `price_cents`, `currency`, `description`). These values only apply when the field is blank, so admins can still override them before saving.
    - Extend the seed task (or run a one-off script) to load this YAML and merge `form_fields` + `kind` into each offering’s `metadata`. The admin `_form.html.erb` partial reads `@offering.metadata['form_fields']` and only renders the listed sections/inputs, so each temple sees a tailored form without separate partials.
    - Store the YAML in Git so the config remains the source of truth. When a temple needs tweaks, edit the YAML, rerun the sync task, and the form will update automatically.
+   - After editing `rails/db/temples/offerings/<slug>.yml`, run `ruby ops/scripts/sync_offering_configs.rb` to push the latest metadata (`form_fields`, defaults, registration schema, attributes) into each offering’s `metadata` column. Without this sync, the admin UI will keep rendering the stale metadata from the DB.
+   - Keep `form_fields` focused on metadata that doesn’t already have a dedicated column on the base form (e.g., certificate hints, lamp locations). Core fields like `description`, `price_cents`, `starts_on`, etc. already appear in the built-in cards, so duplicating them in metadata results in redundant UI.
    - `registration_form.field_settings` unlocks richer controls:
      - `options` (array or `{ value: label }`) renders a `<select>` so staff pick from approved values instead of typing.
      - `allow_multiple: true` shows the “Save as additional option” toggle, letting admins append new defaults instead of overwriting prior ones.

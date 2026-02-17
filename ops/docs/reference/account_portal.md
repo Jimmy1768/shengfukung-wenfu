@@ -1,112 +1,55 @@
-# Account Portal Build Plan
+# Account Portal Reference
 
-Progress tracking: fill in each `Completed:` line after the section ships and is verified.
+Snapshot of what the patron-facing account portal already delivers so future work plugs into the right layers.
 
-## Phase 1 – Theme & Design Foundations
+## Theme & Layout
 
-- Keep `/account` aligned with the shared design system: palettes live in `shared/design-system/themes.json` and require `node bin/sync_design_system.js` after edits.
-- Ensure each temple’s default theme key lives in `shared/app_constants/project.json` (override via `PROJECT_DEFAULT_THEME_KEY`) so the portal + marketing site stay in sync.
-- Maintain the dev-only theme toggle (cookie-driven) so designers can preview alternate looks locally while production locks to the configured theme.
-- Use the shared design tokens (colors, typography, spacing, button styles) but build dedicated `/account` layouts/components on top so patron-facing pages aren’t constrained by the admin UI grid.
+- `/account` uses the shared design-system palettes defined in `shared/design-system/themes.json`. `PROJECT_DEFAULT_THEME_KEY` (per temple) keeps marketing + account shells visually aligned.
+- Developers can preview alternate palettes locally via the cookie-driven theme toggle exposed by `Account::BaseController` and `/dev/theme` endpoints.
+- `layouts/account.html.erb` plus `app/stylesheets/account/account.scss` render a dedicated hero/nav shell while importing the shared tokens.
 
-Completed:
-- `/account/temples` (slug selector) renders hero cards per temple and routes the entire card to `/account/login?temple=<slug>`.
-- Login + sign-up capture `temple`/`account_action`/`offering` params and store them in the session so post-auth routing can happen in 3B.
-- OAuth/email login share the same modal; unauthenticated deep links immediately show the modal atop the background.
-- `/account/login` header now mentions the active temple by name so patrons know where they’re signing in.
-- Tokens + theme files already power both marketing + account shells, and the account layout (`layouts/account`) loads the shared CSS while rendering its own hero/nav. Dev theme toggle works via `Account::BaseController` + `_dev_toggle`, so Phase 1 is ✅.
+## Account Shell & Auth Flow
 
-## Phase 2 – Rails Account Shell
+- All `/account` controllers inherit from `Account::BaseController`, which resolves the active theme, enforces authentication, and injects temple context into layouts.
+- `/account/temples` lists every temple from `rails/app/lib/temples/manifest.yml`. If patrons arrive without a slug, we redirect here so they can pick the correct temple before logging in.
+- `/account/login` hosts the shared OAuth + email/password modal. Deep links from the marketing site pass `temple`, `account_action`, and `offering` params; the session stores these so the flow can resume post-login.
 
-- `Account::BaseController` must resolve the active theme (cookie in dev, default otherwise) and expose it to `layouts/account`.
-- Keep the account layout hero/header in `rails/app/stylesheets/account/account.scss` and verify shared CSS tokens load correctly.
-- Retain the `/dev/theme` endpoints used by both Rails and Vue dev toggles so overrides stay consistent across surfaces.
+## Registration Handoff
 
-Completed:
-- `Account::BaseController` already assigns `@active_theme_key`/`@theme_palette`, handles the dev cookie, and enforces `authenticate_user!`.
-- `layouts/account.html.erb` + `app/stylesheets/account/account.scss` define the dedicated shell while importing shared tokens.
-- `/dev/theme` remains available for toggling themes locally, so the Rails account surface stays in sync with Vue dev previews.
+- Vue “Register” buttons point to `/account/login?temple=<slug>&account_action=<event|service|gathering>&offering=<slug>`.
+- After authentication, `Account::RegistrationsController` checks for an existing registration on that slug. If one exists, patrons land on the detail page; otherwise they see the new-registration form.
+- Personal info fields prefill from the `users` table and write back on save. Offering-specific fields (ancestor names, dedications, etc.) remain read-only outside the registration form; admins control edits.
+- Registrations lock once fulfilled or past the start time. Cancel/refund actions surface only while the offering is open; otherwise we show guidance to contact the temple.
+- Duplicate guardrails allow exactly one active registration per patron/offering (Phase A’s service-period logic handles recurring services on the admin side).
 
-## Phase 3A – Auth + Entry Experience
+## Member Surfaces
 
-- Scope `/account` to authenticated workflows only. Offerings (events/services/gatherings) remain on the public Vue site; patrons tap “Register” there and deep-link into `/account` with the offering slug in tow.
-- `/account/login` reuses the same modal for email/password across all entry points; OAuth stays the default path.
-- Add `/account/temples` as the neutral landing screen when no temple slug is provided. Cards come from `rails/app/lib/temples/manifest.yml` and link back to each temple’s marketing site + deep-link slug.
-- Registration hand-off flow:
-  1. Vue deep-links patrons to `/account/login?temple=<slug>&account_action=<event|service|gathering>&offering=<offering_slug>` whenever they tap “Register.”
-  2. If the patron isn’t signed in, show the login modal atop the page background; once authenticated, continue the flow.
-  3. After login, `Account::RegistrationsController` checks `current_user.temple_event_registrations` for an existing enrollment on that offering. If one exists (one active registration per patron per offering), redirect to the registration detail page so they can view/cancel. Otherwise, render the new-registration form for that offering.
-  4. Prefill personal info from `users` table metadata; if they edit those fields, save back to their profile. Offering-specific metadata (ancestor names, dedications) is read-only outside the registration form—patrons view it per registration but admins remain the only editors.
-  5. Notes/comments stay admin-only for now; patrons don’t see or edit them.
-  6. Lock edits once the registration is fulfilled or the start time passes. Allow cancel/refund actions only while the offering is still open; otherwise surface a contact-the-temple message.
-- For the registration flow, accept these query params, prefill the form for logged-in patrons, and fall back to guided login if they arrive without a session.
+- **Dashboard** shows the next registration, certificate list placeholder, and quick links to profile/payments. Registrant names display on cards to clarify whether the order is for self or a dependent.
+- **Registrations** lists active orders with status pills, payment state, and cancel/help actions. **History** covers fulfilled orders with the same data helpers.
+- **Payments** mirrors the registrations list and reserves room for future LINE Pay receipts. Today it shows placeholder buttons explaining digital receipts are coming.
+- **Profile & Dependents** lets patrons edit their own contact info plus manage dependent cards (name, relationship, optional birthdate/contact). Dependents never receive credentials; registrations remain tied to the caregiver account but display the registrant name in tables.
 
-Completed:
+## Rolling Offerings Hooks (Phase A parity)
 
-## Phase 3B – Member Surfaces
+- The account portal trusts the service metadata populated by the admin tooling. When Vue deep-links into `/account`, the offering slug + period key determine whether new registrations are allowed or if we redirect to an existing record.
+- Certificates appear on dashboard/history lists with their numbers/status but no downloads yet; copy explains that the temple issues printed certificates until digital PDFs arrive.
 
-- Scope `/account` to authenticated workflows only. Offerings (events/services/gatherings) remain on the public Vue site; patrons tap “Register” there and deep-link into `/account` with the offering slug in tow.
-- Sections to implement:
-  - **Dashboard** – show the next registration + quick links to profile/orders.
-  - **Registrations** – list active orders (status, payment, actions like cancel/request help).
-  - **History** – past orders/payments with PDF receipt/LINE Pay reference download.
-  - **Profile & Settings** – read/edit contact info, privacy, QR code for switching temples.
-- Registration hand-off flow:
-  1. Vue deep-links patrons to `/account/login?temple=<slug>&account_action=<event|service|gathering>&offering=<offering_slug>` whenever they tap “Register.” OAuth is the default authentication path; the email/password modal is always available as the fallback.
-  2. If the patron isn’t signed in, show the login modal (same component used on `/account/login`) atop the page background; once authenticated, continue the flow.
-  3. After login, `Account::RegistrationsController` checks `current_user.temple_event_registrations` for an existing enrollment on that offering. If one exists (one active registration per patron per offering), redirect to the registration detail page so they can view/cancel. Otherwise, render the new-registration form for that offering.
-  4. Prefill personal info from `users` table metadata; if they edit those fields, save back to their profile. Offering-specific metadata (ancestor names, dedications) is read-only outside the registration form—patrons view it per registration but admins remain the only editors.
-  5. Notes/comments stay admin-only for now; patrons don’t see or edit them.
-  6. Lock edits once the registration is fulfilled or the start time passes. Allow cancel/refund actions only while the offering is still open; otherwise surface a contact-the-temple message.
-- For the registration flow, accept these query params, prefill the form for logged-in patrons, and fall back to guided login if they arrive without a session.
-- Profile & dependents:
-  - Patrons can edit all standard `users` fields (name, email, phone, address, language) plus opt-ins. The profile page shows their own info first, followed by expandable cards for each dependent.
-  - Dependents are full profiles (name, relationship, optional birthdate, contact info). CRUD lives under the profile screen: “Add dependent” inserts a new card; if saved empty, the card disappears.
-  - Dependents don’t get login credentials—registrations created in their name still belong to the controller account. Payments lists show the registrant name (self or dependent) in an additional column.
-- Certificates:
-  - Dashboard/history list certificates with their numbers and status but no downloads yet. Copy explains “Temple provides printed certificates on-site; check back when digital downloads are available.” Keep the slot ready for future PDF links.
-- LINE Pay placeholder:
-  - Payments table shows “使用 LINE Pay” rows with a placeholder button (ghost style) that opens a modal explaining digital receipts are coming soon; until the pipeline lands we only record cash, so the button is disabled with tooltip copy.
-- Use existing account APIs (`/account/api/registrations`, `/account/api/payment_statuses/:reference`, etc.); add endpoints only if gaps appear (e.g., certificate downloads).
-- Keep future enhancements (LINE Pay, certificate requests) behind feature flags so the portal shell can ship incrementally.
-  - When Vue links patrons into `/account`, pass the registration/offering slug in the query so the portal can redirect to the matching registration detail once they log in.
-  - Implement `Account::RegistrationsController#index/show`, `Account::PaymentsController#index`, and `Account::ProfileController#show/update` to back the sections listed above; reuse the API serializers so fields stay consistent.
+## Workflow & Deployment
 
-Completed:
-- Dashboard cards now show registrant names, certificate lists, and payments table with LINE Pay placeholders + registrant column.
-- Profile page includes dependent CRUD (add/edit/delete), and a “Contact temple” placeholder link exists until messaging lands.
-- Registrations/payments screens reuse the same data helpers (registrant names, status pills) and LINE Pay receipt placeholders.
+- Standard workflow: tweak design tokens → `node bin/sync_design_system.js` → rebuild account CSS → deploy Rails/Vue/Expo via the shared scripts. `ops/docs/COMMANDS.md` documents the sequence.
+- Admin console + Expo stay on the Golden Template UI; only marketing/account surfaces respond to theme switches.
 
-## Phase 4 – Workflow & Deployment
+## Temple Context Enforcement
 
-- Standard workflow: edit themes → run `node bin/sync_design_system.js` → set default theme → preview via dev toggle → deploy. Document this sequence for designers/engineers.
-- Confirm that admin console + Expo share the Golden Template UI while only marketing + account surfaces respond to theme switching.
-- Add regression tests (controller + system) to ensure theme resolution, toggles, and per-temple overrides remain intact.
+- Every session carries a `temple` slug (from deep links or `/account/temples`). If `/account/login` is hit while already authenticated and intent params exist, we skip the login modal and continue the registration flow immediately.
+- Future work will let multi-temple patrons switch context in-app, but today they sign in per temple.
 
-Completed:
-- `ops/docs/COMMANDS.md` now documents the end-to-end deploy commands (sync design system, rebuild account CSS, deploy Vue/Expo, run smoke tests).
-- Admin/Expo re-use the Golden Template UI; only marketing/account respond to theme switches.
-- Account controllers/layouts have been exercised manually; formal regression tests remain future work but the shell is stable.
+## Mobile Alignment
 
-## Phase 5 – Temple Context & Entry Flow
+- Expo clients consume the same scoped payloads (`/account/api/...`) so we avoid divergent contracts. Mobile focuses on light interactions; anything heavy (dependents, payments, certificates) remains on the web portal for now.
 
-- `/account` must always know which temple the patron is managing.
-  - Deep links from the marketing Vue site include the temple slug so login/registration already have context.
-  - If someone visits `/account/login` without a slug (e.g., typed manually), redirect them to a “Select your temple” screen that renders cards from `rails/app/lib/temples/manifest.yml` (new `/account/temples` page) and links back to the correct public site/login deep link.
-  - After sign-in, store the active temple slug in the session so the dashboard/orders load the right data. (Future work: allow patrons with multiple memberships to switch temples from within the account portal.)
-  - When an already-authenticated patron hits `/account/login` with intent params, skip the login form and continue the flow immediately so deep links never lose context.
-- Never sign a patron into a generic, slugless session—every workflow should start from a specific temple domain or the manifest selector.
+## Next Steps / TODOs
 
-Completed:
-- Marketing Vue surfaces now build `/account/login?temple=<slug>&account_action=<type>&offering=<slug>` links for events (offerings + gatherings) and services, so every CTA routes patrons into the correct temple context.
-- `/account/temples` renders hero cards per temple and serves as the fallback when no slug is provided.
-- Login/signup flows now detect deep-link intent, skip the dashboard for returning patrons, and route first-time members straight into the new registration intake with the correct temple/offering context.
-
-## Mobile Alignment Notes
-
-- Slug resolution must stay consistent so both account portal and future Expo clients consume the same scoped payloads.
-- Expo remains a convenience endpoint: reuse existing APIs/cache payloads instead of inventing new contract types.
-- Push notifications or lightweight screens can live in Expo, but heavy workflows should continue to target the account web surface.
-- Mobile should mirror the Rails cache payloads 1:1, skipping only the sections explicitly omitted from the app to keep the experience focused.
-
-Completed:
+- Build the full patron→admin promotion flow, dependent-aware duplicate checks, and digital certificate downloads.
+- Wire LINE Pay receipts once the payment pipeline lands; keep the placeholders in place to avoid UI churn.
+- Add regression tests around theme resolution and temple-context routing once the flows stabilize.
