@@ -57,7 +57,7 @@ Use this when you need representative data locally or on staging:
    - Verify the temple profile shows the placeholder QR and owner-only panels.
    - Ensure audit logs are written when editing basic fields.
 5. **Seed financial events + services**
-   - `Seeds::TempleFinancials` now hydrates `temple_events`, `temple_services`, `temple_gatherings`, and corresponding `temple_registrations` + payments. After editing the YAML or gathering seeds, run:
+   - `Seeds::TempleFinancials` now hydrates `temple_events`, `temple_services`, `temple_gatherings`, and corresponding `temple_registrations` + payments. Services also expect a `registration_period_key` (e.g., `"2026-ghost-month"`) so duplicate guardrails and reports know which cycle the registration belongs to. Define these keys per temple by adding `registration_periods` to the temple YAML (see `rails/db/temples/shenfukung-wenfu.yml` for examples). After editing the YAML or gathering seeds, run:
      ```bash
      bin/rails "temple_financial:seed_offerings[shenfukung-wenfu]"
      ```
@@ -73,6 +73,7 @@ Use this when you need representative data locally or on staging:
      offerings:
        - slug: pudu-table
          kind: service
+         registration_period_key: "2026-ghost-month"
          form_fields:
            basics: [title, slug, offering_type, period, price_cents, currency]
            schedule: [starts_on, ends_on, available_slots]

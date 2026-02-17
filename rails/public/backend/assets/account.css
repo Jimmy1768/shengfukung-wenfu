@@ -480,6 +480,44 @@ body.account-body {
   max-width: fit-content;
 }
 
+.pill-link.secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  padding: 0.65rem 1.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  background: var(--surface-muted);
+  color: var(--text);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.btn-secondary {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--border) 80%, transparent);
+}
+
 .pill-link.danger {
   border-color: transparent;
   background: var(--danger);
@@ -571,6 +609,84 @@ body.account-body {
 .event-notes {
   margin: 0;
   color: var(--text-muted);
+}
+
+.card {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 1.5rem;
+}
+
+.card:last-child {
+  margin-bottom: 0;
+}
+
+.detail-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.25rem;
+  margin: 0;
+}
+
+.detail-list > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-list dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.detail-list dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.payment-callout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.payment-callout .payment-amount {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.payment-callout .payment-amount strong {
+  font-size: clamp(1.5rem, 2vw, 2rem);
+}
+
+.payment-callout.is-pending {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+}
+
+.payment-callout.is-paid {
+  background: color-mix(in srgb, var(--success) 8%, transparent);
+  border-color: color-mix(in srgb, var(--success) 30%, var(--border));
+}
+
+.payment-callout.is-free {
+  background: color-mix(in srgb, var(--surface-muted) 60%, transparent);
+}
+
+.payment-callout .payment-message {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.payment-callout .payment-cta {
+  width: fit-content;
 }
 
 .service-grid {
@@ -895,8 +1011,12 @@ body.account-body {
 
 .status-pill {
   border-radius: 999px;
-  padding: 0.25rem 0.65rem;
-  font-size: 0.8rem;
+  padding: 0.2rem 0.75rem;
+  font-size: inherit;
+  font-weight: 600;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
 }
 
 .status-pill.status-paid {
@@ -1094,4 +1214,16 @@ body.account-body {
 .account-form textarea {
   min-height: 6rem;
   resize: vertical;
+}
+
+.account-registration-form {
+  width: min(720px, 100%);
+}
+
+.account-registration-form .form-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.account-registration-form .form-field--full {
+  grid-column: 1/-1;
 }

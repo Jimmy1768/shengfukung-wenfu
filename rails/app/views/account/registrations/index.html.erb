@@ -24,7 +24,7 @@
           <% @registrations.each do |registration| %>
             <tr>
               <td><%= registration.reference_code %></td>
-              <td><%= registration.temple_offering&.title || "—" %></td>
+              <td><%= registration.offering&.try(:title) || registration.reference_code %></td>
               <td><%= registration.registrant_name %></td>
               <td><span class="status-pill status-<%= registration.payment_status %>"><%= t("account.dashboard.payment_statuses.#{registration.payment_status}", default: registration.payment_status) %></span></td>
               <td><%= registration.certificate_number.presence || t("account.registrations.index.table.certificate_pending") %></td>

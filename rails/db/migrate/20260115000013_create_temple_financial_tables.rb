@@ -47,11 +47,13 @@ class CreateTempleFinancialTables < ActiveRecord::Migration[7.1]
       t.integer :price_cents, null: false, default: 0
       t.string :currency, null: false, default: "TWD"
       t.string :hero_image_url
+      t.string :registration_period_key
       t.jsonb :metadata, null: false, default: {}
       t.timestamps
     end
     add_index :temple_services, [:temple_id, :slug], unique: true
     add_index :temple_services, [:temple_id, :status]
+    add_index :temple_services, [:temple_id, :registration_period_key], name: "index_services_on_temple_and_period"
     add_index :temple_services, [:temple_id, :available_from], name: "index_temple_services_on_temple_and_available_from"
 
     create_table :temple_gatherings do |t|

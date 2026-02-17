@@ -25,5 +25,5 @@
 
 - [x] Update `/account/events` controller + view to load offerings and gatherings separately; add two sections with localized copy.
 - [x] Build `/account/services` (controller, route, view) using the shared offerings templates.
-- [ ] Add an account payment controller/view that accepts a registration reference and prepares the payment payload (Line Pay stub for now).
-- [ ] Implement gallery fetching (reuse `TempleGallery` endpoints) and wire the “View gallery” link to a real route/modal.
+- [x] Add an account payment controller/view that accepts a registration reference and prepares the payment payload (Line Pay stub for now).
+- [x] Implement gallery fetching (reuse `TempleGallery` endpoints) and wire the “View gallery” link to a real route/modal.

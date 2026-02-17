@@ -74,6 +74,7 @@ zh-TW:
         pending: "待處理"
         refunded: "已退款"
         failed: "失敗"
+        completed: "已完成"
     profile:
       header:
         eyebrow: "會員資料"

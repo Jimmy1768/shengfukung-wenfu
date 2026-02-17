@@ -2,7 +2,7 @@
   <header class="section-header">
     <div>
       <p class="eyebrow"><%= t("account.registrations.show.eyebrow") %></p>
-      <h2><%= @registration.temple_offering&.title || @registration.reference_code %></h2>
+      <h2><%= @registration.offering&.try(:title) || @registration.reference_code %></h2>
       <p><%= t("account.registrations.show.subtitle") %></p>
     </div>
     <%= link_to t("account.registrations.show.edit"), edit_account_registration_path(@registration), class: "pill-link" %>

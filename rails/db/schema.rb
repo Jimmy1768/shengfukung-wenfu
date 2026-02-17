@@ -742,10 +742,12 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_15_000014) do
     t.integer "price_cents", default: 0, null: false
     t.string "currency", default: "TWD", null: false
     t.string "hero_image_url"
+    t.string "registration_period_key"
     t.jsonb "metadata", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["temple_id", "available_from"], name: "index_temple_services_on_temple_and_available_from"
+    t.index ["temple_id", "registration_period_key"], name: "index_services_on_temple_and_period"
     t.index ["temple_id", "slug"], name: "index_temple_services_on_temple_id_and_slug", unique: true
     t.index ["temple_id", "status"], name: "index_temple_services_on_temple_id_and_status"
     t.index ["temple_id"], name: "index_temple_services_on_temple_id"

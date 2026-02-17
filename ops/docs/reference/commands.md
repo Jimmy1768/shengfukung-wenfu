@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "built account portal v3"
+git commit -m "included registration period key for offferings"
 git push
 
 git reset --hard HEAD

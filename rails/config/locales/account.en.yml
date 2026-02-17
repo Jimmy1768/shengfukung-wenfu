@@ -67,6 +67,7 @@ en:
         pending: "Pending"
         refunded: "Refunded"
         failed: "Failed"
+        completed: "Completed"
     profile:
       header:
         eyebrow: "Profile"

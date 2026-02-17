@@ -15,16 +15,41 @@ namespace :temple_financial do
 
     offerings.each do |attrs|
       template = loader.template_for(attrs[:slug])
-      record = TempleOffering.find_or_initialize_by(temple:, slug: attrs[:slug])
-      metadata = record.metadata || {}
+      kind = template&.dig(:kind)&.to_sym || :event
+      metadata_target = {}
+
       if template
-        metadata["form_fields"] = template[:form_fields] if template[:form_fields]
-        metadata["form_defaults"] = template[:defaults] if template[:defaults]
-        metadata["form_options"] = template[:options] if template[:options]
-        metadata["form_label"] = template[:label] if template[:label]
-        metadata["registration_form"] = template[:registration_form] if template[:registration_form]
+        metadata_target["form_fields"] = template[:form_fields] if template[:form_fields]
+        metadata_target["form_defaults"] = template[:defaults] if template[:defaults]
+        metadata_target["form_options"] = template[:options] if template[:options]
+        metadata_target["form_label"] = template[:label] if template[:label]
+        metadata_target["registration_form"] = template[:registration_form] if template[:registration_form]
       end
-      record.assign_attributes(attrs.merge(currency: "TWD", metadata: metadata))
+
+      record =
+        if kind == :service
+          temple.temple_services.find_or_initialize_by(slug: attrs[:slug])
+        else
+          TempleOffering.find_or_initialize_by(temple:, slug: attrs[:slug])
+        end
+
+      metadata = (record.metadata || {}).merge(metadata_target)
+      assignment = attrs.slice(:title, :description, :price_cents, :currency, :status)
+      assignment[:currency] ||= "TWD"
+      assignment[:status] ||= "published"
+
+      if kind == :service
+        assignment[:quantity_limit] = attrs[:available_slots] if attrs[:available_slots]
+        assignment[:available_from] = attrs[:available_from]
+        assignment[:available_until] = attrs[:available_until]
+      else
+        assignment[:starts_on] = attrs[:starts_on] || Date.current
+        assignment[:ends_on] = attrs[:ends_on] || assignment[:starts_on]
+        assignment[:available_slots] = attrs[:available_slots] if attrs[:available_slots]
+        assignment[:period] = attrs[:period] || "#{assignment[:starts_on]} – #{assignment[:ends_on]}"
+      end
+
+      record.assign_attributes(assignment.merge(metadata: metadata))
       record.save!
     end
 
