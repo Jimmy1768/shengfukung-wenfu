@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "included registration period key for offferings"
+git commit -m "creating rolling offerings and dependents plan, proceed to build"
 git push
 
 git reset --hard HEAD
