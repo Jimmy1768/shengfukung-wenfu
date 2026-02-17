@@ -51,8 +51,21 @@ module Payments
         event_slug: attributes[:event_slug].presence || offering.slug,
         contact_payload: attributes[:contact_payload].presence || {},
         logistics_payload: attributes[:logistics_payload].presence || {},
-        metadata: attributes[:metadata].presence || {}
+        metadata: merged_metadata
       }
+    end
+
+    def merged_metadata
+      payload = attributes[:metadata].presence || {}
+      key = resolved_registration_period_key
+      payload = payload.merge("registration_period_key" => key) if key.present? && payload["registration_period_key"].blank?
+      payload
+    end
+
+    def resolved_registration_period_key
+      return unless offering.respond_to?(:registration_period_key)
+
+      offering.registration_period_key.presence
     end
 
     def unit_price_cents
@@ -71,13 +84,18 @@ module Payments
         offering_slug: registration.event_slug || offering.slug,
         contact_payload: attributes[:contact_payload],
         logistics_payload: attributes[:logistics_payload],
-        ritual_metadata: attributes[:metadata],
+        ritual_metadata: user_metadata_payload,
         order_details: {
           quantity: registration.quantity,
           certificate_number: registration.certificate_number
         },
         multi_value_fields: multi_value_fields
       ).update!
+    end
+
+    def user_metadata_payload
+      payload = attributes[:metadata].presence || {}
+      payload.except("registration_period_key", :registration_period_key)
     end
   end
 end

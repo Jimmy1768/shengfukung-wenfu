@@ -1620,6 +1620,7 @@ body.admin-body input[type=datetime-local]::placeholder {
 .login-card .login-credentials textarea,
 .login-card .login-actions textarea {
   width: 100%;
+  box-sizing: border-box;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -1666,6 +1667,19 @@ body.admin-body input[type=datetime-local]::placeholder {
 .field-panel .panel-footer, .login-card .login-credentials .panel-footer,
 .login-card .login-actions .panel-footer {
   margin-top: auto;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .login-shell {
@@ -2102,10 +2116,24 @@ body.admin-body input[type=datetime-local]::placeholder {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-section header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .offering-form-grid .form-section {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  margin-bottom: var(--spacing-lg);
 }
 
 .offering-form-grid .form-section header {

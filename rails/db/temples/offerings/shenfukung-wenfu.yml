@@ -2,18 +2,20 @@ offerings:
   - slug: incense-donation
     kind: service
     label: "香油捐獻"
+    registration_period_key: "perennial"
     defaults:
       offering_type: "donation"
       currency: "TWD"
+    attributes:
+      price_cents: 500
+      currency: "TWD"
+      description: "敬獻香油以支持廟務運作，廟方依祈願安排上香儀程。"
     form_fields:
-      basics:
+      fulfillment:
+        title: "工作說明"
         fields:
-          - title
-          - price_cents
-          - currency
-      donation:
-        fields:
-          - description
+          - fulfillment_method
+          - logistics_notes
     registration_form:
       sections:
         order:
@@ -37,16 +39,17 @@ offerings:
     defaults:
       offering_type: "ritual"
       currency: "TWD"
+    attributes:
+      price_cents: 800
+      currency: "TWD"
+      description: "為全家祈福安康的戲丁口捐，含法會誦經祈求護佑。"
     form_fields:
-      basics:
-        fields:
-          - title
-          - period
-          - price_cents
-          - currency
       ritual:
+        title: "儀式設計"
         fields:
-          - description
+          - certificate_hint
+          - blessing_purpose
+          - blessing_names
     registration_form:
       sections:
         order:
@@ -67,24 +70,30 @@ offerings:
           options: ["08:00-09:00", "09:00-10:00", "10:00-11:00"]
 
   - slug: lantern-lighting
-    kind: event
+    kind: service
     label: "點燈作業"
     defaults:
       offering_type: "lamp"
       currency: "TWD"
+    attributes:
+      price_cents: 1200
+      currency: "TWD"
+      description: "點燈祈願燈光常明，廟方協助安排燈位與祈福儀式。"
+    options:
+      period:
+        - "常年供燈"
+        - "燈節檔期"
     form_fields:
-      basics:
-        fields:
-          - title
-          - period
-          - price_cents
-          - currency
       schedule:
+        title: "燈位資訊"
         fields:
-          - available_slots
-          - starts_on
-          - ends_on
-      description: true
+          - lamp_type
+          - lamp_location
+      fulfillment:
+        title: "作業紀錄"
+        fields:
+          - fulfillment_method
+          - logistics_notes
     registration_form:
       sections:
         order:
@@ -107,18 +116,16 @@ offerings:
     defaults:
       offering_type: "ritual"
       currency: "TWD"
+    attributes:
+      price_cents: 1500
+      currency: "TWD"
+      description: "為祖先超薦的法事，含誦經、牌位供奉與證書備註。"
     form_fields:
-      basics:
-        fields:
-          - title
-          - period
-          - price_cents
-          - currency
       ritual:
+        title: "作業備註"
         fields:
-          - description
-      logistics:
-        fields:
+          - fulfillment_method
+          - certificate_hint
           - logistics_notes
     registration_form:
       sections:
@@ -141,6 +148,7 @@ offerings:
   - slug: pudu-table
     kind: service
     label: "普渡供桌"
+    registration_period_key: "2026-ghost-month"
     defaults:
       offering_type: "table"
       currency: "TWD"
@@ -148,27 +156,20 @@ offerings:
       period:
         - "中元普渡"
         - "春祭普渡"
+    attributes:
+      price_cents: 3000
+      currency: "TWD"
+      description: "含供桌佈置與供品，提供春祭/中元普渡專用桌位。"
     form_fields:
-      basics:
-        fields:
-          - title
-          - period
-          - price_cents
-          - currency
       schedule:
+        title: "供桌內容"
         fields:
-          - starts_on
-          - ends_on
-          - available_slots
-      certificate:
-        fields:
-          - certificate_prefix
-          - certificate_hint
+          - table_items
+          - table_size
       logistics:
+        title: "作業方式"
         fields:
-          - ancestor_placard_hint
-          - logistics_notes
-      description: true
+          - fulfillment_method
     registration_form:
       sections:
         order:

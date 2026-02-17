@@ -5,6 +5,7 @@ module Admin
     before_action :require_manage_offerings!, except: %i[index show]
     before_action :set_service, only: %i[show edit update]
     before_action :load_template_loader
+    helper_method :registration_period_options
 
     def index
       @offerings = current_temple.temple_services.order(created_at: :desc)
@@ -14,6 +15,7 @@ module Admin
 
     def new
       @offering = current_temple.temple_services.new(price_cents: nil, currency: "TWD")
+      assign_default_location(@offering)
       apply_template_defaults(@offering, selected_template_slug, :services)
       @offering.currency ||= "TWD"
     end
@@ -65,10 +67,15 @@ module Admin
         :fulfillment_notes,
         :status,
         :hero_image_url,
+        :registration_period_key,
         metadata_settings: {}
       )
       permitted[:currency] = permitted[:currency].presence || "TWD"
       permitted[:metadata] = merge_metadata_settings(permitted.delete(:metadata_settings))
+      if permitted[:registration_period_key].present?
+        offered_period = current_temple.registration_period_label_for(permitted[:registration_period_key])
+        permitted[:period_label] = offered_period if offered_period.present?
+      end
       permitted
     end
 
@@ -101,10 +108,32 @@ module Admin
       offering.metadata["form_label"] = template[:label]
       offering.metadata["registration_form"] = template[:registration_form]
       offering.slug ||= template[:slug]
+      offering.registration_period_key ||= template[:registration_period_key]
+      apply_period_label(offering)
+      assign_default_location(offering)
     end
 
     def load_template_loader
       @template_loader = Offerings::TemplateLoader.new(current_temple.slug)
+    end
+
+    def registration_period_options
+      @registration_period_options ||= current_temple.registration_period_options
+    end
+
+    def apply_period_label(offering)
+      return unless offering.registration_period_key.present?
+
+      offering.period_label = current_temple.registration_period_label_for(offering.registration_period_key)
+    end
+
+    def assign_default_location(offering)
+      return if offering.default_location.present?
+
+      details = current_temple.contact_details
+      offering.default_location = details["mapUrl"].presence ||
+        details["addressZh"].presence ||
+        details["addressEn"]
     end
 
     def require_manage_offerings!

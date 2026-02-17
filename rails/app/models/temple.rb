@@ -68,6 +68,40 @@ class Temple < ApplicationRecord
     about.is_a?(Hash) ? about : {}
   end
 
+  def registration_periods
+    data = metadata.is_a?(Hash) ? metadata : {}
+    periods = Array(data["registration_periods"])
+    periods.map do |entry|
+      entry = entry.with_indifferent_access rescue { key: entry }
+      {
+        "key" => entry[:key] || entry["key"] || entry,
+        "label_zh" => entry[:label_zh] || entry["label_zh"],
+        "label_en" => entry[:label_en] || entry["label_en"]
+      }.with_indifferent_access
+    end
+  end
+
+  def registration_period_options(locale = I18n.locale)
+    registration_periods.map do |entry|
+      [registration_period_label(entry, locale), entry[:key]]
+    end
+  end
+
+  def registration_period_label(entry, locale = I18n.locale)
+    entry = entry.with_indifferent_access
+    case locale
+    when :"zh-TW"
+      entry[:label_zh].presence || entry[:label_en].presence || entry[:key]
+    else
+      entry[:label_en].presence || entry[:label_zh].presence || entry[:key]
+    end
+  end
+
+  def registration_period_label_for(key, locale = I18n.locale)
+    entry = registration_periods.find { |period| period[:key].to_s == key.to_s }
+    entry ? registration_period_label(entry, locale) : key
+  end
+
   def hero_images
     value = self[:hero_images]
     value.present? ? value.stringify_keys : {}

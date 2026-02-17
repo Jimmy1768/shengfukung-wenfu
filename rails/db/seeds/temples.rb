@@ -43,6 +43,10 @@ module Seeds
 
     def ensure_temple(config)
       Temple.find_or_initialize_by(slug: config.fetch("slug")).tap do |record|
+        metadata_payload = (record.metadata || {}).merge(config.fetch("metadata", {}))
+        if config["registration_periods"].present?
+          metadata_payload["registration_periods"] = config["registration_periods"]
+        end
         record.assign_attributes(
           name: config.fetch("name"),
           tagline: config["tagline"],
@@ -53,7 +57,7 @@ module Seeds
           contact_info: config.fetch("contact", {}),
           service_times: config.fetch("service_times", {}),
           published: config.fetch("published", true),
-          metadata: (record.metadata || {}).merge(seed_metadata).merge(config.fetch("metadata", {}))
+          metadata: metadata_payload.merge(seed_metadata)
         )
         record.save!
       end

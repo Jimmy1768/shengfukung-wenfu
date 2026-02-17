@@ -27,6 +27,13 @@ service_times:
   notes: 每週三為閉館整理日，僅供預約導覽。
 metadata:
   seed_profile: demo-lotus
+registration_periods:
+  - key: "2026-lotus-festival"
+    label_zh: "2026 蓮城法會"
+    label_en: "Lotus Festival 2026"
+  - key: "perennial"
+    label_zh: "常年供燈"
+    label_en: "Perennial"
 news_posts:
   - slug: bilingual-tours
     title: 雙語導覽志工招募

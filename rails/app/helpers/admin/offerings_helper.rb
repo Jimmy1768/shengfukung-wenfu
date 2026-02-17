@@ -5,42 +5,38 @@ module Admin
     include ActionView::Helpers::TagHelper
     include ActionView::Helpers::FormTagHelper
     SECTION_TITLES = {
-      basics: ->(metadata) { metadata[:form_label] || I18n.t("admin.offering_form.sections.basics") },
-      donation: ->(_) { "捐獻說明" },
-      ritual: ->(_) { "儀式資訊" },
-      certificate: ->(_) { I18n.t("admin.offering_form.sections.certificate") },
-      logistics: ->(_) { I18n.t("admin.offering_form.sections.logistics") },
-      schedule: ->(_) { "檔期設定" },
-      blessing: ->(_) { "祈福內容" },
-      ancestor: ->(_) { "祖先資訊" },
-      fulfillment: ->(_) { "作業方式" }
+      basics: ->(metadata) { metadata[:form_label] || I18n.t("admin.offering_form.sections.offering_details") },
+      default: ->(_) { I18n.t("admin.offering_form.sections.offering_details") }
     }.freeze
 
-    def render_offering_sections(form, metadata)
+    def render_offering_sections(form, metadata, skip_fields: [], skip_sections: [])
       defaults = metadata[:form_defaults] || {}
       option_map = metadata[:form_options] || {}
       sections = metadata[:form_fields] || {}
 
       safe_join(sections.map do |section_key, config|
-        render_offering_section(form, section_key, config, defaults, option_map, metadata)
+        render_offering_section(form, section_key, config, defaults, option_map, metadata, skip_fields, skip_sections)
       end.compact)
     end
 
     private
 
-    def render_offering_section(form, section_key, config, defaults, option_map, metadata)
+    def render_offering_section(form, section_key, config, defaults, option_map, metadata, skip_fields, skip_sections)
+      return if skip_sections.include?(section_key.to_sym)
+
+      custom_title = section_title_override(config)
       fields = normalize_field_config(section_key, config)
+      fields = fields.reject { |field| skip_fields.include?(field.to_sym) }
       return if fields.empty?
 
-      title_proc = SECTION_TITLES[section_key.to_sym]
-      title = title_proc ? title_proc.call(metadata) : section_key.to_s.titleize
+      title = custom_title.presence || section_title(section_key, metadata)
 
       content_tag(:section, class: "card form-section") do
         safe_join([
           content_tag(:header) do
             content_tag(:h2, title)
           end,
-          render_offering_fields(form, fields, defaults, option_map)
+          render_offering_fields(form, fields, defaults, option_map, skip_fields)
         ])
       end
     end
@@ -60,13 +56,24 @@ module Admin
       end
     end
 
-    def render_offering_fields(form, fields, defaults, option_map)
+    def section_title_override(config)
+      config.is_a?(Hash) ? config[:title] : nil
+    end
+
+    def section_title(section_key, metadata)
+      renderer = SECTION_TITLES[section_key.to_sym] || SECTION_TITLES[:default]
+      renderer.call(metadata)
+    end
+
+    def render_offering_fields(form, fields, defaults, option_map, skip_fields)
       safe_join(fields.map do |field|
-        render_offering_field(form, field, defaults, option_map)
+        render_offering_field(form, field, defaults, option_map, skip_fields)
       end.compact)
     end
 
-    def render_offering_field(form, field, defaults, option_map)
+    def render_offering_field(form, field, defaults, option_map, skip_fields = [])
+      return if skip_fields.include?(field.to_sym)
+
       case field.to_sym
       when :title
         render_text_field(form, :title, I18n.t("admin.offering_form.fields.title"), defaults[:title])

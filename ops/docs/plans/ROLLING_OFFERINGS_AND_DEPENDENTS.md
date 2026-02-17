@@ -7,13 +7,13 @@
 
 ## Phase A — Period Keys & Admin Controls
 
-- [ ] Extend each temple YAML (`rails/db/temples/<slug>.yml`) with a `registration_periods` array of `{ key, label_zh, label_en }`.
-- [ ] `TempleFinancials` seed loader writes the key for demo data/services.
-- [ ] `/admin/services/:id` form shows a select populated from the YAML list (plus optional “Other” text field).
-- [ ] Persist `registration_period_key` and expose it on service cards/orders list.
-- [ ] Registrations copy the service’s key into `metadata["period_key"]`.
-- [ ] Duplicate detection enforces one registration per `(registrant_scope, service.slug, period_key)`.
-- [ ] Admin filters/exports accept `period_key`.
+- [x] Extend each temple YAML (`rails/db/temples/<slug>.yml`) with a `registration_periods` array of `{ key, label_zh, label_en }`.
+- [x] `TempleFinancials` seed loader writes the key for demo data/services.
+- [x] `/admin/services/:id` form shows a select populated from the YAML list (plus optional “Other” text field).
+- [x] Persist `registration_period_key` and expose it on service cards/orders list.
+- [x] Registrations copy the service’s key into `metadata["period_key"]`.
+- [x] Duplicate detection enforces one registration per `(registrant_scope, service.slug, period_key)`.
+- [x] Admin filters/exports accept `period_key`.
 
 ## Phase B — Caregiver / Dependent Flow
 

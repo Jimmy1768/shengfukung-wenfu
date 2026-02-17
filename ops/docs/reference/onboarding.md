@@ -76,11 +76,19 @@ Use this when you need representative data locally or on staging:
          registration_period_key: "2026-ghost-month"
          form_fields:
            basics: [title, slug, offering_type, period, price_cents, currency]
-           schedule: [starts_on, ends_on, available_slots]
+           schedule:
+             title: "Additional offering details"
+             fields: [starts_on, ends_on, available_slots]
            certificate: [certificate_prefix, certificate_hint]
            logistics: [ancestor_placard_hint, logistics_notes]
            description: true
+         attributes:
+           price_cents: 3000
+           currency: "TWD"
+           description: "Summarize what this service covers so admins don't retype copy."
      ```
+   - Each `form_fields` section may include an optional `title:` (as shown above). When present, that string becomes the card heading in the admin form; otherwise the UI falls back to the generic "Offering details" label. This keeps the YAML non-technical while still letting a temple insist on a specific term when needed.
+   - Use the optional `attributes` block to pre-fill core event/service columns (e.g., `price_cents`, `currency`, `description`). These values only apply when the field is blank, so admins can still override them before saving.
    - Extend the seed task (or run a one-off script) to load this YAML and merge `form_fields` + `kind` into each offering’s `metadata`. The admin `_form.html.erb` partial reads `@offering.metadata['form_fields']` and only renders the listed sections/inputs, so each temple sees a tailored form without separate partials.
    - Store the YAML in Git so the config remains the source of truth. When a temple needs tweaks, edit the YAML, rerun the sync task, and the form will update automatically.
    - `registration_form.field_settings` unlocks richer controls:

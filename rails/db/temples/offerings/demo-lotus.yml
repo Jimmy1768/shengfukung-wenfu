@@ -6,19 +6,11 @@ offerings:
       offering_type: "ritual"
       currency: "TWD"
     form_fields:
-      basics:
-        fields:
-          - title
-          - period
-          - price_cents
-          - currency
       schedule:
         fields:
           - starts_on
           - ends_on
-      ritual:
-        fields:
-          - description
+      description: true
     registration_form:
       sections:
         order:
@@ -41,15 +33,11 @@ offerings:
   - slug: lotus-light
     kind: service
     label: "蓮花光明燈"
+    registration_period_key: "perennial"
     defaults:
       offering_type: "lamp"
       currency: "TWD"
     form_fields:
-      basics:
-        fields:
-          - title
-          - price_cents
-          - currency
       schedule:
         fields:
           - available_slots

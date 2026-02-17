@@ -121,6 +121,7 @@ module Admin
         :location_name,
         :location_address,
         :location_notes,
+        :capacity_total,
         :status,
         :hero_image_url,
         :poster_image_url,
@@ -179,6 +180,16 @@ module Admin
       offering.metadata["form_label"] = template[:label]
       offering.metadata["registration_form"] = template[:registration_form]
       offering.slug ||= template[:slug]
+
+      attribute_defaults = template[:attributes] || {}
+      attribute_defaults.each do |attr, value|
+        writer = "#{attr}="
+        next unless offering.respond_to?(writer)
+        current_value = offering.public_send(attr)
+        next if current_value.present?
+
+        offering.public_send(writer, value)
+      end
     end
 
     def log_offering_event(action)

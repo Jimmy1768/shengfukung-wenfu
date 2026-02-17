@@ -86,16 +86,20 @@ module Account
     def metadata_payload
       payload = {}
       payload["ceremony_notes"] = ceremony_notes if ceremony_notes.present?
+      if offering.respond_to?(:registration_period_key) && offering.registration_period_key.present?
+        payload["registration_period_key"] = offering.registration_period_key
+      end
       payload.compact_blank
     end
 
     def update_user_metadata!
+      user_metadata = metadata_payload.except("registration_period_key")
       Registrations::UserMetadataUpdater.new(
         user:,
         offering_slug: offering.slug,
         contact_payload: contact_payload,
         logistics_payload: logistics_payload,
-        ritual_metadata: metadata_payload,
+        ritual_metadata: user_metadata,
         order_details: {
           quantity: quantity,
           certificate_number: @registration&.certificate_number

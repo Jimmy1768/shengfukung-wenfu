@@ -26,6 +26,10 @@
           <dd><%= @offering.period_label.presence || [@offering.available_from&.strftime("%Y/%m/%d"), @offering.available_until&.strftime("%Y/%m/%d")].compact.join(" - ").presence || t("admin.services.index.table.period_flexible") %></dd>
         </div>
         <div>
+          <dt><%= t("admin.services.show.registration_period_key") %></dt>
+          <dd><%= @offering.registration_period_key.presence || "—" %></dd>
+        </div>
+        <div>
           <dt><%= t("admin.services.show.fulfillment") %></dt>
           <dd><%= @offering.fulfillment_notes.presence || "—" %></dd>
         </div>

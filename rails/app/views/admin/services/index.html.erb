@@ -45,6 +45,9 @@
                   <% else %>
                     <span class="muted"><%= t("admin.services.index.table.period_flexible") %></span>
                   <% end %>
+                  <% if service.registration_period_key.present? %>
+                    <p class="muted"><%= service.registration_period_key %></p>
+                  <% end %>
                 </td>
                 <td><%= service.fulfillment_notes.presence || "—" %></td>
                 <td><%= Currency::Symbols.format_amount(service.price_cents, service.currency) %></td>

@@ -6,16 +6,16 @@ namespace :temple_financial do
     loader = Offerings::TemplateLoader.new(slug)
 
     offerings = [
-      { slug: "incense-donation", title: "香油捐獻", offering_type: "donation", price_cents: 500 },
+      { slug: "incense-donation", title: "香油捐獻", offering_type: "donation", price_cents: 500, kind: :service, registration_period_key: "perennial" },
       { slug: "family-peace", title: "平安戲丁口捐", offering_type: "ritual", price_cents: 800 },
       { slug: "lantern-lighting", title: "點燈作業", offering_type: "lamp", price_cents: 1200, available_slots: 50 },
       { slug: "ancestor-ritual", title: "祖先拔薦", offering_type: "ritual", price_cents: 1500 },
-      { slug: "pudu-table", title: "普渡供桌", offering_type: "table", price_cents: 3000, available_slots: 100, period: "Ghost Festival" }
+      { slug: "pudu-table", title: "普渡供桌", offering_type: "table", price_cents: 3000, available_slots: 100, period: "Ghost Festival", kind: :service, registration_period_key: "2026-ghost-month" }
     ]
 
     offerings.each do |attrs|
       template = loader.template_for(attrs[:slug])
-      kind = template&.dig(:kind)&.to_sym || :event
+      kind = (attrs[:kind] || template&.dig(:kind) || :event).to_sym
       metadata_target = {}
 
       if template
@@ -42,6 +42,7 @@ namespace :temple_financial do
         assignment[:quantity_limit] = attrs[:available_slots] if attrs[:available_slots]
         assignment[:available_from] = attrs[:available_from]
         assignment[:available_until] = attrs[:available_until]
+        assignment[:registration_period_key] = (template && template[:registration_period_key]) || attrs[:registration_period_key]
       else
         assignment[:starts_on] = attrs[:starts_on] || Date.current
         assignment[:ends_on] = attrs[:ends_on] || assignment[:starts_on]

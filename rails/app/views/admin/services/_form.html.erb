@@ -62,7 +62,7 @@
         <%= form.text_field :hero_image_url %>
       </div>
     </div>
-    <div class="field">
+    <div class="field-panel">
       <%= form.label :description, t("admin.offering_form.fields.description") %>
       <%= form.text_area :description, rows: 3 %>
     </div>
@@ -74,8 +74,20 @@
     </header>
     <div class="field-row">
       <div class="field-panel">
+        <%= form.label :registration_period_key, t("admin.services.form.fields.registration_period_key") %>
+        <% period_options =
+             current_temple.registration_periods.map do |entry|
+               label = current_temple.registration_period_label(entry)
+               [label, entry[:key], { "data-label": label }]
+             end %>
+        <%= form.select :registration_period_key,
+          options_for_select(period_options, @offering.registration_period_key),
+          { include_blank: t("admin.services.form.fields.registration_period_blank") },
+          disabled: period_options.empty?, data: { period_selector: true } %>
+      </div>
+      <div class="field-panel">
         <%= form.label :period_label, t("admin.services.form.fields.period_label") %>
-        <%= form.text_field :period_label %>
+        <%= form.text_field :period_label, readonly: true, data: { period_label_input: true }, value: current_temple.registration_period_label_for(@offering.registration_period_key) %>
       </div>
       <div class="field-panel">
         <%= form.label :quantity_limit, t("admin.services.form.fields.quantity_limit") %>
@@ -125,7 +137,13 @@
   </section>
 
   <div class="offering-form-grid">
-    <%= render_offering_sections(form, metadata) %>
+    <%= render_offering_sections(
+          form,
+          metadata,
+          skip_fields: %i[
+            title subtitle hero_image_url description period_label registration_period_key quantity_limit available_from available_until default_location fulfillment_notes price_cents currency status
+          ]
+        ) %>
   </div>
 
   <% if show_form_actions %>
@@ -133,4 +151,23 @@
       <%= form.submit t("admin.offering_form.actions.save"), class: "btn btn-primary" %>
     </div>
   <% end %>
+<% end %>
+
+<% content_for :admin_footer_scripts do %>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var periodSelect = document.querySelector('[data-period-selector="true"]');
+      var periodLabelInput = document.querySelector('[data-period-label-input="true"]');
+      if (!periodSelect || !periodLabelInput) return;
+
+      function updatePeriodLabel() {
+        var option = periodSelect.options[periodSelect.selectedIndex];
+        var label = option && option.getAttribute("data-label") ? option.getAttribute("data-label") : "";
+        periodLabelInput.value = label;
+      }
+
+      periodSelect.addEventListener("change", updatePeriodLabel);
+      updatePeriodLabel();
+    });
+  </script>
 <% end %>

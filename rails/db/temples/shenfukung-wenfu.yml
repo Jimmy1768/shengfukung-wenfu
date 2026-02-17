@@ -23,6 +23,16 @@ metadata:
   about:
     hero_subtitle: "把歷史、主祀神明與參拜禮儀整理成段，讓第一次造訪的信眾也能快速認識本廟。"
     section_title: "本廟沿革與信仰特色"
+registration_periods:
+  - key: "2026-ghost-month"
+    label_zh: "2026 中元普渡"
+    label_en: "Ghost Month 2026"
+  - key: "2026-lantern"
+    label_zh: "2026 點燈檔期"
+    label_en: "Lantern Cycle 2026"
+  - key: "perennial"
+    label_zh: "常年供燈"
+    label_en: "Perennial"
 news_posts:
   - slug: new-year-prayer
     title: 新年迎春祈福法會

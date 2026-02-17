@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "creating rolling offerings and dependents plan, proceed to build"
+git commit -m "completed rolling offerings, dependents, phase A"
 git push
 
 git reset --hard HEAD
