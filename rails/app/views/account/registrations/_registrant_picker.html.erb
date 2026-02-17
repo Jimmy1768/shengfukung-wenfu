@@ -1,0 +1,41 @@
+<div class="registrant-picker">
+  <h3><%= t("account.registrations.new.fields.registrant_scope") %></h3>
+
+  <div class="registrant-picker__options">
+    <% options = [{ scope: "self", label: current_user.native_name.presence || current_user.english_name.presence || current_user.email, id: nil }] +
+        Array(dependents).map { |dep| { scope: "dependent", label: dep.native_name.presence || dep.english_name, id: dep.id } } %>
+    <% options.each do |option| %>
+      <% scope = option[:scope] %>
+      <% dep_id = option[:id] %>
+      <% selected = (form.registrant_scope == scope && form.dependent_id.to_i == dep_id.to_i) %>
+      <% registration = existing_registration_for(scope, dep_id) %>
+      <% button_params = { registrant_scope: scope } %>
+      <% button_params[:dependent_id] = dep_id if dep_id %>
+      <% link_params = { offering: offering.slug, account_action:, registrant_scope: scope }
+         link_params[:dependent_id] = dep_id if dep_id %>
+      <%= link_to new_account_registration_path(link_params),
+            class: ["registrant-card", ("is-selected" if selected)] do %>
+        <span class="registrant-name"><%= option[:label] %></span>
+        <% if scope == "self" %>
+          <span class="registrant-pill registrant-pill--self"><%= t("account.registrations.new.fields.self_option") %></span>
+        <% else %>
+          <span class="registrant-pill registrant-pill--dependent"><%= t("account.registrations.new.fields.dependent_label") %></span>
+        <% end %>
+        <% if registration && scope != "self" %>
+          <span class="registrant-status">
+            <%= t("account.registrations.new.fields.already_registered") %>
+            <%= link_to t("account.registrations.new.fields.view_existing"),
+                  account_registration_path(registration),
+                  class: "registrant-status__link" %>
+          </span>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if dependents.blank? %>
+    <p class="hint"><%= t("account.registrations.new.fields.no_dependents_hint") %></p>
+  <% else %>
+    <p class="hint"><%= t("account.registrations.new.fields.dependent_hint") %></p>
+  <% end %>
+</div>

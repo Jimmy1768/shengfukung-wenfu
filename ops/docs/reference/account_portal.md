@@ -18,6 +18,8 @@ Snapshot of what the patron-facing account portal already delivers so future wor
 
 - Vue “Register” buttons point to `/account/login?temple=<slug>&account_action=<event|service|gathering>&offering=<slug>`.
 - After authentication, `Account::RegistrationsController` checks for an existing registration on that slug. If one exists, patrons land on the detail page; otherwise they see the new-registration form.
+- The intake form begins with a "Who is this for?" selector (self vs. dependent). Selecting a dependent prefills contact fields from that profile and persists `dependent_id` + `registrant_scope` into the registration metadata for duplicate guardrails.
+- The selector now renders as a set of cards (Myself + each dependent). Choosing a registrant with an existing entry loads the inline edit form for that registration; otherwise the new-registration form appears prefilled for the selected person.
 - Personal info fields prefill from the `users` table and write back on save. Offering-specific fields (ancestor names, dedications, etc.) remain read-only outside the registration form; admins control edits.
 - Registrations lock once fulfilled or past the start time. Cancel/refund actions surface only while the offering is open; otherwise we show guidance to contact the temple.
 - Duplicate guardrails allow exactly one active registration per patron/offering (Phase A’s service-period logic handles recurring services on the admin side).

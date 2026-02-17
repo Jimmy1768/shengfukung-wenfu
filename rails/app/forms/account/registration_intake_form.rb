@@ -6,6 +6,8 @@ module Account
     include ActiveModel::Attributes
 
     attribute :quantity, :integer, default: 1
+    attribute :registrant_scope, :string, default: "self"
+    attribute :dependent_id, :integer
     attribute :contact_name, :string
     attribute :contact_phone, :string
     attribute :contact_email, :string
@@ -13,9 +15,13 @@ module Account
     attribute :arrival_window, :string
     attribute :ceremony_notes, :string
 
+    REGISTRANT_SCOPES = %w[self dependent].freeze
+
     validates :quantity,
       numericality: { greater_than: 0, less_than_or_equal_to: 10 }
     validates :contact_name, presence: true
+    validates :registrant_scope, inclusion: { in: REGISTRANT_SCOPES }
+    validate :dependent_selection
 
     attr_reader :registration, :offering, :user
 
@@ -24,10 +30,16 @@ module Account
       @offering = offering
       attributes = params.presence || defaults_from_user
       super(attributes)
+      apply_dependent_defaults
     end
 
     def save
       return false unless valid?
+
+      if duplicate_registration_exists?
+        errors.add(:base, I18n.t("account.registrations.new.duplicate_error", default: "You already have a registration for this offering."))
+        return false
+      end
 
       ActiveRecord::Base.transaction do
         build_registration!
@@ -45,6 +57,7 @@ module Account
     def defaults_from_user
       metadata = user&.metadata || {}
       {
+        registrant_scope: "self",
         contact_name: user&.english_name || metadata["contact_name"],
         contact_phone: metadata["phone"],
         contact_email: user&.email,
@@ -85,6 +98,11 @@ module Account
 
     def metadata_payload
       payload = {}
+      payload["registrant_scope"] = registrant_scope if registrant_scope.present?
+      if dependent_selected?
+        payload["dependent_id"] = dependent_id.to_s
+        payload["registrant_name"] = dependent&.english_name
+      end
       payload["ceremony_notes"] = ceremony_notes if ceremony_notes.present?
       if offering.respond_to?(:registration_period_key) && offering.registration_period_key.present?
         payload["registration_period_key"] = offering.registration_period_key
@@ -105,6 +123,52 @@ module Account
           certificate_number: @registration&.certificate_number
         }
       ).update!
+    end
+
+    def apply_dependent_defaults
+      unless registrant_scope == "dependent"
+        self.dependent_id = nil
+        return
+      end
+
+      return unless (selected = dependent)
+
+      self.contact_name = selected.english_name if contact_name.blank?
+      dependent_metadata = selected.metadata || {}
+      self.contact_phone = dependent_metadata["phone"] if contact_phone.blank?
+      self.contact_email = dependent_metadata["email"] if contact_email.blank?
+      self.household_notes = dependent_metadata["notes"] if household_notes.blank?
+    end
+
+    def dependent_selection
+      return unless registrant_scope == "dependent"
+
+      errors.add(:dependent_id, :blank) unless dependent
+    end
+
+    def dependent_selected?
+      registrant_scope == "dependent" && dependent_id.present?
+    end
+
+    def dependent
+      return @dependent if defined?(@dependent)
+
+      @dependent = user&.dependents&.find_by(id: dependent_id)
+    end
+
+    def duplicate_registration_exists?
+      return false unless user && offering
+
+      scope = user.temple_event_registrations.where("metadata ->> 'event_slug' = ?", offering.slug)
+      if offering.respond_to?(:registration_period_key) && offering.registration_period_key.present?
+        scope = scope.where("metadata ->> 'registration_period_key' = ?", offering.registration_period_key)
+      end
+      if dependent_selected?
+        scope = scope.where("metadata ->> 'dependent_id' = ?", dependent_id.to_s)
+      else
+        scope = scope.where("COALESCE(metadata ->> 'dependent_id', '') = ''")
+      end
+      scope.exists?
     end
   end
 end

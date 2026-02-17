@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "fixed/updated docs"
+git commit -m "building account, offering registration screens"
 git push
 
 git reset --hard HEAD

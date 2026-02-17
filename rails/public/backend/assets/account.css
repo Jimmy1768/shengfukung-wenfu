@@ -626,9 +626,10 @@ body.account-body {
 
 .detail-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, max-content));
   gap: 1.25rem;
   margin: 0;
+  justify-content: flex-start;
 }
 
 .detail-list > div {
@@ -1209,6 +1210,8 @@ body.account-body {
   font-size: 1rem;
   background: var(--surface);
   color: var(--text);
+  max-width: 100%;
+  width: 100%;
 }
 
 .account-form textarea {
@@ -1226,4 +1229,81 @@ body.account-body {
 
 .account-registration-form .form-field--full {
   grid-column: 1/-1;
+}
+
+.registrant-picker {
+  margin-bottom: 1.5rem;
+}
+.registrant-picker h3 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+.registrant-picker .registrant-picker__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.6rem;
+}
+.registrant-picker .registrant-card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.65rem 0.85rem;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  background: var(--surface-muted);
+  color: var(--text);
+  text-decoration: none;
+  min-width: 130px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  position: relative;
+}
+.registrant-picker .registrant-card.is-selected {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+}
+.registrant-picker .registrant-name {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+.registrant-picker .registrant-pill {
+  display: inline-flex;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.registrant-picker .registrant-pill--self {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent);
+}
+.registrant-picker .registrant-pill--dependent {
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+}
+.registrant-picker .registrant-status {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+}
+.registrant-picker .registrant-status .registrant-status__link {
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.registrant-existing-card {
+  margin-top: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--surface) 90%, var(--surface-muted));
+  box-shadow: var(--shadow-soft);
+}
+.registrant-existing-card .form-stack {
+  margin-top: 1rem;
+  max-width: 500px;
 }

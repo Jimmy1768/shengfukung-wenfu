@@ -1,4 +1,6 @@
-<%= form_with model: @form, url: account_registration_path(@registration), method: :patch, local: true, class: "form-stack" do |f| %>
+<% form_object = local_assigns[:form] || @form %>
+<% registration_object = local_assigns[:registration] || @registration %>
+<%= form_with model: form_object, url: account_registration_path(registration_object), method: :patch, local: true, class: "form-stack" do |f| %>
   <div class="field-panel">
     <%= f.label :contact_name, "聯絡人" %>
     <%= f.text_field :contact_name, required: true %>

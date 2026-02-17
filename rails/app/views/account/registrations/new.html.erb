@@ -32,43 +32,53 @@
     url: account_registrations_path(offering: @offering.slug, account_action: @account_action),
     local: true,
     class: "account-form account-registration-form" do |f| %>
-    <div class="form-grid">
-      <div class="form-field">
-        <%= f.label :quantity, t("account.registrations.new.fields.quantity") %>
-        <%= f.number_field :quantity, min: 1, max: 10, required: true %>
-      </div>
-      <div class="form-field">
-        <%= f.label :contact_name, t("account.registrations.new.fields.contact_name") %>
-        <%= f.text_field :contact_name, required: true %>
-      </div>
-      <div class="form-field">
-        <%= f.label :contact_phone, t("account.registrations.new.fields.contact_phone") %>
-        <%= f.telephone_field :contact_phone %>
-      </div>
-      <div class="form-field">
-        <%= f.label :contact_email, t("account.registrations.new.fields.contact_email") %>
-        <%= f.email_field :contact_email %>
-      </div>
-      <div class="form-field form-field--full">
-        <%= f.label :household_notes, t("account.registrations.new.fields.household_notes") %>
-        <%= f.text_area :household_notes, rows: 2 %>
-      </div>
-      <div class="form-field">
-        <%= f.label :arrival_window, t("account.registrations.new.fields.arrival_window") %>
-        <%= f.text_field :arrival_window, placeholder: "09:00" %>
-      </div>
-      <div class="form-field form-field--full">
-        <%= f.label :ceremony_notes, t("account.registrations.new.fields.ceremony_notes") %>
-        <%= f.text_area :ceremony_notes, rows: 3 %>
-      </div>
-    </div>
-    <%= f.submit t("account.registrations.new.submit"), class: "btn btn-primary" %>
-  <% end %>
+    <%= hidden_field_tag :registrant_scope, @form.registrant_scope, id: nil %>
+    <%= hidden_field_tag :dependent_id, @form.dependent_id, id: nil %>
+    <%= render "registrant_picker",
+      form: @form,
+      offering: @offering,
+      dependents: @dependents,
+      account_action: @account_action %>
 
-  <p class="muted">
-    <%= t(
-      "account.registrations.new.after_submit_html",
-      link: link_to(t("account.registrations.new.after_submit_link"), account_registrations_path)
-    ).html_safe %>
-  </p>
+    <% if @existing_registration.present? %>
+      <div class="registrant-existing-card">
+        <p class="hint"><%= t("account.registrations.new.fields.already_registered_detail") %></p>
+        <%= render "form", form: @metadata_form, registration: @existing_registration %>
+      </div>
+    <% elsif @form.registrant_scope.blank? %>
+      <p class="hint registrant-form-hint"><%= t("account.registrations.new.fields.select_registrant_hint") %></p>
+    <% else %>
+      <div class="form-grid">
+        <div class="form-field">
+          <%= f.label :quantity, t("account.registrations.new.fields.quantity") %>
+          <%= f.number_field :quantity, min: 1, max: 10, required: true %>
+        </div>
+        <div class="form-field">
+          <%= f.label :contact_name, t("account.registrations.new.fields.contact_name") %>
+          <%= f.text_field :contact_name, required: true %>
+        </div>
+        <div class="form-field">
+          <%= f.label :contact_phone, t("account.registrations.new.fields.contact_phone") %>
+          <%= f.telephone_field :contact_phone %>
+        </div>
+        <div class="form-field">
+          <%= f.label :contact_email, t("account.registrations.new.fields.contact_email") %>
+          <%= f.email_field :contact_email %>
+        </div>
+        <div class="form-field form-field--full">
+          <%= f.label :household_notes, t("account.registrations.new.fields.household_notes") %>
+          <%= f.text_area :household_notes, rows: 2 %>
+        </div>
+        <div class="form-field">
+          <%= f.label :arrival_window, t("account.registrations.new.fields.arrival_window") %>
+          <%= f.text_field :arrival_window, placeholder: "09:00" %>
+        </div>
+        <div class="form-field form-field--full">
+          <%= f.label :ceremony_notes, t("account.registrations.new.fields.ceremony_notes") %>
+          <%= f.text_area :ceremony_notes, rows: 3 %>
+        </div>
+      </div>
+      <%= f.submit t("account.registrations.new.submit"), class: "btn btn-primary" %>
+    <% end %>
+  <% end %>
 </section>

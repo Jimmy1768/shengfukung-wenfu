@@ -4,7 +4,10 @@ module Account
   class RegistrationsController < BaseController
     before_action :set_registration, only: %i[show edit update payment]
     before_action :assign_offering_from_params, only: %i[new create]
-    before_action :redirect_existing_registration!, only: %i[new create]
+    before_action :assign_eligible_registrants, only: %i[new create]
+    before_action :ensure_selected_registrant, only: %i[new create]
+
+    helper_method :existing_registration_for
 
     def index
       @registrations = registration_scope.order(created_at: :desc)
@@ -13,18 +16,19 @@ module Account
     def show; end
 
     def new
-      @form = Account::RegistrationIntakeForm.new(
-        user: current_user,
-        offering: @offering
-      )
+      @form = build_form_from_selected_registrant
+      @existing_registration = existing_registration_for(selected_registrant_scope, selected_dependent_id)
+      @metadata_form = Account::RegistrationMetadataForm.new(registration: @existing_registration) if @existing_registration
     end
 
     def create
       @form = Account::RegistrationIntakeForm.new(
         user: current_user,
         offering: @offering,
-        params: registration_intake_params
+        params: registration_intake_params.merge(registrant_scope: selected_registrant_scope, dependent_id: selected_dependent_id)
       )
+      @existing_registration = existing_registration_for(selected_registrant_scope, selected_dependent_id)
+      @metadata_form = Account::RegistrationMetadataForm.new(registration: @existing_registration) if @existing_registration
 
       if @form.save
         redirect_to payment_account_registration_path(@form.registration),
@@ -74,14 +78,6 @@ module Account
       end
     end
 
-    def redirect_existing_registration!
-      return unless @offering
-
-      return unless (registration = find_registration_for_offering(@offering))
-
-      redirect_to account_registration_path(registration)
-    end
-
     def set_registration
       @registration = registration_scope.find(params[:id])
     end
@@ -106,6 +102,65 @@ module Account
         :household_notes,
         :arrival_window,
         :ceremony_notes
+      )
+    end
+
+    def assign_eligible_registrants
+      @dependents = current_user.dependents.order(:native_name, :english_name)
+      @registrant_options = [
+        { scope: "self", label: current_user.native_name.presence || current_user.english_name.presence || current_user.email }
+      ] +
+        @dependents.map { |dep| { scope: "dependent", dependent: dep, label: dep.native_name.presence || dep.english_name } }
+    end
+
+    def ensure_selected_registrant
+      return unless @offering
+
+      chosen_scope = params[:registrant_scope].presence
+      chosen_id = params[:dependent_id].presence
+
+      if chosen_scope == "dependent" && chosen_id.present?
+        @selected_registrant_scope = "dependent"
+        @selected_dependent_id = chosen_id
+      else
+        @selected_registrant_scope = "self"
+        @selected_dependent_id = nil
+      end
+    end
+
+    def selected_registrant_scope
+      @selected_registrant_scope || "self"
+    end
+
+    def selected_dependent_id
+      @selected_dependent_id.presence
+    end
+
+    def existing_registration_for(scope, dependent_id)
+      return nil unless @offering
+
+      @existing_registration_cache ||= {}
+      key = [scope, dependent_id.presence].join(":")
+      return @existing_registration_cache[key] if @existing_registration_cache.key?(key)
+
+      query = current_user.temple_event_registrations.where("metadata ->> 'event_slug' = ?", @offering.slug)
+      if @offering.respond_to?(:registration_period_key) && @offering.registration_period_key.present?
+        query = query.where("metadata ->> 'registration_period_key' = ?", @offering.registration_period_key)
+      end
+      if scope == "dependent" && dependent_id.present?
+        query = query.where("metadata ->> 'dependent_id' = ?", dependent_id.to_s)
+      else
+        query = query.where("COALESCE(metadata ->> 'dependent_id', '') = ''")
+      end
+      @existing_registration_cache[key] = query.order(created_at: :desc).first
+    end
+
+    def build_form_from_selected_registrant
+      defaults = { registrant_scope: selected_registrant_scope, dependent_id: selected_dependent_id }
+      Account::RegistrationIntakeForm.new(
+        user: current_user,
+        offering: @offering,
+        params: defaults
       )
     end
   end
