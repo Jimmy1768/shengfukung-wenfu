@@ -763,7 +763,7 @@ body.account-body {
   margin-top: 1.5rem;
 }
 
-.profile-form .form-grid {
+.profile-form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.25rem;
@@ -836,12 +836,14 @@ body.account-body {
   grid-auto-flow: row;
   justify-content: flex-start;
   align-items: flex-start;
-  margin-bottom: 1.5rem;
+  margin: 1rem auto 1.5rem;
+  max-width: 380px;
 }
 
 .account-form .form-grid > .form-field {
   min-width: 0;
   max-width: 200px;
+  width: 100%;
 }
 
 .account-form .form-grid input,
@@ -1189,7 +1191,7 @@ body.account-body {
   margin-right: auto;
 }
 
-.account-form .form-grid {
+.account-form .info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
@@ -1220,11 +1222,29 @@ body.account-body {
 }
 
 .account-registration-form {
-  width: min(720px, 100%);
+  width: 100%;
+  max-width: 420px;
 }
 
 .account-registration-form .form-grid {
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem 1rem;
+  margin: 1rem 0;
+}
+
+.new-form-stack {
+  max-width: 380px;
+  margin: 0 auto 1.5rem;
+}
+
+.new-form-stack .form-field {
+  min-width: 0;
+}
+
+.form-stack--inline {
+  max-width: 380px;
+  width: 100%;
 }
 
 .account-registration-form .form-field--full {
@@ -1239,9 +1259,10 @@ body.account-body {
   margin-bottom: 0.75rem;
 }
 .registrant-picker .registrant-picker__options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  display: inline-flex;
+  flex-wrap: wrap;
   gap: 0.6rem;
+  width: auto;
 }
 .registrant-picker .registrant-card {
   display: inline-flex;
@@ -1253,7 +1274,9 @@ body.account-body {
   background: var(--surface-muted);
   color: var(--text);
   text-decoration: none;
-  min-width: 130px;
+  min-width: 140px;
+  max-width: 200px;
+  flex: 0 0 auto;
   transition: border-color 0.15s ease, background 0.15s ease;
   position: relative;
 }
@@ -1305,5 +1328,16 @@ body.account-body {
 }
 .registrant-existing-card .form-stack {
   margin-top: 1rem;
-  max-width: 500px;
+  max-width: 380px;
+  width: 100%;
+}
+.registrant-existing-card .form-stack input,
+.registrant-existing-card .form-stack textarea,
+.registrant-existing-card .form-stack select {
+  width: 100%;
+  max-width: 100%;
+}
+.registrant-existing-card.registrant-new-card {
+  background: var(--surface);
+  margin-top: 1.5rem;
 }

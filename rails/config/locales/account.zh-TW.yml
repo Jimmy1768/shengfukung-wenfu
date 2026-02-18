@@ -212,6 +212,15 @@ zh-TW:
           view: "查看"
           edit: "編輯"
         empty: "尚未有報名紀錄。"
+      form:
+        contact_name: "聯絡人"
+        contact_phone: "電話"
+        contact_email: "Email"
+        household_notes: "家庭／同行備註"
+        arrival_window: "到場時間"
+        arrival_placeholder: "08:30-09:00"
+        ceremony_notes: "儀式備註"
+        submit: "儲存資料"
       show:
         eyebrow: "報名資料"
         subtitle: "更新聯絡方式或檢視憑證資訊。"

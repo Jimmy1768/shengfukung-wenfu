@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "building account, offering registration screens"
+git commit -m "adjusting layout/styles after completing dependents system"
 git push
 
 git reset --hard HEAD

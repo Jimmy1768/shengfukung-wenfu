@@ -205,6 +205,15 @@ en:
           view: "View"
           edit: "Edit"
         empty: "No registrations recorded."
+      form:
+        contact_name: "Contact name"
+        contact_phone: "Phone"
+        contact_email: "Email"
+        household_notes: "Household / companions"
+        arrival_window: "Arrival window"
+        arrival_placeholder: "08:30-09:00"
+        ceremony_notes: "Notes"
+        submit: "Save details"
       show:
         eyebrow: "Registration details"
         subtitle: "Update contact info or view certificate status."

@@ -1,6 +1,6 @@
 <% form_object = local_assigns[:form] || @form %>
 <% registration_object = local_assigns[:registration] || @registration %>
-<%= form_with model: form_object, url: account_registration_path(registration_object), method: :patch, local: true, class: "form-stack" do |f| %>
+<%= form_with model: form_object, url: registration_object.present? ? account_registration_path(registration_object) : account_registrations_path(offering: @offering.slug, account_action: @account_action), method: registration_object.present? ? :patch : :post, local: true, class: "form-stack form-stack--inline" do |f| %>
   <div class="field-panel">
     <%= f.label :contact_name, t("account.registrations.form.contact_name") %>
     <%= f.text_field :contact_name, required: true %>
@@ -25,5 +25,5 @@
     <%= f.label :ceremony_notes, t("account.registrations.form.ceremony_notes") %>
     <%= f.text_area :ceremony_notes, rows: 3 %>
   </div>
-  <%= f.submit t("account.registrations.form.submit"), class: "btn btn-primary" %>
+  <%= f.submit t("account.registrations.form.submit"), class: "btn btn-primary w-100" %>
 <% end %>
