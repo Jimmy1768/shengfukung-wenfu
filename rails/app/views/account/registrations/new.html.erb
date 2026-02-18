@@ -1,4 +1,5 @@
 <section class="account-section">
+  <% gathering_registration = @offering.is_a?(TempleGathering) %>
   <header class="section-header">
     <div>
       <p class="eyebrow"><%= t("account.registrations.new.eyebrow") %></p>
@@ -21,6 +22,14 @@
         <div>
           <dt><%= t("account.registrations.new.details.date") %></dt>
           <dd><%= @offering.starts_on %></dd>
+        </div>
+      <% end %>
+      <% if (@offering.respond_to?(:start_time) && @offering.start_time.present?) || (@offering.respond_to?(:end_time) && @offering.end_time.present?) %>
+        <% start_time = @offering.respond_to?(:start_time) ? @offering.start_time&.strftime("%H:%M") : nil %>
+        <% end_time = @offering.respond_to?(:end_time) ? @offering.end_time&.strftime("%H:%M") : nil %>
+        <div>
+          <dt><%= t("account.registrations.new.details.time") %></dt>
+          <dd><%= [start_time, end_time].compact.join(" - ") %></dd>
         </div>
       <% end %>
     </dl>
@@ -78,14 +87,16 @@
               <%= f.label :household_notes, t("account.registrations.form.household_notes") %>
               <%= f.text_area :household_notes, rows: 3 %>
             </div>
-            <div class="form-field">
-              <%= f.label :arrival_window, t("account.registrations.form.arrival_window") %>
-              <%= f.text_field :arrival_window, placeholder: t("account.registrations.form.arrival_placeholder") %>
-            </div>
-            <div class="form-field form-field--full">
-              <%= f.label :ceremony_notes, t("account.registrations.form.ceremony_notes") %>
-              <%= f.text_area :ceremony_notes, rows: 3 %>
-            </div>
+            <% unless gathering_registration %>
+              <div class="form-field">
+                <%= f.label :arrival_window, t("account.registrations.form.arrival_window") %>
+                <%= f.text_field :arrival_window, placeholder: t("account.registrations.form.arrival_placeholder") %>
+              </div>
+              <div class="form-field form-field--full">
+                <%= f.label :ceremony_notes, t("account.registrations.form.ceremony_notes") %>
+                <%= f.text_area :ceremony_notes, rows: 3 %>
+              </div>
+            <% end %>
           </div>
           <%= f.submit t("account.registrations.new.submit"), class: "btn btn-primary w-100" %>
         <% end %>

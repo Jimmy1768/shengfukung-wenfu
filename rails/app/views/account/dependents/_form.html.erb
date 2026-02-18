@@ -1,40 +1,40 @@
   <% dependent_link = @form.link %>
   <% form_url = dependent_link.present? ? account_dependent_path(dependent_link) : account_dependents_path %>
   <% form_method = dependent_link.present? ? :patch : :post %>
-  <%= form_with model: @form, url: form_url, method: form_method, scope: :account_dependent_form, local: true, class: "account-form", builder: Account::DependentForm::DependentFormBuilder do |f| %>
+  <%= form_with model: @form, url: form_url, method: form_method, scope: :account_dependent_form, local: true, class: "account-form profile-form dependent-profile-form", builder: Account::DependentForm::DependentFormBuilder do |f| %>
     <%= render "shared/form_errors", form: @form %>
-    <div class="form-grid">
-    <div class="form-field">
+    <div class="single-row-grid">
+    <div class="field">
       <%= f.label :english_name, t("account.dependents.form.english_name") %>
       <%= f.text_field :english_name, required: true %>
     </div>
-    <div class="form-field">
+    <div class="field">
       <%= f.label :native_name, t("account.dependents.form.native_name") %>
       <%= f.text_field :native_name %>
     </div>
-    <div class="form-field">
+    <div class="field">
       <%= f.label :relationship_label, t("account.dependents.form.relationship") %>
       <%= f.text_field :relationship_label %>
     </div>
-    <div class="form-field">
+    <div class="field">
       <%= f.label :birthdate, t("account.dependents.form.birthdate") %>
       <%= f.date_field :birthdate %>
     </div>
-    <div class="form-field">
+    <div class="field">
       <%= f.label :phone, t("account.dependents.form.phone") %>
       <%= f.text_field :phone %>
     </div>
-    <div class="form-field">
+    <div class="field">
       <%= f.label :email, t("account.dependents.form.email") %>
       <%= f.email_field :email %>
     </div>
     </div>
-    <div class="form-field">
+    <div class="field">
       <%= f.label :notes, t("account.dependents.form.notes") %>
       <%= f.text_area :notes, rows: 3 %>
     </div>
     <div class="form-actions">
-      <%= f.submit t("account.dependents.form.submit"), class: "btn btn-primary" %>
-      <%= link_to t("account.dependents.form.cancel"), account_profile_path, class: "btn btn-secondary" %>
+      <%= f.submit t("account.dependents.form.submit"), class: "pill-link primary" %>
+      <%= link_to t("account.dependents.form.cancel"), account_profile_path, class: "pill-link" %>
     </div>
   <% end %>

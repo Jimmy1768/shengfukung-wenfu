@@ -31,7 +31,9 @@ module Account
         id: record.id,
         title: record.title,
         date: formatted_date(record.starts_on),
+        time_range: formatted_time_range(record),
         location: record_location(record),
+        map_url: map_url_for(record),
         status: record.timeline_status,
         description: record.try(:subtitle).presence || record.try(:description),
         image_url: record.try(:hero_image_url).presence,
@@ -63,6 +65,32 @@ module Account
       else
         current_temple.contact_details&.dig("addressZh") || I18n.t("account.events.default_location")
       end
+    end
+
+    def map_url_for(record)
+      return unless record.respond_to?(:location_address) && record.location_address.present?
+
+      "https://www.google.com/maps/search/?api=1&query=#{ERB::Util.url_encode(record.location_address)}"
+    end
+
+    def formatted_time_range(record)
+      return unless record.respond_to?(:start_time) || record.respond_to?(:end_time)
+
+      starts_at = format_time_value(record.try(:start_time))
+      ends_at = format_time_value(record.try(:end_time))
+      return if starts_at.blank? && ends_at.blank?
+
+      if starts_at.present? && ends_at.present?
+        "#{starts_at} - #{ends_at}"
+      else
+        starts_at.presence || ends_at
+      end
+    end
+
+    def format_time_value(value)
+      return if value.blank?
+
+      value.respond_to?(:strftime) ? value.strftime("%H:%M") : value.to_s
     end
 
     def gallery_preview_scope

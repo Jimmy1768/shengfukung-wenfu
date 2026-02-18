@@ -63,10 +63,6 @@
       </div>
     </div>
     <div class="field">
-      <%= form.label :poster_image_url, t("admin.events.form.fields.poster_image_url") %>
-      <%= form.text_field :poster_image_url %>
-    </div>
-    <div class="field">
       <%= form.label :description, t("admin.offering_form.fields.description") %>
       <%= form.text_area :description, rows: 3 %>
     </div>
@@ -87,13 +83,22 @@
       </div>
     </div>
     <div class="field-row">
+      <% time_options = (0..23).flat_map { |hour| [0, 15, 30, 45].map { |minute| format("%02d:%02d", hour, minute) } } %>
+      <% selected_start_time = form.object.start_time&.strftime("%H:%M") %>
+      <% selected_end_time = form.object.end_time&.strftime("%H:%M") %>
       <div class="field-panel">
         <%= form.label :start_time, t("admin.events.form.fields.start_time") %>
-        <%= form.time_field :start_time %>
+        <%= form.select :start_time,
+          options_for_select(time_options, selected_start_time),
+          { include_blank: true },
+          class: "admin-time-select" %>
       </div>
       <div class="field-panel">
         <%= form.label :end_time, t("admin.events.form.fields.end_time") %>
-        <%= form.time_field :end_time %>
+        <%= form.select :end_time,
+          options_for_select(time_options, selected_end_time),
+          { include_blank: true },
+          class: "admin-time-select" %>
       </div>
     </div>
     <div class="field-row">

@@ -1,7 +1,7 @@
 <% offering_name = @registration.registrable&.try(:title) || @registration.temple_offering&.title || @registration.reference_code %>
 <% amount_label = Currency::Symbols.format_amount(@registration.total_price_cents, @registration.currency) %>
 <% amount_zero = @registration.total_price_cents.to_i.zero? %>
-<% status_key = @registration.payment_status %>
+<% status_key = @registration.payment_status_for_display %>
 
 <section class="account-section">
   <header class="section-header">

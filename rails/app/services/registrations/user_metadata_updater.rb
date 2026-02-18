@@ -5,6 +5,7 @@ module Registrations
     TRANSIENT_KEY_PATTERN = /(date|time)\z/i
     CONTACT_MAPPINGS = {
       "phone" => "phone",
+      "dependents_notes" => "notes",
       "notes" => "notes"
     }.freeze
 

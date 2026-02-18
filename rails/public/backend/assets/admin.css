@@ -906,6 +906,18 @@ body.admin-body input[type=time]::-webkit-calendar-picker-indicator {
   cursor: pointer;
 }
 
+.admin-time-select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: var(--radius-lg);
+  padding: 0.7rem 0.9rem;
+  min-height: 2.75rem;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+}
+
 .filter-status-chips {
   display: flex;
   flex-direction: column;

@@ -28,7 +28,6 @@ class TempleEventSerializer
       capacity_remaining: event.capacity_remaining,
       timeline_status: event.timeline_status.to_s,
       hero_image_url: event.hero_image_url,
-      poster_image_url: event.poster_image_url,
       metadata: event.metadata
     }
   end

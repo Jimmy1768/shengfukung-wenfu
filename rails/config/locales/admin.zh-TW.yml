@@ -487,13 +487,12 @@ zh-TW:
       form:
         sections:
           basics: "基本資訊"
-          basics_hint: "設定標題、副標與主視覺。"
+          basics_hint: "設定標題、副標與圖片。"
           schedule: "檔期 / 地點"
           pricing: "價格與狀態"
         fields:
           subtitle: "副標題"
-          hero_image_url: "主視覺網址"
-          poster_image_url: "海報網址"
+          hero_image_url: "圖片網址"
           start_time: "開始時間"
           end_time: "結束時間"
           location_name: "地點名稱"
@@ -555,7 +554,7 @@ zh-TW:
           ancestor: "祖先資訊"
         fields:
           subtitle: "副標題"
-          hero_image_url: "主視覺網址"
+          hero_image_url: "圖片網址"
           period_label: "檔期標籤"
           quantity_limit: "數量限制"
           registration_period_key: "檔期識別碼"

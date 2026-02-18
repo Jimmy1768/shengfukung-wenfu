@@ -16,6 +16,7 @@ module Admin
       @offering = current_temple.temple_events.new(price_cents: nil, currency: "TWD")
       apply_template_defaults(@offering, selected_template_slug, :events)
       @offering.currency ||= "TWD"
+      apply_location_defaults(@offering)
     end
 
     def create
@@ -33,7 +34,9 @@ module Admin
       end
     end
 
-    def edit; end
+    def edit
+      apply_location_defaults(@offering)
+    end
 
     def update
       if @offering.update(offering_params)
@@ -66,7 +69,6 @@ module Admin
         :location_notes,
         :status,
         :hero_image_url,
-        :poster_image_url,
         metadata_settings: {}
       )
       permitted[:currency] = permitted[:currency].presence || "TWD"
@@ -103,6 +105,22 @@ module Admin
       offering.metadata["form_label"] = template[:label]
       offering.metadata["registration_form"] = template[:registration_form]
       offering.slug ||= template[:slug]
+    end
+
+    def default_location_name
+      current_temple.name
+    end
+
+    def default_location_address
+      details = current_temple.contact_details || {}
+      details["addressZh"].presence ||
+        details["addressEn"].presence ||
+        details["mapUrl"]
+    end
+
+    def apply_location_defaults(offering)
+      offering.location_name = default_location_name if offering.location_name.blank?
+      offering.location_address = default_location_address if offering.location_address.blank?
     end
 
     def load_template_loader

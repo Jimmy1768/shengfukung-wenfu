@@ -72,6 +72,7 @@ en:
       payment_statuses:
         paid: "Paid"
         pending: "Pending"
+        no_payment_required: "No payment required"
         refunded: "Refunded"
         failed: "Failed"
         completed: "Completed"
@@ -127,6 +128,8 @@ en:
         past: "Completed"
       date_tbd: "Date to be announced"
       default_location: "Temple"
+      time_label: "Time"
+      map_cta: "Open in Google Maps"
       empty_state: "There are no active offerings or gatherings right now. Please check back soon."
       register_cta: "Register"
     galleries:
@@ -175,6 +178,7 @@ en:
           temple: "Temple"
           price: "Price"
           date: "Date"
+          time: "Time"
         fields:
           registrant_scope: "Who is this for?"
           self_option: "Myself"
@@ -230,6 +234,7 @@ en:
         certificate_pending: "Pending"
         status: "Status"
         totals: "Quantity / amount"
+        quantity_only: "Quantity"
         contact:
           title: "Contact information"
           primary: "Contact"

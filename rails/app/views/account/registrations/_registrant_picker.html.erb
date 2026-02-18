@@ -21,13 +21,8 @@
         <% else %>
           <span class="registrant-pill registrant-pill--dependent"><%= t("account.registrations.new.fields.dependent_label") %></span>
         <% end %>
-        <% if registration && scope != "self" %>
-          <span class="registrant-status">
-            <%= t("account.registrations.new.fields.already_registered") %>
-            <%= link_to t("account.registrations.new.fields.view_existing"),
-                  account_registration_path(registration),
-                  class: "registrant-status__link" %>
-          </span>
+        <% if registration %>
+          <span class="registrant-status"><%= t("account.registrations.new.fields.already_registered") %></span>
         <% end %>
       <% end %>
     <% end %>

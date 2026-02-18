@@ -80,6 +80,16 @@ class TempleRegistration < ApplicationRecord
     payment_status == PAYMENT_STATUSES[:paid]
   end
 
+  def no_payment_required?
+    total_price_cents.to_i.zero?
+  end
+
+  def payment_status_for_display
+    return "no_payment_required" if no_payment_required?
+
+    payment_status
+  end
+
   def mark_paid!
     update!(payment_status: PAYMENT_STATUSES[:paid])
   end

@@ -28,7 +28,9 @@ module Account
     def initialize(user:, offering:, params: nil)
       @user = user
       @offering = offering
-      attributes = params.presence || defaults_from_user
+      normalized_params = normalize_params(params)
+      @contact_fields_provided = contact_fields_provided?(normalized_params)
+      attributes = defaults_from_user.merge(normalized_params)
       super(attributes)
       apply_dependent_defaults
     end
@@ -58,11 +60,24 @@ module Account
       metadata = user&.metadata || {}
       {
         registrant_scope: "self",
-        contact_name: user&.english_name || metadata["contact_name"],
+        contact_name: user&.native_name.presence || user&.english_name || metadata["contact_name"],
         contact_phone: metadata["phone"],
         contact_email: user&.email,
         household_notes: metadata["household_notes"]
       }.compact
+    end
+
+    def normalize_params(params)
+      return {} if params.blank?
+
+      case params
+      when ActionController::Parameters
+        params.to_unsafe_h
+      when Hash
+        params
+      else
+        {}
+      end.compact
     end
 
     def build_registration!
@@ -112,10 +127,11 @@ module Account
 
     def update_user_metadata!
       user_metadata = metadata_payload.except("registration_period_key")
+      contact_sync_payload = dependent_selected? ? {} : contact_payload
       Registrations::UserMetadataUpdater.new(
         user:,
         offering_slug: offering.slug,
-        contact_payload: contact_payload,
+        contact_payload: contact_sync_payload,
         logistics_payload: logistics_payload,
         ritual_metadata: user_metadata,
         order_details: {
@@ -123,6 +139,7 @@ module Account
           certificate_number: @registration&.certificate_number
         }
       ).update!
+      sync_dependent_profile! if dependent_selected?
     end
 
     def apply_dependent_defaults
@@ -132,18 +149,44 @@ module Account
       end
 
       return unless (selected = dependent)
+      return if @contact_fields_provided
 
-      self.contact_name = selected.english_name if contact_name.blank?
+      self.contact_name = selected.native_name.presence || selected.english_name
       dependent_metadata = selected.metadata || {}
-      self.contact_phone = dependent_metadata["phone"] if contact_phone.blank?
-      self.contact_email = dependent_metadata["email"] if contact_email.blank?
-      self.household_notes = dependent_metadata["notes"] if household_notes.blank?
+      self.contact_phone = dependent_metadata["phone"]
+      self.contact_email = dependent_metadata["email"]
+      self.household_notes = dependent_metadata["notes"]
+    end
+
+    def contact_fields_provided?(params)
+      %w[contact_name contact_phone contact_email household_notes].any? { |key| params.key?(key) }
     end
 
     def dependent_selection
       return unless registrant_scope == "dependent"
 
       errors.add(:dependent_id, :blank) unless dependent
+    end
+
+    def sync_dependent_profile!
+      selected = dependent
+      return unless selected
+
+      payload = dependent_contact_payload
+      return if payload.blank?
+
+      updated_metadata = (selected.metadata || {}).merge(payload)
+      return if updated_metadata == (selected.metadata || {})
+
+      selected.update!(metadata: updated_metadata)
+    end
+
+    def dependent_contact_payload
+      {
+        "phone" => contact_phone.presence,
+        "email" => contact_email.presence,
+        "notes" => household_notes.presence
+      }.compact
     end
 
     def dependent_selected?

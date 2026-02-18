@@ -1,5 +1,6 @@
 <% form_object = local_assigns[:form] || @form %>
 <% registration_object = local_assigns[:registration] || @registration %>
+<% gathering_registration = registration_object&.registrable_type == "TempleGathering" %>
 <%= form_with model: form_object, url: account_registration_path(registration_object), method: :patch, local: true, class: "form-stack" do |f| %>
   <div class="field-panel">
     <%= f.label :contact_name, t("account.registrations.form.contact_name") %>
@@ -17,13 +18,15 @@
     <%= f.label :household_notes, t("account.registrations.form.household_notes") %>
     <%= f.text_area :household_notes, rows: 3 %>
   </div>
-  <div class="field-panel">
-    <%= f.label :arrival_window, t("account.registrations.form.arrival_window") %>
-    <%= f.text_field :arrival_window, placeholder: t("account.registrations.form.arrival_placeholder") %>
-  </div>
-  <div class="field-panel">
-    <%= f.label :ceremony_notes, t("account.registrations.form.ceremony_notes") %>
-    <%= f.text_area :ceremony_notes, rows: 3 %>
-  </div>
+  <% unless gathering_registration %>
+    <div class="field-panel">
+      <%= f.label :arrival_window, t("account.registrations.form.arrival_window") %>
+      <%= f.text_field :arrival_window, placeholder: t("account.registrations.form.arrival_placeholder") %>
+    </div>
+    <div class="field-panel">
+      <%= f.label :ceremony_notes, t("account.registrations.form.ceremony_notes") %>
+      <%= f.text_area :ceremony_notes, rows: 3 %>
+    </div>
+  <% end %>
   <%= f.submit t("account.registrations.form.submit"), class: "btn btn-primary" %>
 <% end %>

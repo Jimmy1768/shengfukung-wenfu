@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "refine account portal, gathering registration"
+git commit -m "refine account portal layout styles"
 git push
 
 git reset --hard HEAD

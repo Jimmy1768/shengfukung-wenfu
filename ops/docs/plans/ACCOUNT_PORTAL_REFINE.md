@@ -32,7 +32,13 @@
 - [ ] Test duplicate guard behavior for both self and dependent.
 - [ ] Test free vs paid gathering status display in account pages.
 
+### Profile Sync Guardrails
+
+- [ ] Keep registration creation non-blocking when profile fields are incomplete.
+- [ ] When registrant is `self`, sync non-blank registration contact values back to user profile metadata (`phone`, `notes`).
+- [ ] When registrant is `dependent`, sync non-blank registration contact values back to that dependent profile metadata (`phone`, `email`, `notes`) without overwriting main user profile contact metadata.
+- [ ] Never overwrite profile fields with blank values from registration input.
+
 ## Open Decisions
 
 - [ ] One active registration per registrant per gathering vs allow multiple registrations for the same registrant.
-

@@ -22,11 +22,12 @@
         </thead>
         <tbody>
           <% @registrations.each do |registration| %>
+            <% status_key = registration.payment_status_for_display %>
             <tr>
               <td><%= registration.reference_code %></td>
               <td><%= registration.offering&.try(:title) || registration.reference_code %></td>
               <td><%= registration.registrant_name %></td>
-              <td><span class="status-pill status-<%= registration.payment_status %>"><%= t("account.dashboard.payment_statuses.#{registration.payment_status}", default: registration.payment_status) %></span></td>
+              <td><span class="status-pill status-<%= status_key %>"><%= t("account.dashboard.payment_statuses.#{status_key}", default: status_key.to_s.humanize) %></span></td>
               <td><%= registration.certificate_number.presence || t("account.registrations.index.table.certificate_pending") %></td>
               <td>
                 <%= link_to t("account.registrations.index.actions.view"), account_registration_path(registration), class: "pill-link" %>

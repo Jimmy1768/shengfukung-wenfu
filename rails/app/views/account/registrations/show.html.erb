@@ -1,4 +1,7 @@
 <section class="account-section">
+  <% gathering_registration = @registration.registrable_type == "TempleGathering" %>
+  <% free_gathering = gathering_registration && @registration.no_payment_required? %>
+  <% status_key = @registration.payment_status_for_display %>
   <header class="section-header">
     <div>
       <p class="eyebrow"><%= t("account.registrations.show.eyebrow") %></p>
@@ -19,11 +22,16 @@
     </div>
     <div>
       <dt><%= t("account.registrations.show.status") %></dt>
-      <dd><span class="status-pill status-<%= @registration.payment_status %>"><%= t("account.dashboard.payment_statuses.#{@registration.payment_status}", default: @registration.payment_status) %></span></dd>
+      <dd><span class="status-pill status-<%= status_key %>"><%= t("account.dashboard.payment_statuses.#{status_key}", default: status_key.to_s.humanize) %></span></dd>
     </div>
     <div>
-      <dt><%= t("account.registrations.show.totals") %></dt>
-      <dd><%= @registration.quantity %> × <%= Currency::Symbols.format_amount(@registration.unit_price_cents, @registration.currency) %></dd>
+      <% if free_gathering %>
+        <dt><%= t("account.registrations.show.quantity_only") %></dt>
+        <dd><%= @registration.quantity %></dd>
+      <% else %>
+        <dt><%= t("account.registrations.show.totals") %></dt>
+        <dd><%= @registration.quantity %> × <%= Currency::Symbols.format_amount(@registration.unit_price_cents, @registration.currency) %></dd>
+      <% end %>
     </div>
   </dl>
 
@@ -50,19 +58,21 @@
     </dl>
   </article>
 
-  <article class="card">
-    <h3><%= t("account.registrations.show.logistics.title") %></h3>
-    <% logistics = @registration.logistics_payload || {} %>
-    <% metadata = @registration.metadata || {} %>
-    <dl class="detail-list registration-detail-list">
-      <div>
-        <dt><%= t("account.registrations.show.logistics.arrival") %></dt>
-        <dd><%= logistics["arrival_window"].presence || "—" %></dd>
-      </div>
-      <div>
-        <dt><%= t("account.registrations.show.logistics.notes") %></dt>
-        <dd><%= metadata["ceremony_notes"].presence || "—" %></dd>
-      </div>
-    </dl>
-  </article>
+  <% unless gathering_registration %>
+    <article class="card">
+      <h3><%= t("account.registrations.show.logistics.title") %></h3>
+      <% logistics = @registration.logistics_payload || {} %>
+      <% metadata = @registration.metadata || {} %>
+      <dl class="detail-list registration-detail-list">
+        <div>
+          <dt><%= t("account.registrations.show.logistics.arrival") %></dt>
+          <dd><%= logistics["arrival_window"].presence || "—" %></dd>
+        </div>
+        <div>
+          <dt><%= t("account.registrations.show.logistics.notes") %></dt>
+          <dd><%= metadata["ceremony_notes"].presence || "—" %></dd>
+        </div>
+      </dl>
+    </article>
+  <% end %>
 </section>

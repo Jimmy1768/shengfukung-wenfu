@@ -124,7 +124,6 @@ module Admin
         :capacity_total,
         :status,
         :hero_image_url,
-        :poster_image_url,
         metadata_settings: {}
       )
       permitted[:currency] = permitted[:currency].presence || "TWD"

@@ -600,13 +600,12 @@ en:
       form:
         sections:
           basics: "Basic details"
-          basics_hint: "Edit marketing copy and hero assets."
+          basics_hint: "Edit marketing copy and image assets."
           schedule: "Schedule & location"
           pricing: "Pricing & status"
         fields:
           subtitle: "Subtitle"
-          hero_image_url: "Hero image URL"
-          poster_image_url: "Poster image URL"
+          hero_image_url: "Image URL"
           start_time: "Start time"
           end_time: "End time"
           location_name: "Location name"
@@ -669,7 +668,7 @@ en:
           ancestor: "Ancestor details"
         fields:
           subtitle: "Subtitle"
-          hero_image_url: "Hero image URL"
+          hero_image_url: "Image URL"
           period_label: "Period label"
           quantity_limit: "Quantity limit"
           registration_period_key: "Registration period"

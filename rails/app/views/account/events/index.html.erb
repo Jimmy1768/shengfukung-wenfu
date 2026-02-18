@@ -8,7 +8,7 @@
   </header>
 
   <% if @offerings.any? %>
-    <div class="event-grid">
+    <div class="event-grid event-grid--list">
       <% @offerings.each do |event| %>
         <article class="event-card <%= "event-card--with-media" if event[:image_url].present? %>">
           <% if event[:image_url].present? %>
@@ -23,6 +23,17 @@
               <%= event[:location] %> ·
               <%= t("account.events.statuses.#{event[:status]}", default: event[:status].to_s.humanize) %>
             </p>
+            <% if event[:time_range].present? %>
+              <p class="event-detail">
+                <strong><%= t("account.events.time_label") %>:</strong>
+                <%= event[:time_range] %>
+              </p>
+            <% end %>
+            <% if event[:map_url].present? %>
+              <p class="event-detail">
+                <%= link_to t("account.events.map_cta"), event[:map_url], class: "event-map-link", target: "_blank", rel: "noopener" %>
+              </p>
+            <% end %>
             <% if event[:description].present? %>
               <p class="event-notes"><%= event[:description] %></p>
             <% end %>
@@ -50,7 +61,7 @@
   </header>
 
   <% if @gatherings.any? %>
-    <div class="event-grid">
+    <div class="event-grid event-grid--list">
       <% @gatherings.each do |event| %>
         <article class="event-card <%= "event-card--with-media" if event[:image_url].present? %>">
           <% if event[:image_url].present? %>
@@ -65,6 +76,17 @@
               <%= event[:location] %> ·
               <%= t("account.events.statuses.#{event[:status]}", default: event[:status].to_s.humanize) %>
             </p>
+            <% if event[:time_range].present? %>
+              <p class="event-detail">
+                <strong><%= t("account.events.time_label") %>:</strong>
+                <%= event[:time_range] %>
+              </p>
+            <% end %>
+            <% if event[:map_url].present? %>
+              <p class="event-detail">
+                <%= link_to t("account.events.map_cta"), event[:map_url], class: "event-map-link", target: "_blank", rel: "noopener" %>
+              </p>
+            <% end %>
             <% if event[:description].present? %>
               <p class="event-notes"><%= event[:description] %></p>
             <% end %>
