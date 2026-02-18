@@ -114,6 +114,12 @@ body.account-body {
   border-color: color-mix(in srgb, var(--border) 80%, transparent);
 }
 
+.pill-link.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -945,7 +951,7 @@ body.account-body {
   gap: 0.4rem;
 }
 
-.account-form input,
+.account-form input:not([type="submit"]):not([type="button"]):not([type="reset"]),
 .account-form textarea,
 .account-form select {
   border: 1px solid var(--border);
@@ -956,6 +962,12 @@ body.account-body {
   color: var(--text);
   max-width: 100%;
   width: 100%;
+}
+
+.account-form .form-actions .btn,
+.account-form .form-actions input[type="submit"] {
+  width: auto;
+  max-width: none;
 }
 
 .account-form textarea {
