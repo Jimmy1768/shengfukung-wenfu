@@ -22,7 +22,7 @@ Snapshot of what the patron-facing account portal already delivers so future wor
 - The selector now renders as a set of cards (Myself + each dependent). Choosing a registrant with an existing entry loads the inline edit form for that registration; otherwise the new-registration form appears prefilled for the selected person.
 - Personal info fields prefill from the `users` table and write back on save. Offering-specific fields (ancestor names, dedications, etc.) remain read-only outside the registration form; admins control edits.
 - Registrations lock once fulfilled or past the start time. Cancel/refund actions surface only while the offering is open; otherwise we show guidance to contact the temple.
-- Duplicate guardrails allow exactly one active registration per patron/offering (Phase A’s service-period logic handles recurring services on the admin side).
+- Duplicate guardrails allow exactly one active registration per registrant scope (self or dependent), offering slug, and period key.
 
 ## Member Surfaces
 
@@ -31,7 +31,7 @@ Snapshot of what the patron-facing account portal already delivers so future wor
 - **Payments** mirrors the registrations list and reserves room for future LINE Pay receipts. Today it shows placeholder buttons explaining digital receipts are coming.
 - **Profile & Dependents** lets patrons edit their own contact info plus manage dependent cards (name, relationship, optional birthdate/contact). Dependents never receive credentials; registrations remain tied to the caregiver account but display the registrant name in tables.
 
-## Rolling Offerings Hooks (Phase A parity)
+## Rolling Offerings Hooks (Phase A + B parity)
 
 - The account portal trusts the service metadata populated by the admin tooling. When Vue deep-links into `/account`, the offering slug + period key determine whether new registrations are allowed or if we redirect to an existing record.
 - Certificates appear on dashboard/history lists with their numbers/status but no downloads yet; copy explains that the temple issues printed certificates until digital PDFs arrive.
@@ -52,6 +52,5 @@ Snapshot of what the patron-facing account portal already delivers so future wor
 
 ## Next Steps / TODOs
 
-- Build the full patron→admin promotion flow, dependent-aware duplicate checks, and digital certificate downloads.
+- Connect OAuth provider configuration for production auth flows.
 - Wire LINE Pay receipts once the payment pipeline lands; keep the placeholders in place to avoid UI churn.
-- Add regression tests around theme resolution and temple-context routing once the flows stabilize.

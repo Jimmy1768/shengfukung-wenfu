@@ -50,4 +50,3 @@ offerings:
           fields: [primary_contact, phone, email]
         ritual_metadata:
           fields: [dedication_message]
-*** End Patch

@@ -236,6 +236,7 @@ en:
         eyebrow: "Payment"
         title: "Complete payment for %{offering}"
         subtitle: "Review your registration summary and finish payment via LINE Pay."
+        renewal_helper: "Each period requires a new registration. For changes or special requests, contact the temple service desk."
         view_registration: "Registration details"
         amount_label: "Amount due"
         free_notice: "This registration is free. You're all set!"
@@ -248,6 +249,7 @@ en:
         summary:
           reference: "Reference"
           offering: "Offering"
+          period: "Period"
           registrant: "Registrant"
           quantity: "Quantity"
           amount: "Total amount"
@@ -338,7 +340,8 @@ en:
       header:
         eyebrow: "Services"
         title: "Blessing services"
-        subtitle: "Long-term offerings (lamps, tables, rituals) available to members."
+        subtitle: "Long-term offerings (lamps, tables, rituals) available to patrons."
+        renewal_helper: "Each period requires a new registration. For changes or special requests, contact the temple service desk."
       card:
         status_label: "Status"
         price_label: "Price"
@@ -346,7 +349,6 @@ en:
         statuses:
           open: "Open now"
           closed: "Closed"
-        description_fallback: "Service details will be published soon."
         period_default: "Ongoing blessing"
         cta: "Register this service"
       empty: "No services are currently published. Please check back later."

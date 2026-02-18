@@ -6,7 +6,7 @@ This file documents how we bring a new temple onto the Shenfukung Wenfu stack. I
 
 - **Profile YAML** – `rails/db/temples/<slug>.yml`. Source of truth for public copy (name, tagline, contact, service times, about text, metadata). Required before seeding anything.
 - **Owner admin** – first administrator for the temple. Gets elevated privileges (manage admins, manage other admins, payment routing). Stored as a `User` + `AdminAccount(role: owner)` + `AdminTempleMembership`.
-- **Events vs Services** – events (`TempleEvent`) are in-person programs with schedules/capacity; services (`TempleService`) cover proxy rituals (lanterns, placards, etc.). Both are configured from the per-temple YAML templates and seeded through `Seeds::TempleFinancials`. Each template must declare a `kind` (`event`/`service`) so the admin UI knows which controller/model to use.
+- **Events vs Services** – events (`TempleEvent`) are in-person programs with schedules/capacity; services (`TempleService`) cover proxy rituals (lanterns, placards, etc.). Both are configured from the per-temple YAML templates and seeded through `Seeds::TempleFinancials`. Onboarding configs must use top-level `events:` and `services:` sections so entries are classified by section (not by per-entry `kind` flags).
 - **TempleRegistration** – unified polymorphic registration model (table: `temple_registrations`). Every onsite order/payment flows through this table regardless of whether the source is an event, service, or gathering.
 - **Gatherings** – `TempleGathering` records for non-offering community events (e.g., workshops). They share the registration/payment stack but are managed separately from offerings.
 
@@ -67,31 +67,81 @@ Use this when you need representative data locally or on staging:
      ```
    - Cash-only pipeline: use `/admin/events/...`, `/admin/services/...`, or `/admin/gatherings/...` → Orders to capture registrations, then “Record cash payment” to log receipts + ledger entries. LINE Pay arrives after onsite validation.
 6. **Customize product templates per temple**
-   - Each offering entry stores its form definition in metadata. Use the `form_fields` key to describe which inputs should render for that offering (e.g., `sections`, `fields`, `required`, custom labels/hints).
-   - During onboarding, create a config file under `rails/db/temples/offerings/<slug>.yml`. Every entry must include `kind:` (`event` or `service`) so the loader can route to the correct model. Suggested structure:
+   - Each offering entry stores its form definition in metadata. Use `form_fields` + `registration_form` to describe which inputs render and how registration payloads are structured.
+   - During onboarding, create `rails/db/temples/offerings/<slug>.yml` with a strict split shape:
      ```yaml
-     offerings:
-       - slug: pudu-table
-         kind: service
-         registration_period_key: "2026-ghost-month"
+     schema_version: 2
+     events:
+       - slug: ancestor-ritual
+         label: "祖先拔薦"
+         defaults:
+           offering_type: "ritual"
+           currency: "TWD"
+         attributes:
+           price_cents: 1500
+           currency: "TWD"
+           description: "為祖先超薦的法事，含誦經、牌位供奉與證書備註。"
          form_fields:
-           basics: [title, slug, offering_type, period, price_cents, currency]
-           schedule:
-             title: "Additional offering details"
-             fields: [starts_on, ends_on, available_slots]
-           certificate: [certificate_prefix, certificate_hint]
-           logistics: [ancestor_placard_hint, logistics_notes]
-           description: true
+           ritual:
+             title: "作業備註"
+             fields: [fulfillment_method, certificate_hint, logistics_notes]
+         registration_form:
+           sections:
+             order:
+               fields: [quantity, unit_price_cents, currency, certificate_number]
+             contact:
+               fields: [primary_contact, phone, email, dependents_notes, notes]
+             logistics:
+               fields: [preferred_date, preferred_slot, arrival_window, ceremony_location]
+             ritual_metadata:
+               fields: [ancestor_placard_name, dedication_message, incense_option, certificate_notes]
+
+     services:
+       - slug: pudu-table
+         label: "普渡供桌"
+         registration_period_key: "2026-ghost-month"
+         defaults:
+           offering_type: "table"
+           currency: "TWD"
          attributes:
            price_cents: 3000
            currency: "TWD"
-           description: "Summarize what this service covers so admins don't retype copy."
+           description: "含供桌佈置與供品，提供春祭/中元普渡專用桌位。"
+         form_fields:
+           schedule:
+             title: "供桌內容"
+             fields: [table_items, table_size]
+           logistics:
+             title: "作業方式"
+             fields: [fulfillment_method]
+         registration_form:
+           sections:
+             order:
+               fields: [quantity, unit_price_cents, currency]
+             contact:
+               fields: [primary_contact, phone, email]
+             logistics:
+               fields: [preferred_date, ceremony_location]
+             ritual_metadata:
+               fields: [ancestor_placard_name, dedication_message]
      ```
+   - Section constraints (must follow during DOCX -> YAML conversion):
+     - `events:` entries must not include `registration_period_key`.
+     - `services:` entries must include `registration_period_key`.
+     - `events:` must carry schedule/location fields in built-in columns and/or registration form mappings.
+     - `services:` should model proxy/fulfillment flows and should not require gathering-style time/location attendance data.
+     - Do not include per-entry `kind` when the entry already lives under `events` or `services`.
+   - Keep this file YAML-first and deterministic: no ad-hoc keys and no free-form section names. If a temple needs a new structure, update this contract first, then regenerate.
    - Each `form_fields` section may include an optional `title:` (as shown above). When present, that string becomes the card heading in the admin form; otherwise the UI falls back to the generic "Offering details" label. This keeps the YAML non-technical while still letting a temple insist on a specific term when needed.
    - Use the optional `attributes` block to pre-fill core event/service columns (e.g., `price_cents`, `currency`, `description`). These values only apply when the field is blank, so admins can still override them before saving.
-   - Extend the seed task (or run a one-off script) to load this YAML and merge `form_fields` + `kind` into each offering’s `metadata`. The admin `_form.html.erb` partial reads `@offering.metadata['form_fields']` and only renders the listed sections/inputs, so each temple sees a tailored form without separate partials.
+   - Loader behavior: `Offerings::TemplateLoader` reads `events:` + `services:` and syncs `form_fields`, `defaults`, `options`, `registration_form`, and labels into offering metadata. The admin `_form.html.erb` partial reads `@offering.metadata['form_fields']`, so each temple sees a tailored form without separate partials.
    - Store the YAML in Git so the config remains the source of truth. When a temple needs tweaks, edit the YAML, rerun the sync task, and the form will update automatically.
    - After editing `rails/db/temples/offerings/<slug>.yml`, run `ruby ops/scripts/sync_offering_configs.rb` to push the latest metadata (`form_fields`, defaults, registration schema, attributes) into each offering’s `metadata` column. Without this sync, the admin UI will keep rendering the stale metadata from the DB.
+   - Validation checklist before committing onboarding YAML:
+     - Every slug is unique within a temple.
+     - Every service `registration_period_key` exists in `rails/db/temples/<slug>.yml` `registration_periods`.
+     - No event entry defines `registration_period_key`.
+     - Form keys referenced in YAML map to supported admin/registration fields.
    - Keep `form_fields` focused on metadata that doesn’t already have a dedicated column on the base form (e.g., certificate hints, lamp locations). Core fields like `description`, `price_cents`, `starts_on`, etc. already appear in the built-in cards, so duplicating them in metadata results in redundant UI.
    - `registration_form.field_settings` unlocks richer controls:
      - `options` (array or `{ value: label }`) renders a `<select>` so staff pick from approved values instead of typing.
@@ -117,7 +167,7 @@ Use this when you need representative data locally or on staging:
 8. **In-tower workflow summary**
    - **Product templates** – defined in `rails/db/temples/offerings/<slug>.yml` under `events:` and `services:`. Devs sync them into each temple’s metadata via `Offerings::TemplateLoader`. Active temple slugs + deploy metadata now live in `rails/app/lib/temples/manifest.yml`, which deploy scripts and runbooks reference when iterating over multiple clients.
    - **Unified offerings index** – `/admin/offerings` is now the primary list for events *and* services. Each row renders a card with title/subtitle, type, price, status, and last update plus inline “View” / “Orders” buttons. Draft + published offerings show by default; the archived toggle flips `status` to `archived` for historical reference without deleting data.
-   - **Event/Service instances** – editing still occurs under `/admin/events/:id` or `/admin/services/:id`, but creation always starts from `/admin/offerings` so the template picker can auto-select the correct form partial based on `kind`.
+   - **Event/Service instances** – editing still occurs under `/admin/events/:id` or `/admin/services/:id`, but creation always starts from `/admin/offerings` so the template picker can auto-select the correct form partial based on whether the template came from `events:` or `services:`.
    - **Gatherings** – `/admin/gatherings` now mirrors the same card layout (schedule, location, price, status) so staff have a consistent experience whether they manage templated offerings or one-off community meetups. They still funnel into `TempleRegistration` + `/admin/offerings` order management, keeping reporting and payments unified.
    - **Media uploads** – Gatherings (hero image) and gallery entries (photos/video) can now upload files directly via the shared MediaAsset/S3 pipeline; the forms still accept manually pasted URLs as a fallback.
 - **Registration / payment** – staff use `/admin/events/:id/orders`, `/admin/services/:id/orders`, or `/admin/gatherings/:id/orders` to capture registrations, then record payments. Ledger/history sits at this level. The Orders list now labels each entry’s “Source” with `Event`, `Service`, or `Gathering`, and free gatherings automatically show the “No payment required” badge next to the status pill.

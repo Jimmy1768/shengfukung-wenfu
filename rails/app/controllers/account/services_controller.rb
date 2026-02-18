@@ -16,14 +16,21 @@ module Account
 
     def build_service_card(service)
       meta = (service.metadata || {}).with_indifferent_access
+      period_key = service.registration_period_key.presence
+      resolved_period =
+        if period_key.present?
+          current_temple.registration_period_label_for(period_key)
+        else
+          service.period_label.presence || meta[:period_label].presence
+        end
       {
         id: service.id,
         slug: service.slug,
         title: service.title,
-        description: service.description.presence || meta[:description].presence ||
-          I18n.t("account.services.card.description_fallback"),
+        # Patron cards should reflect the temple admin's saved offering copy, not template metadata.
+        description: service.description.presence,
         price: formatted_price(service),
-        period: meta[:period_label].presence || I18n.t("account.services.card.period_default"),
+        period: resolved_period.presence || I18n.t("account.services.card.period_default"),
         status: service.available? ? :open : :closed
       }
     end

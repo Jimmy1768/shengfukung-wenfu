@@ -4,6 +4,7 @@
       <p class="eyebrow"><%= t("account.services.header.eyebrow") %></p>
       <h2><%= t("account.services.header.title") %></h2>
       <p><%= t("account.services.header.subtitle") %></p>
+      <p class="muted"><%= t("account.services.header.renewal_helper") %></p>
     </div>
   </header>
 
@@ -26,7 +27,9 @@
               <dd><%= service[:period] %></dd>
             </div>
           </dl>
-          <p class="service-description"><%= service[:description] %></p>
+          <% if service[:description].present? %>
+            <p class="service-description"><%= service[:description] %></p>
+          <% end %>
           <%= link_to t("account.services.card.cta"),
             new_account_registration_path(offering: service[:slug], account_action: "service"),
             class: "pill-link pill-link--inline" %>

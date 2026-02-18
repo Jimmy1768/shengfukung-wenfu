@@ -23,6 +23,12 @@
         <dt><%= t("account.registrations.payment.summary.offering") %></dt>
         <dd><%= offering_name %></dd>
       </div>
+      <% if @registration_period_label.present? %>
+        <div>
+          <dt><%= t("account.registrations.payment.summary.period") %></dt>
+          <dd><%= @registration_period_label %></dd>
+        </div>
+      <% end %>
       <div>
         <dt><%= t("account.registrations.payment.summary.registrant") %></dt>
         <dd><%= @registration.registrant_name %></dd>
@@ -44,6 +50,7 @@
         </dd>
       </div>
     </dl>
+    <p class="muted"><%= t("account.registrations.payment.renewal_helper") %></p>
   </article>
 
   <% if amount_zero %>

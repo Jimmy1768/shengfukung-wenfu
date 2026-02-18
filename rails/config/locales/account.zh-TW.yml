@@ -243,6 +243,7 @@ zh-TW:
         eyebrow: "付款"
         title: "完成 %{offering} 的付款"
         subtitle: "確認報名摘要並透過 LINE Pay 完成付款。"
+        renewal_helper: "每個檔期需重新登記；如需變更或特殊協助，請洽廟方服務台。"
         view_registration: "查看報名資料"
         amount_label: "應付金額"
         free_notice: "此報名不需付費，已完成。"
@@ -255,6 +256,7 @@ zh-TW:
         summary:
           reference: "編號"
           offering: "項目"
+          period: "檔期"
           registrant: "報名人"
           quantity: "數量"
           amount: "總金額"
@@ -346,6 +348,7 @@ zh-TW:
         eyebrow: "祈福服務"
         title: "祈福服務"
         subtitle: "列出長期供燈、供桌與祈福項目，方便線上了解費用與備註。"
+        renewal_helper: "每個檔期需重新登記；如需變更或特殊協助，請洽廟方服務台。"
       card:
         status_label: "狀態"
         price_label: "費用"
@@ -353,7 +356,6 @@ zh-TW:
         statuses:
           open: "開放中"
           closed: "暫停"
-        description_fallback: "祈福服務說明即將更新。"
         period_default: "長期祈福"
         cta: "登入並報名"
       empty: "目前沒有公開的祈福服務。"

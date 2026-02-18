@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "adjusting layout/styles after completing dependents system"
+git commit -m "finished account portal build, without api endpoint test"
 git push
 
 git reset --hard HEAD

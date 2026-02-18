@@ -57,7 +57,9 @@ module Account
       end
     end
 
-    def payment; end
+    def payment
+      @registration_period_label = period_label_for(@registration)
+    end
 
     private
 
@@ -162,6 +164,15 @@ module Account
         offering: @offering,
         params: defaults
       )
+    end
+
+    def period_label_for(registration)
+      metadata = (registration.metadata || {}).with_indifferent_access
+      period_key = metadata[:registration_period_key].presence
+      period_key ||= registration.registrable.registration_period_key if registration.registrable.respond_to?(:registration_period_key)
+      return if period_key.blank?
+
+      current_temple.registration_period_label_for(period_key)
     end
   end
 end

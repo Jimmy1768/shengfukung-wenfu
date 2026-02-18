@@ -348,6 +348,12 @@ body.account-body {
   gap: 0.5rem;
 }
 
+.service-card dl > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .service-card dt {
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -357,6 +363,7 @@ body.account-body {
 
 .service-card dd {
   margin: 0;
+  margin-top: 0.15rem;
   font-weight: 600;
 }
 
