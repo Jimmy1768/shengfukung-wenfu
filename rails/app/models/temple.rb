@@ -87,6 +87,10 @@ class Temple < ApplicationRecord
     end
   end
 
+  def registration_period_keys
+    registration_periods.map { |entry| entry[:key].to_s }.reject(&:blank?)
+  end
+
   def registration_period_label(entry, locale = I18n.locale)
     entry = entry.with_indifferent_access
     case locale

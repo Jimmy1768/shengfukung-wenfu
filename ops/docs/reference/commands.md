@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "account portal complete"
+git commit -m "period key system scripts built"
 git push
 
 git reset --hard HEAD
@@ -85,6 +85,31 @@ bin/expo_build <preset> [-- extra eas args]
 
 # Smoke tests: curl /api/v1/temples/:slug for every manifest entry (set SMOKE_BASE_URL for staging/prod)
 bin/run_smoke_tests
+
+# Registration period key governance (Phase B)
+# Audit invalid service/registration period keys and write a remediation report
+cd rails && bin/rails registration_period_keys:audit OUTPUT=tmp/registration_period_key_audit.json
+cd rails && bin/rails registration_period_keys:audit SLUG=shenfukung-wenfu OUTPUT=tmp/registration_period_key_audit.json
+
+# Dry-run fallback remap (no writes)
+cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shenfukung-wenfu FALLBACK_KEY=perennial
+
+# Apply fallback remap (writes)
+cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shenfukung-wenfu FALLBACK_KEY=perennial APPLY=true
+
+# Registration period support workflow (Phase C)
+# 1) Edit rails/db/temples/<slug>.yml registration_periods (keys + labels)
+# 2) Sync offering template metadata into temple offerings
+ruby ops/scripts/sync_offering_configs.rb
+
+# 3) Re-seed temple YAML payload into DB for the target temple
+cd rails && bin/rails "temples:seed[shenfukung-wenfu]"
+
+# 4) Validate no invalid period keys remain
+cd rails && bin/rails registration_period_keys:audit SLUG=shenfukung-wenfu OUTPUT=tmp/registration_period_key_audit.json
+
+# 5) Deploy updated app artifacts
+bin/deploy_vue shenfukung-wenfu
 ```
 
 ---

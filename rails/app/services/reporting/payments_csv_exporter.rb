@@ -7,6 +7,7 @@ module Reporting
     HEADER = [
       "Reference",
       "Offering",
+      "Registration Period Key",
       "Patron",
       "Method",
       "Status",
@@ -42,6 +43,7 @@ module Reporting
       [
         payment.external_reference.presence || registration&.reference_code || payment.id,
         offering_title || "—",
+        registration_period_key_for(registration),
         patron_label || "Guest",
         payment.payment_method,
         payment.status,
@@ -54,6 +56,16 @@ module Reporting
 
     def format_amount(cents)
       cents.to_f / 100.0
+    end
+
+    def registration_period_key_for(registration)
+      metadata_key = registration&.metadata.to_h["registration_period_key"]
+      return metadata_key if metadata_key.present?
+
+      offering = registration&.offering
+      return unless offering.respond_to?(:registration_period_key)
+
+      offering.registration_period_key
     end
   end
 end

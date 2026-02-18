@@ -16,6 +16,7 @@ class TempleService < ApplicationRecord
   validates :slug, uniqueness: { scope: :temple_id }
   validates :price_cents, numericality: { greater_than_or_equal_to: 0 }
   validates :quantity_limit, numericality: { allow_nil: true, greater_than_or_equal_to: 0 }
+  validate :registration_period_key_allowed_for_temple
 
   scope :published_visible, -> { where(status: "published") }
 
@@ -41,6 +42,16 @@ class TempleService < ApplicationRecord
   end
 
   private
+
+  def registration_period_key_allowed_for_temple
+    return if registration_period_key.blank?
+    return unless temple
+
+    allowed_keys = temple.registration_period_keys
+    return if allowed_keys.include?(registration_period_key.to_s)
+
+    errors.add(:registration_period_key, "must match a configured temple registration period key")
+  end
 
   def metadata_value(key)
     (metadata || {}).with_indifferent_access[key]

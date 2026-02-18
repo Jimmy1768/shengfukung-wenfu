@@ -8,6 +8,9 @@ module Reporting
         temple:,
         slug: "offering",
         title: "Ancestor Rites",
+        starts_on: Date.current,
+        ends_on: Date.current + 1.day,
+        offering_type: "general",
         currency: "TWD",
         price_cents: 600
       )
@@ -18,17 +21,19 @@ module Reporting
       )
       registration = TempleEventRegistration.create!(
         temple:,
-        temple_offering: offering,
+        registrable: offering,
         user:,
         quantity: 1,
         contact_payload: {},
         logistics_payload: {},
-        metadata: {}
+        metadata: { "registration_period_key" => "2026-ghost-month" }
       )
       payment = TemplePayment.create!(
         temple:,
         temple_event_registration: registration,
         user:,
+        provider: "demo",
+        provider_account: "temple",
         payment_method: TemplePayment::PAYMENT_METHODS[:cash],
         status: TemplePayment::STATUSES[:completed],
         amount_cents: 600,
@@ -44,6 +49,8 @@ module Reporting
       assert_includes csv, "Reference"
       assert_includes csv, payment.temple_event_registration.reference_code
       assert_includes csv, "Ancestor Rites"
+      assert_includes csv, "Registration Period Key"
+      assert_includes csv, "2026-ghost-month"
       assert_includes csv, "cash"
     end
   end

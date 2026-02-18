@@ -12,20 +12,39 @@
 
 ## Phase A — Remove Ad-Hoc Keys
 
-- [ ] Remove the "Other" period key input from `/admin/services/:id` create/edit forms.
-- [ ] Restrict selection to period keys defined in `rails/db/temples/<slug>.yml` `registration_periods`.
-- [ ] Reject unknown `registration_period_key` values server-side with a clear validation error.
+- [x] Remove the "Other" period key input from `/admin/services/:id` create/edit forms.
+- [x] Restrict selection to period keys defined in `rails/db/temples/<slug>.yml` `registration_periods`.
+- [x] Reject unknown `registration_period_key` values server-side with a clear validation error.
 
 ## Phase B — Data Safety & Migration
 
-- [ ] Audit existing services for keys not present in temple YAML and produce a remediation list.
-- [ ] Define a safe fallback/remap process for invalid historical keys before strict validation is enforced.
-- [ ] Ensure admin filters/exports continue to support historical data without data loss.
+- [x] Audit existing services for keys not present in temple YAML and produce a remediation list.
+- [x] Define a safe fallback/remap process for invalid historical keys before strict validation is enforced.
+- [x] Ensure admin filters/exports continue to support historical data without data loss.
+
+### Phase B Runbook
+
+- Audit invalid keys (all temples): `cd rails && bin/rails registration_period_keys:audit OUTPUT=tmp/registration_period_key_audit.json`
+- Audit one temple: `cd rails && bin/rails registration_period_keys:audit SLUG=shenfukung-wenfu OUTPUT=tmp/registration_period_key_audit.json`
+- Dry-run fallback remap: `cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shenfukung-wenfu FALLBACK_KEY=perennial`
+- Apply fallback remap: `cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shenfukung-wenfu FALLBACK_KEY=perennial APPLY=true`
+- Remap stores prior invalid keys in `metadata.legacy_registration_period_keys` on services + registrations before rewriting.
 
 ## Phase C — Ops Workflow
 
-- [ ] Document the support workflow for temples requesting new periods (YAML edit + sync + deploy).
+- [x] Document the support workflow for temples requesting new periods (YAML edit + sync + deploy).
 - [ ] Link yearly rollover automation commands/runbook once the rollover task ships.
+
+### Phase C Support Workflow (Temples Requesting New Periods)
+
+1. Edit `rails/db/temples/<slug>.yml` and update `registration_periods` with the new key + labels.
+2. Sync offering template configs so service templates stay aligned: `ruby ops/scripts/sync_offering_configs.rb`.
+3. Re-seed that temple from YAML: `cd rails && bin/rails "temples:seed[<slug>]"`.
+4. Run governance audit for that temple and save report: `cd rails && bin/rails registration_period_keys:audit SLUG=<slug> OUTPUT=tmp/registration_period_key_audit.json`.
+5. If audit finds historical invalid keys, run remap dry-run first, then apply using approved fallback key.
+6. Deploy updated app artifacts (`bin/deploy_vue <slug>`) and complete normal backend deploy flow.
+
+Reference commands: `ops/docs/reference/commands.md`.
 
 ## Phase D — Yearly Period Rollover Automation
 

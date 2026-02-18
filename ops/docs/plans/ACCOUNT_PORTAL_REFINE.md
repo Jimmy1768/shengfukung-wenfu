@@ -9,36 +9,40 @@
 
 ### Gatherings Registration Parity
 
-- [ ] Extend dependent registrant flow to gatherings (same as offerings: self vs dependent).
-- [ ] Persist `metadata.registrant_scope` + `metadata.dependent_id` for gathering registrations.
-- [ ] Reuse duplicate-check behavior by registrant scope for gatherings (align with final product rule).
-- [ ] If duplicate exists, route to edit/show instead of creating a second active registration.
+- [x] Extend dependent registrant flow to gatherings (same as offerings: self vs dependent).
+- [x] Persist `metadata.registrant_scope` + `metadata.dependent_id` for gathering registrations.
+- [x] Reuse duplicate-check behavior by registrant scope for gatherings (align with final product rule).
+- [x] If duplicate exists, route to edit/show instead of creating a second active registration.
 
 ### Gatherings UX / Data Shape
 
-- [ ] Keep gathering registration form minimal (attendance-first, no offering-specific ritual/logistics sections).
-- [ ] Ensure per-registrant registration still creates one `TempleRegistration` row for attendance reporting.
-- [ ] Show actual registrant (self/dependent) clearly in account registration cards/history.
+- [x] Keep gathering registration form minimal (attendance-first, no offering-specific ritual/logistics sections).
+- [x] Ensure per-registrant registration still creates one `TempleRegistration` row for attendance reporting.
+- [x] Show actual registrant (self/dependent) clearly in account registration cards/history.
 
 ### Payments / Status Semantics
 
-- [ ] For free gatherings, show a non-confusing payment state (`no payment required`) rather than misleading unpaid/pending language.
-- [ ] For paid gatherings, keep normal payment flow and include in payments/history views.
+- [x] For free gatherings, show a non-confusing payment state (`no payment required`) rather than misleading unpaid/pending language.
+- [x] For paid gatherings, keep normal payment flow and include in payments/history views.
 
 ### QA Checklist
 
-- [ ] Test account gathering registration for self.
-- [ ] Test account gathering registration for dependent.
-- [ ] Test duplicate guard behavior for both self and dependent.
-- [ ] Test free vs paid gathering status display in account pages.
+- [x] Test account gathering registration for self.
+- [x] Test account gathering registration for dependent.
+- [x] Test duplicate guard behavior for both self and dependent.
+- [x] Test free vs paid gathering status display in account pages.
 
 ### Profile Sync Guardrails
 
-- [ ] Keep registration creation non-blocking when profile fields are incomplete.
-- [ ] When registrant is `self`, sync non-blank registration contact values back to user profile metadata (`phone`, `notes`).
-- [ ] When registrant is `dependent`, sync non-blank registration contact values back to that dependent profile metadata (`phone`, `email`, `notes`) without overwriting main user profile contact metadata.
-- [ ] Never overwrite profile fields with blank values from registration input.
+- [x] Keep registration creation non-blocking when profile fields are incomplete.
+- [x] When registrant is `self`, sync non-blank registration contact values back to user profile metadata (`phone`, `notes`).
+- [x] When registrant is `dependent`, sync non-blank registration contact values back to that dependent profile metadata (`phone`, `email`, `notes`) without overwriting main user profile contact metadata.
+- [x] Never overwrite profile fields with blank values from registration input.
 
 ## Open Decisions
 
-- [ ] One active registration per registrant per gathering vs allow multiple registrations for the same registrant.
+- [x] One active registration per registrant per gathering (duplicates route to existing registration edit flow).
+
+## Deferred
+
+- [ ] Online payment integration (LINE Pay callbacks + live payment reconciliation) is deferred due to current environment limits.
