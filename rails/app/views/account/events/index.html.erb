@@ -10,19 +10,28 @@
   <% if @offerings.any? %>
     <div class="event-grid">
       <% @offerings.each do |event| %>
-        <article class="event-card">
-          <p class="event-date"><%= event[:date] %></p>
-          <h3><%= event[:title] %></h3>
-          <p class="event-meta">
-            <%= event[:location] %> ·
-            <%= t("account.events.statuses.#{event[:status]}", default: event[:status].to_s.humanize) %>
-          </p>
-          <% if event[:description].present? %>
-            <p class="event-notes"><%= event[:description] %></p>
+        <article class="event-card <%= "event-card--with-media" if event[:image_url].present? %>">
+          <% if event[:image_url].present? %>
+            <div class="event-card__media">
+              <%= image_tag event[:image_url], alt: event[:title], loading: "lazy" %>
+            </div>
           <% end %>
-          <% if event[:cta_path].present? %>
-            <%= link_to t("account.events.register_cta"), event[:cta_path], class: "pill-link pill-link--inline" %>
-          <% end %>
+          <div class="event-card__body">
+            <p class="event-date"><%= event[:date] %></p>
+            <h3><%= event[:title] %></h3>
+            <p class="event-meta">
+              <%= event[:location] %> ·
+              <%= t("account.events.statuses.#{event[:status]}", default: event[:status].to_s.humanize) %>
+            </p>
+            <% if event[:description].present? %>
+              <p class="event-notes"><%= event[:description] %></p>
+            <% end %>
+            <% if event[:cta_path].present? %>
+              <div class="event-card__cta">
+                <%= link_to t("account.events.register_cta"), event[:cta_path], class: "pill-link pill-link--inline" %>
+              </div>
+            <% end %>
+          </div>
         </article>
       <% end %>
     </div>
@@ -43,19 +52,28 @@
   <% if @gatherings.any? %>
     <div class="event-grid">
       <% @gatherings.each do |event| %>
-        <article class="event-card">
-          <p class="event-date"><%= event[:date] %></p>
-          <h3><%= event[:title] %></h3>
-          <p class="event-meta">
-            <%= event[:location] %> ·
-            <%= t("account.events.statuses.#{event[:status]}", default: event[:status].to_s.humanize) %>
-          </p>
-          <% if event[:description].present? %>
-            <p class="event-notes"><%= event[:description] %></p>
+        <article class="event-card <%= "event-card--with-media" if event[:image_url].present? %>">
+          <% if event[:image_url].present? %>
+            <div class="event-card__media">
+              <%= image_tag event[:image_url], alt: event[:title], loading: "lazy" %>
+            </div>
           <% end %>
-          <% if event[:cta_path].present? %>
-            <%= link_to t("account.events.register_cta"), event[:cta_path], class: "pill-link pill-link--inline" %>
-          <% end %>
+          <div class="event-card__body">
+            <p class="event-date"><%= event[:date] %></p>
+            <h3><%= event[:title] %></h3>
+            <p class="event-meta">
+              <%= event[:location] %> ·
+              <%= t("account.events.statuses.#{event[:status]}", default: event[:status].to_s.humanize) %>
+            </p>
+            <% if event[:description].present? %>
+              <p class="event-notes"><%= event[:description] %></p>
+            <% end %>
+            <% if event[:cta_path].present? %>
+              <div class="event-card__cta">
+                <%= link_to t("account.events.register_cta"), event[:cta_path], class: "pill-link pill-link--inline" %>
+              </div>
+            <% end %>
+          </div>
         </article>
       <% end %>
     </div>

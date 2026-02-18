@@ -293,6 +293,21 @@ body.admin-body input[type="datetime-local"] {
   padding-right: 2.25rem;
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
+
+.admin-time-input,
+body.admin-body input[type="time"] {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: var(--radius-lg);
+  padding: 0.7rem 0.9rem;
+  min-height: 2.75rem;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
 .admin-date-input::-webkit-calendar-picker-indicator,
 body.admin-body input[type="date"]::-webkit-calendar-picker-indicator,
 body.admin-body input[type="datetime-local"]::-webkit-calendar-picker-indicator {
@@ -302,6 +317,7 @@ body.admin-body input[type="datetime-local"]::-webkit-calendar-picker-indicator 
 }
 
 .admin-date-input:focus,
+body.admin-body input[type="time"]:focus,
 body.admin-body input[type="date"]:focus,
 body.admin-body input[type="datetime-local"]:focus {
   border-color: var(--accent);
@@ -312,6 +328,26 @@ body.admin-body input[type="datetime-local"]:focus {
 body.admin-body input[type="date"]::placeholder,
 body.admin-body input[type="datetime-local"]::placeholder {
   color: color-mix(in srgb, var(--text-muted) 90%, transparent);
+}
+
+.admin-time-input::-webkit-calendar-picker-indicator,
+body.admin-body input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  width: auto;
+  height: auto;
+  cursor: pointer;
+}
+
+.admin-time-select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: var(--radius-lg);
+  padding: 0.7rem 0.9rem;
+  min-height: 2.75rem;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
 }
 
 .filter-status-chips {
@@ -414,6 +450,10 @@ body.admin-body input[type="datetime-local"]::placeholder {
   .btn {
     white-space: nowrap;
   }
+}
+
+.card > .actions {
+  margin-top: var(--spacing-lg);
 }
 
 .orders-row.is-unpaid {
@@ -738,6 +778,47 @@ body.admin-body input[type="datetime-local"]::placeholder {
   border-radius: var(--radius-lg);
   padding: var(--spacing-md);
   box-shadow: var(--shadow-soft);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, max-content));
+  gap: var(--spacing-md) var(--spacing-lg);
+  margin: var(--spacing-md) 0 0;
+  justify-content: flex-start;
+}
+
+.detail-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.detail-grid dt {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.detail-grid dd {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.admin-registration-show {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--spacing-lg), 3vw, var(--spacing-xl));
+}
+
+.admin-registration-layout {
+  width: min(100%, 1040px);
+  margin-right: auto;
+  padding-inline: clamp(var(--spacing-sm), 2.2vw, var(--spacing-lg));
+  box-sizing: border-box;
 }
 
 .hero {

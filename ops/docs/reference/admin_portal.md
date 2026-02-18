@@ -13,9 +13,11 @@ This document captures what exists in the admin portal today so future work can 
 
 - Offerings are defined by YAML under `rails/db/temples/offerings/<slug>.yml`. Templates include `form_fields`, registration form schema, and optional `attributes` that prefill base model columns (e.g., price, description, currency).
 - A template picker on `/admin/offerings/new` lets admins start from those configs. Selecting a template copies metadata, defaults, and prefilled attributes into the new event/service record before validations run.
-- Temple profile YAML now declares `registration_periods` (`{ key, label_zh, label_en }`). `/admin/services/:id` surfaces these keys in a dropdown (with an “Other” escape hatch) and persists the selection as `registration_period_key`. Service cards and order lists display the chosen label for quick context.
-- Registrations copy the service’s `registration_period_key` into `metadata["period_key"]`. Duplicate detection enforces one active registration per `(registrant_scope, service.slug, period_key)` so recurring services (lanterns, tables, donations) cannot be double-booked.
+- Temple profile YAML declares `registration_periods` (`{ key, label_zh, label_en }`). `/admin/services/:id` surfaces only those keys in a dropdown and persists the selection as `registration_period_key`.
+- Registrations copy the service’s `registration_period_key` into `metadata["registration_period_key"]`. Duplicate detection enforces one active registration per `(registrant_scope, service.slug, registration_period_key)` so recurring services (lanterns, tables, donations) cannot be double-booked.
 - Admin filters and CSV exports accept `period_key`, enabling per-period audits without custom SQL.
+- `/admin/events/:id/orders`, `/admin/services/:id/orders`, and `/admin/gatherings/:id/orders` now support full create/show/edit/update for registrations. This includes editing patron-created records from the admin side.
+- `pending` on order/registration tables means payment is still outstanding (not an “incomplete form” state).
 
 ## Admin UX Enhancements
 

@@ -1,5 +1,5 @@
 <% form_action = gathering.persisted? ? admin_gathering_path(gathering) : admin_gatherings_path %>
-<%= form_with model: gathering, url: form_action, scope: :temple_gathering, class: "form-stack" do |form| %>
+<%= form_with model: gathering, url: form_action, scope: :temple_gathering, class: "form-stack gathering-form" do |form| %>
   <% if gathering.errors.any? %>
     <div class="inline-validation" data-inline-validation>
       <strong><%= t("admin.gatherings.form.errors", count: gathering.errors.count) %></strong>
@@ -21,35 +21,73 @@
     <%= form.text_field :subtitle %>
   </div>
 
-  <div class="field">
+  <div class="field gathering-form__full">
     <%= form.label :description, t("admin.gatherings.fields.description") %>
     <%= form.text_area :description, rows: 5 %>
   </div>
 
-  <div class="field checkbox-field">
-    <label>
-      <%= check_box_tag "temple_gathering[free_gathering]",
-        "1",
-        gathering.free_gathering_enabled?,
-        data: { free_gathering_toggle: true } %>
-      <span><%= t("admin.gatherings.fields.free_gathering") %></span>
-    </label>
-    <p class="muted"><%= t("admin.gatherings.hints.free_gathering") %></p>
+  <%= render "admin/shared/segmented_boolean",
+    name: "temple_gathering[free_gathering]",
+    id_prefix: "temple_gathering_free_gathering",
+    label: nil,
+    hint: nil,
+    selected_value: gathering.free_gathering_enabled? ? "1" : "0",
+    options: [[1, t("admin.shared.binary.free")], [0, t("admin.shared.binary.paid")]] %>
+
+  <div
+    class="field-row gathering-form__full"
+    data-free-gathering-pricing-wrapper
+    <%= "hidden" if gathering.free_gathering_enabled? %>
+  >
+    <div class="field">
+      <%= form.label :price_cents, t("admin.gatherings.fields.price_cents") %>
+      <%= form.number_field :price_cents,
+        min: 0,
+        step: 1,
+        data: { free_gathering_price: true },
+        value: (gathering.price_cents.to_i / 100) %>
+    </div>
+    <div class="field">
+      <%= form.label :currency, t("admin.gatherings.fields.currency") %>
+      <%= form.select :currency,
+        options_for_select(Currency::Symbols.options, gathering.currency || "TWD") %>
+    </div>
   </div>
 
-  <div class="field">
+  <div class="field gathering-form__full">
     <label><%= t("admin.gatherings.fields.hero_image_url") %></label>
     <div class="media-upload"
       data-media-upload
       data-media-upload-context="gathering_hero"
-      data-media-upload-target-url="#gathering-hero-url"
+      data-media-upload-target-url="#gathering-image-link"
       data-media-upload-target-asset="#gathering-hero-asset"
       data-media-upload-preview="#gathering-hero-preview">
       <div class="media-upload__controls">
-        <input type="file" accept="image/*" data-media-upload-file class="media-upload__file-input">
-        <button type="button" class="btn btn-secondary" data-media-upload-button>
-          <%= t("admin.media_uploads.actions.upload") %>
-        </button>
+        <div class="media-upload__row">
+          <button
+            type="button"
+            class="btn btn-secondary media-upload__picker"
+            data-media-upload-picker
+            onclick="document.getElementById('gathering-hero-file')?.click()"
+          >
+            <%= t("admin.media_uploads.actions.choose_file") %>
+          </button>
+          <input
+            id="gathering-hero-file"
+            type="file"
+            accept="image/*"
+            data-media-upload-file
+            class="media-upload__file-input media-upload__file-input--hidden"
+          >
+          <span class="media-upload__filename" data-media-upload-filename>
+            <%= t("admin.media_uploads.status.no_file") %>
+          </span>
+        </div>
+        <div class="media-upload__row media-upload__row--upload">
+          <button type="button" class="btn btn-secondary" data-media-upload-button disabled>
+            <%= t("admin.media_uploads.actions.upload") %>
+          </button>
+        </div>
         <span class="media-upload__status" data-media-upload-status></span>
       </div>
       <div class="media-upload__preview">
@@ -64,28 +102,42 @@
     <%= hidden_field_tag "temple_gathering[hero_asset_id]",
       gathering.hero_asset_id,
       id: "gathering-hero-asset" %>
-    <%= form.url_field :hero_image_url, id: "gathering-hero-url" %>
-    <p class="muted"><%= t("admin.gatherings.hints.hero_image_url") %></p>
   </div>
 
   <div class="field">
-    <%= form.label :starts_on, t("admin.gatherings.fields.starts_on") %>
-    <%= form.date_field :starts_on %>
+    <%= form.label :hero_image_url, t("admin.gatherings.fields.image_link"), for: "gathering-image-link" %>
+    <%= form.text_field :hero_image_url, id: "gathering-image-link" %>
   </div>
 
-  <div class="field">
-    <%= form.label :ends_on, t("admin.gatherings.fields.ends_on") %>
-    <%= form.date_field :ends_on %>
+  <div class="field-row gathering-form__full">
+    <div class="field">
+      <%= form.label :starts_on, t("admin.gatherings.fields.starts_on") %>
+      <%= form.date_field :starts_on, class: "admin-date-input" %>
+    </div>
+    <div class="field">
+      <%= form.label :ends_on, t("admin.gatherings.fields.ends_on") %>
+      <%= form.date_field :ends_on, class: "admin-date-input" %>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :start_time, t("admin.gatherings.fields.start_time") %>
-    <%= form.time_field :start_time %>
-  </div>
-
-  <div class="field">
-    <%= form.label :end_time, t("admin.gatherings.fields.end_time") %>
-    <%= form.time_field :end_time %>
+  <div class="field-row gathering-form__full">
+    <% time_options = (0..23).flat_map { |hour| [0, 15, 30, 45].map { |minute| format("%02d:%02d", hour, minute) } } %>
+    <% selected_start_time = gathering.start_time&.strftime("%H:%M") %>
+    <% selected_end_time = gathering.end_time&.strftime("%H:%M") %>
+    <div class="field">
+      <%= form.label :start_time, t("admin.gatherings.fields.start_time") %>
+      <%= form.select :start_time,
+        options_for_select(time_options, selected_start_time),
+        { include_blank: true },
+        class: "admin-time-select" %>
+    </div>
+    <div class="field">
+      <%= form.label :end_time, t("admin.gatherings.fields.end_time") %>
+      <%= form.select :end_time,
+        options_for_select(time_options, selected_end_time),
+        { include_blank: true },
+        class: "admin-time-select" %>
+    </div>
   </div>
 
   <div class="field">
@@ -104,27 +156,12 @@
   </div>
 
   <div class="field">
-    <%= form.label :price_cents, t("admin.gatherings.fields.price_cents") %>
-    <%= form.number_field :price_cents,
-      min: 0,
-      step: 100,
-      data: { free_gathering_price: true },
-      value: gathering.price_cents %>
-  </div>
-
-  <div class="field">
-    <%= form.label :currency, t("admin.gatherings.fields.currency") %>
-    <%= form.select :currency,
-      options_for_select(Currency::Symbols.options, gathering.currency || "TWD") %>
-  </div>
-
-  <div class="field">
     <%= form.label :status, t("admin.gatherings.fields.status") %>
     <% status_options = %w[draft published archived].map { |status| [t("admin.gatherings.statuses.#{status}"), status] } %>
     <%= form.select :status, options_for_select(status_options, gathering.status || "draft") %>
   </div>
 
-<div class="form-actions form-actions--centered">
+<div class="form-actions form-actions--centered gathering-form__full">
   <%= form.submit t("admin.gatherings.actions.save"), class: "btn btn-primary" %>
   <%= link_to t("admin.gatherings.actions.cancel"), admin_gatherings_path, class: "btn btn-secondary" %>
 </div>
@@ -133,32 +170,59 @@
 <%= render "admin/shared/media_upload_script" %>
 <script>
   (() => {
-    const ready = (fn) => {
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", fn);
-      } else {
-        fn();
-      }
+    const bindGatheringDateRange = () => {
+      const startField = document.querySelector('input[name="temple_gathering[starts_on]"]');
+      const endField = document.querySelector('input[name="temple_gathering[ends_on]"]');
+      if (!startField || !endField) return;
+
+      const syncEndConstraints = () => {
+        const startValue = startField.value;
+        if (!startValue) {
+          endField.removeAttribute("min");
+          return;
+        }
+
+        endField.min = startValue;
+        if (!endField.value || endField.value < startValue) {
+          endField.value = startValue;
+        }
+      };
+
+      startField.addEventListener("change", syncEndConstraints);
+      startField.addEventListener("input", syncEndConstraints);
+      endField.addEventListener("change", () => {
+        if (startField.value && endField.value && endField.value < startField.value) {
+          endField.value = startField.value;
+        }
+      });
+
+      syncEndConstraints();
     };
 
-    ready(() => {
-      const toggle = document.querySelector("[data-free-gathering-toggle]");
+    const bindGatheringPricingToggle = () => {
+      const toggles = Array.from(document.querySelectorAll('input[name="temple_gathering[free_gathering]"]'));
       const priceField = document.querySelector("[data-free-gathering-price]");
-      if (!toggle || !priceField) return;
+      const pricingWrapper = document.querySelector("[data-free-gathering-pricing-wrapper]");
+      if (!toggles.length || !priceField || !pricingWrapper) return;
 
       let previousValue = priceField.value;
+      const freeSelected = () => toggles.find((node) => node.checked)?.value === "1";
 
       const syncState = () => {
-        if (toggle.checked) {
+        if (freeSelected()) {
           if (priceField.value && priceField.value !== "0") {
             previousValue = priceField.value;
           }
           priceField.value = 0;
           priceField.readOnly = true;
           priceField.classList.add("is-readonly");
+          pricingWrapper.hidden = true;
+          pricingWrapper.style.display = "none";
         } else {
           priceField.readOnly = false;
           priceField.classList.remove("is-readonly");
+          pricingWrapper.hidden = false;
+          pricingWrapper.style.display = "";
           if (priceField.value === "0" && previousValue && previousValue !== "0") {
             priceField.value = previousValue;
           }
@@ -166,13 +230,28 @@
       };
 
       priceField.addEventListener("input", () => {
-        if (!toggle.checked) {
+        if (!freeSelected()) {
           previousValue = priceField.value;
         }
       });
 
-      toggle.addEventListener("change", syncState);
+      toggles.forEach((node) => node.addEventListener("change", syncState));
       syncState();
-    });
+    };
+
+    if (!window.AdminGatheringPricingToggleInit) {
+      window.AdminGatheringPricingToggleInit = true;
+      document.addEventListener("turbo:load", bindGatheringPricingToggle);
+      document.addEventListener("DOMContentLoaded", bindGatheringPricingToggle);
+    }
+
+    if (!window.AdminGatheringDateRangeInit) {
+      window.AdminGatheringDateRangeInit = true;
+      document.addEventListener("turbo:load", bindGatheringDateRange);
+      document.addEventListener("DOMContentLoaded", bindGatheringDateRange);
+    }
+
+    bindGatheringDateRange();
+    bindGatheringPricingToggle();
   })();
 </script>

@@ -8,7 +8,7 @@
     <%= link_to t("account.registrations.show.edit"), edit_account_registration_path(@registration), class: "pill-link" %>
   </header>
 
-  <dl class="detail-list">
+  <dl class="detail-list registration-summary-list">
     <div>
       <dt><%= t("account.registrations.show.registrant") %></dt>
       <dd><%= @registration.registrant_name %></dd>
@@ -30,21 +30,39 @@
   <article class="card">
     <h3><%= t("account.registrations.show.contact.title") %></h3>
     <% contact = @registration.contact_payload || {} %>
-    <ul class="detail-list">
-      <li><strong><%= t("account.registrations.show.contact.primary") %>：</strong><%= contact["primary_contact"].presence || "—" %></li>
-      <li><strong><%= t("account.registrations.show.contact.phone") %>：</strong><%= contact["phone"].presence || "—" %></li>
-      <li><strong>Email：</strong><%= contact["email"].presence || "—" %></li>
-      <li><strong><%= t("account.registrations.show.contact.dependents") %>：</strong><%= contact["dependents_notes"].presence || "—" %></li>
-    </ul>
+    <dl class="detail-list registration-detail-list">
+      <div>
+        <dt><%= t("account.registrations.show.contact.primary") %></dt>
+        <dd><%= contact["primary_contact"].presence || "—" %></dd>
+      </div>
+      <div>
+        <dt><%= t("account.registrations.show.contact.phone") %></dt>
+        <dd><%= contact["phone"].presence || "—" %></dd>
+      </div>
+      <div>
+        <dt>Email</dt>
+        <dd><%= contact["email"].presence || "—" %></dd>
+      </div>
+      <div>
+        <dt><%= t("account.registrations.show.contact.dependents") %></dt>
+        <dd><%= contact["dependents_notes"].presence || "—" %></dd>
+      </div>
+    </dl>
   </article>
 
   <article class="card">
     <h3><%= t("account.registrations.show.logistics.title") %></h3>
     <% logistics = @registration.logistics_payload || {} %>
     <% metadata = @registration.metadata || {} %>
-    <ul class="detail-list">
-      <li><strong><%= t("account.registrations.show.logistics.arrival") %>：</strong><%= logistics["arrival_window"].presence || "—" %></li>
-      <li><strong><%= t("account.registrations.show.logistics.notes") %>：</strong><%= metadata["ceremony_notes"].presence || "—" %></li>
-    </ul>
+    <dl class="detail-list registration-detail-list">
+      <div>
+        <dt><%= t("account.registrations.show.logistics.arrival") %></dt>
+        <dd><%= logistics["arrival_window"].presence || "—" %></dd>
+      </div>
+      <div>
+        <dt><%= t("account.registrations.show.logistics.notes") %></dt>
+        <dd><%= metadata["ceremony_notes"].presence || "—" %></dd>
+      </div>
+    </dl>
   </article>
 </section>

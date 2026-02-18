@@ -1,5 +1,12 @@
 en:
   account:
+    confirmations:
+      defaults:
+        title: "Please confirm"
+        message: "Are you sure you want to continue?"
+        confirm: "Confirm"
+        cancel: "Cancel"
+        close: "Close dialog"
     language_selector:
       flash: "Language updated."
     layout:

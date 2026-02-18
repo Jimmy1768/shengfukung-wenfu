@@ -1,0 +1,20 @@
+<% options = Array(options).map { |value, text| [value.to_s, text.to_s] } %>
+<% fallback_value = options.first&.first.to_s %>
+<% current_value = selected_value.to_s.presence || fallback_value %>
+<% aria_label = label.presence || options.map(&:last).join(" / ") %>
+
+<div class="field segmented-field">
+  <% if label.present? %>
+    <label class="segmented-field__label"><%= label %></label>
+  <% end %>
+  <div class="segmented-control" role="radiogroup" aria-label="<%= aria_label %>">
+    <% options.each_with_index do |(value, text), index| %>
+      <% input_id = "#{id_prefix}_#{index}" %>
+      <%= radio_button_tag name, value, current_value == value, id: input_id, class: "segmented-control__input" %>
+      <%= label_tag input_id, text, class: "segmented-control__option" %>
+    <% end %>
+  </div>
+  <% if hint.present? %>
+    <p class="muted"><%= hint %></p>
+  <% end %>
+</div>

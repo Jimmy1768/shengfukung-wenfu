@@ -57,6 +57,7 @@
         <%= yield %>
       </main>
     </div>
+    <%= render "shared/confirmation_modal", scope: :account %>
   </body>
   <%= render "shared/modal_script" %>
 </html>

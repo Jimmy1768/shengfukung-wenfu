@@ -96,5 +96,174 @@
         }
       });
     });
+
+    ready(() => {
+      const modal = document.querySelector('[data-confirmation-modal]');
+      if (!modal || modal.dataset.confirmBound === 'true') return;
+      modal.dataset.confirmBound = 'true';
+
+      const titleEl = modal.querySelector('[data-confirm-title]');
+      const messageEl = modal.querySelector('[data-confirm-message]');
+      const confirmButton = modal.querySelector('[data-confirm-accept]');
+      const cancelButtons = Array.from(modal.querySelectorAll('[data-confirm-cancel]'));
+
+      const defaults = {
+        title: modal.dataset.confirmDefaultTitle || 'Please confirm',
+        message: modal.dataset.confirmDefaultMessage || 'Are you sure you want to continue?',
+        confirmLabel: modal.dataset.confirmDefaultConfirm || 'Confirm',
+        cancelLabel: modal.dataset.confirmDefaultCancel || 'Cancel'
+      };
+
+      let pendingConfirmAction = null;
+
+      const openConfirmModal = ({ title, message, confirmLabel, cancelLabel, onConfirm }) => {
+        pendingConfirmAction = typeof onConfirm === 'function' ? onConfirm : null;
+        titleEl.textContent = title || defaults.title;
+        messageEl.textContent = message || defaults.message;
+        confirmButton.textContent = confirmLabel || defaults.confirmLabel;
+        cancelButtons.forEach((button) => {
+          if (button.classList.contains('btn-secondary')) {
+            button.textContent = cancelLabel || defaults.cancelLabel;
+          }
+        });
+        modal.classList.remove('is-hidden');
+        modal.removeAttribute('hidden');
+        modal.setAttribute('aria-hidden', 'false');
+        confirmButton.focus();
+      };
+
+      const closeConfirmModal = () => {
+        pendingConfirmAction = null;
+        modal.classList.add('is-hidden');
+        modal.setAttribute('hidden', 'hidden');
+        modal.setAttribute('aria-hidden', 'true');
+      };
+
+      const hasConfirmData = (element) => {
+        if (!element || !element.dataset) return false;
+        return Boolean(
+          element.dataset.confirm ||
+            element.dataset.turboConfirm ||
+            element.dataset.confirmMessage ||
+            element.dataset.turboConfirmMessage
+        );
+      };
+
+      const resolveConfirmCopy = (source, fallback) => {
+        const primary = source && source.dataset ? source.dataset : {};
+        const secondary = fallback && fallback.dataset ? fallback.dataset : {};
+        const message =
+          primary.confirmMessage ||
+          primary.turboConfirmMessage ||
+          primary.confirm ||
+          primary.turboConfirm ||
+          secondary.confirmMessage ||
+          secondary.turboConfirmMessage ||
+          secondary.confirm ||
+          secondary.turboConfirm ||
+          defaults.message;
+
+        return {
+          title: primary.confirmTitle || secondary.confirmTitle || defaults.title,
+          message,
+          confirmLabel: primary.confirmConfirm || secondary.confirmConfirm || defaults.confirmLabel,
+          cancelLabel: primary.confirmCancel || secondary.confirmCancel || defaults.cancelLabel
+        };
+      };
+
+      const markApprovedAndSubmit = (form, submitter) => {
+        form.dataset.confirmApproved = 'true';
+        if (typeof form.requestSubmit === 'function') {
+          if (submitter) {
+            form.requestSubmit(submitter);
+          } else {
+            form.requestSubmit();
+          }
+        } else {
+          form.submit();
+        }
+      };
+
+      document.addEventListener(
+        'submit',
+        (event) => {
+          const form = event.target;
+          if (!(form instanceof HTMLFormElement)) return;
+
+          if (form.dataset.confirmApproved === 'true') {
+            delete form.dataset.confirmApproved;
+            return;
+          }
+
+          const submitter = event.submitter;
+          const source = hasConfirmData(submitter) ? submitter : form;
+          if (!hasConfirmData(source) && !hasConfirmData(form)) return;
+
+          event.preventDefault();
+          const copy = resolveConfirmCopy(source, form);
+          openConfirmModal({
+            ...copy,
+            onConfirm: () => markApprovedAndSubmit(form, submitter)
+          });
+        },
+        true
+      );
+
+      document.addEventListener(
+        'click',
+        (event) => {
+          const link = event.target.closest('a');
+          if (!link) return;
+          if (link.dataset.confirmApproved === 'true') {
+            delete link.dataset.confirmApproved;
+            return;
+          }
+          if (!hasConfirmData(link)) return;
+
+          event.preventDefault();
+          const copy = resolveConfirmCopy(link, null);
+          const href = link.getAttribute('href');
+          const target = link.getAttribute('target');
+          openConfirmModal({
+            ...copy,
+            onConfirm: () => {
+              link.dataset.confirmApproved = 'true';
+              if (!href || href === '#') return;
+              if (target === '_blank') {
+                window.open(href, '_blank', 'noopener');
+              } else {
+                window.location.assign(href);
+              }
+            }
+          });
+        },
+        true
+      );
+
+      confirmButton.addEventListener('click', () => {
+        const action = pendingConfirmAction;
+        closeConfirmModal();
+        if (action) action();
+      });
+
+      cancelButtons.forEach((button) => {
+        button.addEventListener('click', (event) => {
+          event.preventDefault();
+          closeConfirmModal();
+        });
+      });
+
+      modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          closeConfirmModal();
+        }
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          closeConfirmModal();
+        }
+      });
+    });
   })();
 </script>

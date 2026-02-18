@@ -27,12 +27,12 @@
     <p class="muted"><%= t("admin.news_posts.hints.published_at") %></p>
   </div>
 
-  <div class="field checkbox-field">
-    <label>
-      <%= form.check_box :published %>
-      <span><%= t("admin.news_posts.fields.published") %></span>
-    </label>
-  </div>
+  <%= render "admin/shared/segmented_boolean",
+    name: "news_post[published]",
+    id_prefix: "news_post_published",
+    label: t("admin.news_posts.fields.published"),
+    selected_value: news_post.published? ? "1" : "0",
+    options: [[1, t("admin.shared.binary.published")], [0, t("admin.shared.binary.draft")]] %>
 
   <div class="form-actions form-actions--centered">
     <%= form.submit t("admin.news_posts.actions.save"), class: "btn btn-primary" %>

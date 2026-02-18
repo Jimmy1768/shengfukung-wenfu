@@ -5,7 +5,7 @@ module Admin
     before_action :require_manage_registrations!
     before_action :set_offering_kind
     before_action :set_offering
-    before_action :set_registration, only: :show
+    before_action :set_registration, only: %i[show edit update]
 
     def index
       scope = @offering.temple_event_registrations
@@ -41,6 +41,33 @@ module Admin
 
     def show; end
 
+    def edit
+      prepare_registration_payloads
+      render :new
+    end
+
+    def update
+      attrs = registration_params
+      merged_metadata = merge_payload(@registration.metadata, attrs.delete(:metadata))
+      merged_metadata["registration_period_key"] ||= @registration.metadata.to_h["registration_period_key"]
+
+      @registration.assign_attributes(
+        attrs.except(:contact_payload, :logistics_payload, :multi_value_fields).merge(
+          contact_payload: merge_payload(@registration.contact_payload, attrs[:contact_payload]),
+          logistics_payload: merge_payload(@registration.logistics_payload, attrs[:logistics_payload]),
+          metadata: merged_metadata,
+          event_slug: attrs[:event_slug].presence || @registration.event_slug || @offering.slug
+        )
+      )
+      @registration.save!
+
+      redirect_to offering_order_path(@offering, @registration), notice: "Registration updated."
+    rescue ActiveRecord::RecordInvalid => e
+      @registration = e.record
+      prepare_registration_payloads
+      render :new, status: :unprocessable_entity
+    end
+
     private
 
     def set_offering_kind
@@ -69,7 +96,7 @@ module Admin
     end
 
     def registration_params
-      permitted = params.require(:temple_event_registration).permit(
+      permitted = ActionController::Parameters.new(merged_registration_param_payload).permit(
         :user_id,
         :quantity,
         :unit_price_cents,
@@ -90,10 +117,36 @@ module Admin
       permitted
     end
 
+    def merged_registration_param_payload
+      payload = {}
+
+      %i[temple_registration temple_event_registration].each do |key|
+        raw = params[key]
+        next if raw.blank?
+
+        payload.deep_merge!(normalize_payload(raw))
+      end
+
+      payload
+    end
+
     def sanitize_payload(raw_hash)
       return {} if raw_hash.blank?
 
-      raw_hash.to_h.transform_values { |value| value.is_a?(String) ? value.strip : value }.compact_blank
+      normalize_payload(raw_hash)
+        .transform_values { |value| value.is_a?(String) ? value.strip : value }
+        .compact_blank
+    end
+
+    def merge_payload(existing, incoming)
+      normalize_payload(existing).merge(normalize_payload(incoming))
+    end
+
+    def normalize_payload(raw_payload)
+      return {} if raw_payload.blank?
+      return raw_payload.to_unsafe_h if raw_payload.is_a?(ActionController::Parameters)
+
+      raw_payload.to_h
     end
 
     def prepare_registration_payloads

@@ -1,0 +1,39 @@
+<%
+  scope = local_assigns[:scope].to_s
+%>
+<div
+  class="modal-overlay is-hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-hidden="true"
+  hidden
+  data-confirmation-modal
+  data-confirm-default-title="<%= t("#{scope}.confirmations.defaults.title") %>"
+  data-confirm-default-message="<%= t("#{scope}.confirmations.defaults.message") %>"
+  data-confirm-default-confirm="<%= t("#{scope}.confirmations.defaults.confirm") %>"
+  data-confirm-default-cancel="<%= t("#{scope}.confirmations.defaults.cancel") %>"
+>
+  <div class="modal-panel" role="document">
+    <button type="button" class="modal-close" data-confirm-cancel>
+      <span class="sr-only"><%= t("#{scope}.confirmations.defaults.close") %></span>
+      ×
+    </button>
+
+    <header class="modal-header">
+      <h2 class="modal-title" data-confirm-title><%= t("#{scope}.confirmations.defaults.title") %></h2>
+    </header>
+
+    <div class="modal-body">
+      <p data-confirm-message><%= t("#{scope}.confirmations.defaults.message") %></p>
+    </div>
+
+    <footer class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-confirm-cancel>
+        <%= t("#{scope}.confirmations.defaults.cancel") %>
+      </button>
+      <button type="button" class="btn btn-primary" data-confirm-accept>
+        <%= t("#{scope}.confirmations.defaults.confirm") %>
+      </button>
+    </footer>
+  </div>
+</div>

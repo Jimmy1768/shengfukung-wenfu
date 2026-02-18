@@ -34,6 +34,7 @@ module Account
         location: record_location(record),
         status: record.timeline_status,
         description: record.try(:subtitle).presence || record.try(:description),
+        image_url: record.try(:hero_image_url).presence,
         cta_path: registration_cta_path(record)
       }
     end

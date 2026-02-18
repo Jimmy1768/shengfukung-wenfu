@@ -651,6 +651,31 @@ body.account-body {
   font-weight: 600;
 }
 
+.registration-summary-list {
+  margin-top: 1.25rem;
+  margin-bottom: 1.5rem;
+  gap: 2rem;
+}
+
+.registration-summary-list > div {
+  gap: 0.5rem;
+}
+
+.registration-detail-list {
+  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem 1.5rem;
+}
+
+.registration-detail-list > div {
+  gap: 0.45rem;
+}
+
+.registration-detail-list dd {
+  font-weight: 500;
+  line-height: 1.5;
+}
+
 .payment-callout {
   display: flex;
   flex-direction: column;

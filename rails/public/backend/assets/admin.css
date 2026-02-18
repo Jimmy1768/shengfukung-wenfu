@@ -861,6 +861,21 @@ body.admin-body input[type=datetime-local] {
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
+.admin-time-input,
+body.admin-body input[type=time] {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: var(--radius-lg);
+  padding: 0.7rem 0.9rem;
+  min-height: 2.75rem;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
 .admin-date-input::-webkit-calendar-picker-indicator,
 body.admin-body input[type=date]::-webkit-calendar-picker-indicator,
 body.admin-body input[type=datetime-local]::-webkit-calendar-picker-indicator {
@@ -870,6 +885,7 @@ body.admin-body input[type=datetime-local]::-webkit-calendar-picker-indicator {
 }
 
 .admin-date-input:focus,
+body.admin-body input[type=time]:focus,
 body.admin-body input[type=date]:focus,
 body.admin-body input[type=datetime-local]:focus {
   border-color: var(--accent);
@@ -880,6 +896,14 @@ body.admin-body input[type=datetime-local]:focus {
 body.admin-body input[type=date]::placeholder,
 body.admin-body input[type=datetime-local]::placeholder {
   color: color-mix(in srgb, var(--text-muted) 90%, transparent);
+}
+
+.admin-time-input::-webkit-calendar-picker-indicator,
+body.admin-body input[type=time]::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  width: auto;
+  height: auto;
+  cursor: pointer;
 }
 
 .filter-status-chips {
@@ -979,6 +1003,10 @@ body.admin-body input[type=datetime-local]::placeholder {
 }
 .actions--inline .btn {
   white-space: nowrap;
+}
+
+.card > .actions {
+  margin-top: var(--spacing-lg);
 }
 
 .orders-row.is-unpaid {
@@ -1280,6 +1308,47 @@ body.admin-body input[type=datetime-local]::placeholder {
   border-radius: var(--radius-lg);
   padding: var(--spacing-md);
   box-shadow: var(--shadow-soft);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, max-content));
+  gap: var(--spacing-md) var(--spacing-lg);
+  margin: var(--spacing-md) 0 0;
+  justify-content: flex-start;
+}
+
+.detail-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.detail-grid dt {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.detail-grid dd {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.admin-registration-show {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--spacing-lg), 3vw, var(--spacing-xl));
+}
+
+.admin-registration-layout {
+  width: min(100%, 1040px);
+  margin-right: auto;
+  padding-inline: clamp(var(--spacing-sm), 2.2vw, var(--spacing-lg));
+  box-sizing: border-box;
 }
 
 .hero {
@@ -1669,6 +1738,148 @@ body.admin-body input[type=datetime-local]::placeholder {
   margin-top: auto;
 }
 
+.segmented-field {
+  gap: 0.5rem;
+}
+
+.segmented-field__label {
+  display: block;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.15rem;
+}
+
+.segmented-control {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.segmented-control__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmented-control__option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  padding: 0.52rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 84%, transparent);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+
+.segmented-control__input:checked + .segmented-control__option {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+  color: var(--text);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.media-upload {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.media-upload__controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.7rem;
+}
+
+.media-upload__row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.media-upload__controls .btn {
+  min-width: 132px;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-upload__file-input--hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.media-upload__picker {
+  margin-right: 0.1rem;
+}
+
+.media-upload__filename {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.media-upload__status {
+  min-height: 1.2rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.media-upload__status[data-state=success] {
+  color: var(--success, #1f7a45);
+}
+
+.media-upload__status[data-state=error] {
+  color: var(--danger, #b13f2b);
+}
+
+.media-upload__preview-image {
+  width: min(280px, 100%);
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-muted, #f3f4f6) 75%, transparent);
+}
+
+.gathering-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-md);
+  align-items: start;
+}
+
+.gathering-form > .field,
+.gathering-form > .segmented-field {
+  min-width: 0;
+}
+
+.gathering-form__full {
+  grid-column: 1/-1;
+}
+
+@media (max-width: 900px) {
+  .gathering-form {
+    grid-template-columns: 1fr;
+  }
+  .gathering-form__full {
+    grid-column: auto;
+  }
+}
 .field {
   display: flex;
   flex-direction: column;
@@ -1680,6 +1891,10 @@ body.admin-body input[type=datetime-local]::placeholder {
 .field textarea {
   width: 100%;
   box-sizing: border-box;
+}
+
+.field[hidden] {
+  display: none !important;
 }
 
 .login-shell {
@@ -2180,6 +2395,7 @@ body.admin-body input[type=datetime-local]::placeholder {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
+  min-width: 0;
   background: var(--surface);
   display: flex;
   flex-direction: column;
@@ -2188,11 +2404,17 @@ body.admin-body input[type=datetime-local]::placeholder {
 
 .patron-search-field {
   position: relative;
+  width: 100%;
+  min-width: 0;
 }
 
 .search-input,
 .patron-search-input {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  display: block;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface-muted, rgba(15, 23, 42, 0.35));

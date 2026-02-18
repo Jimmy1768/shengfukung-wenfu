@@ -20,6 +20,7 @@ module Admin
 
     def new
       @gathering = current_temple.temple_gatherings.new(status: "draft", currency: "TWD")
+      apply_location_defaults(@gathering)
     end
 
     def create
@@ -35,7 +36,9 @@ module Admin
       end
     end
 
-    def edit; end
+    def edit
+      apply_location_defaults(@gathering)
+    end
 
     def update
       reset_detached_assets
@@ -84,11 +87,13 @@ module Admin
         :free_gathering
       )
       permitted[:currency] = permitted[:currency].presence || "TWD"
-      permitted[:price_cents] = permitted[:price_cents].presence&.to_i || 0
+      permitted[:price_cents] = nt_dollars_to_cents(permitted[:price_cents])
+      permitted[:price_cents] = 0 if free_gathering_param
       permitted[:ends_on] = permitted[:ends_on].presence
       permitted[:start_time] = permitted[:start_time].presence
       permitted[:end_time] = permitted[:end_time].presence
       permitted[:location_notes] = permitted[:location_notes].presence
+      permitted.delete(:free_gathering)
       permitted
     end
 
@@ -101,6 +106,12 @@ module Admin
       ActiveModel::Type::Boolean.new.cast(value)
     end
 
+    def nt_dollars_to_cents(value)
+      return 0 if value.blank?
+
+      value.to_i * 100
+    end
+
     def apply_free_pricing(record)
       meta = (record.metadata || {}).with_indifferent_access
       if free_gathering_param
@@ -111,6 +122,22 @@ module Admin
         meta.delete("free_gathering")
         record.metadata = meta
       end
+    end
+
+    def default_location_name
+      current_temple.name
+    end
+
+    def default_location_address
+      details = current_temple.contact_details
+      details["addressZh"].presence ||
+        details["addressEn"].presence ||
+        details["mapUrl"]
+    end
+
+    def apply_location_defaults(record)
+      record.location_name = default_location_name if record.location_name.blank?
+      record.location_address = default_location_address if record.location_address.blank?
     end
 
     def apply_hero_asset(record, asset_id)

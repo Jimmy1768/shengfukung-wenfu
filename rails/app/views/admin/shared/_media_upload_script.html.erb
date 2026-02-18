@@ -1,8 +1,5 @@
 <script>
   (() => {
-    if (window.AdminMediaUploadInit) return;
-    window.AdminMediaUploadInit = true;
-
     const I18N = {
       success: "<%= j t("admin.media_uploads.status.success") %>",
       error: "<%= j t("admin.media_uploads.status.error") %>",
@@ -42,6 +39,15 @@
       input.value = JSON.stringify(filtered);
     };
 
+    const optionalSelector = (selector) => {
+      if (!selector || !selector.trim()) return null;
+      try {
+        return document.querySelector(selector);
+      } catch (_error) {
+        return null;
+      }
+    };
+
     const bindMediaUpload = (container) => {
       if (container.dataset.mediaUploadBound === "true") return;
       container.dataset.mediaUploadBound = "true";
@@ -49,20 +55,28 @@
       const fileInput = container.querySelector("[data-media-upload-file]");
       const uploadButton = container.querySelector("[data-media-upload-button]");
       const statusEl = container.querySelector("[data-media-upload-status]");
+      const fileNameEl = container.querySelector("[data-media-upload-filename]");
       if (!fileInput || !uploadButton) return;
 
-      const targetUrl = document.querySelector(container.dataset.mediaUploadTargetUrl || "");
-      const targetAsset = document.querySelector(container.dataset.mediaUploadTargetAsset || "");
-      const preview = document.querySelector(container.dataset.mediaUploadPreview || "");
-      const appendTextarea = document.querySelector(container.dataset.mediaUploadAppend || "");
-      const assetsPayloadInput = document.querySelector(container.dataset.mediaUploadAssets || "");
+      const targetUrl = optionalSelector(container.dataset.mediaUploadTargetUrl);
+      const targetAsset = optionalSelector(container.dataset.mediaUploadTargetAsset);
+      const preview = optionalSelector(container.dataset.mediaUploadPreview);
+      const appendTextarea = optionalSelector(container.dataset.mediaUploadAppend);
+      const assetsPayloadInput = optionalSelector(container.dataset.mediaUploadAssets);
       const kindSelect = container.querySelector("[data-media-upload-kind]");
       const defaultLabel = uploadButton.textContent;
       const uploadingLabel = uploadButton.dataset.uploadingLabel || "<%= j t("admin.media_uploads.actions.uploading") %>";
 
       fileInput.addEventListener("change", () => {
-        uploadButton.disabled = !(fileInput.files && fileInput.files.length > 0);
+        const hasFile = fileInput.files && fileInput.files.length > 0;
+        uploadButton.disabled = !hasFile;
+        if (fileNameEl) {
+          fileNameEl.textContent = hasFile ? fileInput.files[0].name : "<%= j t("admin.media_uploads.status.no_file") %>";
+        }
+        if (hasFile) setStatus(statusEl, "");
       });
+
+      uploadButton.disabled = !(fileInput.files && fileInput.files.length > 0);
 
       uploadButton.addEventListener("click", async () => {
         const file = fileInput.files ? fileInput.files[0] : null;
@@ -101,6 +115,7 @@
           }
 
           fileInput.value = "";
+          if (fileNameEl) fileNameEl.textContent = "<%= j t("admin.media_uploads.status.no_file") %>";
           uploadButton.textContent = defaultLabel;
           uploadButton.disabled = true;
           setStatus(statusEl, I18N.success, "success");
@@ -127,8 +142,16 @@
       element.dataset.state = state;
     };
 
-    ready(() => {
+    const bindAllMediaUploads = () => {
       document.querySelectorAll("[data-media-upload]").forEach(bindMediaUpload);
-    });
+    };
+
+    if (!window.AdminMediaUploadInit) {
+      window.AdminMediaUploadInit = true;
+      ready(bindAllMediaUploads);
+      document.addEventListener("turbo:load", bindAllMediaUploads);
+    }
+
+    bindAllMediaUploads();
   })();
 </script>

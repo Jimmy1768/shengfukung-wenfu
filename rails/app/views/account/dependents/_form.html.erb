@@ -1,4 +1,7 @@
-  <%= form_with model: @form, url: request.path, scope: :account_dependent_form, local: true, class: "account-form", builder: Account::DependentForm::DependentFormBuilder do |f| %>
+  <% dependent_link = @form.link %>
+  <% form_url = dependent_link.present? ? account_dependent_path(dependent_link) : account_dependents_path %>
+  <% form_method = dependent_link.present? ? :patch : :post %>
+  <%= form_with model: @form, url: form_url, method: form_method, scope: :account_dependent_form, local: true, class: "account-form", builder: Account::DependentForm::DependentFormBuilder do |f| %>
     <%= render "shared/form_errors", form: @form %>
     <div class="form-grid">
     <div class="form-field">

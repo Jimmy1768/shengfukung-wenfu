@@ -188,14 +188,16 @@ module Admin
     end
 
     def render_checkbox_field(form, field, label)
-      content_tag(:div, class: "field checkbox-field") do
-        content_tag(:label) do
-          safe_join([
-            form.check_box(field),
-            content_tag(:span, label)
-          ])
-        end
-      end
+      selected_value = ActiveModel::Type::Boolean.new.cast(form.object.public_send(field)) ? "1" : "0"
+
+      render(
+        "admin/shared/segmented_boolean",
+        name: "#{form.object_name}[#{field}]",
+        id_prefix: "#{form.object_name}_#{field}",
+        label:,
+        selected_value:,
+        options: [[1, I18n.t("admin.shared.binary.enabled")], [0, I18n.t("admin.shared.binary.disabled")]]
+      )
     end
 
     def render_date_field(form, field, label)
@@ -276,6 +278,17 @@ module Admin
         admin_gathering_offering_order_path(offering, registration)
       else
         admin_event_offering_order_path(offering, registration)
+      end
+    end
+
+    def edit_admin_offering_order_path_for(offering, registration)
+      case offering
+      when TempleService
+        edit_admin_service_offering_order_path(offering, registration)
+      when TempleGathering
+        edit_admin_gathering_offering_order_path(offering, registration)
+      else
+        edit_admin_event_offering_order_path(offering, registration)
       end
     end
   end

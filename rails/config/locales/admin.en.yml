@@ -1,5 +1,12 @@
 en:
   admin:
+    confirmations:
+      defaults:
+        title: "Please confirm"
+        message: "Are you sure you want to continue?"
+        confirm: "Confirm"
+        cancel: "Cancel"
+        close: "Close dialog"
     navigation:
       dashboard: "Dashboard"
       temple_profile: "Temple Profile"
@@ -39,6 +46,7 @@ en:
       clear: "Clear filters"
     registration_form:
       title: "New onsite registration"
+      edit_title: "Edit registration"
       subtitle: "Connect a patron and capture interview notes for %{offering}."
       errors_heading: "%{count} issues prevented saving"
       sections:
@@ -96,6 +104,7 @@ en:
         preferred_slot: "Morning / Afternoon"
       actions:
         submit: "Create registration"
+        update: "Update registration"
         select_patron: "Select"
         create_patron: "Create patron"
         cancel: "Cancel"
@@ -128,6 +137,7 @@ en:
         summary: "Details for %{offering}."
       actions:
         back_to_orders: "Back to registrations"
+        edit_registration: "Edit registration"
         record_cash: "Record cash payment"
     offering_form:
       sections:
@@ -448,7 +458,8 @@ en:
         title: "Title"
         subtitle: "Subtitle"
         description: "Description"
-        hero_image_url: "Hero image URL"
+        hero_image_url: "Cover Image"
+        image_link: "Image Link"
         free_gathering: "This gathering is free"
         starts_on: "Starts on"
         ends_on: "Ends on"
@@ -457,11 +468,12 @@ en:
         location_name: "Location name"
         location_address: "Location address"
         location_notes: "Location notes"
-        price_cents: "Price (cents)"
+        price_cents: "Price (NT$)"
         currency: "Currency"
         status: "Status"
       hints:
         hero_image_url: "Optional. Surfaces on marketing cards if present."
+        hero_image_upload: "Use upload to set this automatically. No need to paste links here."
         free_gathering: "Disable the price field and mark every registration as no-payment-required. Orders still appear for headcount/logistics."
       labels:
         unscheduled: "Schedule TBD"
@@ -720,6 +732,7 @@ en:
           total: "Total"
           created: "Created"
           view: "View"
+          edit: "Edit"
     payments:
       index:
         eyebrow: "Payments"
@@ -871,9 +884,19 @@ en:
           hint: "Add or update gallery/event recap content."
     media_uploads:
       actions:
+        choose_file: "Choose file"
         upload: "Upload file"
         uploading: "Uploading..."
       status:
+        no_file: "No file selected"
         success: "Uploaded successfully."
         error: "Upload failed."
         generic: "Unable to complete upload."
+    shared:
+      binary:
+        free: "Free"
+        paid: "Paid"
+        published: "Published"
+        draft: "Draft"
+        enabled: "Enabled"
+        disabled: "Disabled"

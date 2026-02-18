@@ -49,21 +49,21 @@ Rails.application.routes.draw do
         path: "orders",
         controller: "offering_orders",
         defaults: { offering_kind: "events" },
-        only: %i[index new create show]
+        only: %i[index new create show edit update]
     end
     resources :services, controller: "services" do
       resources :offering_orders,
         path: "orders",
         controller: "offering_orders",
         defaults: { offering_kind: "services" },
-        only: %i[index new create show]
+        only: %i[index new create show edit update]
     end
     resources :gatherings, controller: "gatherings", except: :show do
       resources :offering_orders,
         path: "orders",
         controller: "offering_orders",
         defaults: { offering_kind: "gatherings" },
-        only: %i[index new create show]
+        only: %i[index new create show edit update]
     end
     resources :orders, only: :index
     resources :payments, only: %i[index new create] do
@@ -104,7 +104,7 @@ Rails.application.routes.draw do
 
     get "/dashboard", to: "dashboard#index", as: :dashboard
     resource :profile, only: %i[show edit update], controller: "profile"
-    resources :dependents, except: :show
+    resources :dependents, only: %i[new create edit update destroy]
     resources :registrations, only: %i[index show edit update new create] do
       member do
         get :payment

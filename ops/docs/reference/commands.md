@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "finished account portal build, without api endpoint test"
+git commit -m "refine account portal, gathering registration"
 git push
 
 git reset --hard HEAD
