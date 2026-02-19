@@ -52,7 +52,7 @@ class TempleEvent < ApplicationRecord
     slots = available_slots.presence || capacity_total
     return nil if slots.blank?
 
-    remaining = slots.to_i - temple_event_registrations.count
+    remaining = slots.to_i - temple_event_registrations.active_for_capacity.count
     [remaining, 0].max
   end
 

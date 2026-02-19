@@ -90,7 +90,7 @@
 ## Related Future Work (Deferred)
 
 - Pending registration expiry / hold release policy for capacity protection:
-  - [ ] define hold duration (`expires_at`)
-  - [ ] auto-cancel stale unpaid registrations
-  - [ ] release capacity on expiration
+  - [x] define hold duration (`expires_at`)
+  - [x] auto-cancel stale unpaid registrations
+  - [x] release capacity on expiration
   - [ ] optional reminder notifications before expiration

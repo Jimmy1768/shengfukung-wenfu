@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_15_000014) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_15_000015) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -702,6 +702,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_15_000014) do
     t.string "fulfillment_status", default: "open", null: false
     t.datetime "fulfilled_at"
     t.datetime "cancelled_at"
+    t.datetime "expires_at"
     t.text "notes"
     t.jsonb "metadata", default: {}, null: false
     t.datetime "created_at", null: false
@@ -709,6 +710,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_15_000014) do
     t.index ["registrable_type", "registrable_id"], name: "index_temple_registrations_on_registrable"
     t.index ["temple_id", "fulfillment_status"], name: "idx_temple_registrations_on_fulfillment_status"
     t.index ["temple_id", "payment_status"], name: "idx_temple_registrations_on_payment_status"
+    t.index ["temple_id", "expires_at"], name: "idx_temple_registrations_on_temple_and_expires_at"
     t.index ["temple_id", "reference_code"], name: "idx_temple_registrations_on_code", unique: true
     t.index ["temple_id"], name: "index_temple_registrations_on_temple_id"
     t.index ["user_id"], name: "index_temple_registrations_on_user_id"

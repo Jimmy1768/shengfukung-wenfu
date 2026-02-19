@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class TempleRegistration < ApplicationRecord
+  DEFAULT_HOLD_DURATION_HOURS = 24
+
   PAYMENT_STATUSES = {
     pending: "pending",
     paid: "paid",
@@ -32,9 +34,17 @@ class TempleRegistration < ApplicationRecord
   before_validation :assign_reference_code
   before_validation :backfill_currency
   before_validation :calculate_totals
+  before_validation :assign_default_expires_at, on: :create
+  before_validation :clear_expires_at_when_not_pending
 
   scope :recent, -> { order(created_at: :desc) }
   scope :with_status, ->(status) { where(payment_status: status) }
+  scope :active_for_capacity, -> { where.not(fulfillment_status: FULFILLMENT_STATUSES[:cancelled]) }
+  scope :expired_pending_payment_holds, lambda { |now = Time.current|
+    where(payment_status: PAYMENT_STATUSES[:pending], fulfillment_status: FULFILLMENT_STATUSES[:open])
+      .where("total_price_cents > 0")
+      .where("expires_at IS NOT NULL AND expires_at <= ?", now)
+  }
   scope :with_certificate_number, lambda {
     where(Arel.sql("#{certificate_number_sql} <> ''"))
   }
@@ -44,7 +54,7 @@ class TempleRegistration < ApplicationRecord
 
   def self.admin_filtered(filters)
     filters ||= {}
-    scope = includes(:user, :registrable, :temple_payments)
+    scope = includes(:user, :temple_payments).preload(:registrable)
     if filters[:offering_type].present?
       type_values = offering_type_filter_values(filters[:offering_type])
       scope = scope.where(registrable_type: type_values)
@@ -90,7 +100,38 @@ class TempleRegistration < ApplicationRecord
   end
 
   def mark_paid!
-    update!(payment_status: PAYMENT_STATUSES[:paid])
+    update!(payment_status: PAYMENT_STATUSES[:paid], expires_at: nil)
+  end
+
+  def self.hold_duration
+    hours = ENV.fetch("REGISTRATION_HOLD_DURATION_HOURS", DEFAULT_HOLD_DURATION_HOURS).to_i
+    hours = DEFAULT_HOLD_DURATION_HOURS if hours <= 0
+    hours.hours
+  end
+
+  def self.cancel_expired_unpaid!(now: Time.current)
+    cancelled = 0
+    expired_pending_payment_holds(now).find_each do |registration|
+      next unless registration.cancel_pending_hold!(now:)
+
+      cancelled += 1
+    end
+    cancelled
+  end
+
+  def cancel_pending_hold!(now: Time.current)
+    return false unless payment_status == PAYMENT_STATUSES[:pending]
+    return false unless fulfillment_status == FULFILLMENT_STATUSES[:open]
+    return false if total_price_cents.to_i <= 0
+    return false if expires_at.blank? || expires_at > now
+    return false if temple_payments.exists?
+
+    update!(
+      fulfillment_status: FULFILLMENT_STATUSES[:cancelled],
+      cancelled_at: now,
+      expires_at: nil
+    )
+    true
   end
 
   def certificate_number
@@ -164,6 +205,25 @@ class TempleRegistration < ApplicationRecord
       self.unit_price_cents = registrable.price_cents
     end
     self.total_price_cents = unit_price_cents.to_i * quantity.to_i
+  end
+
+  def assign_default_expires_at
+    return if expires_at.present?
+    return unless hold_required?
+
+    self.expires_at = Time.current + self.class.hold_duration
+  end
+
+  def clear_expires_at_when_not_pending
+    return if hold_required?
+
+    self.expires_at = nil
+  end
+
+  def hold_required?
+    payment_status == PAYMENT_STATUSES[:pending] &&
+      fulfillment_status == FULFILLMENT_STATUSES[:open] &&
+      total_price_cents.to_i.positive?
   end
 
   def self.offering_type_filter_values(type)
