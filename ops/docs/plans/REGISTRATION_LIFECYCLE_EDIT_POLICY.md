@@ -53,16 +53,16 @@
 
 - Admin: gathering edit actions/routes are now hidden/blocked (view-only after creation).
 - Admin: `Primary contact` section is editable while pending and read-only after payment exists.
-- Shared/core lifecycle service is not extracted yet; policy checks still live in controller/view logic.
+- Shared/core lifecycle service is now extracted (`Registrations::LifecyclePolicy`) and used by Admin + Account flows.
 
 ## Implementation Phases
 
 ### Phase A: Shared Policy Gate (Backend)
 
-- [ ] Add shared policy helper/service:
-  - `editable_core_fields?(registration)`
-  - `editable_metadata_fields?(registration)`
-- [ ] Centralize payment lock check (`registration.temple_payments.exists?` or equivalent).
+- [x] Add shared policy helper/service:
+  - `editable_core_fields?(registration)` / `core_fields_editable?(registration)`
+  - `editable_metadata_fields?(registration)` / `metadata_fields_editable?(registration)`
+- [x] Centralize payment lock check (`registration.temple_payments.exists?` or equivalent).
 - [x] Enforce strong server-side filtering for immutable fields after payment.
 
 ### Phase B: Admin UX Alignment
@@ -71,20 +71,20 @@
   - pending: show editable core fields
   - paid: show core fields as read-only (or hidden), metadata-only edit
 - [x] Keep gathering edit action hidden/view-only.
-- [ ] Add inline helper text when lock is active.
+- [x] Add inline helper text when lock is active.
 
 ### Phase C: Account UX Alignment
 
-- [ ] Mirror same pending vs paid behavior in account edit flow.
-- [ ] Ensure patron cannot mutate core fields after payment.
-- [ ] Keep duplicate-guard behavior consistent with registrant scope identity.
+- [x] Mirror same pending vs paid behavior in account edit flow.
+- [x] Ensure patron cannot mutate core fields after payment.
+- [x] Keep duplicate-guard behavior consistent with registrant scope identity.
 
 ### Phase D: Regression Coverage
 
-- [ ] Add integration tests for both portals:
+- [x] Add integration tests for both portals:
   - [x] pending allows core field edits
-  - [ ] paid blocks core field edits
-  - [ ] metadata edits remain allowed where intended
+  - [x] paid blocks core field edits
+  - [x] metadata edits remain allowed where intended
   - [x] gathering edit remains view-only
 
 ## Related Future Work (Deferred)

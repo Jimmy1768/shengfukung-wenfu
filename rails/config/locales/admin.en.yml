@@ -83,6 +83,7 @@ en:
         no_patron: "No patron selected yet."
         dependents: "List household members or relationship context."
         unit_price: "Defaults to the offering price if left blank."
+        locked_after_payment: "Payment has been recorded. Core identity and order fields are now read-only."
         manual_user_id: "If JavaScript is disabled, enter the numeric user ID."
         save_additional: "Keep the current default and store this value as another selectable choice."
         registrant_scope: "Choose whether this registration is for the patron account holder or one of their dependents."

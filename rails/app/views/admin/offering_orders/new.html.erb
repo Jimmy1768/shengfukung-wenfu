@@ -1,6 +1,9 @@
 <% edit_mode = @registration.persisted? %>
 <% gathering_mode = @offering.is_a?(TempleGathering) %>
-<% contact_fields_locked = edit_mode && (@registration.temple_payments.exists? || @registration.paid?) %>
+<% core_fields_editable = @core_fields_editable.nil? ? true : @core_fields_editable %>
+<% metadata_fields_editable = @metadata_fields_editable.nil? ? true : @metadata_fields_editable %>
+<% core_fields_locked = edit_mode && !core_fields_editable %>
+<% metadata_fields_locked = edit_mode && !metadata_fields_editable %>
 <div class="admin-registration-layout">
   <section class="page-header">
     <div class="page-header-body">
@@ -29,6 +32,9 @@
   </section>
 
   <section class="card form-card">
+    <% if core_fields_locked %>
+      <p class="hint"><%= t("admin.registration_form.hints.locked_after_payment") %></p>
+    <% end %>
     <%= form_with model: [:admin, @offering, @registration],
         scope: :temple_event_registration,
         url: edit_mode ? admin_offering_order_path_for(@offering, @registration) : admin_offering_orders_path_for(@offering),
@@ -48,7 +54,7 @@
     <% end %>
 
     <% schema = registration_form_schema %>
-    <% unless edit_mode %>
+    <% if !edit_mode || core_fields_editable %>
       <%= render "patron_picker", form:, registration: @registration %>
     <% end %>
     <% if gathering_mode && !edit_mode %>
@@ -67,7 +73,7 @@
       </section>
     <% else %>
 
-    <% if schema.section?(:order) && !edit_mode %>
+    <% if schema.section?(:order) && (!edit_mode || core_fields_editable) %>
       <section class="card form-section">
         <header>
           <h2><%= t("admin.registration_form.headings.order") %></h2>
@@ -83,7 +89,7 @@
                       type: :number,
                       schema:,
                       value: @registration.quantity,
-                      html_options: { min: 1 }) %>
+                      html_options: { min: 1, readonly: core_fields_locked }) %>
                 <%= registration_multi_value_toggle(:quantity, schema) %>
               </div>
             <% end %>
@@ -93,7 +99,8 @@
                 <%= registration_field_control(form, :unit_price_cents,
                       type: :number,
                       schema:,
-                      value: @registration.unit_price_cents) %>
+                      value: @registration.unit_price_cents,
+                      html_options: { readonly: core_fields_locked }) %>
                 <%= registration_multi_value_toggle(:unit_price_cents, schema) %>
                 <p class="hint"><%= t("admin.registration_form.hints.unit_price") %></p>
               </div>
@@ -109,7 +116,8 @@
                 <%= registration_field_control(form, :currency,
                       type: :text,
                       schema:,
-                      value: @registration.currency || @offering.currency) %>
+                      value: @registration.currency || @offering.currency,
+                      html_options: { readonly: core_fields_locked }) %>
                 <%= registration_multi_value_toggle(:currency, schema) %>
               </div>
             <% end %>
@@ -119,7 +127,8 @@
                 <%= registration_field_control(form, :certificate_number,
                       type: :text,
                       schema:,
-                      value: @registration.certificate_number) %>
+                      value: @registration.certificate_number,
+                      html_options: { readonly: core_fields_locked }) %>
                 <%= registration_multi_value_toggle(:certificate_number, schema) %>
               </div>
             <% end %>
@@ -146,7 +155,7 @@
                         type: :text,
                         schema:,
                         value: contact_data[:primary_contact],
-                        html_options: { data: { contact_field: "primary_contact" }, readonly: contact_fields_locked }) %>
+                        html_options: { data: { contact_field: "primary_contact" }, readonly: metadata_fields_locked }) %>
                 </div>
               <% end %>
               <% if schema.include_field?(:contact, :phone) %>
@@ -156,7 +165,7 @@
                         type: :telephone,
                         schema:,
                         value: contact_data[:phone],
-                        html_options: { data: { contact_field: "phone" }, readonly: contact_fields_locked }) %>
+                        html_options: { data: { contact_field: "phone" }, readonly: metadata_fields_locked }) %>
                 </div>
               <% end %>
             </div>
@@ -171,7 +180,7 @@
                         type: :email,
                         schema:,
                         value: contact_data[:email],
-                        html_options: { data: { contact_field: "email" }, readonly: contact_fields_locked }) %>
+                        html_options: { data: { contact_field: "email" }, readonly: metadata_fields_locked }) %>
                 </div>
               <% end %>
               <% if schema.include_field?(:contact, :dependents_notes) %>
@@ -181,7 +190,7 @@
                         type: :text,
                         schema:,
                         value: contact_data[:dependents_notes],
-                        html_options: { data: { contact_field: "dependents_notes" }, readonly: contact_fields_locked }) %>
+                        html_options: { data: { contact_field: "dependents_notes" }, readonly: metadata_fields_locked }) %>
                   <p class="hint"><%= t("admin.registration_form.hints.dependents") %></p>
                 </div>
               <% end %>
@@ -195,7 +204,7 @@
                     type: :textarea,
                     schema:,
                     value: contact_data[:notes],
-                    html_options: { rows: 3, data: { contact_field: "notes" }, readonly: contact_fields_locked }) %>
+                    html_options: { rows: 3, data: { contact_field: "notes" }, readonly: metadata_fields_locked }) %>
             </div>
           <% end %>
         <% end %>

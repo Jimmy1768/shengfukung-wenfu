@@ -77,4 +77,175 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, gallery_entry.title
   end
+
+  test "account pending registration allows core field edits" do
+    temple = create_temple
+    offering = create_offering(temple:, slug: "pending-edit", title: "待付款編輯測試")
+    user = User.create!(
+      email: "pending-edit@example.com",
+      english_name: "Pending User",
+      encrypted_password: User.password_hash("Password123!")
+    )
+    dependent = create_dependent_for(user, name: "Dependent Member")
+    registration = create_registration(
+      user:,
+      offering:,
+      quantity: 1,
+      metadata: { "registrant_scope" => "self" }
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+
+    patch account_registration_path(registration), params: {
+      account_registration_metadata_form: {
+        quantity: 3,
+        registrant_scope: "dependent",
+        dependent_id: dependent.id,
+        contact_name: "Dependent Member",
+        contact_phone: "0900-123-123",
+        contact_email: "pending-edit@example.com",
+        household_notes: "family",
+        arrival_window: "09:00",
+        ceremony_notes: "Pending edit note"
+      }
+    }
+
+    assert_redirected_to account_registration_path(registration)
+    registration.reload
+    assert_equal 3, registration.quantity
+    assert_equal "dependent", registration.metadata["registrant_scope"]
+    assert_equal dependent.id.to_s, registration.metadata["dependent_id"]
+    assert_equal "Dependent Member", registration.metadata["registrant_name"]
+  end
+
+  test "account paid registration blocks core field edits" do
+    temple = create_temple
+    offering = create_offering(temple:, slug: "paid-edit", title: "已付款編輯測試")
+    user = User.create!(
+      email: "paid-edit@example.com",
+      english_name: "Paid User",
+      encrypted_password: User.password_hash("Password123!")
+    )
+    dependent = create_dependent_for(user, name: "Paid Dependent")
+    registration = create_registration(
+      user:,
+      offering:,
+      quantity: 1,
+      metadata: { "registrant_scope" => "self" }
+    )
+    create_payment(registration: registration)
+
+    sign_in_account(user, temple_slug: temple.slug)
+
+    patch account_registration_path(registration), params: {
+      account_registration_metadata_form: {
+        quantity: 4,
+        registrant_scope: "dependent",
+        dependent_id: dependent.id,
+        contact_name: "Paid User",
+        contact_phone: "0900-456-456",
+        contact_email: "paid-edit@example.com",
+        household_notes: "paid household",
+        arrival_window: "10:00",
+        ceremony_notes: "Paid note"
+      }
+    }
+
+    assert_redirected_to account_registration_path(registration)
+    registration.reload
+    assert_equal 1, registration.quantity
+    assert_equal "self", registration.metadata["registrant_scope"]
+    assert_nil registration.metadata["dependent_id"]
+    assert_equal "0900-456-456", registration.contact_payload["phone"]
+    assert_equal "Paid note", registration.metadata["ceremony_notes"]
+  end
+
+  test "account pending update keeps duplicate guard on identity" do
+    temple = create_temple
+    offering = create_offering(temple:, slug: "duplicate-guard", title: "重複身份檢查")
+    user = User.create!(
+      email: "duplicate-guard@example.com",
+      english_name: "Guard User",
+      encrypted_password: User.password_hash("Password123!")
+    )
+    dependent = create_dependent_for(user, name: "Guard Dependent")
+    registration = create_registration(
+      user:,
+      offering:,
+      quantity: 1,
+      metadata: { "registrant_scope" => "self" }
+    )
+    _existing = create_registration(
+      user:,
+      offering:,
+      quantity: 1,
+      metadata: {
+        "registrant_scope" => "dependent",
+        "dependent_id" => dependent.id.to_s,
+        "registrant_name" => "Guard Dependent"
+      }
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+
+    patch account_registration_path(registration), params: {
+      account_registration_metadata_form: {
+        quantity: 2,
+        registrant_scope: "dependent",
+        dependent_id: dependent.id,
+        contact_name: "Guard User",
+        contact_phone: "0900-000-000",
+        contact_email: "duplicate-guard@example.com"
+      }
+    }
+
+    assert_response :unprocessable_content
+    assert_includes response.body, "You already have a registration for this offering."
+    registration.reload
+    assert_equal "self", registration.metadata["registrant_scope"]
+    assert_nil registration.metadata["dependent_id"]
+  end
+
+  test "account gathering registration remains view only after create" do
+    temple = create_temple
+    gathering = temple.temple_gatherings.create!(
+      slug: "community-circle",
+      title: "Community Circle",
+      currency: "TWD",
+      price_cents: 0,
+      status: "published"
+    )
+    user = User.create!(
+      email: "gathering-view-only@example.com",
+      english_name: "Gathering User",
+      encrypted_password: User.password_hash("Password123!")
+    )
+    registration = create_registration(
+      user:,
+      offering: gathering,
+      metadata: { "registrant_scope" => "self" }
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+
+    get account_registration_path(registration)
+    assert_response :success
+    assert_no_match(/Edit registration/, response.body)
+
+    get edit_account_registration_path(registration)
+    assert_redirected_to account_registration_path(registration)
+  end
+
+  private
+
+  def create_dependent_for(user, name:)
+    dependent = Dependent.create!(english_name: name)
+    UserDependent.create!(
+      user: user,
+      dependent: dependent,
+      role: "family",
+      relationship_label: "Family"
+    )
+    dependent
+  end
 end

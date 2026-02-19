@@ -83,6 +83,7 @@ zh-TW:
         no_patron: "尚未選擇信眾。"
         dependents: "列出同戶成員或關係說明。"
         unit_price: "若留白即使用供品預設金額。"
+        locked_after_payment: "已記錄付款，核心身份與訂單欄位改為唯讀。"
         manual_user_id: "若無法使用搜尋，可輸入信眾 ID。"
         save_additional: "保留原本預設值，並把此輸入存成另一個可選項。"
         registrant_scope: "選擇本筆報名是本人或家屬代辦。"

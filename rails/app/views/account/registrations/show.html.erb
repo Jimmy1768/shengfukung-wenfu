@@ -8,7 +8,9 @@
       <h2><%= @registration.offering&.try(:title) || @registration.reference_code %></h2>
       <p><%= t("account.registrations.show.subtitle") %></p>
     </div>
-    <%= link_to t("account.registrations.show.edit"), edit_account_registration_path(@registration), class: "pill-link" %>
+    <% if registration_lifecycle_policy.gathering_editable? %>
+      <%= link_to t("account.registrations.show.edit"), edit_account_registration_path(@registration), class: "pill-link" %>
+    <% end %>
   </header>
 
   <dl class="detail-list registration-summary-list">

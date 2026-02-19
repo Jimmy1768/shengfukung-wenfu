@@ -24,6 +24,7 @@ module Admin
       @registration = @offering.temple_event_registrations.new(quantity: 1)
       prepare_registration_payloads
       apply_registration_defaults
+      prepare_lifecycle_flags
     end
 
     def create
@@ -48,6 +49,7 @@ module Admin
       @registration = e.record
       prepare_registration_payloads
       apply_registration_defaults
+      prepare_lifecycle_flags
       render :new, status: :unprocessable_entity
     end
 
@@ -55,11 +57,21 @@ module Admin
 
     def edit
       prepare_registration_payloads
+      prepare_lifecycle_flags
       render :new
     end
 
     def update
-      attrs = mutable_update_attributes(registration_params)
+      attrs = policy_filtered_update_attributes(registration_params)
+      normalize_registrant_selection!(attrs) if registration_lifecycle_policy.core_fields_editable?
+      prepare_lifecycle_flags
+
+      if registration_lifecycle_policy.core_fields_editable? &&
+          (existing = existing_registration_for(attrs, excluding_id: @registration.id))
+        redirect_to offering_order_path(@offering, existing), alert: "A matching registration already exists for this registrant."
+        return
+      end
+
       merged_metadata = merge_payload(@registration.metadata, attrs.delete(:metadata))
       merged_metadata["registration_period_key"] ||= @registration.metadata.to_h["registration_period_key"]
 
@@ -77,6 +89,7 @@ module Admin
     rescue ActiveRecord::RecordInvalid => e
       @registration = e.record
       prepare_registration_payloads
+      prepare_lifecycle_flags
       render :new, status: :unprocessable_entity
     end
 
@@ -104,7 +117,7 @@ module Admin
     end
 
     def redirect_gathering_edits!
-      return unless @offering.is_a?(TempleGathering)
+      return if registration_lifecycle_policy.gathering_editable?
 
       redirect_to offering_order_path(@offering, @registration), alert: "Gathering attendance entries are read-only after creation."
     end
@@ -230,13 +243,20 @@ module Admin
       ).find
     end
 
-    def mutable_update_attributes(attrs)
+    def policy_filtered_update_attributes(attrs)
+      return attrs if registration_lifecycle_policy.core_fields_editable?
+
       immutable = %i[user_id quantity unit_price_cents currency registrant_scope dependent_id]
       sanitized = attrs.except(*immutable)
       metadata = merge_payload({}, sanitized[:metadata])
       metadata.except!("registrant_scope", "dependent_id", "registrant_name")
       sanitized[:metadata] = metadata
       sanitized
+    end
+
+    def prepare_lifecycle_flags
+      @core_fields_editable = registration_lifecycle_policy.core_fields_editable?
+      @metadata_fields_editable = registration_lifecycle_policy.metadata_fields_editable?
     end
 
     def merge_payload_defaults(payload, defaults)
@@ -251,6 +271,11 @@ module Admin
       @registration_form_schema ||= Registrations::FormSchema.new(@offering.metadata["registration_form"])
     end
     helper_method :registration_form_schema
+
+    def registration_lifecycle_policy
+      @registration_lifecycle_policy ||= Registrations::LifecyclePolicy.new(@registration)
+    end
+    helper_method :registration_lifecycle_policy
 
     def offering_order_path(offering, registration)
       case offering

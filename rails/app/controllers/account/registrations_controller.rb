@@ -4,10 +4,12 @@ module Account
   class RegistrationsController < BaseController
     before_action :set_registration, only: %i[show edit update payment]
     before_action :assign_offering_from_params, only: %i[new create]
-    before_action :assign_eligible_registrants, only: %i[new create]
+    before_action :assign_eligible_registrants, only: %i[new create edit update]
     before_action :ensure_selected_registrant, only: %i[new create]
+    before_action :redirect_gathering_edits!, only: %i[edit update]
 
     helper_method :existing_registration_for
+    helper_method :registration_lifecycle_policy
 
     def index
       @registrations = registration_scope.order(created_at: :desc)
@@ -18,7 +20,7 @@ module Account
     def new
       @form = build_form_from_selected_registrant
       @existing_registration = existing_registration_for(selected_registrant_scope, selected_dependent_id)
-      @metadata_form = Account::RegistrationMetadataForm.new(registration: @existing_registration) if @existing_registration
+      @metadata_form = Account::RegistrationMetadataForm.new(registration: @existing_registration, user: current_user) if @existing_registration
     end
 
     def create
@@ -28,7 +30,7 @@ module Account
         params: registration_intake_params.merge(registrant_scope: selected_registrant_scope, dependent_id: selected_dependent_id)
       )
       @existing_registration = existing_registration_for(selected_registrant_scope, selected_dependent_id)
-      @metadata_form = Account::RegistrationMetadataForm.new(registration: @existing_registration) if @existing_registration
+      @metadata_form = Account::RegistrationMetadataForm.new(registration: @existing_registration, user: current_user) if @existing_registration
 
       if @form.save
         redirect_to payment_account_registration_path(@form.registration),
@@ -40,12 +42,13 @@ module Account
     end
 
     def edit
-      @form = Account::RegistrationMetadataForm.new(registration: @registration)
+      @form = Account::RegistrationMetadataForm.new(registration: @registration, user: current_user)
     end
 
     def update
       @form = Account::RegistrationMetadataForm.new(
         registration: @registration,
+        user: current_user,
         params: metadata_params
       )
 
@@ -98,6 +101,9 @@ module Account
 
     def metadata_params
       params.require(:account_registration_metadata_form).permit(
+        :quantity,
+        :registrant_scope,
+        :dependent_id,
         :contact_name,
         :contact_phone,
         :contact_email,
@@ -105,6 +111,12 @@ module Account
         :arrival_window,
         :ceremony_notes
       )
+    end
+
+    def redirect_gathering_edits!
+      return if registration_lifecycle_policy.gathering_editable?
+
+      redirect_to account_registration_path(@registration), alert: "社群聚會報名建立後不可編輯。"
     end
 
     def assign_eligible_registrants
@@ -170,6 +182,10 @@ module Account
       return if period_key.blank?
 
       current_temple.registration_period_label_for(period_key)
+    end
+
+    def registration_lifecycle_policy
+      @registration_lifecycle_policy ||= Registrations::LifecyclePolicy.new(@registration)
     end
   end
 end

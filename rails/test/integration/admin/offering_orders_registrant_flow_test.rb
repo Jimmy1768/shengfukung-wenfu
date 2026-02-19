@@ -108,7 +108,7 @@ class AdminOfferingOrdersRegistrantFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_gathering_offering_order_path(@gathering, registration)
   end
 
-  test "update keeps immutable identity and amount fields unchanged" do
+  test "admin pending registration allows core field edits" do
     registration = create_registration(
       user: @patron,
       offering: @event,
@@ -139,13 +139,87 @@ class AdminOfferingOrdersRegistrantFlowTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to admin_event_offering_order_path(@event, registration)
     registration.reload
+    assert_equal @other_patron.id, registration.user_id
+    assert_equal 9, registration.quantity
+    assert_equal 2500, registration.unit_price_cents
+    assert_equal "USD", registration.currency
+    assert_equal @other_dependent.id.to_s, registration.metadata["dependent_id"]
+    assert_equal "dependent", registration.metadata["registrant_scope"]
+    assert_equal "Other Family", registration.metadata["registrant_name"]
+    assert_equal "Afternoon", registration.logistics_payload["preferred_slot"]
+  end
+
+  test "admin paid registration blocks core field edits but keeps metadata editable" do
+    registration = create_registration(
+      user: @patron,
+      offering: @event,
+      quantity: 1,
+      unit_price_cents: 1000,
+      total_price_cents: 1000,
+      currency: "TWD",
+      metadata: {
+        "registrant_scope" => "dependent",
+        "dependent_id" => @dependent.id.to_s,
+        "registrant_name" => @dependent.english_name
+      }
+    )
+    create_payment(registration: registration)
+
+    sign_in_admin(@admin)
+
+    patch admin_event_offering_order_path(@event, registration), params: {
+      temple_event_registration: {
+        user_id: @other_patron.id,
+        quantity: 9,
+        unit_price_cents: 2500,
+        currency: "USD",
+        registrant_scope: "dependent",
+        dependent_id: @other_dependent.id,
+        logistics_details: { preferred_slot: "Evening" }
+      }
+    }
+
+    assert_redirected_to admin_event_offering_order_path(@event, registration)
+    registration.reload
     assert_equal @patron.id, registration.user_id
     assert_equal 1, registration.quantity
     assert_equal 1000, registration.unit_price_cents
     assert_equal "TWD", registration.currency
     assert_equal @dependent.id.to_s, registration.metadata["dependent_id"]
     assert_equal "dependent", registration.metadata["registrant_scope"]
-    assert_equal "Afternoon", registration.logistics_payload["preferred_slot"]
+    assert_equal "Evening", registration.logistics_payload["preferred_slot"]
+  end
+
+  test "admin pending update keeps duplicate guard on registrant identity" do
+    registration = create_registration(
+      user: @patron,
+      offering: @event,
+      metadata: { "registrant_scope" => "self" }
+    )
+    existing = create_registration(
+      user: @patron,
+      offering: @event,
+      metadata: {
+        "registrant_scope" => "dependent",
+        "dependent_id" => @dependent.id.to_s,
+        "registrant_name" => "Family Member"
+      }
+    )
+
+    sign_in_admin(@admin)
+
+    patch admin_event_offering_order_path(@event, registration), params: {
+      temple_event_registration: {
+        user_id: @patron.id,
+        registrant_scope: "dependent",
+        dependent_id: @dependent.id
+      }
+    }
+
+    assert_redirected_to admin_event_offering_order_path(@event, existing)
+    registration.reload
+    assert_equal "self", registration.metadata["registrant_scope"]
+    assert_nil registration.metadata["dependent_id"]
   end
 
   private
