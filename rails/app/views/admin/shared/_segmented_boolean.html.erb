@@ -2,6 +2,7 @@
 <% fallback_value = options.first&.first.to_s %>
 <% current_value = selected_value.to_s.presence || fallback_value %>
 <% aria_label = label.presence || options.map(&:last).join(" / ") %>
+<% hint_text = local_assigns[:hint].to_s.presence %>
 
 <div class="field segmented-field">
   <% if label.present? %>
@@ -14,7 +15,7 @@
       <%= label_tag input_id, text, class: "segmented-control__option" %>
     <% end %>
   </div>
-  <% if hint.present? %>
-    <p class="muted"><%= hint %></p>
+  <% if hint_text.present? %>
+    <p class="muted"><%= hint_text %></p>
   <% end %>
 </div>

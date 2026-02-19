@@ -7,6 +7,9 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
       temple: @temple,
       slug: "lamp",
       title: "Lamp",
+      starts_on: Date.current,
+      ends_on: Date.current + 1.day,
+      offering_type: "general",
       currency: "TWD",
       price_cents: 500
     )
@@ -17,7 +20,7 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
     )
     @registration = TempleEventRegistration.create!(
       temple: @temple,
-      temple_offering: @offering,
+      registrable: @offering,
       user: @user,
       quantity: 1,
       contact_payload: {},
@@ -27,6 +30,8 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
     @payment = TemplePayment.create!(
       temple: @temple,
       temple_event_registration: @registration,
+      provider: "demo",
+      provider_account: "temple",
       payment_method: TemplePayment::PAYMENT_METHODS[:cash],
       status: TemplePayment::STATUSES[:completed],
       amount_cents: 500,

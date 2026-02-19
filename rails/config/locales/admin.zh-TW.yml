@@ -9,6 +9,7 @@ zh-TW:
         close: "關閉視窗"
     navigation:
       dashboard: "儀表板"
+      registrations: "報名"
       temple_profile: "宮廟資料"
       profile: "宮廟資料"
       news_posts: "最新消息"
@@ -17,7 +18,7 @@ zh-TW:
       gallery: "活動回顧"
       offerings: "供品管理"
       gatherings: "社群聚會"
-      orders: "報名 / 訂單"
+      orders: "訂單"
       payments: "收款資料"
       patrons: "信眾與管理員"
       archives: "封存 / 年度資料"
@@ -27,11 +28,16 @@ zh-TW:
         label: "搜尋"
         placeholder: "輸入信眾姓名、Email 或訂單編號"
       offering:
-        label: "供品 / 聚會"
+        label: "法會活動 / 祈福服務 / 社群聚會"
+        kind_label: "類型"
+        kind_all: "全部類型"
+        kind_event: "法會活動"
+        kind_service: "祈福服務"
+        kind_gathering: "社群聚會"
         all: "全部供品"
-        event_prefix: "活動"
-        service_prefix: "服務"
-        gathering_prefix: "聚會"
+        event_prefix: "法會活動"
+        service_prefix: "祈福服務"
+        gathering_prefix: "社群聚會"
       payment_method:
         label: "付款方式"
         all: "全部方式"
@@ -79,6 +85,7 @@ zh-TW:
         unit_price: "若留白即使用供品預設金額。"
         manual_user_id: "若無法使用搜尋，可輸入信眾 ID。"
         save_additional: "保留原本預設值，並把此輸入存成另一個可選項。"
+        registrant_scope: "選擇本筆報名是本人或家屬代辦。"
       fields:
         quantity: "數量"
         unit_price: "單價（分）"
@@ -99,6 +106,8 @@ zh-TW:
         certificate_notes: "證書備註"
         search_patron: "搜尋信眾"
         manual_user_id: "信眾 ID"
+        registrant_scope: "報名對象"
+        dependent: "家屬"
       placeholders:
         patron_search: "例如：陳 或 燈主"
         preferred_slot: "上午／下午"
@@ -109,9 +118,17 @@ zh-TW:
         create_patron: "建立信眾"
         cancel: "取消"
         back_to_orders: "返回報名列表"
+        back_to_attendance: "返回出席名單"
+      gathering:
+        title: "新增出席紀錄"
+        edit_title: "編輯出席紀錄"
+        subtitle: "為 %{offering} 記錄出席者資訊。"
       labels:
         dependents: "眷屬："
         save_additional: "另存為選項"
+        registrant_self: "本人"
+        registrant_dependent: "家屬"
+        no_dependent: "選擇家屬"
       errors:
         search_failed: "目前無法搜尋信眾。"
         create_failed: "建立信眾失敗。"
@@ -138,6 +155,8 @@ zh-TW:
       actions:
         back_to_orders: "返回報名列表"
         edit_registration: "編輯報名"
+        back_to_attendance: "返回出席名單"
+        edit_attendance: "編輯出席"
         record_cash: "登記現金繳費"
     offering_form:
       sections:
@@ -184,20 +203,22 @@ zh-TW:
       items:
         dashboard:
           label: "掌握指標與待辦"
+        registrations:
+          label: "報名"
+        orders:
+          label: "訂單"
+        payments:
+          label: "收款資料"
+        gatherings:
+          label: "社群聚會"
+        offerings:
+          label: "供品管理"
         temple_profile:
           label: "宮廟資料"
         news_posts:
           label: "最新消息"
         gallery_entries:
           label: "活動回顧"
-        gatherings:
-          label: "社群聚會"
-        offerings:
-          label: "供品管理"
-        orders:
-          label: "報名 / 訂單"
-        payments:
-          label: "收款資料"
         patrons:
           label: "信眾與管理員"
         archives:
@@ -348,11 +369,11 @@ zh-TW:
       hero_tabs:
         home: "首頁"
         about: "關於本廟"
-        events: "活動 / 法會"
+        events: "法會活動"
         event: "活動詳情"
         archive: "活動回顧"
         news: "最新消息"
-        services: "參拜 / 服務"
+        services: "祈福服務"
         contact: "聯絡 / 交通"
     news_posts:
       index:
@@ -405,8 +426,11 @@ zh-TW:
           type: "類別"
           price: "金額"
           status: "狀態"
+          updated: "更新時間"
           view: "檢視"
+          edit: "編輯"
           orders: "訂單"
+          new_registration: "新增報名"
           actions: "操作"
         empty: "尚未建立任何供品，請點選上方按鈕建立。"
         archived_empty: "目前沒有封存的供品。"
@@ -422,6 +446,7 @@ zh-TW:
         table: "供桌"
       new:
         title: "新增供品"
+        body: "請先選擇模板，再填寫法會活動或祈福服務的詳細設定。"
         template_open: "挑選供品模板"
         template_change: "更換模板"
         template_modal_title: "選擇供品模板"
@@ -444,9 +469,9 @@ zh-TW:
         edit_offering: "編輯供品"
     events:
       index:
-        title: "法會 / 活動"
+        title: "法會活動"
         body: "設定即將到來的法會、禮懺、共修與節慶。"
-        new_button: "建立活動"
+        new_button: "建立法會活動"
         table:
           title: "名稱"
           schedule: "檔期"
@@ -460,18 +485,18 @@ zh-TW:
         published: "已發布"
         archived: "封存"
       new:
-        title: "建立活動"
+        title: "建立法會活動"
         body: "從模板載入欄位，保持證書／物流設定一致。"
-        template_open: "選擇活動模板"
+        template_open: "選擇法會活動模板"
         template_change: "更換模板"
-        template_modal_title: "選擇活動模板"
+        template_modal_title: "選擇法會活動模板"
         template_close: "關閉"
         template_use: "使用此模板"
         template_period: "預設檔期：%{period}"
         template_selected: "已選擇：%{name}"
         template_prompt: "請先挑選模板再開始編輯。"
       edit:
-        title: "編輯活動"
+        title: "編輯法會活動"
       show:
         type: "類型"
         price: "金額"
@@ -483,7 +508,7 @@ zh-TW:
         capacity: "名額"
         capacity_open: "不限名額"
         manage_registrations: "管理報名"
-        edit_event: "編輯活動"
+        edit_event: "編輯法會活動"
       form:
         sections:
           basics: "基本資訊"
@@ -502,9 +527,9 @@ zh-TW:
           status: "狀態"
     services:
       index:
-        title: "供燈 / 供桌 / 祈福服務"
+        title: "祈福服務"
         body: "管理常態性服務，如點燈、供桌、疏文或代念。"
-        new_button: "建立服務"
+        new_button: "建立祈福服務"
         table:
           title: "名稱"
           period: "檔期"
@@ -518,18 +543,18 @@ zh-TW:
         published: "已發布"
         archived: "封存"
       new:
-        title: "建立服務"
+        title: "建立祈福服務"
         body: "從模板載入欄位，保持表單設定一致。"
-        template_open: "選擇服務模板"
+        template_open: "選擇祈福服務模板"
         template_change: "更換模板"
-        template_modal_title: "選擇服務模板"
+        template_modal_title: "選擇祈福服務模板"
         template_close: "關閉"
         template_use: "使用此模板"
         template_period: "預設檔期：%{period}"
         template_selected: "已選擇：%{name}"
         template_prompt: "請先挑選模板再開始編輯。"
       edit:
-        title: "編輯服務"
+        title: "編輯祈福服務"
       show:
         type: "類型"
         price: "金額"
@@ -541,7 +566,7 @@ zh-TW:
         quantity_unlimited: "不限數量"
         registration_period_key: "檔期識別碼"
         manage_registrations: "管理訂單"
-        edit_service: "編輯服務"
+        edit_service: "編輯祈福服務"
       form:
         sections:
           basics: "基本資訊"
@@ -588,6 +613,21 @@ zh-TW:
         paid: "已付款"
         refunded: "已退款"
         failed: "失敗"
+    registrations:
+      index:
+        title: "報名作業"
+        body: "從這裡開始建立報名。先選擇法會活動、祈福服務或社群聚會，再直接進入報名表。"
+        pick_heading: "快速選擇"
+        pick_body: "請選擇要建立報名的項目。"
+        quick_pick_limit_hint: "先顯示最近使用的 %{count} 個項目；按「建立新報名」可查看全部。"
+        recent_heading: "最新報名"
+        recent_body: "跨法會活動、祈福服務與社群聚會的最新報名紀錄。"
+        actions:
+          new_registration: "建立新報名"
+          view_orders: "查看訂單"
+        modal:
+          title: "建立新報名"
+          close: "關閉選擇視窗"
     offering_orders:
       index:
         eyebrow: "現場報到"
@@ -595,6 +635,14 @@ zh-TW:
         body: "集中管理現場報名、面談紀錄與繳費狀態。"
         view_offering: "檢視詳情"
         new_registration: "新增報名"
+        gathering:
+          title: "%{offering} 的出席名單"
+          body: "集中查看這場聚會的出席者與付款狀態。"
+          view_offering: "檢視聚會"
+          new_registration: "新增出席紀錄"
+          table_heading: "出席列表"
+          table_body: "此聚會的出席紀錄會顯示在這裡。"
+          empty: "這場聚會尚未建立任何出席紀錄。"
         guest_fallback: "現場來賓"
         metrics:
           total_registrations: "報名數"
@@ -612,6 +660,7 @@ zh-TW:
         table:
           reference: "編號"
           user: "信眾"
+          attendee: "出席者"
           status: "狀態"
           quantity: "數量"
           total: "總額"
@@ -691,7 +740,7 @@ zh-TW:
         save: "儲存"
         cancel: "取消"
         view: "檢視"
-        view_orders: "查看報名"
+        view_orders: "查看出席名單"
         view_archived: "封存紀錄"
         view_active: "返回現用"
         archive: "封存"

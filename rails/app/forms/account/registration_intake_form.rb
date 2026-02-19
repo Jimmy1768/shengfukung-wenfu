@@ -202,16 +202,13 @@ module Account
     def duplicate_registration_exists?
       return false unless user && offering
 
-      scope = user.temple_event_registrations.where("metadata ->> 'event_slug' = ?", offering.slug)
-      if offering.respond_to?(:registration_period_key) && offering.registration_period_key.present?
-        scope = scope.where("metadata ->> 'registration_period_key' = ?", offering.registration_period_key)
-      end
-      if dependent_selected?
-        scope = scope.where("metadata ->> 'dependent_id' = ?", dependent_id.to_s)
-      else
-        scope = scope.where("COALESCE(metadata ->> 'dependent_id', '') = ''")
-      end
-      scope.exists?
+      Registrations::ExistingLookup.new(
+        scope: user.temple_event_registrations,
+        offering:,
+        user_id: user.id,
+        registrant_scope: registrant_scope,
+        dependent_id:
+      ).find.present?
     end
   end
 end

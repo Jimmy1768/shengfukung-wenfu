@@ -142,11 +142,24 @@ module Admin
 
     def patron_payload(user)
       metadata = user.metadata || {}
+      dependent_entries = user.user_dependents.includes(:dependent).map do |link|
+        dependent = link.dependent
+        dependent_metadata = dependent&.metadata || {}
+        {
+          id: dependent.id,
+          name: dependent.native_name.presence || dependent.english_name,
+          phone: dependent_metadata["phone"],
+          email: dependent_metadata["email"],
+          notes: dependent_metadata["notes"],
+          relationship: link.relationship_label.presence || dependent.relationship_label
+        }
+      end
       {
         id: user.id,
         name: user.english_name,
         email: user.email,
-        dependents: user.dependents.pluck(:english_name),
+        dependents: dependent_entries.map { |entry| entry[:name] },
+        dependent_entries: dependent_entries,
         phone: metadata["phone"],
         notes: metadata["notes"],
         offerings: metadata["offerings"] || {}

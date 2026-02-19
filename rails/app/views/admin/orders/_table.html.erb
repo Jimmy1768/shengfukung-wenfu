@@ -15,21 +15,18 @@
       <tbody>
         <% orders.each do |registration| %>
           <% latest_payment = registration.temple_payments.max_by { |payment| payment.processed_at || payment.created_at } %>
-          <% status_key = registration.payment_status %>
-          <% no_payment_required = registration.total_price_cents.to_i.zero? %>
+          <% status_key = registration.payment_status_for_display %>
+          <% no_payment_required = status_key == "no_payment_required" %>
           <% row_classes = ["orders-row"] %>
-          <% row_classes << "is-unpaid" unless registration.payment_status == TempleEventRegistration::PAYMENT_STATUSES[:paid] %>
-          <% native_name = registration.user&.native_name.presence %>
-          <% contact_name = registration.contact_payload["name"].presence %>
-          <% english_name = registration.user&.english_name.presence %>
-          <% patron_names = [native_name, contact_name, english_name].compact.uniq %>
-          <% display_name = if patron_names.any?
-            patron_names.join(" / ")
-          else
-            registration.user&.email || t("admin.orders.index.guest_fallback")
-          end %>
+          <% row_classes << "is-unpaid" unless registration.payment_status == TempleEventRegistration::PAYMENT_STATUSES[:paid] || no_payment_required %>
+          <% display_name = registration.registrant_name.presence || t("admin.orders.index.guest_fallback") %>
           <tr class="<%= row_classes.join(" ") %>">
-            <td><%= display_name %></td>
+            <td>
+              <%= display_name %>
+              <% if registration.dependent_registration? %>
+                <span class="muted">(<%= t("admin.registration_form.labels.registrant_dependent", default: "Dependent") %>)</span>
+              <% end %>
+            </td>
             <td>
               <% offering = registration.offering %>
               <% if offering.present? %>
@@ -61,11 +58,12 @@
             <td class="orders-created"><%= registration.created_at.strftime("%Y/%m/%d %H:%M") %></td>
             <td>
               <span class="status-pill status-<%= status_key %>">
-                <%= t("admin.orders.statuses.#{status_key}", default: status_key.humanize) %>
+                <% if no_payment_required %>
+                  <%= t("admin.orders.index.table.no_payment_required") %>
+                <% else %>
+                  <%= t("admin.orders.statuses.#{status_key}", default: status_key.humanize) %>
+                <% end %>
               </span>
-              <% if no_payment_required %>
-                <span class="status-note status-note--info"><%= t("admin.orders.index.table.no_payment_required") %></span>
-              <% end %>
             </td>
             <td class="table-actions">
               <div class="table-actions__buttons">

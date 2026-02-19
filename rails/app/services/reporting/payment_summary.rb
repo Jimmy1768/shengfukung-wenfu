@@ -26,10 +26,11 @@ module Reporting
         .joins("LEFT JOIN temple_events ON temple_events.id = temple_registrations.registrable_id AND temple_registrations.registrable_type = 'TempleEvent'")
         .joins("LEFT JOIN temple_services ON temple_services.id = temple_registrations.registrable_id AND temple_registrations.registrable_type = 'TempleService'")
         .joins("LEFT JOIN temple_gatherings ON temple_gatherings.id = temple_registrations.registrable_id AND temple_registrations.registrable_type = 'TempleGathering'")
+        .group("temple_registrations.registrable_type")
         .group("COALESCE(temple_events.title, temple_services.title, temple_gatherings.title, 'Unassigned')")
         .sum(:amount_cents)
 
-      @totals_by_offering = group_and_format(sums)
+      @totals_by_offering = group_and_format_offering(sums)
     end
 
     def totals_by_date
@@ -56,6 +57,23 @@ module Reporting
     def group_and_format(hash)
       hash.sort_by { |key, _| key.to_s }.map do |key, cents|
         { label: key.to_s, amount_cents: cents }
+      end
+    end
+
+    def group_and_format_offering(hash)
+      hash.sort_by { |(type, title), _| [type.to_s, title.to_s] }.map do |(type, title), cents|
+        { label: "#{offering_prefix(type)} · #{title}", amount_cents: cents }
+      end
+    end
+
+    def offering_prefix(type)
+      case type
+      when "TempleService"
+        "Service"
+      when "TempleGathering"
+        "Gathering"
+      else
+        "Event"
       end
     end
   end

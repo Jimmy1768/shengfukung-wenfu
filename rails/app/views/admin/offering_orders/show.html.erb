@@ -6,8 +6,18 @@
       <p class="muted"><%= t("admin.registration_show.hints.summary", offering: @registration.offering&.title) %></p>
     </div>
     <div class="page-header-actions">
-      <%= link_to t("admin.registration_show.actions.back_to_orders"), admin_offering_orders_path_for(@offering), class: "btn btn-secondary" %>
-      <%= link_to t("admin.registration_show.actions.edit_registration"), edit_admin_offering_order_path_for(@offering, @registration), class: "btn btn-secondary" %>
+      <%= link_to(
+            gathering_mode ? t("admin.registration_show.actions.back_to_attendance") : t("admin.registration_show.actions.back_to_orders"),
+            admin_offering_orders_path_for(@offering),
+            class: "btn btn-secondary"
+          ) %>
+      <% unless gathering_mode %>
+        <%= link_to(
+              t("admin.registration_show.actions.edit_registration"),
+              edit_admin_offering_order_path_for(@offering, @registration),
+              class: "btn btn-secondary"
+            ) %>
+      <% end %>
       <% if current_admin_permissions&.allow?(:record_cash_payments) && !@registration.paid? %>
         <%= link_to t("admin.registration_show.actions.record_cash"),
           new_admin_payment_path(registration_id: @registration.id),
@@ -24,7 +34,12 @@
       <dl class="detail-grid">
         <div>
           <dt><%= t("admin.registration_show.labels.patron") %></dt>
-          <dd><%= @registration.user&.english_name || @registration.user&.email || t("admin.registration_show.labels.guest") %></dd>
+          <dd>
+            <%= @registration.registrant_name.presence || t("admin.registration_show.labels.guest") %>
+            <% if @registration.dependent_registration? %>
+              <span class="muted">(<%= t("admin.registration_form.labels.registrant_dependent", default: "Dependent") %>)</span>
+            <% end %>
+          </dd>
         </div>
         <div>
           <dt><%= t("admin.registration_show.labels.quantity") %></dt>
@@ -32,16 +47,27 @@
         </div>
         <div>
           <dt><%= t("admin.registration_show.labels.payment_status") %></dt>
-          <dd><span class="status-pill status-<%= @registration.payment_status %>"><%= @registration.payment_status.humanize %></span></dd>
+          <% status_key = @registration.payment_status_for_display %>
+          <dd>
+            <span class="status-pill status-<%= status_key %>">
+              <% if status_key == "no_payment_required" %>
+                <%= t("admin.orders.index.table.no_payment_required") %>
+              <% else %>
+                <%= t("admin.orders.statuses.#{status_key}", default: status_key.humanize) %>
+              <% end %>
+            </span>
+          </dd>
         </div>
         <div>
           <dt><%= t("admin.registration_show.labels.total") %></dt>
           <dd><%= Currency::Symbols.format_amount(@registration.total_price_cents, @registration.currency) %></dd>
         </div>
-        <div>
-          <dt><%= t("admin.registration_show.labels.certificate_number") %></dt>
-          <dd><%= @registration.certificate_number.presence || "—" %></dd>
-        </div>
+        <% unless gathering_mode %>
+          <div>
+            <dt><%= t("admin.registration_show.labels.certificate_number") %></dt>
+            <dd><%= @registration.certificate_number.presence || "—" %></dd>
+          </div>
+        <% end %>
       </dl>
     </section>
 

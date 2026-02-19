@@ -145,16 +145,13 @@ module Account
       key = [scope, dependent_id.presence].join(":")
       return @existing_registration_cache[key] if @existing_registration_cache.key?(key)
 
-      query = current_user.temple_event_registrations.where("metadata ->> 'event_slug' = ?", @offering.slug)
-      if @offering.respond_to?(:registration_period_key) && @offering.registration_period_key.present?
-        query = query.where("metadata ->> 'registration_period_key' = ?", @offering.registration_period_key)
-      end
-      if scope == "dependent" && dependent_id.present?
-        query = query.where("metadata ->> 'dependent_id' = ?", dependent_id.to_s)
-      else
-        query = query.where("COALESCE(metadata ->> 'dependent_id', '') = ''")
-      end
-      @existing_registration_cache[key] = query.order(created_at: :desc).first
+      @existing_registration_cache[key] = Registrations::ExistingLookup.new(
+        scope: current_user.temple_event_registrations,
+        offering: @offering,
+        user_id: current_user.id,
+        registrant_scope: scope,
+        dependent_id:
+      ).find
     end
 
     def build_form_from_selected_registrant

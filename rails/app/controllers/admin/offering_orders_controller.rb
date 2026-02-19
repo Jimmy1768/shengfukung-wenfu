@@ -6,13 +6,17 @@ module Admin
     before_action :set_offering_kind
     before_action :set_offering
     before_action :set_registration, only: %i[show edit update]
+    before_action :redirect_gathering_edits!, only: %i[edit update]
 
     def index
       scope = @offering.temple_event_registrations
       @registrations = scope.recent
       @registrations_total = scope.count
       @registrations_paid = scope.with_status(TempleEventRegistration::PAYMENT_STATUSES[:paid]).count
-      @registrations_pending = scope.with_status(TempleEventRegistration::PAYMENT_STATUSES[:pending]).count
+      @registrations_pending = scope
+        .with_status(TempleEventRegistration::PAYMENT_STATUSES[:pending])
+        .where("total_price_cents > 0")
+        .count
       @registrations_total_amount_cents = scope.sum(:total_price_cents)
     end
 
@@ -23,11 +27,19 @@ module Admin
     end
 
     def create
+      attrs = registration_params
+      normalize_registrant_selection!(attrs)
+
+      if (existing = existing_registration_for(attrs))
+        redirect_to offering_order_path(@offering, existing), notice: "Existing registration found. Redirected to edit."
+        return
+      end
+
       builder = Payments::TempleRegistrationBuilder.new(
         temple: current_temple,
         offering: @offering,
         admin_user: current_admin,
-        attributes: registration_params
+        attributes: attrs
       )
 
       @registration = builder.create
@@ -47,7 +59,7 @@ module Admin
     end
 
     def update
-      attrs = registration_params
+      attrs = mutable_update_attributes(registration_params)
       merged_metadata = merge_payload(@registration.metadata, attrs.delete(:metadata))
       merged_metadata["registration_period_key"] ||= @registration.metadata.to_h["registration_period_key"]
 
@@ -91,6 +103,12 @@ module Admin
       @registration = @offering.temple_event_registrations.find(params[:id])
     end
 
+    def redirect_gathering_edits!
+      return unless @offering.is_a?(TempleGathering)
+
+      redirect_to offering_order_path(@offering, @registration), alert: "Gathering attendance entries are read-only after creation."
+    end
+
     def require_manage_registrations!
       require_capability!(:manage_registrations)
     end
@@ -103,6 +121,8 @@ module Admin
         :currency,
         :certificate_number,
         :event_slug,
+        :registrant_scope,
+        :dependent_id,
         { multi_value_fields: [] },
         contact_details: %i[primary_contact email phone dependents_notes notes],
         logistics_details: %i[preferred_date preferred_slot arrival_window ceremony_location],
@@ -114,7 +134,7 @@ module Admin
       permitted[:logistics_payload] = sanitize_payload(permitted.delete(:logistics_details))
       metadata_fields = sanitize_payload(permitted.delete(:ritual_metadata))
       permitted[:metadata] = metadata_fields
-      permitted
+      permitted.to_h
     end
 
     def merged_registration_param_payload
@@ -165,6 +185,58 @@ module Admin
       merge_payload_defaults(@registration.contact_payload, registration_form_schema.defaults_for(:contact))
       merge_payload_defaults(@registration.logistics_payload, registration_form_schema.defaults_for(:logistics))
       merge_payload_defaults(@registration.metadata, registration_form_schema.defaults_for(:ritual_metadata))
+    end
+
+    def normalize_registrant_selection!(attrs)
+      user = User.find_by(id: attrs[:user_id])
+      scope = attrs.delete(:registrant_scope).to_s
+      dependent_id = attrs.delete(:dependent_id).presence
+      metadata = merge_payload({}, attrs[:metadata])
+
+      if scope == "dependent" || dependent_id.present?
+        dependent = resolve_dependent_for(user, dependent_id)
+        unless dependent
+          invalid = TempleEventRegistration.new
+          invalid.errors.add(:base, "Dependent selection is invalid for selected patron.")
+          raise ActiveRecord::RecordInvalid, invalid
+        end
+
+        metadata["registrant_scope"] = "dependent"
+        metadata["dependent_id"] = dependent.id.to_s
+        metadata["registrant_name"] = dependent.english_name.presence || dependent.native_name
+      else
+        metadata["registrant_scope"] = "self"
+        metadata.delete("dependent_id")
+        metadata.delete("registrant_name")
+      end
+
+      attrs[:metadata] = metadata
+    end
+
+    def resolve_dependent_for(user, dependent_id)
+      return nil if user.blank? || dependent_id.blank?
+
+      user.dependents.find_by(id: dependent_id)
+    end
+
+    def existing_registration_for(attrs, excluding_id: nil)
+      Registrations::ExistingLookup.new(
+        scope: @offering.temple_event_registrations,
+        offering: @offering,
+        user_id: attrs[:user_id],
+        registrant_scope: attrs.dig(:metadata, "registrant_scope"),
+        dependent_id: attrs.dig(:metadata, "dependent_id"),
+        excluding_id:
+      ).find
+    end
+
+    def mutable_update_attributes(attrs)
+      immutable = %i[user_id quantity unit_price_cents currency registrant_scope dependent_id]
+      sanitized = attrs.except(*immutable)
+      metadata = merge_payload({}, sanitized[:metadata])
+      metadata.except!("registrant_scope", "dependent_id", "registrant_name")
+      sanitized[:metadata] = metadata
+      sanitized
     end
 
     def merge_payload_defaults(payload, defaults)

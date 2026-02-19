@@ -1,5 +1,24 @@
 <% search_endpoint = admin_patrons_path(format: :json) %>
 <% selected_patron = registration.user %>
+<% registration_metadata = registration.metadata.to_h %>
+<% selected_scope = registration_metadata["registrant_scope"].presence || (registration_metadata["dependent_id"].present? ? "dependent" : "self") %>
+<% selected_dependent_id = registration_metadata["dependent_id"].presence %>
+<% selected_dependents = if selected_patron.present?
+  selected_patron.user_dependents.includes(:dependent).map do |link|
+    dependent = link.dependent
+    dependent_metadata = dependent&.metadata || {}
+    {
+      id: dependent.id,
+      name: dependent.native_name.presence || dependent.english_name,
+      phone: dependent_metadata["phone"],
+      email: dependent_metadata["email"],
+      notes: dependent_metadata["notes"],
+      relationship: link.relationship_label.presence || dependent.relationship_label
+    }
+  end
+else
+  []
+end %>
 
 <section id="patron-picker" class="card form-section patron-picker"
   data-search-endpoint="<%= search_endpoint %>"
@@ -8,6 +27,12 @@
   data-no-results="<%= t('admin.registration_form.hints.no_results_placeholder') %>"
   data-search-error="<%= t('admin.registration_form.errors.search_failed') %>"
   data-dependents-label="<%= t('admin.registration_form.labels.dependents') %>"
+  data-registrant-self-label="<%= t('admin.registration_form.labels.registrant_self', default: 'Patron') %>"
+  data-registrant-dependent-label="<%= t('admin.registration_form.labels.registrant_dependent', default: 'Dependent') %>"
+  data-no-dependent-label="<%= t('admin.registration_form.labels.no_dependent', default: 'Select dependent') %>"
+  data-selected-dependents="<%= json_escape(selected_dependents.to_json) %>"
+  data-selected-scope="<%= selected_scope %>"
+  data-selected-dependent-id="<%= selected_dependent_id.to_s %>"
   data-offering-slug="<%= @offering.slug %>">
   <header>
     <h2><%= t("admin.registration_form.headings.patron") %></h2>
@@ -32,6 +57,28 @@
       <div class="picker-message" data-role="picker-message"></div>
     </div>
 
+    <div class="patron-picker-search">
+      <label for="registration-registrant-scope"><%= t("admin.registration_form.fields.registrant_scope", default: "Registrant") %></label>
+      <select
+        id="registration-registrant-scope"
+        name="temple_event_registration[registrant_scope]"
+        data-role="registrant-scope">
+        <option value="self" <%= "selected" if selected_scope == "self" %>><%= t("admin.registration_form.labels.registrant_self", default: "Patron") %></option>
+        <option value="dependent" <%= "selected" if selected_scope == "dependent" %>><%= t("admin.registration_form.labels.registrant_dependent", default: "Dependent") %></option>
+      </select>
+      <p class="hint"><%= t("admin.registration_form.hints.registrant_scope", default: "Choose whether the registration is for the selected patron or one of their dependents.") %></p>
+
+      <label for="registration-dependent-id"><%= t("admin.registration_form.fields.dependent", default: "Dependent") %></label>
+      <select
+        id="registration-dependent-id"
+        name="temple_event_registration[dependent_id]"
+        data-role="dependent-select">
+        <option value=""><%= t("admin.registration_form.labels.no_dependent", default: "Select dependent") %></option>
+        <% selected_dependents.each do |dependent| %>
+          <option value="<%= dependent[:id] %>" <%= "selected" if selected_dependent_id.to_s == dependent[:id].to_s %>><%= dependent[:name] %></option>
+        <% end %>
+      </select>
+    </div>
   </div>
 
   <input type="hidden" name="temple_event_registration[user_id]" id="temple_event_registration_user_id" value="<%= registration.user_id %>" />
@@ -57,10 +104,13 @@
       const hiddenField = document.getElementById("temple_event_registration_user_id");
       const selectionNode = picker.querySelector('[data-role="selection"]');
       const messageNode = picker.querySelector('[data-role="picker-message"]');
+      const registrantScopeField = picker.querySelector('[data-role="registrant-scope"]');
+      const dependentSelectField = picker.querySelector('[data-role="dependent-select"]');
       const formElement = picker.closest('form[data-registration-form]') ||
         document.querySelector('form[data-registration-form]') ||
         picker.closest('form');
       const offeringSlug = picker.dataset.offeringSlug;
+      const initialDependents = JSON.parse(picker.dataset.selectedDependents || '[]');
       let debounceTimer;
       let lastQueryToken = 0;
 
@@ -118,6 +168,56 @@
         setContactField('phone', patron.phone);
         setContactField('dependents_notes', (patron.dependents || []).join(', '));
         setContactField('notes', patron.notes);
+      }
+
+      function selectedDependent() {
+        if (!dependentSelectField || !dependentSelectField.value) return null;
+        const list = dependentSelectField._entries || [];
+        return list.find(function(dep) { return String(dep.id) === String(dependentSelectField.value); }) || null;
+      }
+
+      function applyRegistrantContactDefaults() {
+        if (!registrantScopeField) return;
+        if (registrantScopeField.value !== 'dependent') return;
+        const dependent = selectedDependent();
+        if (!dependent) return;
+
+        setContactField('primary_contact', dependent.name);
+        setContactField('email', dependent.email);
+        setContactField('phone', dependent.phone);
+        setContactField('notes', dependent.notes);
+      }
+
+      function renderDependentOptions(entries, selectedId) {
+        if (!dependentSelectField) return;
+        const list = Array.isArray(entries) ? entries : [];
+        dependentSelectField._entries = list;
+        dependentSelectField.innerHTML = '';
+
+        const blank = document.createElement('option');
+        blank.value = '';
+        blank.textContent = picker.dataset.noDependentLabel || 'Select dependent';
+        dependentSelectField.appendChild(blank);
+
+        list.forEach(function(entry) {
+          const option = document.createElement('option');
+          option.value = entry.id;
+          option.textContent = entry.name;
+          dependentSelectField.appendChild(option);
+        });
+
+        dependentSelectField.value = selectedId ? String(selectedId) : '';
+      }
+
+      function syncRegistrantFields() {
+        if (!registrantScopeField || !dependentSelectField) return;
+        const dependentMode = registrantScopeField.value === 'dependent';
+        dependentSelectField.disabled = !dependentMode;
+        if (!dependentMode) {
+          dependentSelectField.value = '';
+          return;
+        }
+        applyRegistrantContactDefaults();
       }
 
       function setRegistrationField(name, value) {
@@ -224,6 +324,11 @@
         setMessage("");
         populateContactFields(patron);
         populateOfferingFields(patron);
+        renderDependentOptions(patron.dependent_entries || [], null);
+        if (registrantScopeField) {
+          registrantScopeField.value = 'self';
+        }
+        syncRegistrantFields();
       }
 
       if (searchInput) {
@@ -248,6 +353,21 @@
           closeResults();
         }
       });
+
+      if (registrantScopeField) {
+        registrantScopeField.value = picker.dataset.selectedScope || registrantScopeField.value || 'self';
+        registrantScopeField.addEventListener('change', function() {
+          syncRegistrantFields();
+        });
+      }
+
+      if (dependentSelectField) {
+        renderDependentOptions(initialDependents, picker.dataset.selectedDependentId || '');
+        dependentSelectField.addEventListener('change', function() {
+          applyRegistrantContactDefaults();
+        });
+      }
+      syncRegistrantFields();
 
     }
 

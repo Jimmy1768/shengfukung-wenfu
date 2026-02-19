@@ -27,6 +27,18 @@
         class: "filter-input search-input" %>
     </div>
     <div class="filter-field">
+      <%= form.label :offering_kind, t("admin.filters.offering.kind_label", default: "Type"), class: "filter-label" %>
+      <%= form.select :offering_kind,
+        options_for_select([
+          [t("admin.filters.offering.kind_all", default: "All types"), ""],
+          [t("admin.filters.offering.kind_event", default: "Events"), "events"],
+          [t("admin.filters.offering.kind_service", default: "Services"), "services"],
+          [t("admin.filters.offering.kind_gathering", default: "Gatherings"), "gatherings"]
+        ], filters[:offering_kind]),
+        {},
+        class: "filter-input" %>
+    </div>
+    <div class="filter-field">
       <%= form.label :offering_reference, t("admin.filters.offering.label"), class: "filter-label" %>
       <% offering_options = offerings.map do |offering|
         prefix, type =

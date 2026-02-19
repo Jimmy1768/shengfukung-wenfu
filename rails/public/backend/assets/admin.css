@@ -1446,6 +1446,60 @@ body.admin-body input[type=time]::-webkit-calendar-picker-indicator {
   color: var(--text-muted);
 }
 
+.registration-quick-pick-card {
+  background: #f1f3f5;
+}
+
+.registration-picker-modal__panel {
+  width: min(100%, 620px);
+  max-width: 620px;
+}
+
+.registration-target-list .registration-target-card {
+  min-width: 220px;
+  background: #fff;
+  border-color: color-mix(in srgb, var(--border) 75%, #000 5%);
+  color: #111827;
+  box-sizing: border-box;
+  max-width: 100%;
+  box-shadow: 0 8px 20px rgba(17, 24, 39, 0.16);
+}
+.registration-target-list .registration-target-card h3 {
+  color: #111827;
+}
+.registration-target-list .registration-target-card .template-meta {
+  color: #374151;
+}
+.registration-target-list .registration-target-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 55%, #fff 45%);
+  box-shadow: 0 14px 30px rgba(17, 24, 39, 0.22);
+}
+
+.registration-target-list--modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 240px));
+  gap: var(--spacing-md);
+  align-items: stretch;
+  justify-content: center;
+}
+
+.registration-target-list--modal-grid .registration-target-card {
+  display: flex;
+  width: 240px;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .registration-target-list--modal-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .registration-target-list--modal-grid .registration-target-card {
+    width: 100%;
+  }
+}
 .static-value {
   margin: 0;
   font-weight: 600;
@@ -2276,6 +2330,10 @@ body.admin-body input[type=time]::-webkit-calendar-picker-indicator {
 
 .admin-list__actions .table-actions__buttons {
   justify-content: flex-end;
+}
+
+.admin-list--offerings .admin-list__actions {
+  align-self: end;
 }
 
 @media (max-width: 720px) {

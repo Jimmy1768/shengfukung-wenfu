@@ -248,6 +248,17 @@ module Admin
       end
     end
 
+    def edit_admin_offering_path_for(offering)
+      case offering
+      when TempleService
+        edit_admin_service_path(offering)
+      when TempleGathering
+        edit_admin_gathering_path(offering)
+      else
+        edit_admin_event_path(offering)
+      end
+    end
+
     def admin_offering_orders_path_for(offering)
       case offering
       when TempleService

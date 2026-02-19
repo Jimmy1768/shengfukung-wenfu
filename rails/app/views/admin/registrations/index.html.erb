@@ -1,0 +1,92 @@
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide registration-quick-pick-card">
+      <header class="admin-section-header">
+        <div>
+          <h1><%= t("admin.registrations.index.title") %></h1>
+          <p class="muted"><%= t("admin.registrations.index.body") %></p>
+        </div>
+        <div class="actions actions--inline">
+          <button type="button" class="btn btn-primary" data-modal-trigger="registration-offering-modal">
+            <%= t("admin.registrations.index.actions.new_registration") %>
+          </button>
+          <%= link_to t("admin.registrations.index.actions.view_orders"), admin_orders_path, class: "btn btn-secondary" %>
+        </div>
+      </header>
+    </section>
+  </div>
+
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--wide">
+      <header>
+        <h2><%= t("admin.registrations.index.pick_heading") %></h2>
+        <p class="muted"><%= t("admin.registrations.index.pick_body") %></p>
+      </header>
+      <p class="muted"><%= t("admin.registrations.index.quick_pick_limit_hint", count: @quick_pick_targets.size) %></p>
+      <div class="template-list registration-target-list">
+        <% @quick_pick_targets.each do |target| %>
+          <% offering = target[:offering] %>
+          <% prefix =
+            case target[:kind]
+            when :services
+              t("admin.services.index.title")
+            when :gatherings
+              t("admin.gatherings.index.title")
+            else
+              t("admin.events.index.title")
+            end %>
+          <%= link_to new_admin_offering_order_path_for(offering), class: "btn template-card-button registration-target-card" do %>
+            <div class="template-card-body">
+              <div>
+                <h3><%= offering.title %></h3>
+                <p class="template-meta"><%= prefix %></p>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+  </div>
+
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--fluid admin-table-card">
+      <header class="admin-section-header">
+        <div>
+          <h2><%= t("admin.registrations.index.recent_heading") %></h2>
+          <p class="muted"><%= t("admin.registrations.index.recent_body") %></p>
+        </div>
+      </header>
+
+      <%= render "admin/orders/table", orders: @recent_registrations, show_mark_button: false %>
+    </section>
+  </div>
+
+  <%= render "shared/modal_panel",
+    modal_key: "registration-offering-modal",
+    title: t("admin.registrations.index.modal.title"),
+    close_label: t("admin.registrations.index.modal.close"),
+    panel_html: { class: "registration-picker-modal__panel" } do %>
+    <div class="template-list registration-target-list registration-target-list--modal-grid">
+      <% @all_targets.each do |target| %>
+        <% offering = target[:offering] %>
+        <% prefix =
+          case target[:kind]
+          when :services
+            t("admin.services.index.title")
+          when :gatherings
+            t("admin.gatherings.index.title")
+          else
+            t("admin.events.index.title")
+          end %>
+        <%= link_to new_admin_offering_order_path_for(offering), class: "btn template-card-button registration-target-card" do %>
+          <div class="template-card-body">
+            <div>
+              <h3><%= offering.title %></h3>
+              <p class="template-meta"><%= prefix %></p>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

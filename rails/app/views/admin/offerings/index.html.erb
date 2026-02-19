@@ -23,7 +23,7 @@
   <div class="admin-stack__row">
     <section class="card stack-item stack-item--wide">
       <% if @offerings.any? %>
-        <div class="admin-list">
+        <div class="admin-list admin-list--offerings">
           <% @offerings.each do |offering| %>
             <% type_label =
               case offering
@@ -64,7 +64,7 @@
               <div class="admin-list__actions">
                 <div class="table-actions__buttons">
                   <%= link_to t("admin.offerings.index.table.view"), admin_offering_path_for(offering), class: "btn btn-secondary btn-small" %>
-                  <%= link_to t("admin.offerings.index.table.orders"), admin_offering_orders_path_for(offering), class: "btn btn-secondary btn-small" %>
+                  <%= link_to t("admin.offerings.index.table.edit", default: "Edit"), edit_admin_offering_path_for(offering), class: "btn btn-primary btn-small" %>
                 </div>
               </div>
             </article>

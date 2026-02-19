@@ -39,7 +39,7 @@
           modal_key: "offering-template-modal",
           title: t("admin.offerings.new.template_modal_title"),
           close_label: t("admin.offerings.new.template_close") do %>
-          <div class="template-list">
+          <div class="template-list registration-target-list registration-target-list--modal-grid">
             <% @templates.each do |template| %>
               <% slug = template[:slug] %>
               <% selected = slug == params[:template_slug] %>
@@ -47,7 +47,7 @@
               <%= button_to new_admin_offering_path,
                 method: :get,
                 params: { template_slug: slug },
-                class: ["btn", "template-card-button", ("is-selected" if selected)] do %>
+                class: ["btn", "template-card-button", "registration-target-card", ("is-selected" if selected)] do %>
                 <div class="template-card-body">
                   <div>
                     <h3><%= template[:label] || slug.titleize %></h3>
@@ -65,7 +65,7 @@
     </div>
   <% end %>
 
-  <% unless selected_template_entry.present? %>
+  <% if @templates.blank? %>
     <div class="admin-stack__row">
       <section class="card stack-item stack-item--wide">
         <div class="alert alert-info">

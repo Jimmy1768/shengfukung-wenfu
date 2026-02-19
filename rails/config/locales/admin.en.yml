@@ -9,6 +9,7 @@ en:
         close: "Close dialog"
     navigation:
       dashboard: "Dashboard"
+      registrations: "Registrations"
       temple_profile: "Temple Profile"
       profile: "Temple Profile"
       news_posts: "News"
@@ -28,6 +29,11 @@ en:
         placeholder: "Search by patron name, email, or reference"
       offering:
         label: "Offering / Gathering"
+        kind_label: "Type"
+        kind_all: "All types"
+        kind_event: "Events"
+        kind_service: "Services"
+        kind_gathering: "Gatherings"
         all: "All offerings"
         event_prefix: "Event"
         service_prefix: "Service"
@@ -79,6 +85,7 @@ en:
         unit_price: "Defaults to the offering price if left blank."
         manual_user_id: "If JavaScript is disabled, enter the numeric user ID."
         save_additional: "Keep the current default and store this value as another selectable choice."
+        registrant_scope: "Choose whether this registration is for the patron account holder or one of their dependents."
       fields:
         quantity: "Quantity"
         unit_price: "Unit price (cents)"
@@ -99,6 +106,8 @@ en:
         certificate_notes: "Certificate notes"
         search_patron: "Search patrons"
         manual_user_id: "Patron user ID"
+        registrant_scope: "Registrant"
+        dependent: "Dependent"
       placeholders:
         patron_search: "e.g., Chen or lantern donor"
         preferred_slot: "Morning / Afternoon"
@@ -109,9 +118,17 @@ en:
         create_patron: "Create patron"
         cancel: "Cancel"
         back_to_orders: "Back to registrations"
+        back_to_attendance: "Back to attendance"
+      gathering:
+        title: "New attendance entry"
+        edit_title: "Edit attendance entry"
+        subtitle: "Capture attendee details for %{offering}."
       labels:
         dependents: "Dependents:"
         save_additional: "Save as additional option"
+        registrant_self: "Patron"
+        registrant_dependent: "Dependent"
+        no_dependent: "Select dependent"
       errors:
         search_failed: "Unable to search patrons right now."
         create_failed: "Unable to create patron."
@@ -138,6 +155,8 @@ en:
       actions:
         back_to_orders: "Back to registrations"
         edit_registration: "Edit registration"
+        back_to_attendance: "Back to attendance"
+        edit_attendance: "Edit attendance"
         record_cash: "Record cash payment"
     offering_form:
       sections:
@@ -184,20 +203,22 @@ en:
       items:
         dashboard:
           label: "Dashboard"
+        registrations:
+          label: "Registrations"
+        orders:
+          label: "Orders"
+        payments:
+          label: "Payments"
+        gatherings:
+          label: "Gatherings"
+        offerings:
+          label: "Offerings"
         temple_profile:
           label: "Temple Profile"
         news_posts:
           label: "News"
         gallery_entries:
           label: "Gallery"
-        gatherings:
-          label: "Gatherings"
-        offerings:
-          label: "Offerings"
-        orders:
-          label: "Orders"
-        payments:
-          label: "Payments"
         patrons:
           label: "Patrons"
         archives:
@@ -487,7 +508,7 @@ en:
         save: "Save"
         cancel: "Cancel"
         view: "View"
-        view_orders: "Orders"
+        view_orders: "Attendance"
         view_archived: "View archived"
         view_active: "Back to active"
         archive: "Archive"
@@ -519,7 +540,9 @@ en:
           price: "Price"
           status: "Status"
           view: "View"
+          edit: "Edit"
           orders: "Orders"
+          new_registration: "New registration"
           actions: "Actions"
         empty: "No offerings match the current filters."
         archived_empty: "No archived offerings yet."
@@ -535,6 +558,7 @@ en:
         table: "Table"
       new:
         title: "New Offering"
+        body: "Choose a template first, then complete details for events or services."
         template_open: "Select offering template"
         template_change: "Change template"
         template_modal_title: "Choose an offering template"
@@ -702,6 +726,21 @@ en:
         paid: "Paid"
         refunded: "Refunded"
         failed: "Failed"
+    registrations:
+      index:
+        title: "Registrations"
+        body: "Start registration from here. Pick an event, service, or gathering and jump directly to the form."
+        pick_heading: "Quick pick"
+        pick_body: "Choose where you want to create a new registration."
+        quick_pick_limit_hint: "Showing your %{count} most recent targets first. Use Create New Registration to see all."
+        recent_heading: "Recent registrations"
+        recent_body: "Latest registration activity across events, services, and gatherings."
+        actions:
+          new_registration: "Create New Registration"
+          view_orders: "View Orders"
+        modal:
+          title: "Create new registration"
+          close: "Close selector"
     offering_orders:
       index:
         eyebrow: "Onsite desk"
@@ -709,6 +748,14 @@ en:
         body: "Track onsite registrations, reference interview notes, and keep finance synced."
         view_offering: "View details"
         new_registration: "New Registration"
+        gathering:
+          title: "Attendance for %{offering}"
+          body: "Track attendee list and payment state for this gathering."
+          view_offering: "View gathering"
+          new_registration: "New attendance entry"
+          table_heading: "Attendance list"
+          table_body: "Attendees for this gathering appear here."
+          empty: "No attendance entries captured for this gathering yet."
         guest_fallback: "Guest"
         metrics:
           total_registrations: "Registrations"
@@ -726,6 +773,7 @@ en:
         table:
           reference: "Reference"
           user: "User"
+          attendee: "Attendee"
           status: "Status"
           quantity: "Quantity"
           total: "Total"

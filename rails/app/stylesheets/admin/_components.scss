@@ -675,6 +675,10 @@
   justify-content: flex-end;
 }
 
+.admin-list--offerings .admin-list__actions {
+  align-self: end;
+}
+
 @media (max-width: 720px) {
   .admin-list__row {
     grid-template-columns: minmax(0, 1fr);

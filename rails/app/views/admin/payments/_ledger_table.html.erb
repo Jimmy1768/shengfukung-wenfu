@@ -18,7 +18,23 @@
             <td class="mono"><%= payment.external_reference.presence || payment.id %></td>
             <% registration = payment.offering_registration %>
             <td><%= registration&.user&.english_name || payment.user&.english_name || registration&.user&.email || registration&.contact_payload&.dig("name") || t("admin.payments.index.system_fallback") %></td>
-            <td><%= registration&.offering&.title || "—" %></td>
+            <td>
+              <% offering = registration&.offering %>
+              <% if offering.present? %>
+                <% type_label =
+                  case offering
+                  when TempleService
+                    t("admin.filters.offering.service_prefix")
+                  when TempleGathering
+                    t("admin.filters.offering.gathering_prefix")
+                  else
+                    t("admin.filters.offering.event_prefix")
+                  end %>
+                <span><%= type_label %> · <%= offering.title %></span>
+              <% else %>
+                —
+              <% end %>
+            </td>
             <td><%= Currency::Symbols.format_amount(payment.amount_cents, payment.currency) %></td>
             <td><span class="payment-method-pill"><%= t("admin.payments.methods.#{payment.payment_method}", default: payment.payment_method.humanize) %></span></td>
             <td><%= payment.admin_account&.user&.english_name || payment.admin_account&.user&.email || payment.user&.english_name || t("admin.payments.index.system_fallback") %></td>

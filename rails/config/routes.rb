@@ -65,6 +65,7 @@ Rails.application.routes.draw do
         defaults: { offering_kind: "gatherings" },
         only: %i[index new create show edit update]
     end
+    resources :registrations, only: :index
     resources :orders, only: :index
     resources :payments, only: %i[index new create] do
       collection do

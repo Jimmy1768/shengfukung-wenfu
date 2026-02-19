@@ -10,6 +10,41 @@ module Admin
         path: -> { admin_dashboard_path }
       },
       {
+        key: :registrations,
+        label: "Registrations",
+        description: "建立與管理現場報名",
+        path: -> { admin_registrations_path },
+        capabilities: :manage_registrations
+      },
+      {
+        key: :orders,
+        label: "Orders",
+        description: "檢視報名與紙本訂單",
+        path: -> { admin_orders_path },
+        capabilities: :manage_registrations
+      },
+      {
+        key: :payments,
+        label: "Payments",
+        description: "查看付款統計與記錄",
+        path: -> { admin_payments_path },
+        capabilities: %i[view_financials export_financials]
+      },
+      {
+        key: :gatherings,
+        label: "Gatherings",
+        description: "社群活動與交流場次",
+        path: -> { admin_gatherings_path },
+        capabilities: :manage_offerings
+      },
+      {
+        key: :offerings,
+        label: "Offerings",
+        description: "管理法會供品與祈福供品",
+        path: -> { admin_offerings_path },
+        capabilities: :manage_offerings
+      },
+      {
         key: :temple_profile,
         label: "Temple Profile",
         description: "更新官網基本資料",
@@ -30,45 +65,17 @@ module Admin
         capabilities: :manage_gallery
       },
       {
-        key: :gatherings,
-        label: "Gatherings",
-        description: "社群活動與交流場次",
-        path: -> { admin_gatherings_path },
-        capabilities: :manage_offerings
-      },
-      {
-        key: :offerings,
-        label: "Offerings",
-        description: "管理法會供品與祈福供品",
-        path: -> { admin_offerings_path },
-        capabilities: :manage_offerings
-      },
-      {
-        key: :orders,
-        label: "Orders",
-        description: "檢視報名與紙本訂單",
-        path: -> { admin_orders_path },
-        capabilities: :manage_registrations
-      },
-      {
-        key: :payments,
-        label: "Payments",
-        description: "查看付款統計與記錄",
-        path: -> { admin_payments_path },
-        capabilities: %i[view_financials export_financials]
+        key: :patrons,
+        label: "Patrons",
+        description: "查看信眾與管理員候選人",
+        path: -> { admin_patrons_path },
+        capabilities: %i[manage_permissions manage_registrations]
       },
       {
         key: :archives,
         label: "Archives",
         description: "年度紀錄與報表",
         path: -> { admin_archives_path }
-      },
-      {
-        key: :patrons,
-        label: "Patrons",
-        description: "查看信眾與管理員候選人",
-        path: -> { admin_patrons_path },
-        capabilities: %i[manage_permissions manage_registrations]
       },
       {
         key: :permissions,

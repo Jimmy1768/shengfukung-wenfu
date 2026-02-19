@@ -45,11 +45,10 @@ class TempleRegistration < ApplicationRecord
   def self.admin_filtered(filters)
     filters ||= {}
     scope = includes(:user, :registrable, :temple_payments)
-    if filters[:offering_id].present? && filters[:offering_type].present?
-      scope = scope.where(
-        registrable_id: filters[:offering_id],
-        registrable_type: offering_type_filter_values(filters[:offering_type])
-      )
+    if filters[:offering_type].present?
+      type_values = offering_type_filter_values(filters[:offering_type])
+      scope = scope.where(registrable_type: type_values)
+      scope = scope.where(registrable_id: filters[:offering_id]) if filters[:offering_id].present?
     end
     if filters[:payment_method].present?
       scope = scope.left_outer_joins(:temple_payments).where(temple_payments: { payment_method: filters[:payment_method] })
@@ -124,11 +123,30 @@ class TempleRegistration < ApplicationRecord
 
   def registrant_name
     payload = contact_payload || {}
-    user&.english_name ||
-      payload["primary_contact"] ||
-      payload["contact_name"] ||
-      payload["name"] ||
-      "訪客"
+    if dependent_registration?
+      metadata_value("registrant_name") ||
+        payload["primary_contact"] ||
+        payload["contact_name"] ||
+        payload["name"] ||
+        user&.english_name ||
+        user&.email ||
+        "訪客"
+    else
+      user&.english_name ||
+        payload["primary_contact"] ||
+        payload["contact_name"] ||
+        payload["name"] ||
+        user&.email ||
+        "訪客"
+    end
+  end
+
+  def registrant_scope
+    metadata_value("registrant_scope").presence || (dependent_registration? ? "dependent" : "self")
+  end
+
+  def dependent_registration?
+    metadata_value("dependent_id").present?
   end
 
   private

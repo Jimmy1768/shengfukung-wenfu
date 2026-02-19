@@ -48,15 +48,16 @@ class TemplePayment < ApplicationRecord
     filters ||= {}
     scope = includes(:user, { admin_account: :user }, :temple_registration)
     scope = scope.where(payment_method: filters[:payment_method]) if filters[:payment_method].present?
-    if filters[:offering_id].present? && filters[:offering_type].present?
+    if filters[:offering_type].present?
       table = TempleRegistration.table_name
+      type_values = TempleRegistration.offering_type_filter_values(filters[:offering_type])
       scope = scope.joins(:temple_registration)
         .where(
           table => {
-            registrable_id: filters[:offering_id],
-            registrable_type: TempleRegistration.offering_type_filter_values(filters[:offering_type])
+            registrable_type: type_values
           }
         )
+      scope = scope.where(table => { registrable_id: filters[:offering_id] }) if filters[:offering_id].present?
     end
     if filters[:query].present?
       sanitized = ActiveRecord::Base.sanitize_sql_like(filters[:query])

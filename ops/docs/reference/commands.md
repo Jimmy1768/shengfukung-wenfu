@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "period key system scripts built"
+git commit -m "account portal, registration, offerings pages, refined"
 git push
 
 git reset --hard HEAD

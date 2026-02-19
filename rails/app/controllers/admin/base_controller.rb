@@ -142,7 +142,7 @@ module Admin
     def filter_params
       @filter_params ||= params
         .fetch(:filter, {})
-        .permit(:query, :offering_id, :offering_reference, :payment_method, :start_date, :end_date, :status)
+        .permit(:query, :offering_id, :offering_reference, :offering_kind, :payment_method, :start_date, :end_date, :status)
         .to_h
         .symbolize_keys
     end
@@ -159,6 +159,8 @@ module Admin
           normalized[:offering_reference] = reference
           normalized[:offering_type] = normalize_offering_type(type)
           normalized[:offering_id] = id if id.present?
+        elsif normalized[:offering_kind].present?
+          normalized[:offering_type] = normalize_offering_kind(normalized[:offering_kind])
         end
         normalized
       end
@@ -174,6 +176,19 @@ module Admin
         "TempleEvent"
       else
         type
+      end
+    end
+
+    def normalize_offering_kind(kind)
+      case kind.to_s
+      when "events"
+        "TempleEvent"
+      when "services"
+        "TempleService"
+      when "gatherings"
+        "TempleGathering"
+      else
+        nil
       end
     end
 
