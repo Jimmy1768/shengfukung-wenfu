@@ -21,7 +21,7 @@ zh-TW:
       orders: "訂單"
       payments: "收款資料"
       patrons: "信眾與管理員"
-      archives: "封存 / 年度資料"
+      archives: "年度資料"
       permissions: "管理員權限"
     filters:
       search:
@@ -223,7 +223,7 @@ zh-TW:
         patrons:
           label: "信眾與管理員"
         archives:
-          label: "封存 / 年度資料"
+          label: "年度資料"
         permissions:
           label: "管理員權限"
     patrons:
@@ -281,14 +281,14 @@ zh-TW:
       hero:
         eyebrow: "管理主控台"
         title: "%{name}，歡迎回來"
-        body_html: "此頁示範正式環境的結構；請依客戶需求填入真實指標、資料表與工作流程。"
+        body_html: "查看宮廟目前營運概況，並從下方任務卡持續推進後台設定。"
       metrics:
-        title: "起始指標"
-        subtitle: "待後端串接完成後，換成實際 KPI。"
+        title: "關鍵指標"
+        subtitle: "即時顯示目前資料，協助追蹤宮廟營運狀態。"
         entries:
           active_members: "活躍成員"
-          pending_invites: "待邀請"
-          revenue_placeholder: "營收（示意）"
+          pending_invites: "待啟用管理員"
+          revenue: "累計營收"
       next_steps:
         title: "下一步"
         subtitle: "快速完成宮廟上線時會用到的幾個任務。"
@@ -678,6 +678,11 @@ zh-TW:
       edit:
         title: "編輯活動回顧"
         body: "更新文案或補充媒體。"
+      table:
+        title: "標題"
+        event_date: "活動日期"
+        photos: "照片數"
+        actions: "操作"
       fields:
         title: "標題"
         body: "敘述"
@@ -690,7 +695,20 @@ zh-TW:
         photo_urls: "貼上已上傳的圖片網址，每行一個。如尚未整理，可留白。"
         upload_media: "可直接上傳檔案，或維持貼網址的方式。"
       actions:
+        new: "新增回顧"
         save: "儲存"
+        cancel: "取消"
+        edit: "編輯"
+        delete: "刪除"
+      notices:
+        created: "活動回顧已建立。"
+        updated: "活動回顧已更新。"
+        deleted: "活動回顧已刪除。"
+      confirmations:
+        delete: "確定要刪除這筆活動回顧嗎？"
+      form:
+        errors: "共有 %{count} 項錯誤，請修正後再儲存"
+      empty: "目前尚無活動回顧。"
     gatherings:
       index:
         title: "社群聚會"

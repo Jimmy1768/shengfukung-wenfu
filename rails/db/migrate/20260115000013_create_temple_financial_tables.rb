@@ -95,6 +95,7 @@ class CreateTempleFinancialTables < ActiveRecord::Migration[7.1]
       t.string :fulfillment_status, null: false, default: "open"
       t.datetime :fulfilled_at
       t.datetime :cancelled_at
+      t.datetime :expires_at
       t.text :notes
       t.jsonb :metadata, null: false, default: {}
       t.timestamps
@@ -102,6 +103,7 @@ class CreateTempleFinancialTables < ActiveRecord::Migration[7.1]
     add_index :temple_registrations, [:temple_id, :reference_code], unique: true, name: "idx_temple_registrations_on_code"
     add_index :temple_registrations, [:temple_id, :payment_status], name: "idx_temple_registrations_on_payment_status"
     add_index :temple_registrations, [:temple_id, :fulfillment_status], name: "idx_temple_registrations_on_fulfillment_status"
+    add_index :temple_registrations, [:temple_id, :expires_at], name: "idx_temple_registrations_on_temple_and_expires_at"
 
     create_table :temple_payments do |t|
       t.references :temple, null: false, foreign_key: true

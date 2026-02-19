@@ -14,6 +14,10 @@ module Registrations
       new(registration).gathering_editable?
     end
 
+    def self.contact_fields_editable?(registration)
+      new(registration).contact_fields_editable?
+    end
+
     attr_reader :registration
 
     def initialize(registration)
@@ -34,6 +38,14 @@ module Registrations
       gathering_editable?
     end
     alias editable_metadata_fields? metadata_fields_editable?
+
+    def contact_fields_editable?
+      return false unless registration.present?
+      return false unless gathering_editable?
+
+      !payment_recorded?
+    end
+    alias editable_contact_fields? contact_fields_editable?
 
     def gathering_editable?
       return false unless registration.present?

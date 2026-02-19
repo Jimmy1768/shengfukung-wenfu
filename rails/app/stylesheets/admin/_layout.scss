@@ -913,25 +913,38 @@ body.admin-body input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .registration-picker-modal__panel {
-  width: min(100%, 620px);
-  max-width: 620px;
+  width: min(100%, 920px);
+  max-width: 920px;
 }
 
 .registration-target-list .registration-target-card {
-  min-width: 220px;
+  min-width: 0;
   background: #fff;
   border-color: color-mix(in srgb, var(--border) 75%, #000 5%);
   color: #111827;
   box-sizing: border-box;
   max-width: 100%;
+  white-space: normal;
   box-shadow: 0 8px 20px rgba(17, 24, 39, 0.16);
+
+  .template-card-body {
+    width: 100%;
+    min-width: 0;
+  }
 
   h3 {
     color: #111827;
+    margin: 0;
+    line-height: 1.35;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .template-meta {
     color: #374151;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   &:hover {
@@ -943,15 +956,15 @@ body.admin-body input[type="time"]::-webkit-calendar-picker-indicator {
 
 .registration-target-list--modal-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 240px));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--spacing-md);
   align-items: stretch;
-  justify-content: center;
+  justify-content: stretch;
 }
 
 .registration-target-list--modal-grid .registration-target-card {
   display: flex;
-  width: 240px;
+  width: 100%;
   min-width: 0;
   max-width: 100%;
   margin: 0;

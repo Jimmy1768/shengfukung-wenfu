@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "built core registration lifecycle policy"
+git commit -m "finished core registration lifecycle policy"
 git push
 
 git reset --hard HEAD

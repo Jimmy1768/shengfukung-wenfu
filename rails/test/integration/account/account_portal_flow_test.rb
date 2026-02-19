@@ -66,7 +66,7 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to account_registration_path(registration)
 
     registration.reload
-    assert_equal "0912-000-000", registration.contact_payload["phone"]
+    assert_nil registration.contact_payload["phone"]
     assert_equal "Need seating", registration.metadata["ceremony_notes"]
 
     get account_galleries_path
@@ -131,6 +131,7 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
       user:,
       offering:,
       quantity: 1,
+      contact_payload: { "primary_contact" => "Paid User", "phone" => "0911-111-111", "email" => "paid-edit@example.com" },
       metadata: { "registrant_scope" => "self" }
     )
     create_payment(registration: registration)
@@ -156,8 +157,9 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
     assert_equal 1, registration.quantity
     assert_equal "self", registration.metadata["registrant_scope"]
     assert_nil registration.metadata["dependent_id"]
-    assert_equal "0900-456-456", registration.contact_payload["phone"]
+    assert_equal "0911-111-111", registration.contact_payload["phone"]
     assert_equal "Paid note", registration.metadata["ceremony_notes"]
+    assert_equal "10:00", registration.logistics_payload["arrival_window"]
   end
 
   test "account pending update keeps duplicate guard on identity" do

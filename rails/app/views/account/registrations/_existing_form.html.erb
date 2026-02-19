@@ -3,7 +3,8 @@
 <% gathering_registration = registration_object&.registrable_type == "TempleGathering" %>
 <% lifecycle_policy = Registrations::LifecyclePolicy.new(registration_object) %>
 <% core_fields_editable = lifecycle_policy.core_fields_editable? %>
-<% metadata_fields_editable = lifecycle_policy.metadata_fields_editable? %>
+<% contact_fields_editable = lifecycle_policy.contact_fields_editable? %>
+<% offering_fields_editable = lifecycle_policy.metadata_fields_editable? %>
 <%= form_with model: form_object, url: registration_object.present? ? account_registration_path(registration_object) : account_registrations_path(offering: @offering.slug, account_action: @account_action), method: registration_object.present? ? :patch : :post, local: true, class: "form-stack form-stack--inline" do |f| %>
   <div class="field-panel">
     <%= f.label :quantity, t("account.registrations.new.fields.quantity") %>
@@ -35,28 +36,28 @@
   </div>
   <div class="field-panel">
     <%= f.label :contact_name, t("account.registrations.form.contact_name") %>
-    <%= f.text_field :contact_name, required: true, readonly: !metadata_fields_editable %>
+    <%= f.text_field :contact_name, required: true, readonly: !contact_fields_editable %>
   </div>
   <div class="field-panel">
     <%= f.label :contact_phone, t("account.registrations.form.contact_phone") %>
-    <%= f.telephone_field :contact_phone, readonly: !metadata_fields_editable %>
+    <%= f.telephone_field :contact_phone, readonly: !contact_fields_editable %>
   </div>
   <div class="field-panel">
     <%= f.label :contact_email, t("account.registrations.form.contact_email") %>
-    <%= f.email_field :contact_email, readonly: !metadata_fields_editable %>
+    <%= f.email_field :contact_email, readonly: !contact_fields_editable %>
   </div>
   <div class="field-panel">
     <%= f.label :household_notes, t("account.registrations.form.household_notes") %>
-    <%= f.text_area :household_notes, rows: 3, readonly: !metadata_fields_editable %>
+    <%= f.text_area :household_notes, rows: 3, readonly: !contact_fields_editable %>
   </div>
   <% unless gathering_registration %>
     <div class="field-panel">
       <%= f.label :arrival_window, t("account.registrations.form.arrival_window") %>
-      <%= f.text_field :arrival_window, placeholder: t("account.registrations.form.arrival_placeholder"), readonly: !metadata_fields_editable %>
+      <%= f.text_field :arrival_window, placeholder: t("account.registrations.form.arrival_placeholder"), readonly: !offering_fields_editable %>
     </div>
     <div class="field-panel">
       <%= f.label :ceremony_notes, t("account.registrations.form.ceremony_notes") %>
-      <%= f.text_area :ceremony_notes, rows: 3, readonly: !metadata_fields_editable %>
+      <%= f.text_area :ceremony_notes, rows: 3, readonly: !offering_fields_editable %>
     </div>
   <% end %>
   <%= f.submit t("account.registrations.form.submit"), class: "btn btn-primary w-100" %>

@@ -248,6 +248,7 @@ module Admin
 
       immutable = %i[user_id quantity unit_price_cents currency registrant_scope dependent_id]
       sanitized = attrs.except(*immutable)
+      sanitized = sanitized.except(:contact_payload) unless registration_lifecycle_policy.contact_fields_editable?
       metadata = merge_payload({}, sanitized[:metadata])
       metadata.except!("registrant_scope", "dependent_id", "registrant_name")
       sanitized[:metadata] = metadata
@@ -257,6 +258,7 @@ module Admin
     def prepare_lifecycle_flags
       @core_fields_editable = registration_lifecycle_policy.core_fields_editable?
       @metadata_fields_editable = registration_lifecycle_policy.metadata_fields_editable?
+      @contact_fields_editable = registration_lifecycle_policy.contact_fields_editable?
     end
 
     def merge_payload_defaults(payload, defaults)

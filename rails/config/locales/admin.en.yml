@@ -281,14 +281,14 @@ en:
       hero:
         eyebrow: "Admin console"
         title: "Welcome back, %{name}"
-        body_html: "This placeholder mirrors the structure of the production admin. Replace these cards with the real KPIs, resource tables, and workflows your client needs."
+        body_html: "Track your temple's current operating snapshot and continue setup work from the task cards below."
       metrics:
-        title: "Starter metrics"
-        subtitle: "Swap these for live KPIs once the backend endpoints are wired."
+        title: "Key metrics"
+        subtitle: "Live counts and totals from current temple data."
         entries:
           active_members: "Active members"
-          pending_invites: "Pending invites"
-          revenue_placeholder: "Revenue (placeholder)"
+          pending_invites: "Pending admin activation"
+          revenue: "Total revenue"
       next_steps:
         title: "Next steps"
         subtitle: "Quick links to finish onboarding tasks."

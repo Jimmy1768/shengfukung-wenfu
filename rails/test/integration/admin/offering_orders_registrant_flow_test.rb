@@ -175,6 +175,7 @@ class AdminOfferingOrdersRegistrantFlowTest < ActionDispatch::IntegrationTest
         currency: "USD",
         registrant_scope: "dependent",
         dependent_id: @other_dependent.id,
+        contact_details: { primary_contact: "Changed After Paid" },
         logistics_details: { preferred_slot: "Evening" }
       }
     }
@@ -187,6 +188,7 @@ class AdminOfferingOrdersRegistrantFlowTest < ActionDispatch::IntegrationTest
     assert_equal "TWD", registration.currency
     assert_equal @dependent.id.to_s, registration.metadata["dependent_id"]
     assert_equal "dependent", registration.metadata["registrant_scope"]
+    assert_not_equal "Changed After Paid", registration.contact_payload["primary_contact"]
     assert_equal "Evening", registration.logistics_payload["preferred_slot"]
   end
 

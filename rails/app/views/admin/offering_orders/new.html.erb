@@ -2,8 +2,10 @@
 <% gathering_mode = @offering.is_a?(TempleGathering) %>
 <% core_fields_editable = @core_fields_editable.nil? ? true : @core_fields_editable %>
 <% metadata_fields_editable = @metadata_fields_editable.nil? ? true : @metadata_fields_editable %>
+<% contact_fields_editable = @contact_fields_editable.nil? ? true : @contact_fields_editable %>
 <% core_fields_locked = edit_mode && !core_fields_editable %>
 <% metadata_fields_locked = edit_mode && !metadata_fields_editable %>
+<% contact_fields_locked = edit_mode && !contact_fields_editable %>
 <div class="admin-registration-layout">
   <section class="page-header">
     <div class="page-header-body">
@@ -155,7 +157,7 @@
                         type: :text,
                         schema:,
                         value: contact_data[:primary_contact],
-                        html_options: { data: { contact_field: "primary_contact" }, readonly: metadata_fields_locked }) %>
+                        html_options: { data: { contact_field: "primary_contact" }, readonly: contact_fields_locked }) %>
                 </div>
               <% end %>
               <% if schema.include_field?(:contact, :phone) %>
@@ -165,7 +167,7 @@
                         type: :telephone,
                         schema:,
                         value: contact_data[:phone],
-                        html_options: { data: { contact_field: "phone" }, readonly: metadata_fields_locked }) %>
+                        html_options: { data: { contact_field: "phone" }, readonly: contact_fields_locked }) %>
                 </div>
               <% end %>
             </div>
@@ -180,7 +182,7 @@
                         type: :email,
                         schema:,
                         value: contact_data[:email],
-                        html_options: { data: { contact_field: "email" }, readonly: metadata_fields_locked }) %>
+                        html_options: { data: { contact_field: "email" }, readonly: contact_fields_locked }) %>
                 </div>
               <% end %>
               <% if schema.include_field?(:contact, :dependents_notes) %>
@@ -190,7 +192,7 @@
                         type: :text,
                         schema:,
                         value: contact_data[:dependents_notes],
-                        html_options: { data: { contact_field: "dependents_notes" }, readonly: metadata_fields_locked }) %>
+                        html_options: { data: { contact_field: "dependents_notes" }, readonly: contact_fields_locked }) %>
                   <p class="hint"><%= t("admin.registration_form.hints.dependents") %></p>
                 </div>
               <% end %>
@@ -204,7 +206,7 @@
                     type: :textarea,
                     schema:,
                     value: contact_data[:notes],
-                    html_options: { rows: 3, data: { contact_field: "notes" }, readonly: metadata_fields_locked }) %>
+                    html_options: { rows: 3, data: { contact_field: "notes" }, readonly: contact_fields_locked }) %>
             </div>
           <% end %>
         <% end %>

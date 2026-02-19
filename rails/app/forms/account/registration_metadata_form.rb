@@ -17,7 +17,7 @@ module Account
     attribute :arrival_window, :string
     attribute :ceremony_notes, :string
 
-    validates :contact_name, presence: true
+    validates :contact_name, presence: true, if: :contact_fields_editable?
     validates :registrant_scope, inclusion: { in: REGISTRANT_SCOPES }
     validates :quantity, numericality: { greater_than: 0, less_than_or_equal_to: 10 }, if: :core_fields_editable?
     validate :dependent_selection
@@ -58,11 +58,19 @@ module Account
       lifecycle_policy.core_fields_editable?
     end
 
+    def contact_fields_editable?
+      lifecycle_policy.contact_fields_editable?
+    end
+
     def filtered_params(raw_params)
       params_hash = (raw_params.presence || {}).to_h
-      return params_hash if core_fields_editable?
+      params_hash = params_hash.except("quantity", "registrant_scope", "dependent_id", :quantity, :registrant_scope, :dependent_id) unless core_fields_editable?
+      return params_hash if contact_fields_editable?
 
-      params_hash.except("quantity", "registrant_scope", "dependent_id", :quantity, :registrant_scope, :dependent_id)
+      params_hash.except(
+        "contact_name", "contact_phone", "contact_email", "household_notes",
+        :contact_name, :contact_phone, :contact_email, :household_notes
+      )
     end
 
     def defaults_from_registration
@@ -83,6 +91,8 @@ module Account
     end
 
     def merged_contact_payload
+      return registration.contact_payload || {} unless contact_fields_editable?
+
       (registration.contact_payload || {}).merge(
         "primary_contact" => contact_name,
         "phone" => contact_phone,
