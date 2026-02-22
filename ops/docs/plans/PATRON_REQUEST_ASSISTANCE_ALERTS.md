@@ -24,12 +24,14 @@
 - Backend model + endpoint to create/close alerts.
 - Admin dashboard widget/list of open alerts.
 - Optional push/email fan-out hook (phase-gated).
+- This is the only new support-request table in the initial rollout.
 
 ## Out of Scope
 
 - Two-way chat.
 - Complex assignment workflow.
 - Rich ticket metadata and custom states.
+- Contact Temple email persistence (handled as email-forward flow without DB table).
 
 ## UX Placement Decision
 

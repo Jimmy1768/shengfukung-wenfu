@@ -94,3 +94,23 @@
   - [x] auto-cancel stale unpaid registrations
   - [x] release capacity on expiration
   - [ ] optional reminder notifications before expiration
+    - [ ] Add notification events:
+      - `registration.expiring_soon` (for example, 24 hours before `expires_at`)
+      - `registration.expired` (when hold is released)
+    - [ ] Notify both audiences:
+      - patron (`registration.user_id`)
+      - temple admins for the same `temple_id`
+    - [ ] Channel behavior:
+      - Expo/mobile push (when device-token linkage is finalized)
+      - email
+      - web in-app alert/badge state
+    - [ ] Respect notification preferences/rules:
+      - user-level channel preference (`push`, `email`, `both`, or disabled)
+      - event-level enable/disable via `notification_rules`
+    - [ ] Add safe fallback:
+      - when push is unavailable, attempt email if enabled
+      - log notification delivery outcomes for auditing
+    - [ ] Add tests:
+      - expiring-soon event fan-out to patron + admins
+      - expired event fan-out to patron + admins
+      - preference opt-out respected per channel

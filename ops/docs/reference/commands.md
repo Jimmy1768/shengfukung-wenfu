@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "finished core registration lifecycle policy"
+git commit -m "refactoring rails controllers, creating docs"
 git push
 
 git reset --hard HEAD

@@ -17,7 +17,7 @@
 
 - Account portal only (patron-facing submit action).
 - Rails backend endpoint + mailer delivery.
-- Basic anti-abuse controls and audit logging.
+- Basic anti-abuse controls and structured app logging.
 - No admin reply UI, no threaded conversations, no inbox module.
 
 ## Out of Scope
@@ -35,31 +35,24 @@
 
 ## Data / Persistence
 
-- Add `temple_contact_requests` table (or equivalent):
-  - `temple_id` (required)
-  - `user_id` (required)
-  - `subject` (required)
-  - `message` (required)
-  - `status` (`submitted`, `delivered`, `failed`)
-  - `submitted_at`, `delivered_at`
-  - `request_ip`, `user_agent`
-  - `metadata` (jsonb, optional)
+- No database table in initial version.
+- Request is processed synchronously/asynchronously through mail delivery only.
+- Keep structured logs with temple slug, user id, and request id for traceability.
 
 Notes:
-- Persist requests even if email delivery fails (for retry/traceability).
 - Keep message body length-limited and sanitized.
 
 ## Backend Flow
 
 1. Patron submits form (`subject`, `message`).
-2. Backend validates and creates request row.
+2. Backend validates request payload and temple context.
 3. Backend resolves recipient temple email:
    - current temple (slug-bound account context)
    - fallback temple profile contact email
 4. Send two emails via mailer:
    - to patron: receipt/thank-you
    - to temple: new contact request summary + patron callback info
-5. Update request status and timestamps.
+5. Log delivery outcome (success/failure) with request metadata.
 
 ## API / Controller Draft
 
@@ -82,24 +75,24 @@ Notes:
 ## Observability
 
 - Log request lifecycle with request id.
-- Track counters:
+- Track counters from logs/metrics:
   - submitted
   - delivered
   - failed
-- Add admin-only audit query path later if needed.
+- Add DB persistence later only if operations require retry queue or audit UI.
 
 ## Implementation Phases
 
 ### Phase A: Domain + Persistence
 
-- [ ] Add model + migration for contact requests.
-- [ ] Add validation and status transitions.
+- [ ] Add endpoint/service validation for `subject` + `message`.
 - [ ] Add policy scope to ensure account can only create for own temple context.
+- [ ] Add structured logging payload (request id, temple slug, user id, result).
 
 ### Phase B: Delivery
 
 - [ ] Add mailer templates (patron acknowledgment + temple notification).
-- [ ] Add delivery service wrapper with retry-safe status update.
+- [ ] Add delivery service wrapper with clear success/failure logging.
 - [ ] Add fallback behavior when temple email is missing.
 
 ### Phase C: Account UI
@@ -124,5 +117,6 @@ Notes:
 
 ## Deferred
 
+- [ ] Add `temple_contact_requests` table if retry queue/audit UI becomes necessary.
 - [ ] Admin-side ticket board for contact requests.
 - [ ] Webhook integration (Slack/LINE/Discord) for temple teams.
