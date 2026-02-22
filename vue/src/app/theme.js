@@ -4,7 +4,7 @@ import project from '@/app/project.js';
 const THEME_COOKIE = 'temple_theme';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 1 week
 const API_BASE =
-  import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') || 'http://localhost:3001';
+  import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') || 'http://localhost:3002';
 
 const BUILD_THEME_KEY =
   import.meta.env.VITE_TEMPLE_THEME ||

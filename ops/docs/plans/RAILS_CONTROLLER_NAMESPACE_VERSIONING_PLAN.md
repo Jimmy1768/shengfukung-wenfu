@@ -88,17 +88,19 @@
   - Dedicated integration callback surface (OmniAuth), not an API-versioning concern.
 - `concerns/*`
   - Shared controller modules/mixins (standard Rails location).
-- `dev/*`
-  - Development-only tooling surface (keep gated by `Rails.env.development?` routes).
 - `utils/*` (with stricter rule)
   - Keep only for infrastructure/task-style endpoints (uploads, password flows, utility tasks), not business-domain CRUD.
 
 ### Prune / Consolidate
 
 - `web/*`
-  - Remove if unused; current HTML surfaces are already represented by `account/*` and `admin/*`.
+  - Remove; current HTML surfaces are already represented by `account/*` and `admin/*`.
 - `expo/*`
   - Remove as a namespace owner; Expo should consume `Api::V1::*` endpoints instead.
+- `dev/*`
+  - Remove as a long-term namespace surface (local testing should use normal controllers/APIs).
+  - Do not use `dev/*` for production troubleshooting or data correction tooling.
+  - Exception: migrate showcase/demo controllers to a dedicated `demo/*` namespace (feature-oriented, not environment-oriented).
 - `account/api/*` (after migration)
   - Consolidate into top-level versioned API (`api/v1/account/*` or `api/v1/me/*`).
 
@@ -110,6 +112,12 @@
   - Base surface exists without active route namespace.
 - `app/controllers/expo/base_controller.rb`
   - Base surface exists without active route namespace.
+
+### Dedicated Demo Surface (Intentional)
+
+- `marketing_admin` showcase may remain as a hidden promotional/demo feature.
+- Internally, demo controllers should live under `Demo::*` (for example `app/controllers/demo/*`), not under `Dev::*`.
+- Keep `/marketing/admin` route path unchanged; only internal module organization changes.
 
 ## Implementation Plan (No Refactor Yet)
 
@@ -135,7 +143,7 @@
 
 ### Phase D: Account API Consolidation Into Top-Level API (Chosen Direction)
 
-- [ ] Introduce `Api::V1::Account::*` (or `Api::V1::Me::*`) endpoints for current account JSON use cases.
+- [ ] Introduce `Api::V1::Account::*`
 - [ ] Migrate routes from `/account/api/*` to `/api/v1/account/*` (or `/api/v1/me/*`).
 - [ ] Keep temporary compatibility aliases only if active clients require a transition window.
 - [ ] Remove `Account::Api::*` controllers and routes after migration verification.
@@ -147,6 +155,29 @@
   - [ ] HTML namespaces (`admin`, `account`) do not include version segments.
   - [ ] account/admin JSON endpoints do not live outside `api/v1/*`.
 - [ ] Add a lightweight architecture doc link from `README` or `ops/docs`.
+
+## Future Operations Surface (Out of Scope for Phase 1)
+
+- Create a dedicated production support namespace: `ops/*` (or `support/*`).
+- Do not reuse `dev/*` for production issue handling.
+
+### Intended Responsibilities
+
+- Admin issue intake / ticketing (structured reports from admins, not email).
+- Operator impersonation / "god mode" for reproducible debugging.
+- Audited corrective tools for data fixes (orders, payments, refunds, registrations).
+- Investigation dashboards and runbooks for production support.
+
+### Design Constraints (Future-Proofing)
+
+- All ops mutations must be explicit domain actions/services (not generic raw CRUD editors).
+- Every ops mutation must require:
+  - actor identity
+  - reason / note
+  - ticket reference
+  - before/after change logging
+- Impersonation must be time-bounded, visible in UI, and fully audited.
+- Permission levels must separate read-only support, mutation support, and high-risk financial operations.
 
 ## Risks + Mitigations
 

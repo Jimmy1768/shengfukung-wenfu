@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'node:path';
 
-const devApiProxy = process.env.VITE_DEV_API_PROXY || 'http://localhost:3001';
+const devApiProxy = process.env.VITE_DEV_API_PROXY || 'http://localhost:3002';
 const frontendAssetsDir =
   process.env.VITE_FRONTEND_ASSETS_DIR ||
   process.env.VITE_MARKETING_ASSETS_DIR ||

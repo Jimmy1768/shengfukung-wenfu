@@ -10,12 +10,12 @@ function resolveAccountBaseUrl() {
     }
   }
   if (import.meta.env.DEV) {
-    return 'http://localhost:3001';
+    return 'http://localhost:3002';
   }
   if (typeof window !== 'undefined' && window.location?.origin) {
     return window.location.origin;
   }
-  return 'http://localhost:3001';
+  return 'http://localhost:3002';
 }
 
 function buildAccountUrl(path, params = {}) {

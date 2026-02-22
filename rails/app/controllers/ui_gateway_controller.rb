@@ -1,7 +1,7 @@
 # UiGatewayController
 # Central HTML/Turbo entry point that acts as the home for cross-platform web views.
 # Used by:
-# - Dev::BaseController / Web::BaseController (main UI surfaces)
+# - Account::BaseController / Admin::BaseController (browser UI surfaces)
 # - Utils::MobileController (deep links + in-app webviews)
 #
 # Responsibilities:

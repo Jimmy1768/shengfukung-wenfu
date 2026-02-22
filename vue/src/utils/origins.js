@@ -1,5 +1,5 @@
 const devMarketingOrigin = "http://localhost:5173/marketing";
-const devAdminOrigin = "http://localhost:3001/marketing/admin";
+const devAdminOrigin = "http://localhost:3002/marketing/admin";
 
 const prodMarketingFallback = "/marketing";
 const prodAdminFallback = "/marketing/admin";

@@ -2,7 +2,7 @@
 <html data-theme="<%= @active_theme_key || Themes::DEFAULT_KEY %>">
   <head>
     <meta charset="utf-8" />
-    <title><%= AppConstants::Project.name %> · Admin</title>
+    <title><%= AppConstants::Project.company_name %> · Admin</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <link rel="stylesheet" href="/backend/assets/showcase.css" />
@@ -12,7 +12,7 @@
     <div class="admin-shell">
       <header class="admin-nav">
         <div class="brand">
-          <span class="brand-name"><%= AppConstants::Project.name %></span>
+          <span class="brand-name"><%= AppConstants::Project.company_name %></span>
         </div>
         <% if show_admin_nav %>
           <div

@@ -15,11 +15,18 @@ Rails.application.routes.draw do
       get "temples/:slug/services", to: "temple_services#index"
       get "temples/:slug/services/:service_slug", to: "temple_services#show"
       get "temples/:slug/gatherings", to: "temple_gatherings#index"
+
+      namespace :account do
+        resources :registrations, only: :index
+        resources :payment_statuses, only: :show, param: :reference
+        resources :certificates, only: :index
+        resources :guest_lists, only: :show, param: :offering_id
+      end
     end
   end
 
   # --- Marketing admin showcase ----------------------------------------------
-  namespace :marketing_admin, path: "/marketing/admin", module: "dev/demo/rails" do
+  namespace :marketing_admin, path: "/marketing/admin", module: "demo" do
     # Auth + sessions
     get "/", to: "sessions#new", as: :login
     post "/", to: "sessions#create", as: :sessions
@@ -117,12 +124,6 @@ Rails.application.routes.draw do
     resources :payments, only: :index
     resource :locale, only: :create, controller: "locales"
 
-    namespace :api, defaults: { format: :json } do
-      resources :registrations, only: :index
-      resources :payment_statuses, only: :show, param: :reference
-      resources :certificates, only: :index
-      resources :guest_lists, only: :show, param: :offering_id
-    end
   end
 
   resource :password, controller: "utils/passwords", only: %i[new create edit]
@@ -136,9 +137,4 @@ Rails.application.routes.draw do
   match "/auth/:provider/callback", to: "auth/omniauth#callback", via: %i[get post]
   match "/auth/failure", to: "auth/omniauth#failure", via: %i[get post]
 
-  if Rails.env.development?
-    namespace :dev do
-      resource :theme, only: :create, controller: "theme_previews"
-    end
-  end
 end

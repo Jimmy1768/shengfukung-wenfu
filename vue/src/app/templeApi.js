@@ -1,4 +1,4 @@
-const DEFAULT_BASE_URL = 'http://localhost:3001';
+const DEFAULT_BASE_URL = 'http://localhost:3002';
 const DEFAULT_SLUG =
   import.meta.env.VITE_TEMPLE_SLUG || 'shenfukung-wenfu';
 

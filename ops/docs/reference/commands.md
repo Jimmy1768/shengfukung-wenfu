@@ -3,7 +3,7 @@
 ```bash
 
 git add .
-git commit -m "refactoring rails controllers, creating docs"
+git commit -m "fixed/recovered demoshowcase"
 git push
 
 git reset --hard HEAD

@@ -10,12 +10,14 @@ module AppConstants
 
     DEFAULT_SLUG = RAW_CONFIG.fetch("slug", "golden-template").freeze
     DEFAULT_NAME = RAW_CONFIG.fetch("name", "Golden Template").freeze
+    DEFAULT_COMPANY_NAME = RAW_CONFIG.fetch("companyName", "SourceGrid Labs").freeze
     DEFAULT_MARKETING_ROOT = RAW_CONFIG.fetch("marketingRoot", "/var/www/#{DEFAULT_SLUG}")
     DEFAULT_SYSTEMD_ENV_DIR = RAW_CONFIG.fetch("systemdEnvDir", "/etc/default")
     DEFAULT_THEME_KEY = RAW_CONFIG.fetch("defaultThemeKey", Themes::DEFAULT_KEY)
 
     SLUG = ENV.fetch("PROJECT_SLUG", DEFAULT_SLUG).freeze
     NAME = ENV.fetch("PROJECT_NAME", DEFAULT_NAME).freeze
+    COMPANY_NAME = ENV.fetch("PROJECT_COMPANY_NAME", DEFAULT_COMPANY_NAME).freeze
     MARKETING_ROOT = ENV.fetch("PROJECT_MARKETING_ROOT", DEFAULT_MARKETING_ROOT).freeze
     SYSTEMD_ENV_DIR = ENV.fetch("PROJECT_SYSTEMD_ENV_DIR", DEFAULT_SYSTEMD_ENV_DIR).freeze
 
@@ -25,6 +27,10 @@ module AppConstants
 
     def self.name
       NAME
+    end
+
+    def self.company_name
+      COMPANY_NAME
     end
 
     def self.systemd_env_file
