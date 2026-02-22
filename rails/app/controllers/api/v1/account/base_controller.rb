@@ -3,7 +3,7 @@
 module Api
   module V1
     module Account
-      class BaseController < Account::BaseController
+      class BaseController < ::Account::BaseController
         layout false
         protect_from_forgery with: :null_session
 
