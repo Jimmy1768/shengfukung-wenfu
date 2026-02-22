@@ -17,6 +17,7 @@
 
 - Account portal only (patron-facing submit action).
 - Rails backend endpoint + mailer delivery.
+- Brevo-backed outbound delivery (transactional sender).
 - Basic anti-abuse controls and structured app logging.
 - No admin reply UI, no threaded conversations, no inbox module.
 
@@ -36,7 +37,7 @@
 ## Data / Persistence
 
 - No database table in initial version.
-- Request is processed synchronously/asynchronously through mail delivery only.
+- Request is processed through mail delivery only (Phase 1: synchronous send in request cycle).
 - Keep structured logs with temple slug, user id, and request id for traceability.
 
 Notes:
@@ -49,10 +50,15 @@ Notes:
 3. Backend resolves recipient temple email:
    - current temple (slug-bound account context)
    - fallback temple profile contact email
+   - fallback global support email (if temple email missing)
 4. Send two emails via mailer:
    - to patron: receipt/thank-you
    - to temple: new contact request summary + patron callback info
 5. Log delivery outcome (success/failure) with request metadata.
+
+Development mode note:
+- In local development, allow a dev-only email sink override so both patron + temple emails route to one test inbox (for example `DEV_EMAIL_SINK`).
+- Production must always use real resolved recipients.
 
 ## API / Controller Draft
 
@@ -64,17 +70,28 @@ Notes:
   - success toast/flash
   - generic failure message (no internal error details)
 
+Implementation note:
+- Controller should not talk to Brevo directly.
+- Use service orchestration (`controller -> service -> email/mailer adapter -> Brevo client`).
+
 ## Security / Guardrails
 
 - Require authenticated account session.
-- Rate limit by `user_id` + IP (e.g., N requests per hour).
+- Rate limit by `user_id` + IP (initial target: 3/hour/user + IP guard; tune later).
 - Minimum/maximum length validation.
 - Strip HTML; plain-text only.
 - Add spam honeypot field (optional).
 
+Notes:
+- Phase 1 may use a local/service-level throttle for speed.
+- Long-term, this should plug into the generalized request-protection system (`api_usage_logs`, `api_request_counters`, `blacklist_entries`) so abuse controls are consistent across the project.
+
 ## Observability
 
 - Log request lifecycle with request id.
+- In development, when email sink override is active, log both:
+  - intended recipients
+  - actual sink recipient
 - Track counters from logs/metrics:
   - submitted
   - delivered
@@ -88,12 +105,15 @@ Notes:
 - [ ] Add endpoint/service validation for `subject` + `message`.
 - [ ] Add policy scope to ensure account can only create for own temple context.
 - [ ] Add structured logging payload (request id, temple slug, user id, result).
+- [ ] Add simple local throttle guard (Phase 1) pending generalized system-wide throttling rollout.
 
 ### Phase B: Delivery
 
 - [ ] Add mailer templates (patron acknowledgment + temple notification).
 - [ ] Add delivery service wrapper with clear success/failure logging.
+- [ ] Reuse existing Brevo transport stack (`Notifications::BrevoClient`) via service/email adapter boundary.
 - [ ] Add fallback behavior when temple email is missing.
+- [ ] Add development-only email sink override (`DEV_EMAIL_SINK`) for local testing.
 
 ### Phase C: Account UI
 
@@ -109,11 +129,54 @@ Notes:
 - [ ] Missing temple email fallback behavior.
 - [ ] Rate limiting blocks abusive request bursts.
 
+## Integration Roadmap (Beyond Phase 1)
+
+- Generalized request protection / throttling:
+  - Move feature-specific throttles into the shared abuse-protection framework.
+  - Apply endpoint-class rules consistently across API and selected HTML POST endpoints.
+  - See: `SYSTEM_WIDE_ABUSE_PROTECTION_RATE_LIMITING_PLAN.md`.
+- Email queue + dedupe:
+  - Move synchronous send to Sidekiq/worker delivery.
+  - Add dedupe/idempotency controls at dispatch/enqueue layer.
+  - See: `EMAIL_DELIVERY_QUEUE_AND_DEDUPE_PLAN.md`.
+
 ## Open Decisions
 
 - [ ] Should duplicate submissions within a short window be deduplicated?
-- [ ] Should temple notification include direct links to patron records?
+  - Decision deferred to queued email delivery phase (Sidekiq / dispatch layer).
+- [x] Should temple notification include direct links to patron records?
+  - No for Phase 1; defer until temples request inbox-to-admin handoff shortcuts.
+  - Rationale: this flow is email-inbox-first, not an in-app ticket workflow.
 - [ ] Keep category dropdown (billing/registration/other) now or defer?
+- [x] Email template strategy for Phase 1 (Rails vs Brevo templates)?
+  - Use simple Rails-rendered email templates (HTML + plain text) in repo.
+  - Do not use Brevo template IDs for Phase 1.
+  - Rationale: no-reply/utility emails, low design churn, easier template/project maintenance across deployments.
+
+## Delivery Provider Notes (Brevo + Zoho)
+
+- Brevo is the outbound transactional sender API used by Rails.
+- Zoho (or similar mailbox host) is where temple staff receive and reply to inbox mail (for example `help@temple-name.org.tw`).
+- For TempleMate (multi-temple project), Phase 1 can use one project-level Brevo API key with multiple temple-specific sender/reply-to identities.
+- Temple-specific mailbox/domain hosting cost (for example Zoho domain/email setup) is separate from Brevo API usage.
+- Keep Brevo API key in the project env file (for example `/etc/default/<slug>-env`), not in code.
+
+## Agreed Implementation Defaults (Current)
+
+- Delivery mode (Phase 1): synchronous send in request cycle
+  - keep service boundary so background job delivery can be introduced later without controller/API changes
+- Temple recipient resolution:
+  - temple-specific contact/support email
+  - fallback temple profile contact email
+  - fallback global support email
+- Patron acknowledgment:
+  - confirmation email only (no complex reply handling in Phase 1)
+- Template strategy:
+  - Rails-rendered email templates first (not Brevo template IDs in Phase 1)
+- Development testing:
+  - optional dev-only recipient sink via `DEV_EMAIL_SINK`
+  - routes both patron + temple emails to one test inbox locally
+  - production ignores this override behavior
 
 ## Deferred
 
