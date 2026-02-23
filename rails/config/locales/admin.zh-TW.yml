@@ -286,9 +286,10 @@ zh-TW:
         title: "關鍵指標"
         subtitle: "即時顯示目前資料，協助追蹤宮廟營運狀態。"
         entries:
-          active_members: "活躍成員"
-          pending_invites: "待啟用管理員"
-          revenue: "累計營收"
+          new_registrations_7d: "近 7 日新報名"
+          pending_registrations: "待處理報名"
+          unpaid_registrations: "未付款報名"
+          revenue_mtd: "本月營收"
       next_steps:
         title: "下一步"
         subtitle: "快速完成宮廟上線時會用到的幾個任務。"

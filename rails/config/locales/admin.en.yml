@@ -286,9 +286,10 @@ en:
         title: "Key metrics"
         subtitle: "Live counts and totals from current temple data."
         entries:
-          active_members: "Active members"
-          pending_invites: "Pending admin activation"
-          revenue: "Total revenue"
+          new_registrations_7d: "New registrations (7 days)"
+          pending_registrations: "Pending registrations"
+          unpaid_registrations: "Unpaid registrations"
+          revenue_mtd: "Revenue (this month)"
       next_steps:
         title: "Next steps"
         subtitle: "Quick links to finish onboarding tasks."

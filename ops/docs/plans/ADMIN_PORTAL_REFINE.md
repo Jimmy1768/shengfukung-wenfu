@@ -7,6 +7,23 @@
 
 ## Active Tasks
 
+### Admin Dashboard KPI Refinement (Ops-Useful)
+
+- [x] Remove low-value KPI (`Pending admin activation`) from primary dashboard KPI row.
+- [x] Replace dashboard KPI row with registration/payment operations signals.
+- [x] Change revenue KPI to month-to-date (`this month`) instead of all-time.
+- [ ] Add `New patrons (this month)` to core KPI row.
+- [ ] Keep core KPI row focused on daily operations:
+  `New patrons (this month)`, `Pending registrations`, `Unpaid registrations`, `Revenue (this month)`.
+- [ ] Add second dashboard KPI/queue row for operations alerts (phase-in as features land).
+- [ ] Include `Expiring unpaid holds` in second row (required reminder, not optional).
+- [ ] Add `Open assistance requests` in second row when Request Assistance workflow ships.
+- [ ] Add `Unread contact inquiries` in second row when inquiry inbox/queue tracking exists.
+
+Notes:
+- `New registrations (7 days)` is currently useful during transition, but should not crowd out `New patrons (this month)` once the core row is finalized.
+- Keep admin/staff counts out of the primary KPI row unless the screen is explicitly owner/admin-management focused.
+
 ### Gatherings Orders / Attendance Workflow
 
 - [x] Keep gathering orders form minimal (attendance-first) and avoid offering-template metadata sections.

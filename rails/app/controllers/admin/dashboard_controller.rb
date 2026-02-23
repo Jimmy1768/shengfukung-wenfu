@@ -1,17 +1,26 @@
 module Admin
   class DashboardController < BaseController
     def index
-      members_count = current_temple.temple_event_registrations.where.not(user_id: nil).distinct.count(:user_id)
-      pending_admin_invites_count = current_temple.admin_temple_memberships
-        .joins(:admin_account)
-        .where(admins: { active: false })
+      registrations = current_temple.temple_event_registrations
+      open_status = TempleRegistration::FULFILLMENT_STATUSES[:open]
+
+      new_registrations_count = registrations.where("created_at >= ?", 7.days.ago).count
+      pending_registrations_count = registrations.where(fulfillment_status: open_status).count
+      unpaid_registrations_count = registrations
+        .where(fulfillment_status: open_status)
+        .where("total_price_cents > 0")
+        .where.not(payment_status: TempleRegistration::PAYMENT_STATUSES[:paid])
         .count
-      total_revenue_cents = current_temple.temple_payments.completed.sum(:amount_cents)
+      month_revenue_cents = current_temple.temple_payments
+        .completed
+        .where("created_at >= ?", Time.zone.now.beginning_of_month)
+        .sum(:amount_cents)
 
       @metrics = [
-        { label: I18n.t("admin.dashboard.metrics.entries.active_members"), value: members_count },
-        { label: I18n.t("admin.dashboard.metrics.entries.pending_invites"), value: pending_admin_invites_count },
-        { label: I18n.t("admin.dashboard.metrics.entries.revenue"), value: Currency::Symbols.format_amount(total_revenue_cents, "TWD") }
+        { label: I18n.t("admin.dashboard.metrics.entries.new_registrations_7d"), value: new_registrations_count },
+        { label: I18n.t("admin.dashboard.metrics.entries.pending_registrations"), value: pending_registrations_count },
+        { label: I18n.t("admin.dashboard.metrics.entries.unpaid_registrations"), value: unpaid_registrations_count },
+        { label: I18n.t("admin.dashboard.metrics.entries.revenue_mtd"), value: Currency::Symbols.format_amount(month_revenue_cents, "TWD") }
       ]
       @next_steps = build_next_steps
     end
