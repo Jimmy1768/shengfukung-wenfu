@@ -21,7 +21,7 @@ zh-TW:
       flash: "已更新顯示模式。"
       options:
         standard: "標準"
-        alternate: "替代"
+        dark: "夜間"
     layout:
       hero:
         title: "會員專區"

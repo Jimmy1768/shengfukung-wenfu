@@ -70,6 +70,10 @@
   - `golden-default`
   - `golden-light`
   - `golden-dark`
+- Rails/mobile operational display palettes (not client-facing brand palette choices):
+  - `ops-standard`
+  - `ops-dark`
+  - `ops-high-contrast` (reserved for future mobile accessibility mode; not exposed in Rails v1)
 
 ### V1 Allowed Palette Matrix (Client Policy)
 
@@ -77,11 +81,11 @@
   - allowed: `temple-1`, `temple-2`
   - can expose palette selection to clients
 - `rails_account`
-  - allowed: `temple-1`, `temple-2`
-  - expose as display/accessibility choices only
+  - uses Rails display-mode ids (`standard`, `dark`)
+  - display modes map internally to `ops-*` palettes
 - `rails_admin`
-  - allowed: `temple-1`, `temple-2`
-  - expose as display/accessibility choices only
+  - uses Rails display-mode ids (`standard`, `dark`)
+  - display modes map internally to `ops-*` palettes
 - `mobile` (Expo)
   - allowed: `temple-1`, `temple-2`
   - no layout concept; palette only
@@ -133,9 +137,9 @@ Notes:
   - `temple-1` -> `Temple Red`
   - `temple-2` -> `Gold Lantern`
 - Rails account/admin use separate display-mode ids (not Vue palette ids)
-  - `standard` -> maps internally to `temple-1`
-  - `alternate` -> maps internally to `temple-2`
-  - labels are Rails-only display labels (`Standard`, `Alternate`) and may evolve independently
+  - `standard` -> maps internally to `ops-standard`
+  - `dark` -> maps internally to `ops-dark`
+  - labels are Rails-only display labels and may evolve independently
 - Mobile (Expo) labels (v1)
   - Start with Vue labels (`Temple Red`, `Gold Lantern`) until a mobile-specific UX requires accessibility wording.
   - Keep ids canonical (`temple-1`, `temple-2`) even if labels change later.
@@ -155,15 +159,20 @@ Notes:
 - Keep one stable layout per surface.
 - Expose a small, curated palette selector focused on readability:
   - `Standard`
-  - `High Contrast`
-  - `Dark` (optional; only if tested for readability)
+  - `Dark`
 - Present these as accessibility/display options, not visual novelty themes.
+- Do not expose `High Contrast` in Rails v1; reserve richer accessibility modes for mobile first.
 
 ### Mobile (Expo)
 
 - Consume the same palette ids/tokens used by Vue/Rails.
 - Support project default palette and (later) user preference sync.
 - Keep platform-native handling for typography/spacing, but palette ids should map to the same design language.
+- Mobile accessibility roadmap (post-bootstrap):
+  - Add `High Contrast` display mode (can map to `ops-high-contrast` or a mobile-specific accessibility palette later).
+  - Add an elderly-friendly text magnification mode for content reading.
+  - Guardrail: magnification should affect content/body text only; do not scale buttons, menus, nav chrome, or icon-based controls in a way that breaks layout.
+  - Prefer explicit content typography tokens/styles over globally scaling all UI text.
 
 ## Data + Storage Strategy (Recommended)
 
@@ -208,6 +217,7 @@ Notes:
 - [x] Add shared Rails palette policy helper/service (allowed ids, labels, fallback).
 - [x] Expose selector UI in `account` and `admin`.
 - [x] Persist preference (session/cookie first).
+- [x] Replace temporary Vue palette placeholders with real Rails display-mode palettes (`ops-standard`, `ops-dark`, `ops-high-contrast`).
 - [ ] Verify contrast/readability for older users in both portals.
 
 ### Phase C: Mobile (Expo) Alignment

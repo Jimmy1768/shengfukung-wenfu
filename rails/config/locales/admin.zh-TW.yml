@@ -199,7 +199,7 @@ zh-TW:
       flash: "已更新顯示模式。"
       options:
         standard: "標準"
-        alternate: "替代"
+        dark: "夜間"
     nav:
       menu_heading: "管理選單"
       sign_out: "登出"

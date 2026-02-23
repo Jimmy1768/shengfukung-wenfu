@@ -14,7 +14,7 @@ en:
       flash: "Display mode updated."
       options:
         standard: "Standard"
-        alternate: "Alternate"
+        dark: "Dark"
     layout:
       hero:
         title: "Member Portal"

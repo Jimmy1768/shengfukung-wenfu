@@ -199,7 +199,7 @@ en:
       flash: "Display mode updated."
       options:
         standard: "Standard"
-        alternate: "Alternate"
+        dark: "Dark"
     nav:
       menu_heading: "Console menu"
       sign_out: "Sign out"

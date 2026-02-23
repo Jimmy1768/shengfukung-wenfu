@@ -50,6 +50,72 @@ export const themes = {
       "shadowSoft": "0 20px 60px rgba(15, 23, 42, 0.12)"
     }
   },
+  "ops-standard": {
+    "id": "ops-standard",
+    "label": "Ops Standard",
+    "mode": "light",
+    "description": "Readable light interface palette for account/admin operational screens.",
+    "tokens": {
+      "surface": "#f7f5f1",
+      "surfaceRaised": "#ffffff",
+      "surfaceMuted": "#ece8e0",
+      "border": "#cdc4b7",
+      "text": "#191613",
+      "textMuted": "#544d45",
+      "primary": "#7d2d23",
+      "primaryForeground": "#fff8f2",
+      "accent": "#275b87",
+      "accentForeground": "#f5f9ff",
+      "danger": "#b42318",
+      "warning": "#b76e00",
+      "success": "#1f7a4d",
+      "shadowSoft": "0 16px 38px rgba(33, 24, 16, 0.12)"
+    }
+  },
+  "ops-dark": {
+    "id": "ops-dark",
+    "label": "Ops Dark",
+    "mode": "dark",
+    "description": "Low-glare dark palette for night-time admin/account use.",
+    "tokens": {
+      "surface": "#0f1318",
+      "surfaceRaised": "#171d24",
+      "surfaceMuted": "#202833",
+      "border": "#2f3946",
+      "text": "#f2f4f7",
+      "textMuted": "#c5ccd6",
+      "primary": "#f2b35d",
+      "primaryForeground": "#221507",
+      "accent": "#9fd3ff",
+      "accentForeground": "#0d1a26",
+      "danger": "#ff8f7d",
+      "warning": "#ffd166",
+      "success": "#5fd6a2",
+      "shadowSoft": "0 24px 60px rgba(2, 6, 12, 0.55)"
+    }
+  },
+  "ops-high-contrast": {
+    "id": "ops-high-contrast",
+    "label": "Ops High Contrast",
+    "mode": "light",
+    "description": "High-contrast palette prioritizing legibility for operational interfaces.",
+    "tokens": {
+      "surface": "#ffffff",
+      "surfaceRaised": "#ffffff",
+      "surfaceMuted": "#f2f2f2",
+      "border": "#4a4a4a",
+      "text": "#000000",
+      "textMuted": "#1f1f1f",
+      "primary": "#0038a8",
+      "primaryForeground": "#ffffff",
+      "accent": "#000000",
+      "accentForeground": "#ffffff",
+      "danger": "#9f111b",
+      "warning": "#8a5a00",
+      "success": "#0d6b3f",
+      "shadowSoft": "0 0 0 rgba(0, 0, 0, 0)"
+    }
+  },
   "golden-default": {
     "id": "golden-default",
     "label": "Golden Default",

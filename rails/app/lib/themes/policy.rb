@@ -9,16 +9,16 @@ module Themes
         cookie_key: "account_display_mode",
         i18n_scope: "account.theme_selector.options",
         modes: [
-          { id: "standard", palette_key: "temple-1" },
-          { id: "alternate", palette_key: "temple-2" }
+          { id: "standard", palette_key: "ops-standard" },
+          { id: "dark", palette_key: "ops-dark" }
         ].freeze
       },
       admin: {
         cookie_key: "admin_display_mode",
         i18n_scope: "admin.theme_selector.options",
         modes: [
-          { id: "standard", palette_key: "temple-1" },
-          { id: "alternate", palette_key: "temple-2" }
+          { id: "standard", palette_key: "ops-standard" },
+          { id: "dark", palette_key: "ops-dark" }
         ].freeze
       }
     }.freeze

@@ -40,8 +40,8 @@
   position: absolute;
   top: $space-4;
   right: $space-4;
-  border: none;
-  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+  background: var(--surface-raised);
   color: var(--text);
   width: 44px;
   height: 44px;
@@ -51,11 +51,13 @@
   justify-content: center;
   font-size: $font-size-xl;
   cursor: pointer;
-  transition: transform 160ms ease, background 160ms ease;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
 
   &:hover {
     transform: translateY(-1px);
-    background: rgba(15, 23, 42, 0.8);
+    background: color-mix(in srgb, var(--surface-raised) 85%, var(--surface-muted));
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
   }
 
   .sr-only {

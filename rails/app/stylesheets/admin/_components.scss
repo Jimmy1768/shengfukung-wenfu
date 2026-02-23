@@ -602,7 +602,8 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: var(--card-bg, #fff);
+  background: var(--surface-raised);
+  color: var(--text);
 }
 
 .admin-list__row {
