@@ -129,7 +129,7 @@ Notes:
 - [x] Open `Contact Temple` modal from header CTA (do not keep this feature buried in profile page).
 - [x] Prefill signed-in user identity/contact info in modal.
 - [x] Show success/error flash states.
-- [ ] Add clear expectation copy on response time.
+- [x] Add clear expectation copy on response time.
 
 ### Phase C2: Vue Public UI (Follow-up)
 

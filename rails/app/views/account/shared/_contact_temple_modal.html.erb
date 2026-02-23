@@ -12,6 +12,7 @@
   close_label: t("account.contact_temple_modal.close_label"),
   panel_html: { class: "account-contact-temple-modal" } do %>
   <p class="muted"><%= t("account.profile.contact_temple.subtitle") %></p>
+  <p class="muted"><%= t("account.contact_temple_modal.response_expectation") %></p>
 
   <div class="flash flash-alert" style="<%= 'display:none;' unless contact_form.errors.any? %>">
     <%= t("account.profile.contact_temple.validation_error") %>

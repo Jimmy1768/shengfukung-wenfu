@@ -126,6 +126,7 @@ en:
       identity_label: "Sending as"
       email_label: "Reply email"
       phone_label: "Phone"
+      response_expectation: "Temple staff will reply by email when available. Response times may vary."
     events:
       offerings:
         eyebrow: "Events"

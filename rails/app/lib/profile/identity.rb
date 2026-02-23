@@ -34,7 +34,7 @@ module Profile
     # Default sender/support emails for notifications. Non-secret.
     #
 
-    DEFAULT_SENDER_NAME  = "Golden Template App".freeze
+    DEFAULT_SENDER_NAME  = "TempleMate".freeze
     DEFAULT_SENDER_EMAIL = "no-reply@sourcegridlabs.com".freeze
 
     SUPPORT_EMAIL        = "admin@sourcegridlabs.com".freeze
@@ -45,9 +45,9 @@ module Profile
     # Used for email footers, legal text, and generic non-localized labels.
     #
 
-    APP_BRAND_NAME       = "Golden Template App".freeze
-    COMPANY_LEGAL_NAME   = "Golden Template Co.".freeze
-    COMPANY_DISPLAY_NAME = "Golden Template Co.".freeze
+    APP_BRAND_NAME       = "TempleMate".freeze
+    COMPANY_LEGAL_NAME   = "SourceGrid Labs".freeze
+    COMPANY_DISPLAY_NAME = "SourceGrid Labs".freeze
     # COMPANY_ADDRESS_LINE_1 = "123 Example St".freeze
     # COMPANY_ADDRESS_LINE_2 = "City, Country".freeze
 
