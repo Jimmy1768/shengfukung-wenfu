@@ -62,6 +62,16 @@ const isSending = computed(() => props.formState === 'sending');
                   required
                 />
               </label>
+              <label v-if="copy?.subjectLabel" class="contact-field">
+                <span>{{ copy?.subjectLabel }}</span>
+                <input
+                  v-model="contactForm.subject"
+                  type="text"
+                  :placeholder="copy?.subjectPlaceholder"
+                  maxlength="120"
+                  required
+                />
+              </label>
               <label class="contact-field">
                 <span>{{ copy?.messageLabel }}</span>
                 <textarea
@@ -70,6 +80,15 @@ const isSending = computed(() => props.formState === 'sending');
                   :placeholder="copy?.messagePlaceholder"
                   required
                 ></textarea>
+              </label>
+              <label v-if="Object.prototype.hasOwnProperty.call(contactForm, 'website')" class="contact-field contact-field--honeypot" aria-hidden="true">
+                <span>Website</span>
+                <input
+                  v-model="contactForm.website"
+                  type="text"
+                  tabindex="-1"
+                  autocomplete="off"
+                />
               </label>
 
               <div class="contact-form-actions">
@@ -164,6 +183,10 @@ const isSending = computed(() => props.formState === 'sending');
   display: grid;
   gap: 0.35rem;
   font-size: 0.9rem;
+}
+
+.contact-field--honeypot {
+  display: none;
 }
 
 .contact-field span {

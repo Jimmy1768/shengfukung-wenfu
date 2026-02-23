@@ -36,6 +36,13 @@
   - Do not reuse production Brevo keys across projects; isolate blast radius, rotation, and deliverability reputation per client/project.
   - It is acceptable to defer creating a project's production Brevo key (for example TempleMate) until sender domains/inboxes are ready.
   - Name keys clearly in Brevo (for example `DEV_SHARED_*`, `PROD_<PROJECT_SLUG>`) to simplify audits and rotation.
+- Email recipient routing policy (template convention):
+  - In local development, prefer a dev recipient sink override (for example `DEV_EMAIL`) so transactional/contact emails route to one operator inbox during testing.
+  - In production, use real recipient routing with a configured fallback support inbox for incomplete/missing customer contact setup.
+  - It is valid to keep one shared operator mailbox plus aliases for internal/support traffic while provisioning separate customer-domain mailboxes/aliases as projects onboard.
+  - Document where each alias is entered:
+    - recipient aliases for customer-facing notifications usually belong in app-managed profile/config records (for example admin-editable contact/support email fields or seeded profile YAML)
+    - shared sender alias/domain settings belong in production env (`/etc/default/<slug>-env`, e.g. `BREVO_SENDER_EMAIL`)
 - `services/` are the only classes permitted to write to the database (controllers may orchestrate them, too). `workers/` execute services, and `jobs/` (with `scheduling/run_time`) schedule workers, handle retries, and notify you via Brevo/email when exceptions occur.
 - Feature flags + runtime settings now live in `config_entries` (plus optional `feature_flag_rollouts`). Use `Config::EntryResolver` (or the thin `Configurable` concern) whenever controllers/services need a value so settings stay centralized and auditable.
 - Long-running jobs should call `BackgroundTasks::Recorder` from their service layer so task status/attempt metadata lands in the `background_tasks` table automatically; workers stay thin wrappers around those services.

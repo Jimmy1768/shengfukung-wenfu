@@ -30,6 +30,7 @@ Snapshot of what the patron-facing account portal already delivers so future wor
 - **Registrations** lists active orders with status pills, payment state, and cancel/help actions. **History** covers fulfilled orders with the same data helpers.
 - **Payments** mirrors the registrations list and reserves room for future LINE Pay receipts. Today it shows placeholder buttons explaining digital receipts are coming.
 - **Profile & Dependents** lets patrons edit their own contact info plus manage dependent cards (name, relationship, optional birthdate/contact). Dependents never receive credentials; registrations remain tied to the caregiver account but display the registrant name in tables.
+- **Contact Temple / Email Us** is a persistent account action (header utility CTA) that opens a modal and submits to the shared contact-email delivery flow. See `ops/docs/reference/inquiry_support_workflows.md`.
 
 ## Rolling Offerings Hooks (Phase A + B parity)
 

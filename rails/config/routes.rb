@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       resources :demo_contacts, only: :create
+      post "temples/:slug/contact_temple_requests", to: "contact_temple_requests#create"
       resources :temples, only: :show, param: :slug
       get "temples/:slug/news", to: "temple_news#index"
       get "temples/:slug/archive", to: "temple_galleries#index"

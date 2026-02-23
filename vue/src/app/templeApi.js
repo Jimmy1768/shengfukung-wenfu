@@ -31,6 +31,36 @@ async function request(path, overrides = {}) {
   return response.json();
 }
 
+async function requestJson(path, options = {}, overrides = {}) {
+  const { baseUrl } = buildConfig(overrides);
+  const url = `${baseUrl}/api/v1/${path.replace(/^\/+/, '')}`;
+  const response = await fetch(url, {
+    method: options.method || 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined
+  });
+
+  let payload = null;
+  try {
+    payload = await response.json();
+  } catch (_error) {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    const message = payload?.error || `Temple API request failed (${response.status})`;
+    const error = new Error(message);
+    error.status = response.status;
+    error.payload = payload;
+    throw error;
+  }
+
+  return payload;
+}
+
 export function fetchTempleProfile(overrides = {}) {
   const { slug } = buildConfig(overrides);
   return request(`temples/${slug}`, overrides);
@@ -85,4 +115,12 @@ export function fetchTempleService(serviceSlug, overrides = {}) {
   const { slug } = buildConfig(overrides);
   const safeSlug = encodeURIComponent(serviceSlug);
   return request(`temples/${slug}/services/${safeSlug}`, overrides);
+}
+
+export function submitTempleContactRequest(payload, overrides = {}) {
+  const { slug } = buildConfig(overrides);
+  return requestJson(`temples/${slug}/contact_temple_requests`, {
+    method: 'POST',
+    body: payload
+  }, overrides);
 }

@@ -7,13 +7,13 @@ module Contact
     class << self
       def temple_notification_html(temple_name:, user_name:, user_email:, subject:, message:, submitted_at:)
         body_html = <<~HTML
-          <p>A new contact request was submitted from the account portal.</p>
-          <p><strong>Temple:</strong> #{esc(temple_name)}</p>
-          <p><strong>Patron:</strong> #{esc(user_name)}</p>
+          <p>收到一則新的聯絡詢問。</p>
+          <p><strong>寺廟：</strong>#{esc(temple_name)}</p>
+          <p><strong>聯絡人：</strong>#{esc(user_name)}</p>
           <p><strong>Email:</strong> <a href="mailto:#{esc(user_email)}">#{esc(user_email)}</a></p>
-          <p><strong>Submitted at:</strong> #{esc(submitted_at)}</p>
-          <p><strong>Subject:</strong> #{esc(subject)}</p>
-          <p><strong>Message:</strong><br />#{format_multiline(message)}</p>
+          <p><strong>送出時間：</strong>#{esc(submitted_at)}</p>
+          <p><strong>主旨：</strong>#{esc(subject)}</p>
+          <p><strong>訊息內容：</strong><br />#{format_multiline(message)}</p>
         HTML
 
         Notifications::EmailTemplates.standard_layout(body_html)
@@ -21,11 +21,11 @@ module Contact
 
       def patron_ack_html(temple_name:, user_name:, subject:)
         body_html = <<~HTML
-          <p>Hello #{esc(user_name)},</p>
-          <p>We received your message for #{esc(temple_name)}.</p>
-          <p><strong>Subject:</strong> #{esc(subject)}</p>
-          <p>The temple team will review your inquiry and reply by email when available.</p>
-          <p style="margin-top: 16px;">Thank you.</p>
+          <p>您好，#{esc(user_name)}：</p>
+          <p>我們已收到您寄給 #{esc(temple_name)} 的訊息。</p>
+          <p><strong>主旨：</strong>#{esc(subject)}</p>
+          <p>寺方會在可回覆時以 Email 與您聯繫，回覆時間可能依工作情況有所不同。</p>
+          <p style="margin-top: 16px;">感謝您的來信。</p>
         HTML
 
         Notifications::EmailTemplates.standard_layout(body_html)

@@ -4,17 +4,20 @@ module Contact
   class TempleInquirySender
     Result = Struct.new(:success?, :error_code, :temple_email, :patron_email, keyword_init: true)
 
-    def initialize(user:, temple:, subject:, message:, request_id:, ip:)
+    def initialize(user: nil, temple:, subject:, message:, request_id:, ip:, guest_name: nil, guest_email: nil)
       @user = user
       @temple = temple
       @subject = subject
       @message = message
       @request_id = request_id
       @ip = ip
+      @guest_name = guest_name.to_s.strip
+      @guest_email = guest_email.to_s.strip
     end
 
     def call
-      unless @user&.email.present?
+      patron_email = resolved_patron_email
+      unless patron_email.present?
         log(:failed, reason: :missing_user_email)
         return Result.new(success?: false, error_code: :missing_user_email)
       end
@@ -25,14 +28,13 @@ module Contact
         return Result.new(success?: false, error_code: :missing_temple_email)
       end
 
-      patron_email = @user.email
       actual_temple_recipient = apply_dev_email_override(temple_email)
       actual_patron_recipient = apply_dev_email_override(patron_email)
 
       client = Notifications::BrevoClient.new
       delivered_temple = client.send_email(
         to: { email: actual_temple_recipient, name: @temple&.name || "Temple" },
-        subject: "[Temple Contact] #{@subject}",
+        subject: "【寺廟聯絡】#{@subject}",
         html: Contact::TempleInquiryMailer.temple_notification_html(
           temple_name: @temple&.name || AppConstants::Project.name,
           user_name: patron_display_name,
@@ -41,20 +43,20 @@ module Contact
           message: @message,
           submitted_at: Time.current.strftime("%Y-%m-%d %H:%M:%S %Z")
         ),
-        sender_name: Notifications::EmailConfig::DEFAULT_SENDER_NAME,
+        sender_name: sender_display_name,
         sender_email: Notifications::EmailConfig::DEFAULT_SENDER_EMAIL
       )
       return failure(:temple_delivery_failed, temple_email:, patron_email:) unless delivered_temple
 
       delivered_patron = client.send_email(
         to: { email: actual_patron_recipient, name: patron_display_name },
-        subject: "We received your message",
+        subject: "我們已收到您的訊息",
         html: Contact::TempleInquiryMailer.patron_ack_html(
           temple_name: @temple&.name || AppConstants::Project.name,
           user_name: patron_display_name,
           subject: @subject
         ),
-        sender_name: Notifications::EmailConfig::DEFAULT_SENDER_NAME,
+        sender_name: sender_display_name,
         sender_email: Notifications::EmailConfig::DEFAULT_SENDER_EMAIL
       )
       return failure(:patron_delivery_failed, temple_email:, patron_email:) unless delivered_patron
@@ -89,7 +91,11 @@ module Contact
     end
 
     def patron_display_name
-      @user.native_name.presence || @user.english_name.presence || @user.email
+      @guest_name.presence || @user&.native_name.presence || @user&.english_name.presence || resolved_patron_email
+    end
+
+    def resolved_patron_email
+      @guest_email.presence || @user&.email
     end
 
     def resolve_temple_email
@@ -97,6 +103,14 @@ module Contact
       details["email"].presence ||
         details["contactEmail"].presence ||
         AppConstants::Emails.support_email.presence
+    end
+
+    def sender_display_name
+      temple_name = @temple&.name.to_s.strip
+      base_name = Notifications::EmailConfig::DEFAULT_SENDER_NAME.to_s.strip.presence || "TempleMate"
+      return base_name if temple_name.blank?
+
+      "#{temple_name} via #{base_name}"
     end
 
     def dev_email_override
