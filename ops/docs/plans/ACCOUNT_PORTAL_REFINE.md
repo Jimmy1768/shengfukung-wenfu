@@ -7,6 +7,23 @@
 
 ## Active Tasks
 
+### V1 Onboarding Blockers (Ship Before First Temple)
+
+- [ ] Restore media upload pipeline end-to-end for admin forms using `media_assets` uploads.
+- [ ] Provision and document Amazon S3 bucket/env setup for uploads (`S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, optional `S3_PUBLIC_BASE_URL`).
+- [ ] QA upload flows in admin pages that already use upload widgets (gatherings hero image, gallery uploads, profile hero uploads) against real S3.
+- [ ] Add event hero-image upload UI to admin events form (currently URL field only; gatherings already supports upload + URL).
+- [x] Show event/gathering thumbnails in public Vue event cards using existing `hero_image_url` API fields (account portal cards already render thumbnails).
+- [x] Fix account registration registrant picker (`self` / dependents) so selection swaps form state in-place without full-page jump-to-top navigation.
+
+### V1 Notes (Confirmed Current State)
+
+- `Admin::MediaUploadsController` and `Utils::UploadsController` exist and already route uploads through `Storage::S3Service` + `MediaAsset` records.
+- Upload failure is currently a v1 readiness/configuration blocker (S3 provisioning/env + end-to-end wiring validation), not a missing controller/service pipeline.
+- Account portal events/gatherings cards already render thumbnail media when `hero_image_url` is present.
+- Public Vue events page receives event/gathering data, but `EventCard.vue` does not currently render image thumbnails.
+- Public/API serializers already expose `hero_image_url` for both offerings and gatherings.
+
 ### Gatherings Registration Parity
 
 - [x] Extend dependent registrant flow to gatherings (same as offerings: self vs dependent).

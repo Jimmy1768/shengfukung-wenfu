@@ -15,6 +15,9 @@ const linkAttrs = computed(() =>
 
 <template>
   <component :is="linkTag" class="card" v-bind="linkAttrs">
+    <div v-if="item.imageUrl" class="thumb">
+      <img :src="item.imageUrl" :alt="item.title || ''" loading="lazy" decoding="async" />
+    </div>
     <div class="row">
       <div class="date">
         <div class="m">{{ item.month }}</div>
@@ -54,6 +57,23 @@ const linkAttrs = computed(() =>
   align-items: start;
 }
 
+.thumb {
+  width: 100%;
+  height: 144px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+  background: color-mix(in srgb, var(--border) 10%, transparent);
+  margin-bottom: 12px;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .date {
   border-radius: 14px;
   padding: var(--spacing-sm) var(--spacing-xs);
@@ -77,5 +97,11 @@ const linkAttrs = computed(() =>
   background: color-mix(in srgb, var(--primary) 18%, transparent);
   color: var(--primary);
   font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .thumb {
+    height: 124px;
+  }
 }
 </style>

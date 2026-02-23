@@ -14,7 +14,11 @@
       <% link_params = { offering: offering.slug, account_action:, registrant_scope: scope }
          link_params[:dependent_id] = dep_id if dep_id %>
       <%= link_to new_account_registration_path(link_params),
-            class: ["registrant-card", ("is-selected" if selected)] do %>
+            class: ["registrant-card", ("is-selected" if selected)],
+            data: {
+              turbo_frame: "account-registration-registrant-panel",
+              registrant_picker_link: true
+            } do %>
         <span class="registrant-name"><%= option[:label] %></span>
         <% if scope == "self" %>
           <span class="registrant-pill registrant-pill--self"><%= t("account.registrations.new.fields.self_option") %></span>

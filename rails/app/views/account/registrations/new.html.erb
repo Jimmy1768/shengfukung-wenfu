@@ -35,72 +35,123 @@
     </dl>
   </article>
 
-  <%= render "shared/form_errors", form: @form %>
+  <turbo-frame id="account-registration-registrant-panel">
+    <%= render "shared/form_errors", form: @form %>
 
-  <% if @existing_registration.present? %>
-    <%= render "registrant_picker",
-      form: @form,
-      offering: @offering,
-      dependents: @dependents,
-      account_action: @account_action %>
+    <% if @existing_registration.present? %>
+      <%= render "registrant_picker",
+        form: @form,
+        offering: @offering,
+        dependents: @dependents,
+        account_action: @account_action %>
 
-    <div class="registrant-existing-card">
-      <p class="hint"><%= t("account.registrations.new.fields.already_registered_detail") %></p>
-      <%= render "existing_form", form: @metadata_form, registration: @existing_registration %>
-    </div>
-  <% else %>
-    <%= render "registrant_picker",
-      form: @form,
-      offering: @offering,
-      dependents: @dependents,
-      account_action: @account_action %>
+      <div class="registrant-existing-card">
+        <p class="hint"><%= t("account.registrations.new.fields.already_registered_detail") %></p>
+        <%= render "existing_form", form: @metadata_form, registration: @existing_registration %>
+      </div>
+    <% else %>
+      <%= render "registrant_picker",
+        form: @form,
+        offering: @offering,
+        dependents: @dependents,
+        account_action: @account_action %>
 
-    <div class="registrant-existing-card registrant-new-card">
-      <%= form_with model: @form,
-        url: account_registrations_path(offering: @offering.slug, account_action: @account_action),
-        local: true,
-        class: "form-stack form-stack--inline" do |f| %>
-        <%= hidden_field_tag :registrant_scope, @form.registrant_scope, id: nil %>
-        <%= hidden_field_tag :dependent_id, @form.dependent_id, id: nil %>
+      <div class="registrant-existing-card registrant-new-card">
+        <%= form_with model: @form,
+          url: account_registrations_path(offering: @offering.slug, account_action: @account_action),
+          local: true,
+          class: "form-stack form-stack--inline" do |f| %>
+          <%= hidden_field_tag :registrant_scope, @form.registrant_scope, id: nil %>
+          <%= hidden_field_tag :dependent_id, @form.dependent_id, id: nil %>
 
-        <% if @form.registrant_scope.blank? %>
-          <p class="hint registrant-form-hint"><%= t("account.registrations.new.fields.select_registrant_hint") %></p>
-        <% else %>
-          <div class="form-grid">
-            <div class="form-field">
-              <%= f.label :quantity, t("account.registrations.new.fields.quantity") %>
-              <%= f.number_field :quantity, min: 1, max: 10, required: true %>
-            </div>
-            <div class="form-field">
-              <%= f.label :contact_name, t("account.registrations.form.contact_name") %>
-              <%= f.text_field :contact_name, required: true %>
-            </div>
-            <div class="form-field">
-              <%= f.label :contact_phone, t("account.registrations.form.contact_phone") %>
-              <%= f.telephone_field :contact_phone %>
-            </div>
-            <div class="form-field">
-              <%= f.label :contact_email, t("account.registrations.form.contact_email") %>
-              <%= f.email_field :contact_email %>
-            </div>
-            <div class="form-field form-field--full">
-              <%= f.label :household_notes, t("account.registrations.form.household_notes") %>
-              <%= f.text_area :household_notes, rows: 3 %>
-            </div>
-            <% unless gathering_registration %>
+          <% if @form.registrant_scope.blank? %>
+            <p class="hint registrant-form-hint"><%= t("account.registrations.new.fields.select_registrant_hint") %></p>
+          <% else %>
+            <div class="form-grid">
               <div class="form-field">
-                <%= f.label :arrival_window, t("account.registrations.form.arrival_window") %>
-                <%= f.text_field :arrival_window, placeholder: t("account.registrations.form.arrival_placeholder") %>
+                <%= f.label :quantity, t("account.registrations.new.fields.quantity") %>
+                <%= f.number_field :quantity, min: 1, max: 10, required: true %>
+              </div>
+              <div class="form-field">
+                <%= f.label :contact_name, t("account.registrations.form.contact_name") %>
+                <%= f.text_field :contact_name, required: true %>
+              </div>
+              <div class="form-field">
+                <%= f.label :contact_phone, t("account.registrations.form.contact_phone") %>
+                <%= f.telephone_field :contact_phone %>
+              </div>
+              <div class="form-field">
+                <%= f.label :contact_email, t("account.registrations.form.contact_email") %>
+                <%= f.email_field :contact_email %>
               </div>
               <div class="form-field form-field--full">
-                <%= f.label :ceremony_notes, t("account.registrations.form.ceremony_notes") %>
-                <%= f.text_area :ceremony_notes, rows: 3 %>
+                <%= f.label :household_notes, t("account.registrations.form.household_notes") %>
+                <%= f.text_area :household_notes, rows: 3 %>
               </div>
-            <% end %>
-          </div>
-          <%= f.submit t("account.registrations.new.submit"), class: "btn btn-primary w-100" %>
+              <% unless gathering_registration %>
+                <div class="form-field">
+                  <%= f.label :arrival_window, t("account.registrations.form.arrival_window") %>
+                  <%= f.text_field :arrival_window, placeholder: t("account.registrations.form.arrival_placeholder") %>
+                </div>
+                <div class="form-field form-field--full">
+                  <%= f.label :ceremony_notes, t("account.registrations.form.ceremony_notes") %>
+                  <%= f.text_area :ceremony_notes, rows: 3 %>
+                </div>
+              <% end %>
+            </div>
+            <%= f.submit t("account.registrations.new.submit"), class: "btn btn-primary w-100" %>
+          <% end %>
         <% end %>
-      <% end %>
-    </div>
-  <% end %>
+      </div>
+    <% end %>
+  </turbo-frame>
 </section>
+
+<script>
+  (() => {
+    const FRAME_ID = "account-registration-registrant-panel";
+    const LINK_SELECTOR = "[data-registrant-picker-link]";
+    let bound = false;
+
+    const swapRegistrantPanel = async (event) => {
+      const link = event.target.closest(LINK_SELECTOR);
+      if (!link) return;
+
+      event.preventDefault();
+
+      const frame = document.getElementById(FRAME_ID);
+      if (!frame) {
+        window.location.href = link.href;
+        return;
+      }
+
+      try {
+        const response = await fetch(link.href, {
+          headers: { "X-Requested-With": "XMLHttpRequest" },
+          credentials: "same-origin"
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const html = await response.text();
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const nextFrame = doc.getElementById(FRAME_ID);
+        if (!nextFrame) throw new Error("Registrant panel not found in response");
+
+        frame.replaceWith(nextFrame);
+      } catch (error) {
+        console.error("Registrant picker swap failed", error);
+        window.location.href = link.href;
+      }
+    };
+
+    const bindRegistrantPicker = () => {
+      if (bound) return;
+      document.addEventListener("click", swapRegistrantPanel);
+      bound = true;
+    };
+
+    bindRegistrantPicker();
+    document.addEventListener("DOMContentLoaded", bindRegistrantPicker);
+  })();
+</script>

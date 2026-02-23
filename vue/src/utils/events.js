@@ -67,6 +67,7 @@ export function formatEventCard(event, options = {}) {
     where: location,
     summary,
     badge,
+    imageUrl: event.hero_image_url || '',
     ctaHref: buildRegistrationLink(action, event.slug)
   };
 }
