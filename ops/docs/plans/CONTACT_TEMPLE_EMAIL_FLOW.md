@@ -110,18 +110,18 @@ Notes:
 
 ### Phase A: Domain + Persistence
 
-- [ ] Add endpoint/service validation for `subject` + `message`.
+- [x] Add endpoint/service validation for `subject` + `message`.
 - [ ] Add policy scope to ensure account can only create for own temple context.
-- [ ] Add structured logging payload (request id, temple slug, user id, result).
-- [ ] Add simple local throttle guard (Phase 1) pending generalized system-wide throttling rollout.
+- [x] Add structured logging payload (request id, temple slug, user id, result).
+- [x] Add simple local throttle guard (Phase 1) pending generalized system-wide throttling rollout.
 
 ### Phase B: Delivery
 
-- [ ] Add mailer templates (patron acknowledgment + temple notification).
-- [ ] Add delivery service wrapper with clear success/failure logging.
-- [ ] Reuse existing Brevo transport stack (`Notifications::BrevoClient`) via service/email adapter boundary.
-- [ ] Add fallback behavior when temple email is missing.
-- [ ] Add development-only email override (`DEV_EMAIL`) for local testing.
+- [x] Add mailer templates (patron acknowledgment + temple notification).
+- [x] Add delivery service wrapper with clear success/failure logging.
+- [x] Reuse existing Brevo transport stack (`Notifications::BrevoClient`) via service/email adapter boundary.
+- [x] Add fallback behavior when temple email is missing.
+- [x] Add development-only email override (`DEV_EMAIL`) for local testing.
 
 ### Phase C: Account UI
 
@@ -139,9 +139,9 @@ Notes:
 
 ### Phase D: Test Coverage
 
-- [ ] Request create success path.
-- [ ] Invalid payload rejects with validation errors.
-- [ ] Email fan-out sends to both patron and temple.
+- [x] Request create success path.
+- [x] Invalid payload rejects with validation errors.
+- [x] Email fan-out sends to both patron and temple.
 - [ ] Missing temple email fallback behavior.
 - [ ] Rate limiting blocks abusive request bursts.
 
@@ -193,6 +193,7 @@ Notes:
   - optional dev-only recipient override via `DEV_EMAIL`
   - routes both patron + temple emails to one test inbox locally
   - production ignores this override behavior
+  - verified end-to-end in local development on February 23, 2026 (Brevo recent activity showed both temple + patron emails delivered to `DEV_EMAIL`)
 - UX direction:
   - use modal-based entry points (public Vue + account header CTA)
   - avoid hiding contact email in a single account screen like profile
