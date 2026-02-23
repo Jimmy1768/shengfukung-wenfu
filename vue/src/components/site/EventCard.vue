@@ -15,9 +15,6 @@ const linkAttrs = computed(() =>
 
 <template>
   <component :is="linkTag" class="card" v-bind="linkAttrs">
-    <div v-if="item.imageUrl" class="thumb">
-      <img :src="item.imageUrl" :alt="item.title || ''" loading="lazy" decoding="async" />
-    </div>
     <div class="row">
       <div class="date">
         <div class="m">{{ item.month }}</div>
@@ -30,6 +27,9 @@ const linkAttrs = computed(() =>
       </div>
     </div>
     <div class="badge" v-if="item.badge">{{ item.badge }}</div>
+    <div v-if="item.imageUrl" class="thumb">
+      <img :src="item.imageUrl" :alt="item.title || ''" loading="lazy" decoding="async" />
+    </div>
   </component>
 </template>
 
@@ -64,13 +64,14 @@ const linkAttrs = computed(() =>
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
   background: color-mix(in srgb, var(--border) 10%, transparent);
-  margin-bottom: 12px;
+  margin-top: 12px;
 }
 
 .thumb img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   display: block;
 }
 
