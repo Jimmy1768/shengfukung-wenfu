@@ -39,6 +39,7 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
 
     get account_dashboard_path
     assert_response :success
+    assert_includes response.body, 'data-modal-trigger="account-contact-temple-modal"'
     assert_includes response.body, "新春點燈"
     assert_includes response.body, "CERT-001"
 

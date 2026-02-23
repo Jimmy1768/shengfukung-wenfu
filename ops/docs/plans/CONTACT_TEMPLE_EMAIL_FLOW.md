@@ -15,7 +15,7 @@
 
 ## Scope
 
-- Account portal only (patron-facing submit action).
+- Shared contact-email delivery foundation (usable by account and public-site entry points).
 - Rails backend endpoint + mailer delivery.
 - Brevo-backed outbound delivery (transactional sender).
 - Basic anti-abuse controls and structured app logging.
@@ -28,11 +28,19 @@
 - File attachments.
 - SLA/routing engine.
 
-## UX Placement
+## UX Placement (Revised)
 
-- Primary CTA: Account `Profile` page (`Contact Temple`).
-- Optional secondary CTA: Account dashboard quick action.
+- Public site (Vue):
+  - `Contact Temple` / `Email Us` CTA opens a modal form.
+  - Supports non-patrons and patrons who cannot sign in.
+- Account portal (Rails):
+  - Always-visible `Email Us` CTA in account header/nav area.
+  - Opens a modal form (not hidden inside `Profile`).
+  - Prefills signed-in patron identity/contact info when available.
 - Keep copy explicit: this is email-based and may not be immediate.
+
+Note:
+- Current Rails implementation may temporarily render on profile during backend rollout, but target UX is header CTA + modal.
 
 ## Data / Persistence
 
@@ -57,7 +65,7 @@ Notes:
 5. Log delivery outcome (success/failure) with request metadata.
 
 Development mode note:
-- In local development, allow a dev-only email sink override so both patron + temple emails route to one test inbox (for example `DEV_EMAIL_SINK`).
+- In local development, allow a dev-only email override so both patron + temple emails route to one test inbox (for example `DEV_EMAIL`).
 - Production must always use real resolved recipients.
 
 ## API / Controller Draft
@@ -113,13 +121,21 @@ Notes:
 - [ ] Add delivery service wrapper with clear success/failure logging.
 - [ ] Reuse existing Brevo transport stack (`Notifications::BrevoClient`) via service/email adapter boundary.
 - [ ] Add fallback behavior when temple email is missing.
-- [ ] Add development-only email sink override (`DEV_EMAIL_SINK`) for local testing.
+- [ ] Add development-only email override (`DEV_EMAIL`) for local testing.
 
 ### Phase C: Account UI
 
-- [ ] Add `Contact Temple` form in profile.
-- [ ] Show success/error flash states.
+- [x] Add account header/nav `Email Us` CTA (persistent across account screens).
+- [x] Open `Contact Temple` modal from header CTA (do not keep this feature buried in profile page).
+- [x] Prefill signed-in user identity/contact info in modal.
+- [x] Show success/error flash states.
 - [ ] Add clear expectation copy on response time.
+
+### Phase C2: Vue Public UI (Follow-up)
+
+- [ ] Add Vue `Contact Temple` / `Email Us` CTA + modal for public site.
+- [ ] Reuse demo-showcase contact/modal interaction pattern where practical.
+- [ ] Submit to a public endpoint backed by the same shared delivery service.
 
 ### Phase D: Test Coverage
 
@@ -174,9 +190,12 @@ Notes:
 - Template strategy:
   - Rails-rendered email templates first (not Brevo template IDs in Phase 1)
 - Development testing:
-  - optional dev-only recipient sink via `DEV_EMAIL_SINK`
+  - optional dev-only recipient override via `DEV_EMAIL`
   - routes both patron + temple emails to one test inbox locally
   - production ignores this override behavior
+- UX direction:
+  - use modal-based entry points (public Vue + account header CTA)
+  - avoid hiding contact email in a single account screen like profile
 
 ## Deferred
 

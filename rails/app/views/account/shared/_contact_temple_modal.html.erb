@@ -1,0 +1,67 @@
+<%
+  contact_form = @contact_temple_form || Account::ContactTempleRequestForm.new
+  modal_open = controller.controller_name == "contact_temple_requests" || contact_form.errors.any?
+  patron_name = current_user.english_name.presence || current_user.native_name.presence || current_user.email
+  patron_phone = current_user.metadata&.dig("phone")
+%>
+
+<%= render "shared/modal_panel",
+  modal_key: "account-contact-temple-modal",
+  title: t("account.profile.contact_temple.title"),
+  open: modal_open,
+  close_label: t("account.contact_temple_modal.close_label"),
+  panel_html: { class: "account-contact-temple-modal" } do %>
+  <p class="muted"><%= t("account.profile.contact_temple.subtitle") %></p>
+
+  <div class="flash flash-alert" style="<%= 'display:none;' unless contact_form.errors.any? %>">
+    <%= t("account.profile.contact_temple.validation_error") %>
+  </div>
+
+  <div class="profile-summary" style="margin-top: 1rem; margin-bottom: 1rem;">
+    <div>
+      <span class="label"><%= t("account.contact_temple_modal.identity_label") %></span>
+      <p><%= patron_name %></p>
+    </div>
+    <div>
+      <span class="label"><%= t("account.contact_temple_modal.email_label") %></span>
+      <p><%= current_user.email %></p>
+    </div>
+    <% if patron_phone.present? %>
+      <div>
+        <span class="label"><%= t("account.contact_temple_modal.phone_label") %></span>
+        <p><%= patron_phone %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <%= form_with model: contact_form, url: account_contact_temple_requests_path, class: "profile-form" do |f| %>
+    <%= hidden_field_tag :return_to, request.fullpath %>
+
+    <div class="field">
+      <%= f.label :subject, t("account.profile.contact_temple.subject") %>
+      <%= f.text_field :subject, maxlength: 120, required: true %>
+      <% if contact_form.errors[:subject].any? %>
+        <p class="muted"><%= contact_form.errors[:subject].to_sentence %></p>
+      <% end %>
+    </div>
+
+    <div class="field">
+      <%= f.label :message, t("account.profile.contact_temple.message") %>
+      <%= f.text_area :message, rows: 4, maxlength: 2000, required: true %>
+      <% if contact_form.errors[:message].any? %>
+        <p class="muted"><%= contact_form.errors[:message].to_sentence %></p>
+      <% end %>
+    </div>
+
+    <div style="display:none;" aria-hidden="true">
+      <%= f.label :website, "Website" %>
+      <%= f.text_field :website, tabindex: -1, autocomplete: "off" %>
+    </div>
+
+    <p class="muted"><%= t("account.profile.contact_temple.notice") %></p>
+
+    <div class="form-actions">
+      <%= f.submit t("account.profile.contact_temple.submit"), class: "btn btn-primary" %>
+    </div>
+  <% end %>
+<% end %>

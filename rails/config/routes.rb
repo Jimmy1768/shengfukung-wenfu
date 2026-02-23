@@ -123,6 +123,7 @@ Rails.application.routes.draw do
     resources :galleries, only: %i[index show]
     resources :payments, only: :index
     resource :locale, only: :create, controller: "locales"
+    resources :contact_temple_requests, only: :create
 
   end
 

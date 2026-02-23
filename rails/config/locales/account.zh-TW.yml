@@ -28,6 +28,7 @@ zh-TW:
         services: "祈福服務"
         registrations: "報名紀錄"
         payments: "付款紀錄"
+        email_us: "Email 聯絡"
         sign_out: "登出"
     dashboard:
       intro:
@@ -103,6 +104,15 @@ zh-TW:
         notes: "備註"
         not_provided: "尚未填寫"
         no_notes: "尚無備註。"
+      contact_temple:
+        eyebrow: "聯絡寺廟"
+        title: "寄送詢問信件"
+        subtitle: "此表單適用一般詢問，寺方工作人員會以 Email 回覆。"
+        subject: "主旨"
+        message: "訊息內容"
+        notice: "此功能為 Email 詢問，回覆可能需要一些時間。"
+        submit: "送出訊息"
+        validation_error: "請修正欄位內容後再送出。"
       dependents:
         eyebrow: "家屬 / 受照護者"
         title: "管理家屬資料"
@@ -118,6 +128,11 @@ zh-TW:
         delete: "刪除"
         delete_confirm: "確定刪除此家屬？"
         empty: "尚未建立任何家屬資料。"
+    contact_temple_modal:
+      close_label: "關閉聯絡表單"
+      identity_label: "寄件身份"
+      email_label: "回覆 Email"
+      phone_label: "電話"
     events:
       offerings:
         eyebrow: "活動與法會"

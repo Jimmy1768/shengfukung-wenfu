@@ -46,3 +46,4 @@
 ## Deferred
 
 - [ ] Online payment integration (LINE Pay callbacks + live payment reconciliation) is deferred due to current environment limits.
+- [x] Add persistent header/nav `Email Us` CTA that opens the account contact-temple modal (paired with public Vue contact modal flow).

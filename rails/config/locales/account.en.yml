@@ -21,6 +21,7 @@ en:
         services: "Services"
         registrations: "Registrations"
         payments: "Payments"
+        email_us: "Email Us"
         sign_out: "Sign Out"
     dashboard:
       intro:
@@ -96,6 +97,15 @@ en:
         notes: "Notes"
         not_provided: "Not provided"
         no_notes: "No notes yet."
+      contact_temple:
+        eyebrow: "Contact temple"
+        title: "Send an email inquiry"
+        subtitle: "Use this form for general questions. Temple staff will reply by email when available."
+        subject: "Subject"
+        message: "Message"
+        notice: "This is an email request and may not receive an immediate response."
+        submit: "Send message"
+        validation_error: "Please fix the highlighted fields."
       dependents:
         eyebrow: "Family / caretakers"
         title: "Manage dependent profiles"
@@ -111,6 +121,11 @@ en:
         delete: "Remove"
         delete_confirm: "Remove this dependent?"
         empty: "No dependent profiles yet."
+    contact_temple_modal:
+      close_label: "Close contact form"
+      identity_label: "Sending as"
+      email_label: "Reply email"
+      phone_label: "Phone"
     events:
       offerings:
         eyebrow: "Events"
