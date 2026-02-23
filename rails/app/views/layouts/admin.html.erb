@@ -61,6 +61,38 @@
                 <% end %>
               </div>
             </div>
+            <div class="profile-menu language-selector" data-profile-menu>
+              <button
+                type="button"
+                class="nav-user-trigger"
+                aria-haspopup="true"
+                aria-expanded="false"
+                data-profile-menu-trigger
+              >
+                <span class="nav-user-name"><%= current_admin_theme_label %></span>
+                <span class="nav-user-chevron" aria-hidden="true">▾</span>
+                <span class="sr-only"><%= t("admin.theme_selector.menu_toggle") %></span>
+              </button>
+              <div class="nav-user-dropdown" role="menu" data-profile-menu-panel>
+                <%= form_with url: admin_theme_path,
+                              scope: :theme_switch,
+                              method: :post,
+                              data: { turbo: false },
+                              local: true,
+                              html: { class: "language-dropdown-menu" } do |form| %>
+                  <% admin_theme_options.each do |option| %>
+                    <button
+                      type="submit"
+                      name="theme_switch[mode_key]"
+                      value="<%= option[:id] %>"
+                      class="nav-dropdown-item <%= 'is-disabled' if option[:id] == current_admin_display_mode_id %>"
+                      <%= 'disabled' if option[:id] == current_admin_display_mode_id %>>
+                      <span class="nav-dropdown-title"><%= option[:label] %></span>
+                    </button>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
             <div class="nav-links">
               <div class="profile-menu nav-user-menu" data-profile-menu>
                 <button

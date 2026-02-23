@@ -88,7 +88,57 @@
 
 Notes:
 - The allowed list can diverge later per surface, but v1 should start with the same client-safe set to avoid policy complexity.
-- Human-facing labels may differ by surface (`Temple Red` vs `Standard`) while palette ids remain canonical and shared.
+- Vue/mobile can expose branded palette labels, while Rails should expose Rails-only display-mode labels.
+
+### Current Palette Sources + Selectors (Inventory)
+
+- Shared source of truth (palettes + tokens)
+  - `shared/design-system/themes.json`
+  - Canonical palette ids + tokens live here and are synced into surface-specific files.
+- Rails
+  - Palette parsing + runtime palette lookup:
+    - `rails/app/lib/themes/palettes.rb`
+    - `rails/app/lib/themes/tokens.rb`
+  - Project default palette resolution:
+    - `rails/app/lib/app_constants/project.rb` (`default_theme_key`)
+  - Account/admin runtime theme resolution (now via shared Rails display-mode policy):
+    - `rails/app/controllers/account/base_controller.rb`
+    - `rails/app/controllers/admin/base_controller.rb`
+    - `rails/app/lib/themes/policy.rb` (Rails display modes -> palette mapping)
+  - Admin layout consumes resolved theme key:
+    - `rails/app/views/layouts/admin.html.erb`
+  - Account layout consumes resolved theme key:
+    - `rails/app/views/layouts/account.html.erb`
+- Vue (public site)
+  - Synced palette registry + labels:
+    - `vue/src/theme/themes.js`
+  - Runtime theme apply/persist logic:
+    - `vue/src/app/theme.js`
+  - Dev theme selector (already filters to `temple-*`):
+    - `vue/src/components/dev/DevThemeToggle.vue`
+- Mobile (Expo)
+  - Synced palette registry + labels:
+    - `mobile/theme/tokens.js`
+  - Project/app constants loader:
+    - `mobile/app/lib/app_constants/project.js`
+  - Placeholder app currently consumes palette tokens from `mobile/theme/tokens.js`:
+    - `mobile/App.js`
+
+### V1 Surface Label Mapping (Palette IDs vs Rails Display Modes)
+
+- Canonical palette ids remain shared for brand palettes (Vue + mobile):
+  - `temple-1`
+  - `temple-2`
+- Vue public site labels (branding-forward)
+  - `temple-1` -> `Temple Red`
+  - `temple-2` -> `Gold Lantern`
+- Rails account/admin use separate display-mode ids (not Vue palette ids)
+  - `standard` -> maps internally to `temple-1`
+  - `alternate` -> maps internally to `temple-2`
+  - labels are Rails-only display labels (`Standard`, `Alternate`) and may evolve independently
+- Mobile (Expo) labels (v1)
+  - Start with Vue labels (`Temple Red`, `Gold Lantern`) until a mobile-specific UX requires accessibility wording.
+  - Keep ids canonical (`temple-1`, `temple-2`) even if labels change later.
 
 ## Surface-Specific Policy
 
@@ -141,23 +191,23 @@ Notes:
 - Do not expose layout switching in Rails operational UIs.
 - Avoid surface-specific forks of core design tokens.
 - Palette ids must be stable across `vue`, `rails`, and `mobile`.
-- Accessibility labels in Rails can map to branded internal palette ids.
+- Rails display-mode ids/labels are a separate UX layer and may map to canonical palette ids internally.
 
 ## Implementation Phases
 
 ### Phase A: Policy + Inventory
 
-- [ ] Inventory current palette sources and selectors across `vue`, `rails`, `mobile`.
+- [x] Inventory current palette sources and selectors across `vue`, `rails`, `mobile`.
 - [x] Define demo-vs-client palette boundary (`golden-*` excluded from client policy by default).
 - [x] Define canonical palette inventory buckets (client-safe vs demo/showcase).
 - [x] Define v1 allowed palette matrix for `vue_public`, `rails_account`, `rails_admin`, and `mobile`.
-- [ ] Define surface-specific label mapping (canonical ids -> user-facing labels per surface).
+- [x] Define surface-specific label mapping (canonical ids -> user-facing labels per surface).
 
 ### Phase B: Rails Accessibility Palette Selector
 
-- [ ] Add shared Rails palette policy helper/service (allowed ids, labels, fallback).
-- [ ] Expose selector UI in `account` and `admin`.
-- [ ] Persist preference (session/cookie first).
+- [x] Add shared Rails palette policy helper/service (allowed ids, labels, fallback).
+- [x] Expose selector UI in `account` and `admin`.
+- [x] Persist preference (session/cookie first).
 - [ ] Verify contrast/readability for older users in both portals.
 
 ### Phase C: Mobile (Expo) Alignment

@@ -99,6 +99,7 @@ Rails.application.routes.draw do
     end
     resource :temple_switch, only: :create, controller: "temple_switches"
     resource :locale, only: :create, controller: "locales"
+    resource :theme, only: :create, controller: "themes"
   end
 
   # --- User account console --------------------------------------------------
@@ -124,6 +125,7 @@ Rails.application.routes.draw do
     resources :galleries, only: %i[index show]
     resources :payments, only: :index
     resource :locale, only: :create, controller: "locales"
+    resource :theme, only: :create, controller: "themes"
     resources :contact_temple_requests, only: :create
 
   end

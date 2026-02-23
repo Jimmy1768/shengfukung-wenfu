@@ -193,6 +193,13 @@ en:
         en: "English"
         zh-TW: "Traditional Chinese"
       flash: "Language updated."
+    theme_selector:
+      label: "Display mode"
+      menu_toggle: "Open display mode menu"
+      flash: "Display mode updated."
+      options:
+        standard: "Standard"
+        alternate: "Alternate"
     nav:
       menu_heading: "Console menu"
       sign_out: "Sign out"

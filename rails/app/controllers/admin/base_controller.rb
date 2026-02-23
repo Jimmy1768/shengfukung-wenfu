@@ -11,6 +11,9 @@ module Admin
                   :admin_signed_in?,
                   :available_admin_temples,
                   :allow_temple_switch?,
+                  :admin_theme_options,
+                  :current_admin_theme_label,
+                  :current_admin_display_mode_id,
                   :current_admin_locale,
                   :admin_locale_options,
                   :admin_brand_name,
@@ -18,6 +21,7 @@ module Admin
 
     before_action :authenticate_admin!
     before_action :ensure_admin_temple_scope
+    before_action :assign_admin_theme
     before_action :apply_admin_locale
 
     TEMPLE_SELECTION_SESSION_KEY = AppConstants::Sessions.key(:admin_temple)
@@ -93,6 +97,29 @@ module Admin
 
     def set_admin_selected_temple_slug(slug)
       session[TEMPLE_SELECTION_SESSION_KEY] = slug
+    end
+
+    def assign_admin_theme
+      resolved = Themes::Policy.resolve(
+        surface: :admin,
+        cookie_value: cookies[Themes::Policy.cookie_key(:admin)],
+        project_default: AppConstants::Project.default_theme_key
+      )
+      @active_theme_key = resolved.fetch(:palette_key)
+      @active_admin_display_mode_id = resolved.fetch(:mode_id)
+      @theme_palette = Themes.for(@active_theme_key)
+    end
+
+    def admin_theme_options
+      Themes::Policy.options(:admin, locale: current_admin_locale)
+    end
+
+    def current_admin_theme_label
+      admin_theme_options.find { |option| option[:id] == current_admin_display_mode_id }&.dig(:label) || current_admin_display_mode_id
+    end
+
+    def current_admin_display_mode_id
+      @active_admin_display_mode_id
     end
 
     def default_admin_temple_slug(admin_account)

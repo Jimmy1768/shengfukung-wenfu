@@ -11,23 +11,42 @@
     <div class="account-shell">
       <header class="account-hero">
         <div class="account-language-selector">
-          <%= form_with url: account_locale_path,
-                        scope: :locale_switch,
-                        method: :post,
-                        data: { turbo: false },
-                        local: true,
-                        html: { class: "language-selector-form" } do |form| %>
-            <% account_locale_options.each do |option| %>
-              <% value = option[:value].to_s %>
-              <button
-                type="submit"
-                name="locale_switch[locale]"
-                value="<%= value %>"
-                class="language-switch-button <%= 'is-active' if value == current_account_locale.to_s %>">
-                <%= option[:label] %>
-              </button>
+          <div>
+            <%= form_with url: account_locale_path,
+                          scope: :locale_switch,
+                          method: :post,
+                          data: { turbo: false },
+                          local: true,
+                          html: { class: "language-selector-form" } do |form| %>
+              <% account_locale_options.each do |option| %>
+                <% value = option[:value].to_s %>
+                <button
+                  type="submit"
+                  name="locale_switch[locale]"
+                  value="<%= value %>"
+                  class="language-switch-button <%= 'is-active' if value == current_account_locale.to_s %>">
+                  <%= option[:label] %>
+                </button>
+              <% end %>
             <% end %>
-          <% end %>
+            <%= form_with url: account_theme_path,
+                          scope: :theme_switch,
+                          method: :post,
+                          data: { turbo: false },
+                          local: true,
+                          html: { class: "language-selector-form" } do |form| %>
+              <% account_theme_options.each do |option| %>
+                <button
+                  type="submit"
+                  name="theme_switch[mode_key]"
+                  value="<%= option[:id] %>"
+                  class="language-switch-button <%= 'is-active' if option[:id] == current_account_display_mode_id %>"
+                  title="<%= t("account.theme_selector.label") %>">
+                  <%= option[:label] %>
+                </button>
+              <% end %>
+            <% end %>
+          </div>
         </div>
         <div class="account-hero-inner">
           <div class="account-brand">

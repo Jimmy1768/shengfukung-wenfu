@@ -8,6 +8,8 @@ module Account
     helper_method :current_user,
       :user_signed_in?,
       :account_theme_options,
+      :current_account_theme_label,
+      :current_account_display_mode_id,
       :active_nav?,
       :active_temple_slug,
       :current_account_locale,
@@ -20,20 +22,18 @@ module Account
     before_action :authenticate_user!
 
     private
-    THEME_COOKIE_KEY = "temple_theme"
-    ACCOUNT_THEME_CHOICES = %w[temple-1 golden-light].freeze
     ACCOUNT_TEMPLE_SESSION_KEY = "account_active_temple_slug"
     ACCOUNT_ENTRY_INTENT_SESSION_KEY = "account_entry_intent"
     ACCOUNT_LOCALE_SESSION_KEY = AppConstants::Sessions.key(:account_locale)
 
     def assign_account_theme
-      key = if allow_theme_override?
-        cookie_value = cookies[THEME_COOKIE_KEY]
-        cookie_value if valid_theme_key?(cookie_value)
-      end
-      key ||= AppConstants::Project.default_theme_key
-
-      @active_theme_key = sanitize_theme_key(key)
+      resolved = Themes::Policy.resolve(
+        surface: :account,
+        cookie_value: cookies[Themes::Policy.cookie_key(:account)],
+        project_default: AppConstants::Project.default_theme_key
+      )
+      @active_theme_key = resolved.fetch(:palette_key)
+      @active_account_display_mode_id = resolved.fetch(:mode_id)
       @theme_palette = Themes.for(@active_theme_key)
     end
 
@@ -91,25 +91,16 @@ module Account
       reset_session
     end
 
-    def allow_theme_override?
-      Rails.env.development?
-    end
-
-    def sanitize_theme_key(value)
-      valid_theme_key?(value) ? value : ACCOUNT_THEME_CHOICES.first
-    end
-
-    def valid_theme_key?(value)
-      ACCOUNT_THEME_CHOICES.include?(value.to_s)
-    end
-
     def account_theme_options
-      ACCOUNT_THEME_CHOICES.map do |key|
-        {
-          id: key,
-          label: Themes::Palettes::RAW_CONFIG.dig("themes", key, "label") || key.humanize
-        }
-      end
+      Themes::Policy.options(:account, locale: current_account_locale)
+    end
+
+    def current_account_theme_label
+      account_theme_options.find { |option| option[:id] == current_account_display_mode_id }&.dig(:label) || current_account_display_mode_id
+    end
+
+    def current_account_display_mode_id
+      @active_account_display_mode_id
     end
 
     def account_locale_options

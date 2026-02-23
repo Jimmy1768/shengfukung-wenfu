@@ -193,6 +193,13 @@ zh-TW:
         en: "英文"
         zh-TW: "繁體中文"
       flash: "已切換語言。"
+    theme_selector:
+      label: "顯示模式"
+      menu_toggle: "開啟顯示模式選單"
+      flash: "已更新顯示模式。"
+      options:
+        standard: "標準"
+        alternate: "替代"
     nav:
       menu_heading: "管理選單"
       sign_out: "登出"

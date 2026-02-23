@@ -9,6 +9,12 @@ en:
         close: "Close dialog"
     language_selector:
       flash: "Language updated."
+    theme_selector:
+      label: "Display mode"
+      flash: "Display mode updated."
+      options:
+        standard: "Standard"
+        alternate: "Alternate"
     layout:
       hero:
         title: "Member Portal"
