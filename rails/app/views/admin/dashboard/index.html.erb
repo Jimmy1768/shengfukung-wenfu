@@ -27,6 +27,27 @@
     </section>
   </div>
 
+  <% if @queue_metrics.present? %>
+    <div class="admin-stack__row">
+      <section class="card stack-item stack-item--metrics metrics-card">
+        <header>
+          <h2><%= t("admin.dashboard.metrics.queue_title") %></h2>
+          <p class="muted"><%= t("admin.dashboard.metrics.queue_subtitle") %></p>
+        </header>
+        <div class="metrics-grid-container">
+          <div class="metrics-grid">
+            <% @queue_metrics.each do |metric| %>
+              <article class="metric-card">
+                <h3><%= metric[:value] %></h3>
+                <p class="muted"><%= metric[:label] %></p>
+              </article>
+            <% end %>
+          </div>
+        </div>
+      </section>
+    </div>
+  <% end %>
+
   <div class="admin-stack__row">
     <section class="card stack-item">
       <% if @next_steps.any? %>

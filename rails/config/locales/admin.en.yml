@@ -285,10 +285,13 @@ en:
       metrics:
         title: "Key metrics"
         subtitle: "Live counts and totals from current temple data."
+        queue_title: "Ops reminders"
+        queue_subtitle: "Items that may need follow-up soon."
         entries:
-          new_registrations_7d: "New registrations (7 days)"
+          new_patrons_mtd: "New patrons (this month)"
           pending_registrations: "Pending registrations"
           unpaid_registrations: "Unpaid registrations"
+          expiring_unpaid_holds_24h: "Unpaid holds expiring (24h)"
           revenue_mtd: "Revenue (this month)"
       next_steps:
         title: "Next steps"

@@ -12,11 +12,11 @@
 - [x] Remove low-value KPI (`Pending admin activation`) from primary dashboard KPI row.
 - [x] Replace dashboard KPI row with registration/payment operations signals.
 - [x] Change revenue KPI to month-to-date (`this month`) instead of all-time.
-- [ ] Add `New patrons (this month)` to core KPI row.
-- [ ] Keep core KPI row focused on daily operations:
+- [x] Add `New patrons (this month)` to core KPI row.
+- [x] Keep core KPI row focused on daily operations:
   `New patrons (this month)`, `Pending registrations`, `Unpaid registrations`, `Revenue (this month)`.
-- [ ] Add second dashboard KPI/queue row for operations alerts (phase-in as features land).
-- [ ] Include `Expiring unpaid holds` in second row (required reminder, not optional).
+- [x] Add second dashboard KPI/queue row for operations alerts (phase-in as features land).
+- [x] Include `Expiring unpaid holds` in second row (required reminder, not optional).
 - [ ] Add `Open assistance requests` in second row when Request Assistance workflow ships.
 - [ ] Add `Unread contact inquiries` in second row when inquiry inbox/queue tracking exists.
 

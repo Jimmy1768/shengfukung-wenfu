@@ -3,24 +3,41 @@ module Admin
     def index
       registrations = current_temple.temple_event_registrations
       open_status = TempleRegistration::FULFILLMENT_STATUSES[:open]
+      month_start = Time.zone.now.beginning_of_month
+      now = Time.zone.now
+      hold_warning_window_end = now + 24.hours
 
-      new_registrations_count = registrations.where("created_at >= ?", 7.days.ago).count
+      new_patrons_month_count = registrations
+        .where.not(user_id: nil)
+        .group(:user_id)
+        .having("MIN(temple_registrations.created_at) >= ?", month_start)
+        .count
+        .size
       pending_registrations_count = registrations.where(fulfillment_status: open_status).count
       unpaid_registrations_count = registrations
         .where(fulfillment_status: open_status)
         .where("total_price_cents > 0")
         .where.not(payment_status: TempleRegistration::PAYMENT_STATUSES[:paid])
         .count
+      expiring_unpaid_holds_count = registrations
+        .where(fulfillment_status: open_status, payment_status: TempleRegistration::PAYMENT_STATUSES[:pending])
+        .where("total_price_cents > 0")
+        .where.not(expires_at: nil)
+        .where("temple_registrations.expires_at > ? AND temple_registrations.expires_at <= ?", now, hold_warning_window_end)
+        .count
       month_revenue_cents = current_temple.temple_payments
         .completed
-        .where("created_at >= ?", Time.zone.now.beginning_of_month)
+        .where("temple_payments.created_at >= ?", month_start)
         .sum(:amount_cents)
 
       @metrics = [
-        { label: I18n.t("admin.dashboard.metrics.entries.new_registrations_7d"), value: new_registrations_count },
+        { label: I18n.t("admin.dashboard.metrics.entries.new_patrons_mtd"), value: new_patrons_month_count },
         { label: I18n.t("admin.dashboard.metrics.entries.pending_registrations"), value: pending_registrations_count },
         { label: I18n.t("admin.dashboard.metrics.entries.unpaid_registrations"), value: unpaid_registrations_count },
         { label: I18n.t("admin.dashboard.metrics.entries.revenue_mtd"), value: Currency::Symbols.format_amount(month_revenue_cents, "TWD") }
+      ]
+      @queue_metrics = [
+        { label: I18n.t("admin.dashboard.metrics.entries.expiring_unpaid_holds_24h"), value: expiring_unpaid_holds_count }
       ]
       @next_steps = build_next_steps
     end

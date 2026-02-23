@@ -285,10 +285,13 @@ zh-TW:
       metrics:
         title: "關鍵指標"
         subtitle: "即時顯示目前資料，協助追蹤宮廟營運狀態。"
+        queue_title: "營運提醒"
+        queue_subtitle: "即將需要跟進的項目。"
         entries:
-          new_registrations_7d: "近 7 日新報名"
+          new_patrons_mtd: "本月新信眾"
           pending_registrations: "待處理報名"
           unpaid_registrations: "未付款報名"
+          expiring_unpaid_holds_24h: "24 小時內到期保留單"
           revenue_mtd: "本月營收"
       next_steps:
         title: "下一步"
