@@ -24,6 +24,7 @@ This document captures what exists in the admin portal today so future work can 
 - All admin sections use localized copy, improved spacing, and consistent card scaffolding. Payments dashboards, ledger tables, and archive filters adopt the latest visual system.
 - The patrons directory (owner-only) adds search and table views plus actions that serve as the precursor to the “promote patron to admin” workflow.
 - The temple switcher lets owners jump between slugs locally while remaining disabled in production.
+- Shared visual/preference policy details (Rails display modes, mobile sync contract, token boundaries) live in `ops/docs/reference/visual_preference_systems.md`.
 
 ## Public API Surface
 

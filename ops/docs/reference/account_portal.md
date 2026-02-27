@@ -7,6 +7,7 @@ Snapshot of what the patron-facing account portal already delivers so future wor
 - `/account` uses the shared design-system palettes defined in `shared/design-system/themes.json`. `PROJECT_DEFAULT_THEME_KEY` (per temple) keeps marketing + account shells visually aligned.
 - Developers can preview alternate palettes locally via the cookie-driven theme toggle exposed by `Account::BaseController` and `/dev/theme` endpoints.
 - `layouts/account.html.erb` plus `app/stylesheets/account/account.scss` render a dedicated hero/nav shell while importing the shared tokens.
+- Cross-surface theme/palette policy and preference sync contracts are documented in `ops/docs/reference/visual_preference_systems.md`.
 
 ## Account Shell & Auth Flow
 
