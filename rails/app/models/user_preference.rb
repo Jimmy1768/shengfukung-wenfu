@@ -18,11 +18,29 @@ class UserPreference < ApplicationRecord
   end
 
   def set_display_mode(surface, mode_id)
-    data = (metadata || {}).deep_dup
+    data = metadata_payload
     display_modes = (data["display_modes"] || {}).deep_dup
     display_modes[surface.to_s] = mode_id.to_s
     data["display_modes"] = display_modes
     self.metadata = data
+  end
+
+  def mobile_theme_id
+    metadata_payload["mobile_theme_id"].presence
+  end
+
+  def set_mobile_theme_id(theme_id)
+    data = metadata_payload
+    data["mobile_theme_id"] = theme_id.to_s
+    self.metadata = data
+  end
+
+  def theme_preferences_payload
+    {
+      account_display_mode: display_mode_for(:account),
+      admin_display_mode: display_mode_for(:admin),
+      mobile_theme_id:
+    }.compact
   end
 
   def apply_defaults
@@ -34,5 +52,11 @@ class UserPreference < ApplicationRecord
     self.measurement_system = self.class.column_defaults["measurement_system"] if measurement_system.blank?
     self.twenty_four_hour_time = false if twenty_four_hour_time.nil?
     self.metadata = {} if metadata.blank?
+  end
+
+  private
+
+  def metadata_payload
+    (metadata || {}).deep_dup
   end
 end

@@ -3,6 +3,7 @@
 module Themes
   module Policy
     COOKIE_EXPIRY = 180.days
+    MOBILE_ALLOWED_THEME_IDS = %w[temple-1 temple-2].freeze
 
     SURFACE_CONFIG = {
       account: {
@@ -62,6 +63,14 @@ module Themes
         palette_key ||= modes_for(surface).first.fetch(:palette_key)
 
         { mode_id:, palette_key: }
+      end
+
+      def allowed_mobile_theme_ids
+        MOBILE_ALLOWED_THEME_IDS
+      end
+
+      def valid_mobile_theme_id?(theme_id)
+        allowed_mobile_theme_ids.include?(theme_id.to_s)
       end
 
       private

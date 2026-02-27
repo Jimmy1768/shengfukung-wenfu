@@ -245,9 +245,11 @@ Notes:
 
 ### Phase D: Backend Preference Unification (Optional Next Step)
 
+Status: complete (implemented in current project scope).
+
 - [x] Add persisted user palette preference in Rails data model/profile settings (implemented via existing `user_preferences.metadata` without schema changes).
-- [ ] Sync preference across account/admin/mobile for the same authenticated user.
-- [ ] Add audit-safe updates for preference changes (if needed).
+- [x] Sync preference across account/admin/mobile for the same authenticated user (account/admin selectors persist to shared user preference record; mobile sync contract exposed via account API preferences endpoint).
+- [x] Add audit-safe updates for preference changes (preference update endpoint writes `SystemAuditLog` entries).
 
 ### Phase D Note (Current Project Stage)
 

@@ -22,6 +22,7 @@ Rails.application.routes.draw do
         resources :payment_statuses, only: :show, param: :reference
         resources :certificates, only: :index
         resources :guest_lists, only: :show, param: :offering_id
+        resource :preferences, only: %i[show update]
       end
     end
   end
