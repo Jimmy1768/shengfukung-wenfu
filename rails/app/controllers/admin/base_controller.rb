@@ -102,12 +102,17 @@ module Admin
     def assign_admin_theme
       resolved = Themes::Policy.resolve(
         surface: :admin,
+        persisted_mode: persisted_admin_display_mode,
         cookie_value: cookies[Themes::Policy.cookie_key(:admin)],
         project_default: AppConstants::Project.default_theme_key
       )
       @active_theme_key = resolved.fetch(:palette_key)
       @active_admin_display_mode_id = resolved.fetch(:mode_id)
       @theme_palette = Themes.for(@active_theme_key)
+    end
+
+    def persisted_admin_display_mode
+      current_admin&.user_preference&.display_mode_for(:admin)
     end
 
     def admin_theme_options

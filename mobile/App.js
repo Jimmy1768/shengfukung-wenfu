@@ -1,11 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Linking, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { defaultThemeId, getTheme } from './theme/tokens';
 import createPlaceholderStyles from './theme/styles/login';
+import { loadThemePreference } from './app/lib/theme/storage';
+import { resolveMobileTheme } from './app/lib/theme/resolver';
 
 const getExtras = () => {
   const expoConfig = Constants?.expoConfig ?? Constants?.manifest ?? {};
@@ -21,7 +23,18 @@ export default function App() {
   const extras = useMemo(() => getExtras(), []);
   const expoConfig = Constants?.expoConfig ?? Constants?.manifest ?? {};
   const appName = expoConfig?.name || 'Golden Template Mobile';
-  const themeId = extras.defaultThemeId || defaultThemeId;
+  const [storedThemePreference, setStoredThemePreference] = useState(null);
+  const [themePreferenceLoaded, setThemePreferenceLoaded] = useState(false);
+  const resolvedTheme = useMemo(
+    () =>
+      resolveMobileTheme({
+        userPreference: storedThemePreference,
+        projectDefault: extras.defaultThemeId,
+        hardcodedFallback: defaultThemeId
+      }),
+    [storedThemePreference, extras.defaultThemeId]
+  );
+  const themeId = resolvedTheme.themeId;
   const theme = getTheme(themeId);
   const tokens = theme.tokens;
   const styles = useMemo(() => createPlaceholderStyles(tokens), [tokens]);
@@ -51,6 +64,24 @@ export default function App() {
 
   const primaryButtonLabel = oauthConfigured ? 'Launch OAuth stub' : 'OAuth not available';
 
+  useEffect(() => {
+    let isMounted = true;
+
+    loadThemePreference()
+      .then((value) => {
+        if (!isMounted) return;
+        setStoredThemePreference(value);
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setThemePreferenceLoaded(true);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
@@ -62,6 +93,10 @@ export default function App() {
             <Text style={styles.subtitle}>
               Keep this skeleton light until a client signs off on mobile scope. Everything you need to start building is still
               in the repo.
+            </Text>
+            <Text style={styles.caption}>
+              Theme: {theme.label} ({themeId}) · Source:{' '}
+              {themePreferenceLoaded ? resolvedTheme.source.replace(/_/g, ' ') : 'loading'}
             </Text>
           </View>
 

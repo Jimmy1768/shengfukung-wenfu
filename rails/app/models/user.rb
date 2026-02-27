@@ -7,6 +7,7 @@ class User < ApplicationRecord
     class_name: "AdminAccount",
     dependent: :destroy,
     inverse_of: :user
+  has_one :user_preference, dependent: :destroy
   has_many :user_dependents, dependent: :destroy
   has_many :dependents, through: :user_dependents
   has_many :oauth_identities, dependent: :destroy

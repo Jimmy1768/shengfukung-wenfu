@@ -29,12 +29,17 @@ module Account
     def assign_account_theme
       resolved = Themes::Policy.resolve(
         surface: :account,
+        persisted_mode: persisted_account_display_mode,
         cookie_value: cookies[Themes::Policy.cookie_key(:account)],
         project_default: AppConstants::Project.default_theme_key
       )
       @active_theme_key = resolved.fetch(:palette_key)
       @active_account_display_mode_id = resolved.fetch(:mode_id)
       @theme_palette = Themes.for(@active_theme_key)
+    end
+
+    def persisted_account_display_mode
+      current_user&.user_preference&.display_mode_for(:account)
     end
 
     def assign_active_temple_slug
@@ -105,8 +110,8 @@ module Account
 
     def account_locale_options
       [
-        { label: "English", value: :en },
-        { label: "繁體中文", value: :"zh-TW" }
+        { label: "繁體中文", value: :"zh-TW" },
+        { label: "English", value: :en }
       ]
     end
 

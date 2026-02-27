@@ -42,8 +42,8 @@ module Themes
         end
       end
 
-      def resolve_mode_id(surface:, requested: nil, cookie_value: nil)
-        [requested, cookie_value, default_mode_id(surface)].compact.each do |candidate|
+      def resolve_mode_id(surface:, requested: nil, persisted_mode: nil, cookie_value: nil)
+        [requested, persisted_mode, cookie_value, default_mode_id(surface)].compact.each do |candidate|
           return candidate.to_s if valid_mode_id?(surface, candidate)
         end
 
@@ -55,8 +55,8 @@ module Themes
         mode&.fetch(:palette_key)
       end
 
-      def resolve(surface:, requested_mode: nil, cookie_value: nil, project_default: AppConstants::Project.default_theme_key)
-        mode_id = resolve_mode_id(surface:, requested: requested_mode, cookie_value:)
+      def resolve(surface:, requested_mode: nil, persisted_mode: nil, cookie_value: nil, project_default: AppConstants::Project.default_theme_key)
+        mode_id = resolve_mode_id(surface:, requested: requested_mode, persisted_mode:, cookie_value:)
         palette_key = palette_key_for(surface:, mode_id:)
         palette_key ||= project_default.to_s if palette_allowed_for_surface?(surface, project_default)
         palette_key ||= modes_for(surface).first.fetch(:palette_key)

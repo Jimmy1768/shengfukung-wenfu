@@ -15,6 +15,7 @@ module Account
         expires: Themes::Policy::COOKIE_EXPIRY.from_now,
         httponly: false
       }
+      persist_account_display_mode!(next_mode)
 
       redirect_back(
         fallback_location: account_login_path,
@@ -26,6 +27,14 @@ module Account
 
     def theme_params
       params.require(:theme_switch).permit(:mode_key)
+    end
+
+    def persist_account_display_mode!(mode_id)
+      return unless current_user.present?
+
+      preference = UserPreference.for_user(current_user)
+      preference.set_display_mode(:account, mode_id)
+      preference.save!
     end
   end
 end

@@ -10,8 +10,23 @@
   <body class="account-body account-theme-<%= @active_theme_key %>">
     <div class="account-shell">
       <header class="account-hero">
-        <div class="account-language-selector">
-          <div>
+        <div class="account-hero-inner">
+          <div class="account-brand">
+            <p class="account-eyebrow">TEMPLEMATE</p>
+            <h1><%= t("account.layout.hero.title") %></h1>
+            <p class="account-blurb"><%= t("account.layout.hero.subtitle") %></p>
+          </div>
+          <% if user_signed_in? %>
+            <div class="account-hero-utilities">
+              <button type="button" class="pill-link secondary" data-modal-trigger="account-contact-temple-modal">
+                <%= t("account.layout.nav.email_us") %>
+              </button>
+              <%= button_to t("account.layout.nav.sign_out"), account_logout_path, method: :delete, class: "pill-link danger" %>
+            </div>
+          <% end %>
+        </div>
+        <div class="account-preferences-row">
+          <div class="account-preference-group">
             <%= form_with url: account_locale_path,
                           scope: :locale_switch,
                           method: :post,
@@ -29,6 +44,8 @@
                 </button>
               <% end %>
             <% end %>
+          </div>
+          <div class="account-preference-group">
             <%= form_with url: account_theme_path,
                           scope: :theme_switch,
                           method: :post,
@@ -41,27 +58,12 @@
                   name="theme_switch[mode_key]"
                   value="<%= option[:id] %>"
                   class="language-switch-button <%= 'is-active' if option[:id] == current_account_display_mode_id %>"
-                  title="<%= t("account.theme_selector.label") %>">
+                  title="<%= t('account.theme_selector.label') %>">
                   <%= option[:label] %>
                 </button>
               <% end %>
             <% end %>
           </div>
-        </div>
-        <div class="account-hero-inner">
-          <div class="account-brand">
-            <p class="account-eyebrow">TEMPLEMATE</p>
-            <h1><%= t("account.layout.hero.title") %></h1>
-            <p class="account-blurb"><%= t("account.layout.hero.subtitle") %></p>
-          </div>
-          <% if user_signed_in? %>
-            <div class="account-hero-utilities">
-              <button type="button" class="pill-link secondary" data-modal-trigger="account-contact-temple-modal">
-                <%= t("account.layout.nav.email_us") %>
-              </button>
-              <%= button_to t("account.layout.nav.sign_out"), account_logout_path, method: :delete, class: "pill-link danger" %>
-            </div>
-          <% end %>
         </div>
         <% if user_signed_in? %>
           <nav class="account-hero-actions">

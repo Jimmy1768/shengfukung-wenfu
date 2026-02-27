@@ -13,6 +13,7 @@ module Admin
         expires: Themes::Policy::COOKIE_EXPIRY.from_now,
         httponly: false
       }
+      persist_admin_display_mode!(next_mode)
 
       redirect_back(
         fallback_location: admin_dashboard_path,
@@ -24,6 +25,14 @@ module Admin
 
     def theme_params
       params.require(:theme_switch).permit(:mode_key)
+    end
+
+    def persist_admin_display_mode!(mode_id)
+      return unless current_admin.present?
+
+      preference = UserPreference.for_user(current_admin)
+      preference.set_display_mode(:admin, mode_id)
+      preference.save!
     end
   end
 end

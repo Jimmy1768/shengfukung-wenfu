@@ -174,6 +174,23 @@ Notes:
   - Guardrail: magnification should affect content/body text only; do not scale buttons, menus, nav chrome, or icon-based controls in a way that breaks layout.
   - Prefer explicit content typography tokens/styles over globally scaling all UI text.
 
+### Mobile Theme Behavior (Phase C v1)
+
+- `/mobile` consumes canonical palette ids/tokens from the synced token registry:
+  - `mobile/theme/tokens.js` (generated from `shared/design-system/themes.json`)
+- Mobile v1 allowed palette ids:
+  - `temple-1`
+  - `temple-2`
+- Mobile runtime resolution order (implemented):
+  1. locally stored mobile user preference (SecureStore; memory fallback)
+  2. Expo project default palette (`expo.extra.defaultThemeId`)
+  3. hardcoded fallback (`defaultThemeId` from synced tokens)
+- Sanitization rule:
+  - If stored/project default points to a non-mobile palette (for example `ops-*` or `golden-*`), mobile ignores it and falls back to the next valid candidate.
+- Current implementation scope:
+  - resolver + local storage support is wired in the Expo placeholder app
+  - no user-facing theme selector UI yet (that comes with real mobile UX screens)
+
 ## Data + Storage Strategy (Recommended)
 
 ### Phase 1 (Low-Risk)
@@ -222,15 +239,20 @@ Notes:
 
 ### Phase C: Mobile (Expo) Alignment
 
-- [ ] Confirm `/mobile` (Expo app) consumes canonical palette ids/tokens.
-- [ ] Add fallback resolution order (user pref -> project default -> hardcoded fallback).
-- [ ] Document mobile theme behavior in `ops/docs`.
+- [x] Confirm `/mobile` (Expo app) consumes canonical palette ids/tokens.
+- [x] Add fallback resolution order (user pref -> project default -> hardcoded fallback).
+- [x] Document mobile theme behavior in `ops/docs`.
 
 ### Phase D: Backend Preference Unification (Optional Next Step)
 
-- [ ] Add persisted user palette preference in Rails data model/profile settings.
+- [x] Add persisted user palette preference in Rails data model/profile settings (implemented via existing `user_preferences.metadata` without schema changes).
 - [ ] Sync preference across account/admin/mobile for the same authenticated user.
 - [ ] Add audit-safe updates for preference changes (if needed).
+
+### Phase D Note (Current Project Stage)
+
+- No backfill task is required for this project.
+- Reason: the project is still in dev/empty-data phase, so display preferences can be created lazily on first user selection.
 
 ## Risks + Mitigations
 
