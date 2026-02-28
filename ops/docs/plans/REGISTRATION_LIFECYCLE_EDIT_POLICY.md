@@ -117,6 +117,7 @@
       - preference opt-out respected per channel
 
 - Online payment webhook lifecycle integration (placeholder; not blocking cash-mode lifecycle):
+  - See `ops/docs/plans/PAYMENTS_CORE_SUBSYSTEM_PLAN.md` for provider-agnostic payment architecture, idempotency, and webhook ingest design.
   - [ ] Add webhook event mapping into lifecycle state transitions:
     - `payment.authorized`
     - `payment.captured`
