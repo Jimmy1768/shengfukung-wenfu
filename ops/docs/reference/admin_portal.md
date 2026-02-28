@@ -19,6 +19,22 @@ This document captures what exists in the admin portal today so future work can 
 - `/admin/events/:id/orders`, `/admin/services/:id/orders`, and `/admin/gatherings/:id/orders` now support full create/show/edit/update for registrations. This includes editing patron-created records from the admin side.
 - `pending` on order/registration tables means payment is still outstanding (not an “incomplete form” state).
 
+## Registration Lifecycle Automation
+
+- Unpaid holds are managed by `Registrations::PendingExpiryManager` and exposed via `bin/rails registrations:expire_unpaid`.
+- The lifecycle run order is: send `registration.expiring_soon` notifications, cancel stale unpaid registrations, then send `registration.expired` notifications.
+- Notification fan-out currently targets the patron plus active temple admins, honoring `notification_rules` and `notification_preferences`.
+- Delivery writes `Notification` records and stores dedupe markers in `registration.metadata["expiry_notifications"]` to avoid duplicate reminders.
+- In development, recipient routing is safely overridden to `DEV_APP_NOTIFICATION_EMAIL` (fallback default is in `AppConstants::Emails.dev_app_notification_email`).
+- Until Sidekiq scheduling is wired for this flow, run the task from cron/systemd timer or an explicit admin runbook command.
+
+## Period-Key Yearly Rollover Ops
+
+- Annual period-key maintenance is automated by `bin/rails registration_period_keys:rollover_year`.
+- Default mode is dry-run (`WRITE` absent/false) and emits a report so admins can review key/label changes before applying.
+- `WRITE=true` applies YAML updates; `UPDATE_SERVICES=true` additionally updates existing `TempleService.registration_period_key` and `period_label` values.
+- Post-rollover duplicate key collisions fail fast and are reported, so admins can fix labels/keys before finalizing.
+
 ## Admin UX Enhancements
 
 - All admin sections use localized copy, improved spacing, and consistent card scaffolding. Payments dashboards, ledger tables, and archive filters adopt the latest visual system.

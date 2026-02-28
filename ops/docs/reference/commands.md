@@ -123,6 +123,13 @@ cd rails && bin/rails registration_period_keys:rollover_year SLUG=shenfukung-wen
 
 # Apply YAML rollover + update existing services (explicit flag)
 cd rails && bin/rails registration_period_keys:rollover_year SLUG=shenfukung-wenfu WRITE=true UPDATE_SERVICES=true OUTPUT=tmp/registration_period_rollover_apply.json
+
+# Registration lifecycle expiry automation
+# Runs expiring-soon notifications, cancels stale unpaid holds, then sends expired notifications.
+cd rails && bin/rails registrations:expire_unpaid
+
+# Optional dev recipient sink for app notifications/reminders
+export DEV_APP_NOTIFICATION_EMAIL=jimmy.chuang@outlook.com
 ```
 
 ---

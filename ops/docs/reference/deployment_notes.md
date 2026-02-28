@@ -4,6 +4,7 @@
 # Adapt every path, domain, and placeholder to the project you copy this template into.
 #
 # ⚠️ Do not store secrets here.
+# Last updated: 2026-02-28
 
 ## Client bootstrap checklist
 
@@ -34,10 +35,11 @@
   - Use one shared **development** Brevo API key for local/testing across projects, stored in each project's `.env.development` as `BREVO_API_KEY`.
   - Use one **production** Brevo API key per project/client, stored in that project's production env file (for example `/etc/default/<slug>-env`).
   - Do not reuse production Brevo keys across projects; isolate blast radius, rotation, and deliverability reputation per client/project.
-  - It is acceptable to defer creating a project's production Brevo key (for example TempleMate) until sender domains/inboxes are ready.
+  - It is acceptable to defer creating a project's production Brevo key until sender domains/inboxes are ready.
   - Name keys clearly in Brevo (for example `DEV_SHARED_*`, `PROD_<PROJECT_SLUG>`) to simplify audits and rotation.
 - Email recipient routing policy (template convention):
   - In local development, prefer a dev recipient sink override (for example `DEV_EMAIL`) so transactional/contact emails route to one operator inbox during testing.
+  - Registration lifecycle reminders/expiry notifications use `DEV_APP_NOTIFICATION_EMAIL` as the development recipient sink override.
   - In production, use real recipient routing with a configured fallback support inbox for incomplete/missing customer contact setup.
   - It is valid to keep one shared operator mailbox plus aliases for internal/support traffic while provisioning separate customer-domain mailboxes/aliases as projects onboard.
   - Document where each alias is entered:
@@ -102,7 +104,7 @@
 - JWTs persist via `expo-secure-store` (`npm install` already scoped it to the Expo project). When replicating this feature elsewhere, ensure that dependency is installed and that SecureStore is available (or swap in your preferred storage—in that case, update `mobile/app/lib/auth/storage.js`).
 - Build/test loop for the mobile shell: `cd mobile && npm run start` for Metro, `expo prebuild` when you switch between dev-client/native builds, and `cd android && ./gradlew assembleRelease` (or the manual iOS archive) once you’re ready to sideload an APK/IPA for clients. Always set the mobile env vars above before running those commands so the generated binary points at the right Rails host.
 - EAS projects: `app.config.js` now reads the Expo Application Services project ID from `EAS_PROJECT_ID` (env) or `shared/app_constants/project.json` (`easProjectId`). Populate that per client so `extra.eas.projectId` matches their slug, or leave it blank during initial setup and run `bin/setup_expo_once` (wraps `npx eas init` and stores the ID) inside Golden Template before the first build.
-- Config plugins: Golden Template keeps a local copy under `mobile/plugins-local/` so we can iterate on Expo config plugins (edge-to-edge tweaks, manifest fixes, cutout mode, large-screen overrides, APNs entitlements, and release Gradle flags) without touching the shared package. `bin/local-only/new_client_from_template.sh` excludes that folder when cloning a client. Run `bin/pull_expo_plugins [../expo-config-plugins [../SourceGrid-Labs/mobile/plugins-local]]` to copy your shared `expo-config-plugins` repo into `mobile/plugins-local/` (or pass an explicit target like `../SourceGrid-Labs/mobile/plugins-local` when you need to update another repo), and run `bin/local-only/sync_expo_plugins [../expo-config-plugins]` after editing so your changes flow back into the shared repo. After syncing, publish/bump it and set `GOLDEN_TEMPLATE_EXPO_PLUGIN` (or install the `@golden-template/expo-config-plugins` package) inside each client project so `app.config.js` can resolve the plugin module during `expo prebuild`. Runtime toggles: set `APN_ENV=development|production` to force the iOS entitlement, `EXPO_SKIP_MAIN_ORIENTATION_UNLOCK=true` if a client insists on keeping the portrait lock, and `EXPO_LEGACY_EDGE_TO_EDGE=true` to fall back to the legacy `WindowCompat` shim.
+- Config plugins: Golden Template keeps a local copy under `mobile/plugins-local/` so we can iterate on Expo config plugins (edge-to-edge tweaks, manifest fixes, cutout mode, large-screen overrides, APNs entitlements, and release Gradle flags) without touching the shared package. `bin/local-only/new_client_from_template.sh` excludes that folder when cloning a client. Run `bin/pull_expo_plugins [../expo-config-plugins [../sourcegrid-labs/mobile/plugins-local]]` to copy your shared `expo-config-plugins` repo into `mobile/plugins-local/` (or pass an explicit target like `../sourcegrid-labs/mobile/plugins-local` when you need to update another repo), and run `bin/local-only/sync_expo_plugins [../expo-config-plugins]` after editing so your changes flow back into the shared repo. After syncing, publish/bump it and set `GOLDEN_TEMPLATE_EXPO_PLUGIN` (or install the `@golden-template/expo-config-plugins` package) inside each client project so `app.config.js` can resolve the plugin module during `expo prebuild`. Runtime toggles: set `APN_ENV=development|production` to force the iOS entitlement, `EXPO_SKIP_MAIN_ORIENTATION_UNLOCK=true` if a client insists on keeping the portrait lock, and `EXPO_LEGACY_EDGE_TO_EDGE=true` to fall back to the legacy `WindowCompat` shim.
 
 #### Deferred integrations (documented only)
 - **Amazon S3 uploads** – Rails already ships the scaffolding (`rails/config/initializers/storage_s3.rb`, `rails/config/storage.yml`, and the placeholder `UploadsController`). When a client actually needs uploads, set `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, and `S3_SECRET_ACCESS_KEY` in their env file, then plug the controller into `Storage::S3Service` for presigned URLs or ActiveStorage. Leave those env vars empty inside the template repo so each client can point at their own bucket.
@@ -169,3 +171,9 @@
 - `bin/project_info` prints the resolved slug/roots/service names after applying `PROJECT_*` overrides so you can sanity-check deployments.
 - `systemctl restart golden-template` / `systemctl restart golden-template-sidekiq` after deploys.
 - `tail -f log/notifications/*.log` for notifications logs that outlive the Rails process.
+
+## Change Log
+
+- 2026-02-28: Started in-file changelog tracking for deployment notes.
+- 2026-02-28: Added `DEV_APP_NOTIFICATION_EMAIL` guidance for development notification sink behavior.
+- 2026-02-28: Removed non-generic product example from Brevo policy and normalized shared repo path example to `sourcegrid-labs`.
