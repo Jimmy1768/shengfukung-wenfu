@@ -175,9 +175,71 @@ Policy:
 
 ### Phase 0 — Discovery + Reuse/Replace Decision
 
-- [ ] Audit current payment code paths/models/services/controllers.
-- [ ] Write short reuse-vs-replace decision notes in this plan.
+- [x] Audit current payment code paths/models/services/controllers.
+- [x] Write short reuse-vs-replace decision notes in this plan.
 - [ ] Identify exact seam points for adapter + persistence abstraction.
+
+## Phase 0 Findings (Audit + Proposed Direction)
+
+### Existing Payment Surface (Confirmed)
+
+- Core models/tables already present and active:
+  - `TemplePayment` (`rails/app/models/temple_payment.rb`)
+  - `PaymentWebhookLog` (`rails/app/models/payment_webhook_log.rb`)
+  - `TempleRegistration` payment lock/status integration (`rails/app/models/temple_registration.rb`)
+- Active service/controller path today is cash-first:
+  - `Payments::CashPaymentRecorder` (`rails/app/services/payments/cash_payment_recorder.rb`)
+  - `Admin::PaymentsController#create` records cash payment and marks registration paid.
+- Account payment UX is currently placeholder for online provider:
+  - `account/registrations/payment` page shows LINE Pay CTA text but no real checkout flow wiring.
+- Existing LINE Pay-specific code is stub-only:
+  - `Payments::LinePayGatewayStub` exists (`create_order`, `confirm_order` stubbed responses).
+- Route/API audit:
+  - no dedicated payment webhook/callback routes currently wired in `rails/config/routes.rb`.
+- Test baseline:
+  - strong coverage for cash recording/reporting and payment status serialization.
+  - no end-to-end webhook/idempotency/refund adapter suite yet.
+
+### Reuse vs Replace Decision Notes (Proposed)
+
+Reuse as-is:
+
+- `TemplePayment` as the primary payment record in TempleMate.
+- `PaymentWebhookLog` as the starting provider event log store (subject to minor evolution).
+- `TempleRegistration` status lock behavior (`mark_paid!`, pending/paid lifecycle constraints).
+- `Payments::CashPaymentRecorder` as a channel-specific legacy flow that can be wrapped by `Payments::CheckoutService` later.
+
+Replace/refactor:
+
+- `Payments::LinePayGatewayStub` should be superseded by adapter-based gateway classes under `PaymentGateway::*`.
+- Provider orchestration must move into provider-agnostic services (`Payments::CheckoutService`, `WebhookIngestService`, `RefundService`) and not remain controller-coupled.
+- Introduce a persistence seam so core orchestration logic does not hardcode `TemplePayment` internals (portable for sibling projects with different schema).
+
+### Key Gaps Found
+
+- No unified provider adapter contract in app today.
+- No webhook ingest endpoint/service pipeline yet.
+- No normalized transition guard for payment statuses beyond basic `TemplePayment::STATUSES`.
+- No request idempotency key standard for checkout/refund/cancel.
+- `LinePayCallback` model exists but no backing table in `schema.rb` and no active usage path.
+
+### Decisions Needed Before Phase 1
+
+1. Event store strategy:
+   - Option A: keep and evolve `payment_webhook_logs` for all providers.
+   - Option B: introduce new generic provider event table and deprecate `payment_webhook_logs`.
+
+2. `LinePayCallback` cleanup:
+   - Option A: remove model as dead code and use unified provider event log only.
+   - Option B: keep model and add table/use-case (less preferred for provider-agnostic core).
+
+3. Payment state mapping granularity:
+   - Option A: keep current internal statuses (`pending|completed|failed|refunded`) and map provider states into metadata.
+   - Option B: expand internal statuses now (`initiated|pending|authorized|succeeded|failed|canceled|refunded`) with transitional migration work.
+
+4. Cash flow integration strategy:
+   - Option A: keep `CashPaymentRecorder` separate and bridge it into new services later.
+   - Option B: refactor cash immediately behind new `Payments::CheckoutService` boundary in Phase 1.
 
 ### Phase 1 — Core Service + Adapter Boundary
 

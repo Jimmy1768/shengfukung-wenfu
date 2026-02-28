@@ -487,11 +487,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_15_000014) do
     t.string "provider", null: false
     t.string "event_type", null: false
     t.string "provider_reference", null: false
+    t.string "provider_event_id"
     t.jsonb "payload", default: {}, null: false
+    t.boolean "signature_valid", default: false, null: false
     t.boolean "processed", default: false, null: false
+    t.datetime "received_at"
     t.datetime "processed_at"
+    t.text "processing_error"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["provider", "provider_event_id"], name: "idx_payment_webhooks_provider_event", unique: true, where: "(provider_event_id IS NOT NULL)"
+    t.index ["temple_id", "processed"], name: "idx_payment_webhooks_processing"
     t.index ["temple_id", "provider_reference"], name: "idx_payment_webhooks_on_reference"
     t.index ["temple_id"], name: "index_payment_webhook_logs_on_temple_id"
   end
@@ -665,6 +671,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_15_000014) do
     t.string "provider_account", default: "temple", null: false
     t.string "provider_reference"
     t.string "external_reference"
+    t.string "idempotency_key"
+    t.string "intent_key"
     t.string "payment_method", null: false
     t.string "status", default: "pending", null: false
     t.integer "amount_cents", default: 0, null: false
@@ -677,7 +685,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_15_000014) do
     t.datetime "updated_at", null: false
     t.index ["admin_account_id"], name: "index_temple_payments_on_admin_account_id"
     t.index ["external_reference"], name: "index_temple_payments_on_external_reference", unique: true
-    t.index ["provider_reference"], name: "index_temple_payments_on_provider_reference"
+    t.index ["temple_id", "intent_key"], name: "idx_temple_payments_intent", where: "(intent_key IS NOT NULL)"
+    t.index ["temple_id", "provider", "idempotency_key"], name: "idx_temple_payments_idempo", unique: true, where: "(idempotency_key IS NOT NULL)"
+    t.index ["temple_id", "provider", "provider_reference"], name: "idx_temple_payments_provider_ref"
     t.index ["temple_id", "provider"], name: "index_temple_payments_on_temple_id_and_provider"
     t.index ["temple_id", "status"], name: "index_temple_payments_on_temple_id_and_status"
     t.index ["temple_id"], name: "index_temple_payments_on_temple_id"

@@ -114,6 +114,8 @@ class CreateTempleFinancialTables < ActiveRecord::Migration[7.1]
       t.string :provider_account, null: false, default: "temple"
       t.string :provider_reference
       t.string :external_reference
+      t.string :idempotency_key
+      t.string :intent_key
       t.string :payment_method, null: false
       t.string :status, null: false, default: "pending"
       t.integer :amount_cents, null: false, default: 0
@@ -126,7 +128,9 @@ class CreateTempleFinancialTables < ActiveRecord::Migration[7.1]
     end
     add_index :temple_payments, [:temple_id, :status]
     add_index :temple_payments, [:temple_id, :provider]
-    add_index :temple_payments, :provider_reference
+    add_index :temple_payments, [:temple_id, :provider, :provider_reference], name: "idx_temple_payments_provider_ref"
+    add_index :temple_payments, [:temple_id, :provider, :idempotency_key], unique: true, where: "idempotency_key IS NOT NULL", name: "idx_temple_payments_idempo"
+    add_index :temple_payments, [:temple_id, :intent_key], where: "intent_key IS NOT NULL", name: "idx_temple_payments_intent"
     add_index :temple_payments, :external_reference, unique: true
 
     create_table :payment_webhook_logs do |t|
@@ -134,11 +138,17 @@ class CreateTempleFinancialTables < ActiveRecord::Migration[7.1]
       t.string :provider, null: false
       t.string :event_type, null: false
       t.string :provider_reference, null: false
+      t.string :provider_event_id
       t.jsonb :payload, null: false, default: {}
+      t.boolean :signature_valid, null: false, default: false
       t.boolean :processed, null: false, default: false
+      t.datetime :received_at
       t.datetime :processed_at
+      t.text :processing_error
       t.timestamps
     end
     add_index :payment_webhook_logs, [:temple_id, :provider_reference], name: "idx_payment_webhooks_on_reference"
+    add_index :payment_webhook_logs, [:temple_id, :processed], name: "idx_payment_webhooks_processing"
+    add_index :payment_webhook_logs, [:provider, :provider_event_id], unique: true, where: "provider_event_id IS NOT NULL", name: "idx_payment_webhooks_provider_event"
   end
 end

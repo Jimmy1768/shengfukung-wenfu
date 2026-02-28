@@ -45,6 +45,12 @@
   - Document where each alias is entered:
     - recipient aliases for customer-facing notifications usually belong in app-managed profile/config records (for example admin-editable contact/support email fields or seeded profile YAML)
     - shared sender alias/domain settings belong in production env (`/etc/default/<slug>-env`, e.g. `BREVO_SENDER_EMAIL`)
+- Optional subsystem naming convention (template convention):
+  - When documenting portable payment architecture in this file, use generic resource names (for example `payments_transactions`, `payments_provider_events`) rather than project-domain table names.
+  - Keep deployment notes provider-agnostic and client-agnostic. Project-specific mappings (e.g., how a given app maps generic names to real model/table names) belong in project reference docs.
+  - Suggested generic split for payment-core docs:
+    - `payments_transactions`: canonical payment records (cash + online normalized entries)
+    - `payments_provider_events`: inbound provider callbacks/webhooks + replay/idempotency tracking
 - `services/` are the only classes permitted to write to the database (controllers may orchestrate them, too). `workers/` execute services, and `jobs/` (with `scheduling/run_time`) schedule workers, handle retries, and notify you via Brevo/email when exceptions occur.
 - Feature flags + runtime settings now live in `config_entries` (plus optional `feature_flag_rollouts`). Use `Config::EntryResolver` (or the thin `Configurable` concern) whenever controllers/services need a value so settings stay centralized and auditable.
 - Long-running jobs should call `BackgroundTasks::Recorder` from their service layer so task status/attempt metadata lands in the `background_tasks` table automatically; workers stay thin wrappers around those services.
@@ -140,6 +146,24 @@
 - Drop/migrate/seed an entire subsystem with `bin/reset_subsystem <name>` (e.g., `bin/reset_subsystem auth_core`). The script covers `db:migrate:down/up` for the relevant migration and then invokes the matching `db:seed:<name>` task, so the tables and demo data reset cleanly. The command now accepts the full list above (`config_entries`, `background_tasks`, `api_protection`, `compliance`, `analytics_exports`, etc.).
 - Environment variables (`PROJECT_DEFAULT_ADMIN_*`, `PROJECT_PRIMARY_USER_EMAIL`, etc.) override the seeded credentials so you can brand each client while still running the same seed files. Keep those overrides documented in your client README.
 
+### Optional Financial + Payment-Core Migration Pattern
+
+- Financial and payment schema should be created during client onboarding only when that client needs those capabilities.
+- Keep one financial migration pack per client onboarding phase (minimal file count), and include payment-core tables in that same financial migration when online/cash payment tracking is in scope.
+- Generic template naming for docs/contracts:
+  - `payments_transactions` (canonical transaction records)
+  - `payments_provider_events` (provider callbacks/webhooks + replay/idempotency log)
+- Project implementations may map these generic resources to project-domain names (for example `temple_payments`, `payment_webhook_logs`) without changing the generic architecture contract.
+- Minimum payment-core fields to include in the financial migration:
+  - transactions table: provider, provider reference(s), external reference, amount, currency, status, idempotency key, intent key, payload/metadata, timestamps
+  - provider-events table: provider, event type, provider event id/reference, payload, signature verification result, processed flags/timestamps, processing error
+- Minimum payment-core indexes:
+  - unique external/business reference for transaction records
+  - unique idempotency key scope (for example provider + tenant + idempotency key where present)
+  - provider event dedupe key (for example provider + provider event id where present)
+  - operational filters for processing state (for example `processed` queues)
+- If a client starts without payment-core, add it later via a new migration at that time; do not force payment tables into projects that will never use payment flows.
+
 ### First-time setup
 - After cloning, run all migrations from the repo root: `cd rails && bin/rails db:migrate`. This creates every subsystem table in order.
 - Then seed the initial demo data: `bin/rails db:seed`. This now executes every subsystem seed (`auth_core`, `session_preferences`, `messaging`, `admin_controls`, `cache_control`, `record_archives`, `config_entries`, `background_tasks`, `api_protection`, `compliance`, `analytics_exports`) so the dashboard/admin tooling and all supporting registries/policies have representative data out of the box.
@@ -177,3 +201,5 @@
 - 2026-02-28: Started in-file changelog tracking for deployment notes.
 - 2026-02-28: Added `DEV_APP_NOTIFICATION_EMAIL` guidance for development notification sink behavior.
 - 2026-02-28: Removed non-generic product example from Brevo policy and normalized shared repo path example to `sourcegrid-labs`.
+- 2026-02-28: Added generic naming convention for optional payment-core resources (`payments_transactions`, `payments_provider_events`) in deployment notes.
+- 2026-02-28: Added optional financial/payment-core migration pattern and minimum schema/index guidance for onboarding new projects.
