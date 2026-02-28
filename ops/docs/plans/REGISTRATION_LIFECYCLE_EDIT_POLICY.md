@@ -93,24 +93,39 @@
   - [x] define hold duration (`expires_at`)
   - [x] auto-cancel stale unpaid registrations
   - [x] release capacity on expiration
-  - [ ] optional reminder notifications before expiration
-    - [ ] Add notification events:
+  - [x] optional reminder notifications before expiration (v1 email path)
+    - [x] Add notification events:
       - `registration.expiring_soon` (for example, 24 hours before `expires_at`)
       - `registration.expired` (when hold is released)
-    - [ ] Notify both audiences:
+    - [x] Notify both audiences:
       - patron (`registration.user_id`)
       - temple admins for the same `temple_id`
     - [ ] Channel behavior:
-      - Expo/mobile push (when device-token linkage is finalized)
-      - email
-      - web in-app alert/badge state
-    - [ ] Respect notification preferences/rules:
+      - [ ] Expo/mobile push (when device-token linkage is finalized)
+      - [x] email
+      - [ ] web in-app alert/badge state
+    - [x] Respect notification preferences/rules:
       - user-level channel preference (`push`, `email`, `both`, or disabled)
       - event-level enable/disable via `notification_rules`
-    - [ ] Add safe fallback:
+    - [x] Add safe fallback:
       - when push is unavailable, attempt email if enabled
       - log notification delivery outcomes for auditing
-    - [ ] Add tests:
+      - dev safety: route recipients to `DEV_APP_NOTIFICATION_EMAIL` in development
+    - [x] Add tests:
       - expiring-soon event fan-out to patron + admins
       - expired event fan-out to patron + admins
       - preference opt-out respected per channel
+
+- Online payment webhook lifecycle integration (placeholder; not blocking cash-mode lifecycle):
+  - [ ] Add webhook event mapping into lifecycle state transitions:
+    - `payment.authorized`
+    - `payment.captured`
+    - `payment.failed`
+    - `payment.refunded`
+    - `payment.voided`
+  - [ ] Ensure webhook processing triggers the same lock policy as cash:
+    - first successful payment record locks core fields
+    - refund/void flows follow explicit replacement/correction rules
+  - [ ] Add idempotency handling for duplicate/retried webhook deliveries.
+  - [ ] Add audit logging for webhook-driven lifecycle transitions.
+  - [ ] Add integration tests with webhook payload fixtures (provider adapter to be wired later).
