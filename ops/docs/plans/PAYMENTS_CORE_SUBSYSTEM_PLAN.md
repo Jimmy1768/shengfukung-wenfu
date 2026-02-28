@@ -177,7 +177,7 @@ Policy:
 
 - [x] Audit current payment code paths/models/services/controllers.
 - [x] Write short reuse-vs-replace decision notes in this plan.
-- [ ] Identify exact seam points for adapter + persistence abstraction.
+- [x] Identify exact seam points for adapter + persistence abstraction.
 
 ## Phase 0 Findings (Audit + Proposed Direction)
 
@@ -225,21 +225,37 @@ Replace/refactor:
 
 ### Decisions Needed Before Phase 1
 
+Resolved decisions (locked for Phase 1):
+
 1. Event store strategy:
-   - Option A: keep and evolve `payment_webhook_logs` for all providers.
-   - Option B: introduce new generic provider event table and deprecate `payment_webhook_logs`.
+   - **A selected**: keep and evolve `payment_webhook_logs` for all providers.
+   - Implemented baseline schema evolution in financial migration (`provider_event_id`, signature/process fields, replay indexes).
 
 2. `LinePayCallback` cleanup:
-   - Option A: remove model as dead code and use unified provider event log only.
-   - Option B: keep model and add table/use-case (less preferred for provider-agnostic core).
+   - **A selected**: remove model as dead code and use unified provider event log only.
+   - `rails/app/models/line_pay_callback.rb` removed in Phase 0.
 
 3. Payment state mapping granularity:
-   - Option A: keep current internal statuses (`pending|completed|failed|refunded`) and map provider states into metadata.
-   - Option B: expand internal statuses now (`initiated|pending|authorized|succeeded|failed|canceled|refunded`) with transitional migration work.
+   - **A selected**: keep current internal statuses (`pending|completed|failed|refunded`) for Phase 1, and map richer provider states into metadata/adapter envelopes.
 
 4. Cash flow integration strategy:
-   - Option A: keep `CashPaymentRecorder` separate and bridge it into new services later.
-   - Option B: refactor cash immediately behind new `Payments::CheckoutService` boundary in Phase 1.
+   - **A selected**: keep `CashPaymentRecorder` separate for now and bridge into `Payments::CheckoutService` after provider-agnostic services are in place.
+
+### Seam Points (Phase 1 Build Targets)
+
+- Service entrypoints (domain-facing):
+  - `Payments::CheckoutService` (all create/attempt flows)
+  - `Payments::WebhookIngestService` (all provider callback/webhook processing)
+  - `Payments::RefundService` (refund/cancel orchestration)
+- Provider boundary:
+  - `PaymentGateway::Adapter` contract + provider implementations (`Fake`, `Stripe`, `LinePay`)
+  - No SDK/provider calls outside adapters.
+- Persistence boundary (portability seam):
+  - Payment transaction repository interface backed by `TemplePayment` in this project.
+  - Provider event log repository interface backed by `PaymentWebhookLog` in this project.
+  - Registration payment-state updater seam (bridges payment outcomes to `TempleRegistration` lifecycle).
+- Controller boundary:
+  - Controllers call `Payments::*` services only (no provider branching, no direct payment row writes except transitional cash path).
 
 ### Phase 1 — Core Service + Adapter Boundary
 
