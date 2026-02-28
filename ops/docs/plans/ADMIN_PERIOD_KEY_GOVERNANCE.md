@@ -33,7 +33,7 @@
 ## Phase C — Ops Workflow
 
 - [x] Document the support workflow for temples requesting new periods (YAML edit + sync + deploy).
-- [ ] Link yearly rollover automation commands/runbook once the rollover task ships.
+- [x] Link yearly rollover automation commands/runbook once the rollover task ships.
 
 ### Phase C Support Workflow (Temples Requesting New Periods)
 
@@ -48,15 +48,30 @@ Reference commands: `ops/docs/reference/commands.md`.
 
 ## Phase D — Yearly Period Rollover Automation
 
-- [ ] Build a script/rake task that rolls temple YAML period keys and labels forward by year (e.g., `2026-ghost-month` -> `2027-ghost-month`).
-- [ ] Make `--dry-run` the default so ops can preview changes before writing files (`--write` required to persist).
-- [ ] Support scope controls (`--slug <temple>` or all temples).
-- [ ] Optionally update existing services to the new `registration_period_key` after YAML rollover (with explicit confirmation flag).
-- [ ] Document the yearly rollover runbook in ops docs (timing, command examples, verification checklist).
-- [ ] Parse period keys with a year-prefix pattern (`^(\\d{4})-(.+)$`), increment only the year, and preserve the suffix exactly (script stays agnostic to custom slug text).
-- [ ] Update `label_zh` / `label_en` by replacing the year token only; keep non-year wording unchanged.
-- [ ] Skip and report keys that do not match the year-prefix pattern (no silent rewrites).
-- [ ] Validate post-rollover uniqueness of period keys per temple and fail fast on collisions.
+- [x] Build a script/rake task that rolls temple YAML period keys and labels forward by year (e.g., `2026-ghost-month` -> `2027-ghost-month`).
+- [x] Make dry-run the default so ops can preview changes before writing files (`WRITE=true` required to persist).
+- [x] Support scope controls (`SLUG=<temple>` or all temples).
+- [x] Optionally update existing services to the new `registration_period_key` after YAML rollover (explicit `UPDATE_SERVICES=true` flag).
+- [x] Document the yearly rollover runbook in ops docs (timing, command examples, verification checklist).
+- [x] Parse period keys with a year-prefix pattern (`^(\\d{4})-(.+)$`), increment only the year, and preserve the suffix exactly (script stays agnostic to custom slug text).
+- [x] Update `label_zh` / `label_en` by replacing the year token only; keep non-year wording unchanged.
+- [x] Skip and report keys that do not match the year-prefix pattern (no silent rewrites).
+- [x] Validate post-rollover uniqueness of period keys per temple and fail fast on collisions.
+
+### Phase D Rollover Runbook
+
+1. Dry-run one temple and inspect report:
+   - `cd rails && bin/rails registration_period_keys:rollover_year SLUG=shenfukung-wenfu OUTPUT=tmp/registration_period_rollover.json`
+2. Dry-run all temples:
+   - `cd rails && bin/rails registration_period_keys:rollover_year OUTPUT=tmp/registration_period_rollover.json`
+3. Apply YAML rollover for one temple:
+   - `cd rails && bin/rails registration_period_keys:rollover_year SLUG=shenfukung-wenfu WRITE=true OUTPUT=tmp/registration_period_rollover_apply.json`
+4. Apply YAML rollover + service key updates (explicit flag):
+   - `cd rails && bin/rails registration_period_keys:rollover_year SLUG=shenfukung-wenfu WRITE=true UPDATE_SERVICES=true OUTPUT=tmp/registration_period_rollover_apply.json`
+5. Verify:
+   - run `registration_period_keys:audit` and confirm no unexpected invalid keys were introduced
+   - review service list in admin for expected period labels/keys
+   - deploy normally after verification
 
 ## Open Questions
 

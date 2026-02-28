@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "json"
+require "yaml"
 
 module RegistrationPeriodKeyGovernance
   module_function
@@ -147,5 +148,48 @@ namespace :registration_period_keys do
     else
       puts "Dry-run only. Re-run with APPLY=true to persist changes."
     end
+  end
+
+  desc "Roll registration period keys/labels forward by one year (dry-run by default, set WRITE=true to persist)"
+  task rollover_year: :environment do
+    write_changes = RegistrationPeriodKeyGovernance.boolean_env("WRITE", default: false)
+    update_services = RegistrationPeriodKeyGovernance.boolean_env("UPDATE_SERVICES", default: false)
+    if update_services && !write_changes
+      abort "UPDATE_SERVICES=true requires WRITE=true"
+    end
+
+    result = Registrations::PeriodKeyRollover.call(
+      slug: ENV["SLUG"],
+      write: write_changes,
+      update_services: update_services
+    )
+
+    total_errors = 0
+    total_updated_keys = 0
+    total_service_updates = 0
+
+    result.fetch(:results).each do |entry|
+      errors = Array(entry[:errors])
+      updated_keys = entry.fetch(:updated_keys, {})
+      skipped = entry.fetch(:skipped_keys, [])
+
+      total_errors += errors.size
+      total_updated_keys += updated_keys.size
+      total_service_updates += entry.fetch(:service_updates, 0).to_i
+
+      puts "#{entry[:temple_slug]}: updated_keys=#{updated_keys.size} skipped=#{skipped.size} service_updates=#{entry[:service_updates]} errors=#{errors.size}"
+      errors.each { |error| puts "  error: #{error}" }
+    end
+
+    puts "Rollover #{write_changes ? 'apply' : 'dry-run'} complete: temples=#{result[:temple_count]} updated_keys=#{total_updated_keys} service_updates=#{total_service_updates} errors=#{total_errors}"
+
+    output_path = ENV["OUTPUT"].to_s.strip
+    if output_path.present?
+      File.write(output_path, JSON.pretty_generate(result))
+      puts "Wrote rollover report to #{output_path}"
+    end
+
+    abort "Rollover failed with #{total_errors} error(s)." if total_errors.positive?
+    puts "Dry-run only. Re-run with WRITE=true to persist YAML changes." unless write_changes
   end
 end

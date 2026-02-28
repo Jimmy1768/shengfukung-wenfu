@@ -110,6 +110,19 @@ cd rails && bin/rails registration_period_keys:audit SLUG=shenfukung-wenfu OUTPU
 
 # 5) Deploy updated app artifacts
 bin/deploy_vue shenfukung-wenfu
+
+# Registration period yearly rollover (Phase D)
+# Dry-run one temple (default: no writes)
+cd rails && bin/rails registration_period_keys:rollover_year SLUG=shenfukung-wenfu OUTPUT=tmp/registration_period_rollover.json
+
+# Dry-run all temples
+cd rails && bin/rails registration_period_keys:rollover_year OUTPUT=tmp/registration_period_rollover.json
+
+# Apply YAML rollover for one temple
+cd rails && bin/rails registration_period_keys:rollover_year SLUG=shenfukung-wenfu WRITE=true OUTPUT=tmp/registration_period_rollover_apply.json
+
+# Apply YAML rollover + update existing services (explicit flag)
+cd rails && bin/rails registration_period_keys:rollover_year SLUG=shenfukung-wenfu WRITE=true UPDATE_SERVICES=true OUTPUT=tmp/registration_period_rollover_apply.json
 ```
 
 ---
