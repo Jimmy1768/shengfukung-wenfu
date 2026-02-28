@@ -10,6 +10,8 @@ module Payments
     end
 
     def call(payment:, amount_cents: nil, reason: nil, idempotency_key:)
+      raise ArgumentError, "idempotency_key is required" if idempotency_key.blank?
+
       adapter_payload = adapter(payment.provider).refund(
         payment_reference: payment.provider_reference.presence || payment.external_reference.presence || payment.id.to_s,
         amount_cents: amount_cents,

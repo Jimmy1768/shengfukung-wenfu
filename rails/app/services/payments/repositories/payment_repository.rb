@@ -15,6 +15,12 @@ module Payments
         temple.temple_payments.find_by(provider: provider, provider_reference: provider_reference)
       end
 
+      def find_completed_by_intent(temple:, intent_key:)
+        return nil if intent_key.blank?
+
+        temple.temple_payments.completed.find_by(intent_key: intent_key)
+      end
+
       def create_pending!(registration:, provider:, provider_account:, payment_method:, amount_cents:, currency:, idempotency_key:, intent_key:, metadata: {})
         registration.temple_payments.create!(
           temple: registration.temple,
@@ -32,6 +38,8 @@ module Payments
       end
 
       def apply_checkout_result!(payment:, status:, provider_reference:, payload: {}, metadata: {})
+        Payments::StatusTransitionPolicy.assert!(from: payment.status, to: status)
+
         attrs = {
           status: status,
           provider_reference: provider_reference,
@@ -44,6 +52,8 @@ module Payments
       end
 
       def update_status!(payment:, status:, payload: {}, metadata: {}, provider_reference: nil)
+        Payments::StatusTransitionPolicy.assert!(from: payment.status, to: status)
+
         attrs = {
           status: status,
           payment_payload: payload,

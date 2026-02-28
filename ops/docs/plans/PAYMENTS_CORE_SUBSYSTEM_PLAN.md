@@ -269,10 +269,10 @@ Resolved decisions (locked for Phase 1):
 
 ### Phase 2 — State Machine + Idempotency
 
-- [ ] Enforce internal status transition matrix.
-- [ ] Add request idempotency key handling.
-- [ ] Add provider webhook event dedupe store + replay ignore behavior.
-- [ ] Add duplicate business-intent payment guardrails.
+- [x] Enforce internal status transition matrix.
+- [x] Add request idempotency key handling.
+- [x] Add provider webhook event dedupe store + replay ignore behavior.
+- [x] Add duplicate business-intent payment guardrails.
 
 ### Phase 3 — Safety + Audit Baseline
 

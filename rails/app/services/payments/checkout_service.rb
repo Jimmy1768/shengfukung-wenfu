@@ -10,12 +10,27 @@ module Payments
     end
 
     def call(registration:, amount_cents:, currency:, provider:, idempotency_key:, intent_key:, provider_account: "temple", metadata: {})
+      raise ArgumentError, "idempotency_key is required" if idempotency_key.blank?
+      raise ArgumentError, "intent_key is required" if intent_key.blank?
+
       existing = payment_repository.find_by_idempotency(
         temple: registration.temple,
         provider: provider,
         idempotency_key: idempotency_key
       )
       return Result.new(payment: existing, adapter_payload: {}, reused: true) if existing
+
+      completed_for_intent = payment_repository.find_completed_by_intent(
+        temple: registration.temple,
+        intent_key: intent_key
+      )
+      if completed_for_intent
+        return Result.new(
+          payment: completed_for_intent,
+          adapter_payload: { reason: "duplicate_intent", intent_key: intent_key },
+          reused: true
+        )
+      end
 
       payment = payment_repository.create_pending!(
         registration: registration,
