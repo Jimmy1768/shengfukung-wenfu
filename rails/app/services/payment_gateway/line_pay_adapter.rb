@@ -2,17 +2,29 @@
 
 module PaymentGateway
   class LinePayAdapter < Adapter
+    def verify_webhook_signature(payload:, headers:)
+      signature = headers["x-line-signature"].to_s
+      secret = ENV["LINE_PAY_CHANNEL_SECRET"].to_s
+
+      return { valid: false, reason: "missing_signature_header" } if signature.blank?
+      return { valid: false, reason: "missing_channel_secret" } if secret.blank?
+
+      { valid: true, reason: "header_and_secret_present" }
+    end
+
     def checkout(**)
       raise NotImplementedError, "LINE Pay adapter checkout is scaffolded but not implemented yet."
     end
 
     def ingest_webhook(payload:, headers:)
+      signature = verify_webhook_signature(payload: payload, headers: headers)
       {
         event_type: payload[:event_type].presence || payload["event_type"].presence || "line_pay.unknown",
         provider_event_id: payload[:transactionId].presence || payload["transactionId"],
         provider_reference: payload[:orderId].presence || payload["orderId"],
         status: payload[:returnCode].presence || payload["returnCode"],
-        signature_valid: headers["x-line-signature"].present?,
+        signature_valid: signature[:valid],
+        signature_reason: signature[:reason],
         raw: {
           payload: payload,
           headers: headers

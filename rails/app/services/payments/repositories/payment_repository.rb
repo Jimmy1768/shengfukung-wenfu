@@ -43,7 +43,7 @@ module Payments
         attrs = {
           status: status,
           provider_reference: provider_reference,
-          payment_payload: payload,
+          payment_payload: sanitize_for_audit(payload),
           metadata: payment.metadata.merge(metadata)
         }
         attrs[:processed_at] = Time.current if status == TemplePayment::STATUSES[:completed]
@@ -56,7 +56,7 @@ module Payments
 
         attrs = {
           status: status,
-          payment_payload: payload,
+          payment_payload: sanitize_for_audit(payload),
           metadata: payment.metadata.merge(metadata)
         }
         attrs[:provider_reference] = provider_reference if provider_reference.present?
@@ -64,6 +64,30 @@ module Payments
         attrs[:refunded_at] = Time.current if status == TemplePayment::STATUSES[:refunded]
         payment.update!(attrs)
         payment
+      end
+
+      private
+
+      def sanitize_for_audit(value)
+        case value
+        when Hash
+          value.each_with_object({}) do |(key, val), result|
+            key_str = key.to_s
+            result[key] = if sensitive_key?(key_str)
+                            "[FILTERED]"
+                          else
+                            sanitize_for_audit(val)
+                          end
+          end
+        when Array
+          value.map { |item| sanitize_for_audit(item) }
+        else
+          value
+        end
+      end
+
+      def sensitive_key?(key)
+        key.match?(/secret|token|authorization|signature|card|cvv|cvc|pan|password/i)
       end
     end
   end

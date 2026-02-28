@@ -29,7 +29,7 @@ module Payments
       end
 
       def mark_failed!(event_log, error)
-        event_log.update!(processed: false, processing_error: error.to_s)
+        event_log.update!(processed: false, processing_error: error.to_s.truncate(500))
       end
     end
   end

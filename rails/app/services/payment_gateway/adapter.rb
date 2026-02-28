@@ -2,6 +2,10 @@
 
 module PaymentGateway
   class Adapter
+    def verify_webhook_signature(**)
+      raise NotImplementedError, "#{self.class.name} must implement #verify_webhook_signature"
+    end
+
     def checkout(**)
       raise NotImplementedError, "#{self.class.name} must implement #checkout"
     end

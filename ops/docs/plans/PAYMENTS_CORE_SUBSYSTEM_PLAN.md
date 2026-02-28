@@ -276,9 +276,31 @@ Resolved decisions (locked for Phase 1):
 
 ### Phase 3 — Safety + Audit Baseline
 
-- [ ] Webhook signature verification seam (fake bypass; Stripe verify path).
-- [ ] Structured, audit-friendly metadata/logging (no PCI-sensitive fields).
-- [ ] Failure handling paths documented for operator recovery.
+- [x] Webhook signature verification seam (fake bypass; Stripe verify path).
+- [x] Structured, audit-friendly metadata/logging (no PCI-sensitive fields).
+- [x] Failure handling paths documented for operator recovery.
+
+Phase 3 implementation notes:
+- Signature seam now lives in adapter boundary via `verify_webhook_signature`.
+  - Fake adapter: explicit bypass (`valid: true`, reason `fake_bypass`).
+  - Stripe/LINE adapters: fail-closed when required signature header/secret is missing.
+  - `WebhookIngestService` now rejects invalid signatures before payment status mutation.
+- Audit-safe payload handling:
+  - webhook/event payload persistence now redacts sensitive key patterns (`token`, `secret`, `authorization`, `card`, etc.).
+  - `_raw_body` is excluded from event log payload storage.
+  - payment payload persistence through repository now applies same redaction policy.
+  - processing errors are truncated for safe storage (`500` chars).
+
+Operator recovery paths:
+- Invalid signature:
+  - Outcome: webhook event log is written with `signature_valid=false`, `processed=false`, and `processing_error`.
+  - Action: verify provider webhook secret/header config, then replay from provider dashboard or reconcile via query-status flow.
+- Duplicate webhook replay:
+  - Outcome: duplicate event id is ignored (`duplicate=true`) with no payment mutation.
+  - Action: no manual update required unless upstream provider reports mismatch.
+- Transition failure:
+  - Outcome: invalid status transition is blocked by policy; event remains unprocessed with error details.
+  - Action: inspect current payment status + provider truth, then correct via admin tooling or controlled reconciliation script.
 
 ### Phase 4 — Test Coverage (Fake End-to-End)
 

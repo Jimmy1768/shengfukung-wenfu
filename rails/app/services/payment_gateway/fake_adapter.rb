@@ -2,6 +2,10 @@
 
 module PaymentGateway
   class FakeAdapter < Adapter
+    def verify_webhook_signature(payload:, headers:)
+      { valid: true, reason: "fake_bypass" }
+    end
+
     def checkout(intent:, amount_cents:, currency:, metadata:, idempotency_key:)
       {
         status: "pending",
@@ -20,12 +24,14 @@ module PaymentGateway
     end
 
     def ingest_webhook(payload:, headers:)
+      signature = verify_webhook_signature(payload: payload, headers: headers)
       {
         event_type: payload[:event_type].presence || payload["event_type"].presence || "payment.updated",
         provider_event_id: payload[:event_id].presence || payload["event_id"].presence || "fake_evt_#{SecureRandom.hex(8)}",
         provider_reference: payload[:provider_reference].presence || payload["provider_reference"].presence || payload[:payment_reference].presence || payload["payment_reference"].presence,
         status: payload[:status].presence || payload["status"].presence || "pending",
-        signature_valid: true,
+        signature_valid: signature[:valid],
+        signature_reason: signature[:reason],
         raw: {
           payload: payload,
           headers: headers

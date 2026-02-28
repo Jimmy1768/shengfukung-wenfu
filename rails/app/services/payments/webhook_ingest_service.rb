@@ -3,6 +3,7 @@
 module Payments
   class WebhookIngestService
     Result = Struct.new(:event_log, :payment, :duplicate, keyword_init: true)
+    InvalidWebhookSignature = Class.new(StandardError)
 
     def initialize(
       provider_resolver: ProviderResolver,
@@ -23,9 +24,13 @@ module Payments
         event_type: adapter_payload[:event_type],
         provider_reference: adapter_payload[:provider_reference],
         provider_event_id: adapter_payload[:provider_event_id],
-        payload: adapter_payload[:raw] || payload,
+        payload: sanitize_for_audit(adapter_payload[:raw] || payload),
         signature_valid: adapter_payload[:signature_valid]
       )
+
+      unless adapter_payload[:signature_valid]
+        raise InvalidWebhookSignature, "Invalid #{provider} webhook signature (#{adapter_payload[:signature_reason] || 'unknown'})"
+      end
 
       payment = payment_repository.find_by_provider_reference(
         temple: temple,
@@ -37,8 +42,12 @@ module Payments
         payment_repository.update_status!(
           payment: payment,
           status: map_status(adapter_payload[:status]),
-          payload: adapter_payload[:raw] || payload,
-          metadata: { webhook_event_type: adapter_payload[:event_type] },
+          payload: sanitize_for_audit(adapter_payload[:raw] || payload),
+          metadata: {
+            webhook_event_type: adapter_payload[:event_type],
+            provider_event_id: adapter_payload[:provider_event_id],
+            signature_verified: true
+          },
           provider_reference: adapter_payload[:provider_reference]
         )
       end
@@ -72,6 +81,30 @@ module Payments
       else
         TemplePayment::STATUSES[:pending]
       end
+    end
+
+    def sanitize_for_audit(value)
+      case value
+      when Hash
+        value.each_with_object({}) do |(key, val), result|
+          key_str = key.to_s
+          next if key_str == "_raw_body"
+
+          result[key] = if sensitive_key?(key_str)
+                          "[FILTERED]"
+                        else
+                          sanitize_for_audit(val)
+                        end
+        end
+      when Array
+        value.map { |item| sanitize_for_audit(item) }
+      else
+        value
+      end
+    end
+
+    def sensitive_key?(key)
+      key.match?(/secret|token|authorization|signature|card|cvv|cvc|pan|password/i)
     end
   end
 end
