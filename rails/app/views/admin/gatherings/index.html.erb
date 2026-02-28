@@ -7,7 +7,9 @@
           <p class="muted"><%= t("admin.gatherings.index.body") %></p>
         </div>
         <div class="actions actions--inline">
-          <%= link_to t("admin.gatherings.actions.new"), new_admin_gathering_path, class: "btn btn-primary" %>
+          <% if current_admin_permissions&.allow?(:manage_offerings) %>
+            <%= link_to t("admin.gatherings.actions.new"), new_admin_gathering_path, class: "btn btn-primary" %>
+          <% end %>
           <% if @show_archived %>
             <%= link_to t("admin.gatherings.actions.view_active"), admin_gatherings_path, class: "btn btn-secondary" %>
           <% else %>
@@ -73,8 +75,12 @@
               </div>
               <div class="admin-list__actions">
                 <div class="table-actions__buttons">
-                  <%= link_to t("admin.gatherings.actions.view"), edit_admin_gathering_path(gathering), class: "btn btn-secondary btn-small" %>
-                  <%= link_to t("admin.gatherings.actions.view_orders"), admin_gathering_offering_orders_path(gathering), class: "btn btn-secondary btn-small" %>
+                  <% if current_admin_permissions&.allow?(:manage_offerings) %>
+                    <%= link_to t("admin.gatherings.actions.view"), edit_admin_gathering_path(gathering), class: "btn btn-secondary btn-small" %>
+                  <% end %>
+                  <% if current_admin_permissions&.allow?(:manage_registrations) %>
+                    <%= link_to t("admin.gatherings.actions.view_orders"), admin_gathering_offering_orders_path(gathering), class: "btn btn-secondary btn-small" %>
+                  <% end %>
                 </div>
               </div>
             </article>

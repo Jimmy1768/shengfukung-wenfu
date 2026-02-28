@@ -2,7 +2,7 @@
 
 module Admin
   class GatheringsController < BaseController
-    before_action -> { require_capability!(:manage_offerings) }
+    before_action -> { require_capability!(:manage_offerings) }, except: :index
     before_action :set_gathering, only: %i[edit update destroy]
 
     def index

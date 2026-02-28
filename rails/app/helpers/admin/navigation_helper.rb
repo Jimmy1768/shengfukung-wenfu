@@ -34,15 +34,13 @@ module Admin
         key: :gatherings,
         label: "Gatherings",
         description: "社群活動與交流場次",
-        path: -> { admin_gatherings_path },
-        capabilities: :manage_offerings
+        path: -> { admin_gatherings_path }
       },
       {
         key: :offerings,
         label: "Offerings",
         description: "管理法會供品與祈福供品",
-        path: -> { admin_offerings_path },
-        capabilities: :manage_offerings
+        path: -> { admin_offerings_path }
       },
       {
         key: :temple_profile,
