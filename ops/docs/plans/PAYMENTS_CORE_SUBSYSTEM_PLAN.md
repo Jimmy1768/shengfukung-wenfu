@@ -304,12 +304,18 @@ Operator recovery paths:
 
 ### Phase 4 — Test Coverage (Fake End-to-End)
 
-- [ ] Checkout success path test.
-- [ ] Checkout failure path test.
-- [ ] Webhook replay duplicate ignored test.
-- [ ] Invalid state transition blocked test.
-- [ ] Refund/cancel path tests.
-- [ ] Record exact commands and pass/fail results in this plan.
+- [x] Checkout success path test.
+- [x] Checkout failure path test.
+- [x] Webhook replay duplicate ignored test.
+- [x] Invalid state transition blocked test.
+- [x] Refund/cancel path tests.
+- [x] Record exact commands and pass/fail results in this plan.
+
+Phase 4 test execution log:
+- Command:
+  - `cd rails && bin/rails test test/services/payments/status_transition_policy_test.rb test/services/payments/checkout_service_test.rb test/services/payments/webhook_ingest_service_test.rb test/services/payments/refund_service_test.rb`
+- Result:
+  - `10 runs, 26 assertions, 0 failures, 0 errors, 0 skips`
 
 ### Phase 5 — Reference Documentation
 

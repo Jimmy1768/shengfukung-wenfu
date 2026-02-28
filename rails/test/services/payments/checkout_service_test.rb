@@ -6,13 +6,45 @@ module Payments
   class CheckoutServiceTest < ActiveSupport::TestCase
     FakeTemple = Struct.new(:id)
     FakeRegistration = Struct.new(:temple, :user)
+    FakePayment = Struct.new(:status, :provider_reference, :metadata, keyword_init: true)
+
+    class FakeAdapter
+      def initialize(status:)
+        @status = status
+      end
+
+      def checkout(intent:, amount_cents:, currency:, metadata:, idempotency_key:)
+        {
+          status: @status,
+          provider_reference: "pay_ref_123",
+          raw: {
+            intent: intent,
+            amount_cents: amount_cents,
+            currency: currency,
+            metadata: metadata,
+            idempotency_key: idempotency_key
+          }
+        }
+      end
+    end
+
+    class FakeResolver
+      def initialize(adapter)
+        @adapter = adapter
+      end
+
+      def resolve(provider:)
+        @adapter
+      end
+    end
 
     class FakeRepository
-      attr_reader :completed_intent_lookup
+      attr_reader :completed_intent_lookup, :created_attrs, :applied_status
 
-      def initialize(existing_by_idempotency: nil, completed_for_intent: nil)
+      def initialize(existing_by_idempotency: nil, completed_for_intent: nil, created_payment: nil)
         @existing_by_idempotency = existing_by_idempotency
         @completed_for_intent = completed_for_intent
+        @created_payment = created_payment || FakePayment.new(status: TemplePayment::STATUSES[:pending], metadata: {})
       end
 
       def find_by_idempotency(**)
@@ -23,10 +55,23 @@ module Payments
         @completed_intent_lookup = [temple, intent_key]
         @completed_for_intent
       end
+
+      def create_pending!(**attrs)
+        @created_attrs = attrs
+        @created_payment
+      end
+
+      def apply_checkout_result!(payment:, status:, provider_reference:, payload:, metadata:)
+        @applied_status = status
+        payment.status = status
+        payment.provider_reference = provider_reference
+        payment.metadata = metadata
+        payment
+      end
     end
 
     test "requires idempotency_key" do
-      service = CheckoutService.new(payment_repository: FakeRepository.new)
+      service = CheckoutService.new(payment_repository: FakeRepository.new, provider_resolver: FakeResolver.new(FakeAdapter.new(status: "pending")))
 
       error = assert_raises(ArgumentError) do
         service.call(
@@ -45,7 +90,7 @@ module Payments
     test "returns existing completed intent as reused" do
       existing_payment = TemplePayment.new(status: TemplePayment::STATUSES[:completed])
       repository = FakeRepository.new(completed_for_intent: existing_payment)
-      service = CheckoutService.new(payment_repository: repository)
+      service = CheckoutService.new(payment_repository: repository, provider_resolver: FakeResolver.new(FakeAdapter.new(status: "pending")))
 
       result = service.call(
         registration: FakeRegistration.new(FakeTemple.new(1), nil),
@@ -59,6 +104,48 @@ module Payments
       assert result.reused
       assert_equal existing_payment, result.payment
       assert_equal "duplicate_intent", result.adapter_payload[:reason]
+    end
+
+    test "checkout success maps to completed" do
+      repository = FakeRepository.new
+      service = CheckoutService.new(
+        payment_repository: repository,
+        provider_resolver: FakeResolver.new(FakeAdapter.new(status: "completed"))
+      )
+
+      result = service.call(
+        registration: FakeRegistration.new(FakeTemple.new(1), nil),
+        amount_cents: 1200,
+        currency: "TWD",
+        provider: "fake",
+        idempotency_key: "idem-success",
+        intent_key: "intent-success"
+      )
+
+      assert_equal TemplePayment::STATUSES[:completed], repository.applied_status
+      assert_equal TemplePayment::STATUSES[:completed], result.payment.status
+      assert_equal false, result.reused
+    end
+
+    test "checkout failure maps to failed" do
+      repository = FakeRepository.new
+      service = CheckoutService.new(
+        payment_repository: repository,
+        provider_resolver: FakeResolver.new(FakeAdapter.new(status: "failed"))
+      )
+
+      result = service.call(
+        registration: FakeRegistration.new(FakeTemple.new(1), nil),
+        amount_cents: 1200,
+        currency: "TWD",
+        provider: "fake",
+        idempotency_key: "idem-failed",
+        intent_key: "intent-failed"
+      )
+
+      assert_equal TemplePayment::STATUSES[:failed], repository.applied_status
+      assert_equal TemplePayment::STATUSES[:failed], result.payment.status
+      assert_equal false, result.reused
     end
   end
 end
