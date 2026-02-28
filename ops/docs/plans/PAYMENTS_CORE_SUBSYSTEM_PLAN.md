@@ -49,6 +49,10 @@ Define a shared adapter interface (`PaymentGateway::Adapter`) with normalized re
   - returns: `provider_checkout_id`, `provider_payment_id` (if available), `status`, `redirect_url`/`client_secret`, `raw`
 - `ingest_webhook(payload:, headers:)`
   - verifies signature (if provider supports), parses event, returns normalized event envelope
+- `confirm(provider_payment_ref:, amount_cents: nil, currency: nil, metadata: {}, idempotency_key:)`
+  - finalizes/acknowledges provider-side payment where required (mandatory for some gateways like LINE Pay)
+- `query_status(provider_payment_ref:, metadata: {})`
+  - fetches current provider status for reconciliation/callback recovery flows
 - `refund(payment_reference:, amount_cents: nil, reason: nil, idempotency_key:)`
   - returns: normalized refund status + provider identifiers
 - `cancel(payment_reference:, reason: nil, idempotency_key:)`
@@ -58,6 +62,24 @@ Define a shared adapter interface (`PaymentGateway::Adapter`) with normalized re
 
 - `PaymentGateway::FakeAdapter` (fully functional in dev/test/staging)
 - `PaymentGateway::StripeAdapter` (scaffold + gated implementation; can remain partial until provider cutover)
+- `PaymentGateway::LinePayAdapter` (scaffold in this plan; implementation phase after credential confirmation)
+
+## Provider Capability Matrix (v1 Target)
+
+| Capability | Fake | Stripe | LINE Pay |
+| --- | --- | --- | --- |
+| Checkout create | Yes | Yes | Yes |
+| Confirm step | Optional no-op | Usually no (intent/session handles) | Yes (required flow) |
+| Webhook ingest | Simulated | Yes (primary lifecycle source) | Partial/provider-dependent; callback + confirm/query still required |
+| Status query | Yes (simulated) | Optional | Yes (important for reconciliation) |
+| Refund | Yes | Yes | Yes (subject to provider/account limits) |
+| Cancel/Void | Yes | Yes | Yes |
+| Signature verification | Bypass allowed in dev/test | Webhook signing secret | LINE request/callback signature scheme |
+| Idempotency key passthrough | Yes | Yes | Yes |
+
+Notes:
+- `payments-core` must not assume webhook-first lifecycle. Some providers (including LINE Pay patterns) require confirm/query-centric orchestration.
+- Normalized internal statuses remain authoritative; provider-specific statuses are mapped in adapters.
 
 ## Payment State Machine (Target)
 
@@ -115,7 +137,33 @@ Rules:
 - Default provider in `development` and `test`: fake adapter.
 - Staging may use fake by default unless explicitly switched.
 - Stripe activation must be explicit via env configuration.
+- LINE Pay activation must be explicit via env configuration and enabled only after merchant credentials are validated.
 - Provider selection should be centralized (resolver/factory), not conditionals scattered across services.
+
+### Environment Variables (Planned)
+
+Shared:
+
+- `PAYMENTS_PROVIDER` (`fake|stripe|line_pay`)
+- `PAYMENTS_IDEMPOTENCY_WINDOW_SECONDS` (optional)
+
+Stripe:
+
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_PUBLISHABLE_KEY` (client-side surfaces if needed)
+
+LINE Pay:
+
+- `LINE_PAY_CHANNEL_ID`
+- `LINE_PAY_CHANNEL_SECRET`
+- `LINE_PAY_API_BASE`
+- `LINE_PAY_CONFIRM_BASE_URL` (if flow requires explicit return/confirm URL composition)
+
+Policy:
+
+- Dev/test default to `fake` unless explicitly overridden.
+- Missing provider credentials must fail closed (clear startup/runtime error), not silently downgrade in production.
 
 ## Persistence Strategy (TempleMate + Portability)
 
@@ -139,6 +187,7 @@ Rules:
 - [ ] Create `PaymentGateway::Adapter` contract.
 - [ ] Implement `PaymentGateway::FakeAdapter`.
 - [ ] Scaffold `PaymentGateway::StripeAdapter` behind provider gating.
+- [ ] Add `PaymentGateway::LinePayAdapter` scaffold behind provider gating.
 
 ### Phase 2 — State Machine + Idempotency
 
@@ -170,6 +219,13 @@ Rules:
 - [ ] Add failure scenarios + recovery playbooks.
 - [ ] Add portability checklist for copying into Combatives/sibling apps.
 
+### Phase 6 — Provider Rollout Sequence
+
+- [ ] Phase A provider: Fake adapter complete and default in dev/test.
+- [ ] Phase B provider: Stripe adapter integrated end-to-end using test account.
+- [ ] Phase C provider: LINE Pay adapter integrated after merchant credential validation.
+- [ ] Phase D provider(s): optional additional gateways (e.g., Alipay) via same adapter contract.
+
 ## Done Criteria
 
 - Core app payment flows call `Payments::*` services only.
@@ -179,6 +235,17 @@ Rules:
 - State transition policy is enforced and covered by tests.
 - Plan + reference docs are updated with actual implementation outcomes.
 - Portable file manifest is produced for low-risk copy into sibling projects.
+
+Provider-specific completion:
+
+- Stripe-ready:
+  - [ ] Checkout + webhook + refund/cancel working in test mode
+  - [ ] Signature verification active
+  - [ ] Replay/idempotency tests passing
+- LINE Pay-ready:
+  - [ ] Checkout + confirm + query_status working
+  - [ ] Callback/signature verification flow verified
+  - [ ] Replay/idempotency + reconciliation tests passing
 
 ## Migration Governance (Must Follow)
 
