@@ -259,13 +259,13 @@ Resolved decisions (locked for Phase 1):
 
 ### Phase 1 — Core Service + Adapter Boundary
 
-- [ ] Create/confirm `Payments::CheckoutService`.
-- [ ] Create/confirm `Payments::WebhookIngestService`.
-- [ ] Create/confirm `Payments::RefundService`.
-- [ ] Create `PaymentGateway::Adapter` contract.
-- [ ] Implement `PaymentGateway::FakeAdapter`.
-- [ ] Scaffold `PaymentGateway::StripeAdapter` behind provider gating.
-- [ ] Add `PaymentGateway::LinePayAdapter` scaffold behind provider gating.
+- [x] Create/confirm `Payments::CheckoutService`.
+- [x] Create/confirm `Payments::WebhookIngestService`.
+- [x] Create/confirm `Payments::RefundService`.
+- [x] Create `PaymentGateway::Adapter` contract.
+- [x] Implement `PaymentGateway::FakeAdapter`.
+- [x] Scaffold `PaymentGateway::StripeAdapter` behind provider gating.
+- [x] Add `PaymentGateway::LinePayAdapter` scaffold behind provider gating.
 
 ### Phase 2 — State Machine + Idempotency
 
