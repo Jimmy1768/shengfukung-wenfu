@@ -4,6 +4,7 @@ module Admin
   class ArchivesController < BaseController
     helper_method :allow_archive_details?, :allow_archive_exports?
 
+    before_action :require_archive_access!, only: :index
     before_action :require_archive_exports!, only: %i[registrations_export payments_export certificates_export]
 
     def index
@@ -78,6 +79,16 @@ module Admin
 
     def allow_archive_exports?
       current_admin.admin_account.owner_role? || current_admin_permissions&.allow?(:export_financials)
+    end
+
+    def allow_archive_access?
+      allow_archive_details? || allow_archive_exports?
+    end
+
+    def require_archive_access!
+      return if allow_archive_access?
+
+      redirect_to admin_dashboard_path, alert: "You do not have permission to access archives."
     end
 
     def require_archive_exports!

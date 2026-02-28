@@ -42,6 +42,18 @@ This document captures what exists in the admin portal today so future work can 
 - The temple switcher lets owners jump between slugs locally while remaining disabled in production.
 - Shared visual/preference policy details (Rails display modes, mobile sync contract, token boundaries) live in `ops/docs/reference/visual_preference_systems.md`.
 
+## Permission Model (Current Policy)
+
+- Baseline policy direction: admins should have read access to core console surfaces, while permissions gate mutation actions (create/edit/delete/export/record cash).
+- Navigation should mirror effective access (avoid showing links that always redirect to forbidden states).
+- Current aligned gates:
+  - `Payments` nav requires `view_financials`, matching `/admin/payments` index access.
+  - `Temple Profile` nav requires `manage_profile`, matching `/admin/temple/profile` controller gate.
+  - `Permissions` nav requires `manage_permissions`, matching permissions controller gate.
+  - `Archives` nav requires `view_financials` or `export_financials`; `/admin/archives` index now enforces the same access rule.
+- Mutation paths remain capability-gated server-side via `require_capability!` and should not rely on UI hiding alone.
+- Ongoing refinement target: keep nav visibility, page-level read access, and action-level mutation permissions fully consistent for each admin capability.
+
 ## Public API Surface
 
 - `/api/v1/temples/:slug` exposes profile, news, archive, events, and services payloads. Serializers (`TempleEventSerializer`, `TempleServiceSerializer`) include the metadata Vue/Expo require.

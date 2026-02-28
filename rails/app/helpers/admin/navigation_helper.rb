@@ -28,7 +28,7 @@ module Admin
         label: "Payments",
         description: "查看付款統計與記錄",
         path: -> { admin_payments_path },
-        capabilities: %i[view_financials export_financials]
+        capabilities: :view_financials
       },
       {
         key: :gatherings,
@@ -48,7 +48,8 @@ module Admin
         key: :temple_profile,
         label: "Temple Profile",
         description: "更新官網基本資料",
-        path: -> { admin_temple_profile_path }
+        path: -> { admin_temple_profile_path },
+        capabilities: :manage_profile
       },
       {
         key: :news_posts,
@@ -75,14 +76,15 @@ module Admin
         key: :archives,
         label: "Archives",
         description: "年度紀錄與報表",
-        path: -> { admin_archives_path }
+        path: -> { admin_archives_path },
+        capabilities: %i[view_financials export_financials]
       },
       {
         key: :permissions,
         label: "Permissions",
         description: "管理管理員權限",
         path: -> { admin_permissions_path },
-        owner_only: true
+        capabilities: :manage_permissions
       }
     ].freeze
 
