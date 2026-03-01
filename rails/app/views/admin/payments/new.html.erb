@@ -47,6 +47,13 @@
 
         <%= form.submit "Record cash payment", class: "btn btn-primary" %>
       <% end %>
+
+      <div class="stack-row">
+        <%= button_to "Start fake online checkout",
+          fake_checkout_admin_payments_path(registration_id: @registration.id),
+          method: :post,
+          class: "btn btn-secondary" %>
+      </div>
     </section>
   </div>
 </div>

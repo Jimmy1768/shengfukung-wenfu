@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :demo_contacts, only: :create
       post "temples/:slug/contact_temple_requests", to: "contact_temple_requests#create"
+      post "payments/webhooks/:provider", to: "payment_webhooks#create", as: :payment_webhook
       resources :temples, only: :show, param: :slug
       get "temples/:slug/news", to: "temple_news#index"
       get "temples/:slug/archive", to: "temple_galleries#index"
@@ -79,6 +80,7 @@ Rails.application.routes.draw do
     resources :payments, only: %i[index new create] do
       collection do
         get :export
+        post :fake_checkout
       end
     end
     resources :news_posts
@@ -119,6 +121,7 @@ Rails.application.routes.draw do
     resources :registrations, only: %i[index show edit update new create] do
       member do
         get :payment
+        post :start_fake_checkout
       end
     end
     resources :events, only: :index

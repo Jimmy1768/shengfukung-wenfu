@@ -33,7 +33,7 @@ module Payments
           currency: currency,
           idempotency_key: idempotency_key,
           intent_key: intent_key,
-          metadata: metadata
+          metadata: normalize_metadata(metadata)
         )
       end
 
@@ -44,7 +44,7 @@ module Payments
           status: status,
           provider_reference: provider_reference,
           payment_payload: sanitize_for_audit(payload),
-          metadata: payment.metadata.merge(metadata)
+          metadata: normalize_metadata(payment.metadata).merge(normalize_metadata(metadata))
         }
         attrs[:processed_at] = Time.current if status == TemplePayment::STATUSES[:completed]
         payment.update!(attrs)
@@ -57,7 +57,7 @@ module Payments
         attrs = {
           status: status,
           payment_payload: sanitize_for_audit(payload),
-          metadata: payment.metadata.merge(metadata)
+          metadata: normalize_metadata(payment.metadata).merge(normalize_metadata(metadata))
         }
         attrs[:provider_reference] = provider_reference if provider_reference.present?
         attrs[:processed_at] = Time.current if status == TemplePayment::STATUSES[:completed]
@@ -88,6 +88,12 @@ module Payments
 
       def sensitive_key?(key)
         key.match?(/secret|token|authorization|signature|card|cvv|cvc|pan|password/i)
+      end
+
+      def normalize_metadata(value)
+        return {} if value.blank?
+
+        value.to_h.deep_stringify_keys
       end
     end
   end

@@ -74,7 +74,10 @@
         <strong><%= amount_label %></strong>
       </div>
       <p class="payment-message"><%= t("account.registrations.payment.pending_notice") %></p>
-      <button type="button" class="btn btn-primary payment-cta"><%= t("account.registrations.payment.line_pay_cta") %></button>
+      <%= button_to t("account.registrations.payment.line_pay_cta"),
+          start_fake_checkout_account_registration_path(@registration),
+          method: :post,
+          class: "btn btn-primary payment-cta" %>
       <p class="muted"><%= t("account.registrations.payment.line_pay_hint") %></p>
       <%= link_to t("account.registrations.payment.pay_later"), account_registration_path(@registration), class: "pill-link secondary" %>
     </article>

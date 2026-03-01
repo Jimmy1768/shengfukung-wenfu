@@ -2,7 +2,7 @@
 
 module Account
   class RegistrationsController < BaseController
-    before_action :set_registration, only: %i[show edit update payment]
+    before_action :set_registration, only: %i[show edit update payment start_fake_checkout]
     before_action :assign_offering_from_params, only: %i[new create]
     before_action :assign_eligible_registrants, only: %i[new create edit update]
     before_action :ensure_selected_registrant, only: %i[new create]
@@ -62,6 +62,31 @@ module Account
 
     def payment
       @registration_period_label = period_label_for(@registration)
+    end
+
+    def start_fake_checkout
+      result = Payments::CheckoutService.new.call(
+        registration: @registration,
+        amount_cents: @registration.total_price_cents,
+        currency: @registration.currency,
+        provider: "fake",
+        idempotency_key: fake_idempotency_key,
+        intent_key: "registration:#{@registration.id}",
+        metadata: {
+          source: "account_portal",
+          temple_slug: current_temple.slug
+        }
+      )
+
+      message = if result.reused
+                  "A payment attempt already exists. Waiting for confirmation."
+                else
+                  "Fake checkout started. Waiting for webhook confirmation."
+                end
+
+      redirect_to payment_account_registration_path(@registration), notice: message
+    rescue StandardError => e
+      redirect_to payment_account_registration_path(@registration), alert: "Unable to start checkout: #{e.message}"
     end
 
     private
@@ -186,6 +211,10 @@ module Account
 
     def registration_lifecycle_policy
       @registration_lifecycle_policy ||= Registrations::LifecyclePolicy.new(@registration)
+    end
+
+    def fake_idempotency_key
+      params[:idempotency_key].presence || "acct-reg-#{@registration.id}-#{SecureRandom.hex(4)}"
     end
   end
 end

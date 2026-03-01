@@ -73,4 +73,26 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "This registration is free"
   end
+
+  test "start fake checkout creates pending payment and stays on payment page" do
+    temple = create_temple
+    offering = create_offering(temple:, slug: "fake-checkout", title: "Fake Checkout Offering", price_cents: 800)
+    user = User.create!(
+      email: "fakecheckout@example.com",
+      english_name: "Fake Checkout",
+      encrypted_password: User.password_hash("Password123!")
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+    registration = create_registration(user:, offering:)
+
+    post start_fake_checkout_account_registration_path(registration)
+
+    assert_redirected_to payment_account_registration_path(registration)
+    payment = registration.temple_payments.order(:created_at).last
+    assert_not_nil payment
+    assert_equal "fake", payment.provider
+    assert_equal TemplePayment::STATUSES[:pending], payment.status
+    assert_equal TempleRegistration::PAYMENT_STATUSES[:pending], registration.reload.payment_status
+  end
 end

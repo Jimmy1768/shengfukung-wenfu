@@ -327,10 +327,32 @@ Phase 4 test execution log:
 
 ### Phase 6 — Provider Rollout Sequence
 
-- [ ] Phase A provider: Fake adapter complete and default in dev/test.
+- [x] Phase A provider: Fake adapter complete and default in dev/test.
 - [ ] Phase B provider: Stripe adapter integrated end-to-end using test account.
 - [ ] Phase C provider: LINE Pay adapter integrated after merchant credential validation.
 - [ ] Phase D provider(s): optional additional gateways (e.g., Alipay) via same adapter contract.
+
+Phase 6A implementation notes (fake end-to-end):
+- Added account checkout action:
+  - `POST /account/registrations/:id/start_fake_checkout`
+  - uses `Payments::CheckoutService` with provider `fake`.
+- Added admin checkout action:
+  - `POST /admin/payments/fake_checkout?registration_id=:id`
+  - uses `Payments::CheckoutService` with provider `fake`.
+- Added webhook ingest endpoint:
+  - `POST /api/v1/payments/webhooks/:provider`
+  - resolves temple via payload (`temple_slug`) and executes `Payments::WebhookIngestService`.
+- Payment status synchronization:
+  - `CheckoutService`, `WebhookIngestService`, and `RefundService` now sync registration payment status (`pending/paid/failed/refunded`) based on payment outcome.
+- Cash flow compatibility fixes:
+  - `CashPaymentRecorder` now writes `provider`/`provider_account`.
+  - `CashPaymentRecorder` no longer assumes legacy offering columns/foreign keys that are absent in current schema.
+
+Phase 6A test execution log:
+- Command:
+  - `cd rails && bin/rails test test/integration/account/registration_payment_flow_test.rb test/integration/admin/payments_flow_test.rb test/integration/api/v1/payment_webhooks_test.rb test/services/payments/status_transition_policy_test.rb test/services/payments/checkout_service_test.rb test/services/payments/webhook_ingest_service_test.rb test/services/payments/refund_service_test.rb`
+- Result:
+  - `17 runs, 58 assertions, 0 failures, 0 errors, 0 skips`
 
 ## Done Criteria
 

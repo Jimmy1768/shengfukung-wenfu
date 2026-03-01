@@ -59,6 +59,7 @@ module Payments
         payload: adapter_payload,
         metadata: metadata
       )
+      sync_registration_status!(payment)
 
       Result.new(payment: payment, adapter_payload: adapter_payload, reused: false)
     end
@@ -90,6 +91,18 @@ module Payments
         TemplePayment::STATUSES[:refunded]
       else
         TemplePayment::STATUSES[:pending]
+      end
+    end
+
+    def sync_registration_status!(payment)
+      registration = payment.temple_registration
+      return unless registration
+
+      case payment.status
+      when TemplePayment::STATUSES[:completed]
+        registration.mark_paid! unless registration.paid?
+      when TemplePayment::STATUSES[:failed]
+        registration.update!(payment_status: TempleRegistration::PAYMENT_STATUSES[:failed])
       end
     end
   end

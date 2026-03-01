@@ -6,7 +6,7 @@ module Payments
   class CheckoutServiceTest < ActiveSupport::TestCase
     FakeTemple = Struct.new(:id)
     FakeRegistration = Struct.new(:temple, :user)
-    FakePayment = Struct.new(:status, :provider_reference, :metadata, keyword_init: true)
+    FakePayment = Struct.new(:status, :provider_reference, :metadata, :temple_registration, keyword_init: true)
 
     class FakeAdapter
       def initialize(status:)

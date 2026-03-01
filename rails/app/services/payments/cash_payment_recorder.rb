@@ -37,11 +37,12 @@ module Payments
     attr_reader :registration, :admin_user, :amount_cents, :currency, :notes
 
     def create_payment!(ledger_entry)
-      registration.temple_payments.create!(
+      attrs = {
         temple: registration.temple,
         user: registration.user,
         admin_account: admin_user&.admin_account,
-        financial_ledger_entry: ledger_entry,
+        provider: "manual_cash",
+        provider_account: "temple",
         payment_method: TemplePayment::PAYMENT_METHODS[:cash],
         status: TemplePayment::STATUSES[:completed],
         amount_cents: amount_cents,
@@ -49,7 +50,10 @@ module Payments
         processed_at: Time.current,
         payment_payload: payment_payload,
         metadata: {}
-      )
+      }
+      attrs[:financial_ledger_entry] = ledger_entry if TemplePayment.column_names.include?("financial_ledger_entry_id")
+
+      registration.temple_payments.create!(attrs)
     end
 
     def create_ledger_entry!
@@ -67,7 +71,7 @@ module Payments
         user_email_snapshot: registration.user&.email,
         details: {
           registration_id: registration.id,
-          offering_id: registration.temple_offering_id,
+          offering_id: registration.registrable_id,
           payment_method: "cash"
         },
         metadata: {

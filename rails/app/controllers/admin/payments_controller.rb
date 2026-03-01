@@ -3,9 +3,9 @@
 module Admin
   class PaymentsController < BaseController
     before_action :require_view_financials!, only: :index
-    before_action :require_cash_permissions!, only: %i[new create]
+    before_action :require_cash_permissions!, only: %i[new create fake_checkout]
     before_action :require_export_permissions!, only: :export
-    before_action :set_registration, only: %i[new create]
+    before_action :set_registration, only: %i[new create fake_checkout]
 
     def index
       @filters = normalized_filter_params
@@ -59,6 +59,30 @@ module Admin
       render :new, status: :unprocessable_entity
     end
 
+    def fake_checkout
+      result = Payments::CheckoutService.new.call(
+        registration: @registration,
+        amount_cents: @registration.total_price_cents,
+        currency: @registration.currency,
+        provider: "fake",
+        idempotency_key: fake_idempotency_key,
+        intent_key: "registration:#{@registration.id}",
+        metadata: {
+          source: "admin_console",
+          temple_slug: current_temple.slug
+        }
+      )
+
+      notice = if result.reused
+                 "Fake checkout already exists for this registration."
+               else
+                 "Fake checkout started. Awaiting webhook confirmation."
+               end
+      redirect_to offering_order_path(@registration.offering, @registration), notice: notice
+    rescue StandardError => e
+      redirect_to offering_order_path(@registration.offering, @registration), alert: "Unable to start fake checkout: #{e.message}"
+    end
+
     private
 
     def require_cash_permissions!
@@ -102,6 +126,10 @@ module Admin
       return admin_gathering_offering_order_path(offering, registration) if offering.is_a?(TempleGathering)
 
       admin_orders_path
+    end
+
+    def fake_idempotency_key
+      params[:idempotency_key].presence || "admin-reg-#{@registration.id}-#{SecureRandom.hex(4)}"
     end
   end
 end

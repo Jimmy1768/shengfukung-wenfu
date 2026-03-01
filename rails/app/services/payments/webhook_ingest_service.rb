@@ -50,6 +50,7 @@ module Payments
           },
           provider_reference: adapter_payload[:provider_reference]
         )
+        sync_registration_status!(payment)
       end
 
       event_log_repository.mark_processed!(event_log)
@@ -105,6 +106,20 @@ module Payments
 
     def sensitive_key?(key)
       key.match?(/secret|token|authorization|signature|card|cvv|cvc|pan|password/i)
+    end
+
+    def sync_registration_status!(payment)
+      registration = payment.temple_registration
+      return unless registration
+
+      case payment.status
+      when TemplePayment::STATUSES[:completed]
+        registration.mark_paid! unless registration.paid?
+      when TemplePayment::STATUSES[:refunded]
+        registration.update!(payment_status: TempleRegistration::PAYMENT_STATUSES[:refunded])
+      when TemplePayment::STATUSES[:failed]
+        registration.update!(payment_status: TempleRegistration::PAYMENT_STATUSES[:failed])
+      end
     end
   end
 end

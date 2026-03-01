@@ -36,6 +36,7 @@ module Payments
           operation: operation.to_sym
         }.compact
       )
+      sync_registration_status!(payment)
 
       Result.new(payment: payment, adapter_payload: adapter_payload)
     end
@@ -54,6 +55,20 @@ module Payments
       return TemplePayment::STATUSES[:failed] if %w[canceled cancelled].include?(status)
 
       TemplePayment::STATUSES[:failed]
+    end
+
+    def sync_registration_status!(payment)
+      registration = payment.temple_registration
+      return unless registration
+
+      case payment.status
+      when TemplePayment::STATUSES[:refunded]
+        registration.update!(payment_status: TempleRegistration::PAYMENT_STATUSES[:refunded])
+      when TemplePayment::STATUSES[:failed]
+        registration.update!(payment_status: TempleRegistration::PAYMENT_STATUSES[:failed])
+      when TemplePayment::STATUSES[:completed]
+        registration.mark_paid! unless registration.paid?
+      end
     end
   end
 end
