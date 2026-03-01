@@ -94,6 +94,15 @@ Refund/cancel response:
 }
 ```
 
+Stripe checkout modes supported by adapter:
+- `payment_intent`:
+  - intended for Expo/native in-app payment sheets
+  - returns `client_secret`
+- `checkout_session`:
+  - intended for web/account redirect flow
+  - returns `redirect_url`
+  - requires `success_url` + `cancel_url` in metadata
+
 ## Internal Status Lifecycle
 Current canonical statuses:
 - `pending`

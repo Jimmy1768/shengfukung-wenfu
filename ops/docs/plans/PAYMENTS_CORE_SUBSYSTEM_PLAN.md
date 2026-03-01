@@ -354,6 +354,17 @@ Phase 6A test execution log:
 - Result:
   - `17 runs, 58 assertions, 0 failures, 0 errors, 0 skips`
 
+Phase 6B progress notes (in progress):
+- Stripe adapter now supports dual checkout modes:
+  - `payment_intent` (returns `client_secret` for Expo/native)
+  - `checkout_session` (returns `redirect_url` for web/account)
+- Stripe adapter now implements:
+  - `checkout`, `ingest_webhook`, `query_status`, `refund`, `cancel`
+  - SDK + env-gated configuration checks (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`)
+- Remaining to mark 6B complete:
+  - run against live Stripe test credentials (service + webhook signature path)
+  - verify account namespace redirect flow + webhook completion on real Stripe events
+
 ## Done Criteria
 
 - Core app payment flows call `Payments::*` services only.
