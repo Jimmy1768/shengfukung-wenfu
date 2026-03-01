@@ -319,11 +319,11 @@ Phase 4 test execution log:
 
 ### Phase 5 — Reference Documentation
 
-- [ ] Add `ops/docs/reference/platform_payments.md`.
-- [ ] Document architecture (text diagram), adapter contract, and payload examples.
-- [ ] Document lifecycle table, idempotency rules, env vars, and local runbook.
-- [ ] Add failure scenarios + recovery playbooks.
-- [ ] Add portability checklist for copying into Combatives/sibling apps.
+- [x] Add `ops/docs/reference/platform_payments.md`.
+- [x] Document architecture (text diagram), adapter contract, and payload examples.
+- [x] Document lifecycle table, idempotency rules, env vars, and local runbook.
+- [x] Add failure scenarios + recovery playbooks.
+- [x] Add portability checklist for copying into Combatives/sibling apps.
 
 ### Phase 6 — Provider Rollout Sequence
 
