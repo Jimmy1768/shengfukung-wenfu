@@ -1,56 +1,158 @@
 # Deployment Readiness Plan
 
-This checklist covers the steps needed to move TempleMate (shenfukung-wenfu) onto its dedicated droplet, wire nginx/SSL, and validate the stack via smoke tests. Amazon S3/media uploads remain out of scope until buckets are provisioned.
+This is the go-live checklist for TempleMate (`shenfukung-wenfu`) staging deployment. Use this as an execution runbook, not just a reference note.
 
----
+## Execution Rules
 
-## 1. Finalize nginx template
+- Complete sections in order. Do not skip gates.
+- Record command output links/log snippets in PR or deployment notes.
+- If any gate fails, stop and resolve before continuing.
+- Media uploads/S3 are out of scope for this rollout.
 
-- Update `ops/nginx/shenfukung-wenfu.conf` with separate `server` blocks for staging (`shenfukung.com.tw`) and the eventual production domain (placeholder for `.org.tw`).
-- Document upstreams, asset roots, and where certbot paths will be inserted. Add comments describing how to append additional temple domains later.
+## Release Metadata
 
-## 2. Provision TempleMate droplet
+- Slug: `shenfukung-wenfu`
+- Staging domain: `shenfukung.com.tw`
+- Future production domain: `.org.tw` (pending client purchase)
+- Target host: `<user@host>`
+- Ops owner: `<name>`
+- Date window: `<yyyy-mm-dd>`
 
-- Create a new droplet under the “Core Projects” DigitalOcean account dedicated to TempleMate.
-- SSH in, clone the repo, and run `bin/setup_backend_once --force` to install Rails deps, seeds, and Vue/Expo prerequisites.
-- Render/apply systemd + nginx configs:
+## 0. Preflight Gate (Local)
+
+- [ ] Owner: Ops
+- [ ] Repo is clean and up to date on intended release commit.
+- [ ] Required scripts are present and executable:
+  - `bin/stage_ops_configs`
+  - `bin/apply_systemd_units`
+  - `bin/apply_nginx_config`
+  - `bin/run_smoke_tests`
+  - `bin/init_temple_env`
+  - `bin/push_temple_env`
+- [ ] Nginx/systemd templates render for slug without placeholder leaks.
+- [ ] Pass criteria: no local blockers before touching infra.
+
+## 1. Environment File Bootstrap + Deploy
+
+- [ ] Owner: Ops + App engineer
+- [ ] Generate local env template:
+  ```bash
+  bin/init_temple_env shenfukung-wenfu
+  ```
+- [ ] Fill `etc/default/shenfukung-wenfu.env` with real staging values:
+  - project origins
+  - payment provider settings (default `PAYMENTS_PROVIDER=fake` until real provider credentials are validated)
+  - email provider keys
+- [ ] Validate env loads:
+  ```bash
+  bin/load_temple_env shenfukung-wenfu -- (cd rails && bundle exec rails runner "puts ENV.fetch('PROJECT_SLUG')")
+  ```
+- [ ] Push env to host:
+  ```bash
+  bin/push_temple_env shenfukung-wenfu <user@host>
+  ```
+- [ ] Confirm remote file exists: `/etc/default/shenfukung-wenfu-env`
+- [ ] Pass criteria: env file installed with root-only permissions and expected key set.
+
+## 2. Nginx Template Finalization
+
+- [ ] Owner: Ops
+- [ ] Ensure `ops/nginx/shenfukung-wenfu.conf` contains:
+  - staging `server_name shenfukung.com.tw`
+  - future production placeholder block/comments
+  - upstream/socket references aligned with rendered systemd service names
+  - correct Vue root (`/var/www/<slug>` style path)
+- [ ] Keep comments that indicate certbot-managed sections and future temple domain expansion path.
+- [ ] Pass criteria: config is syntactically valid and matches current architecture split (Vue static + Rails upstream).
+
+## 3. Host Provisioning
+
+- [ ] Owner: Ops
+- [ ] Create dedicated DigitalOcean droplet under Core Projects.
+- [ ] SSH into host, clone repo, checkout release commit.
+- [ ] Run setup:
+  ```bash
+  bin/setup_backend_once --force
+  ```
+- [ ] Render/apply service and nginx configs:
   ```bash
   bin/stage_ops_configs
   sudo bin/apply_systemd_units
   sudo bin/apply_nginx_config
   ```
-- Ensure `/var/www/<slug>` directories exist for Vue deployments.
+- [ ] Ensure Vue target directory exists:
+  - `/var/www/shenfukung-wenfu` (or rendered equivalent)
+- [ ] Pass criteria: Puma/Sidekiq services installed and nginx reload succeeds.
 
-## 3. Point staging DNS + issue TLS cert
+## 4. DNS + TLS
 
-- Update DNS so `shenfukung.com.tw` points to the new droplet.
-- Once DNS propagates, run certbot:
+- [ ] Owner: Ops / DNS admin
+- [ ] Point `shenfukung.com.tw` A record to droplet IP.
+- [ ] Wait for DNS propagation.
+- [ ] Issue cert:
   ```bash
   sudo certbot --nginx -d shenfukung.com.tw
   ```
-- Capture the live nginx config + cert paths back into the repo:
+- [ ] Capture live certbot-managed config back into repo:
   ```bash
   sudo bin/capture_live_configs
   bin/update_conf_template_after_certbot
   ```
+- [ ] Pass criteria: HTTPS loads successfully with valid certificate chain.
 
-## 4. Deploy + smoke test staging
+## 5. Application Deploy (Staging)
 
-- Update `rails/app/lib/temples/manifest.yml` so the `shenfukung-wenfu` entry lists `https://shenfukung.com.tw` as `public_url`.
-- Deploy the Vue site + Expo app (if needed):
+- [ ] Owner: App engineer
+- [ ] Update manifest public URL for slug:
+  - `rails/app/lib/temples/manifest.yml` -> `https://shenfukung.com.tw`
+- [ ] Deploy Vue:
   ```bash
   bin/deploy_vue shenfukung-wenfu
-  # Expo builds remain manual (dev-client/APK/AAB/IPA) via bin/expo_prebuild / bin/expo_build
   ```
-- Run smoke tests to confirm `/api/v1/temples/:slug` responds with 200:
+- [ ] Restart services after env/config changes:
+  ```bash
+  sudo systemctl restart shenfukung-wenfu-puma
+  sudo systemctl restart shenfukung-wenfu-sidekiq
+  ```
+- [ ] Optional: Expo builds via `bin/expo_prebuild` / `bin/expo_build` as release scope requires.
+- [ ] Pass criteria: site + API reachable from staging domain.
+
+## 6. Verification + Smoke Tests
+
+- [ ] Owner: QA + App engineer
+- [ ] Run platform smoke tests:
   ```bash
   SMOKE_BASE_URL=https://shenfukung.com.tw bin/run_smoke_tests
   ```
-- Document results (success/failure, follow-up tasks).
+- [ ] Manual checks:
+  - home page loads with expected temple content
+  - `/api/v1/temples/shenfukung-wenfu` returns `200`
+  - admin sign-in page reachable
+  - one registration flow can be created in staging
+- [ ] Payments gate for this phase:
+  - keep `PAYMENTS_PROVIDER=fake` unless provider sandbox credentials are ready and validated
+- [ ] Pass criteria: smoke tests pass and manual critical path checks pass.
 
----
+## 7. Rollback Preparedness
 
-### Future work (after staging verified)
+- [ ] Owner: Ops
+- [ ] Keep previous nginx config snapshot and known-good release SHA.
+- [ ] Confirm ability to:
+  - redeploy previous SHA
+  - restore previous nginx config
+  - restart puma/sidekiq cleanly
+- [ ] Pass criteria: rollback can be executed in under 15 minutes.
 
-- Wire the production `.org.tw` domain once the client purchases it: add a new `server` block + manifest entry, run certbot for the new host, and repeat the smoke-test flow.
-- Integrate Amazon S3/media uploads once buckets and credentials are ready.
+## 8. Go/No-Go Signoff
+
+- [ ] Ops signoff
+- [ ] App signoff
+- [ ] QA signoff
+- [ ] Decision logged with timestamp and release SHA.
+
+## Post-Staging Follow-Ups
+
+- Wire production `.org.tw` once client purchases domain.
+- Repeat DNS/TLS/deploy/smoke flow for production hostnames.
+- Enable live Stripe/LINE Pay only after provider credential validation and callback verification.
+- Add S3/media upload rollout once bucket + IAM credentials are provisioned.
