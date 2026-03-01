@@ -200,6 +200,9 @@ git status --short
 ## Portability Checklist (Siblings / Combatives)
 Use this checklist when porting to another Rails app with different schema names.
 
+Canonical file manifest for copy/adapt scope:
+- `ops/docs/reference/payments_core_portability_manifest.md`
+
 1. Copy core files:
    - `rails/app/services/payment_gateway/*`
    - `rails/app/services/payments/checkout_service.rb`
