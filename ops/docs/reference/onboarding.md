@@ -16,13 +16,40 @@ Use this when you need representative data locally or on staging:
 
 > 🔐 **Per-temple env overrides**
 >
+> - Generate local env files from the shared template: `bin/init_temple_env <slug>`. This writes `etc/default/<slug>.env` with safe defaults/placeholders.
 > - Keep third-party credentials in `etc/default/<temple-slug>.env`. This folder is tracked via `.keep`, but the files themselves should not be committed.
 > - Load a specific temple’s secrets by prefixing any command with `bin/load_temple_env <slug> -- <command>`. Example: `bin/load_temple_env shenfukung-wenfu -- (cd rails && bundle exec rails server -p 3001)`.
 > - The loader sources `.env`, `.env.<env>`, then `etc/default/<slug>.env` (falling back to `.env.development`), so Vue/Expo builds and Rails share the exact same credential set for the active temple.
+> - For initial server onboarding, push the local env file with `bin/push_temple_env <slug> <user@host>`, which installs it as `/etc/default/<slug>-env` on the target host.
+
+### Generate + Deploy Env Files
+
+Use this workflow whenever you onboard a new temple slug.
+
+1. Generate a local env file from the template:
+   ```bash
+   bin/init_temple_env <slug>
+   ```
+2. Open `etc/default/<slug>.env` and fill in real values (API keys, origins, payment provider credentials).
+3. Validate the app can boot with that env:
+   ```bash
+   bin/load_temple_env <slug> -- (cd rails && bundle exec rails runner "puts ENV.fetch('PROJECT_SLUG')")
+   ```
+4. Push the env file to the server (initial onboarding):
+   ```bash
+   bin/push_temple_env <slug> <user@host>
+   ```
+   This copies `etc/default/<slug>.env` to `/etc/default/<slug>-env` with root-only permissions.
+5. Restart services that read the env file (for example Puma/Sidekiq) after pushing changes.
+
+Notes:
+- `bin/init_temple_env` refuses to overwrite existing files unless `--force` is passed.
+- `bin/push_temple_env` refuses to overwrite existing remote files unless `--force` is passed.
+- Use `--force` only for intentional rotations/updates.
 
 ### Template + Theme selection
 
-- Create `etc/default/<slug>.env` from your local `.env.development` and set the following keys before any build:
+- Ensure `etc/default/<slug>.env` exists (recommended: `bin/init_temple_env <slug>`) and set the following keys before any build:
   ```
   VITE_TEMPLE_SLUG=<slug>
   VITE_TEMPLE_LAYOUT=classic
