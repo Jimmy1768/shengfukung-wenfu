@@ -103,6 +103,14 @@ Stripe checkout modes supported by adapter:
   - returns `redirect_url`
   - requires `success_url` + `cancel_url` in metadata
 
+LINE Pay adapter capabilities:
+- `checkout` via `/v3/payments/request`
+- `confirm` via `/v3/payments/{transactionId}/confirm`
+- `query_status` via `/v3/payments/requests/{orderId}/check`
+- `refund` via `/v3/payments/{transactionId}/refund`
+- `cancel` currently mapped to refund behavior for parity
+- webhook/callback signature check uses `x-line-signature` against raw request body HMAC
+
 ## Internal Status Lifecycle
 Current canonical statuses:
 - `pending`

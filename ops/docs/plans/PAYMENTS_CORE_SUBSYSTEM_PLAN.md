@@ -365,6 +365,22 @@ Phase 6B progress notes (in progress):
   - run against live Stripe test credentials (service + webhook signature path)
   - verify account namespace redirect flow + webhook completion on real Stripe events
 
+Phase 6C progress notes (in progress):
+- Line Pay adapter now implements:
+  - `checkout` (request API)
+  - `ingest_webhook` (callback normalization + signature validation)
+  - `confirm`
+  - `query_status`
+  - `refund`
+  - `cancel` (mapped to refund endpoint behavior)
+- Env + signing gates:
+  - requires `LINE_PAY_CHANNEL_ID`, `LINE_PAY_CHANNEL_SECRET`, `LINE_PAY_API_BASE`
+  - webhook signature verification now checks `x-line-signature` against raw request body HMAC
+- Remaining to mark 6C complete:
+  - test with real merchant sandbox credentials and callback URLs
+  - verify webhook/callback signature behavior against actual provider payloads
+  - verify account namespace checkout-return UX with live LINE redirect
+
 ## Done Criteria
 
 - Core app payment flows call `Payments::*` services only.
