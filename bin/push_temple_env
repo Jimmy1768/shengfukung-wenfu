@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ENV_DIR="$ROOT_DIR/etc/default"
+
+usage() {
+  cat <<'USAGE'
+Usage: bin/push_temple_env <slug> <user@host> [--force]
+
+Copies local etc/default/<slug>.env to remote /etc/default/<slug>-env.
+Default behavior refuses overwrite when remote file already exists.
+Use --force to allow replacement.
+USAGE
+  exit 1
+}
+
+[[ $# -lt 2 ]] && usage
+
+SLUG=""
+REMOTE=""
+FORCE=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --force)
+      FORCE=1
+      shift
+      ;;
+    -*)
+      echo "Unknown option: $1" >&2
+      usage
+      ;;
+    *)
+      if [[ -z "$SLUG" ]]; then
+        SLUG="$1"
+      elif [[ -z "$REMOTE" ]]; then
+        REMOTE="$1"
+      else
+        echo "Unexpected extra argument: $1" >&2
+        usage
+      fi
+      shift
+      ;;
+  esac
+done
+
+[[ -z "$SLUG" || -z "$REMOTE" ]] && usage
+
+LOCAL_FILE="$ENV_DIR/${SLUG}.env"
+REMOTE_FILE="/etc/default/${SLUG}-env"
+
+if [[ ! -f "$LOCAL_FILE" ]]; then
+  echo "Local env file not found: $LOCAL_FILE" >&2
+  echo "Create it first with: bin/init_temple_env $SLUG" >&2
+  exit 1
+fi
+
+if [[ $FORCE -ne 1 ]]; then
+  if ssh "$REMOTE" "test -f '$REMOTE_FILE'"; then
+    echo "Remote file already exists: $REMOTE_FILE" >&2
+    echo "Refusing overwrite. Use --force only if intentional." >&2
+    exit 1
+  fi
+fi
+
+scp "$LOCAL_FILE" "$REMOTE:/tmp/${SLUG}-env.tmp"
+ssh "$REMOTE" "sudo install -m 600 -o root -g root /tmp/${SLUG}-env.tmp '$REMOTE_FILE' && rm -f /tmp/${SLUG}-env.tmp"
+
+echo "Pushed env file to $REMOTE:$REMOTE_FILE"
+echo "Next step: restart services that read this env file if needed."

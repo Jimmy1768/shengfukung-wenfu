@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TEMPLATE_PATH="$ROOT_DIR/ops/env/template.temple.env"
+ENV_DIR="$ROOT_DIR/etc/default"
+
+usage() {
+  cat <<'USAGE'
+Usage: bin/init_temple_env <slug> [--force]
+
+Creates etc/default/<slug>.env from ops/env/template.temple.env.
+Refuses to overwrite an existing file unless --force is passed.
+USAGE
+  exit 1
+}
+
+[[ $# -lt 1 ]] && usage
+
+SLUG=""
+FORCE=0
+
+for arg in "$@"; do
+  case "$arg" in
+    --force)
+      FORCE=1
+      ;;
+    -*)
+      echo "Unknown option: $arg" >&2
+      usage
+      ;;
+    *)
+      if [[ -z "$SLUG" ]]; then
+        SLUG="$arg"
+      else
+        echo "Unexpected extra argument: $arg" >&2
+        usage
+      fi
+      ;;
+  esac
+done
+
+[[ -z "$SLUG" ]] && usage
+
+if [[ ! "$SLUG" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
+  echo "Invalid slug '$SLUG'. Use lowercase letters, numbers, hyphens." >&2
+  exit 1
+fi
+
+if [[ ! -f "$TEMPLATE_PATH" ]]; then
+  echo "Template not found: $TEMPLATE_PATH" >&2
+  exit 1
+fi
+
+mkdir -p "$ENV_DIR"
+TARGET_PATH="$ENV_DIR/${SLUG}.env"
+
+if [[ -f "$TARGET_PATH" && $FORCE -ne 1 ]]; then
+  echo "Refusing to overwrite existing file: $TARGET_PATH" >&2
+  echo "Use --force only if you explicitly want to regenerate it." >&2
+  exit 1
+fi
+
+sed "s/__SLUG__/$SLUG/g" "$TEMPLATE_PATH" > "$TARGET_PATH"
+chmod 600 "$TARGET_PATH"
+
+echo "Created: $TARGET_PATH"
+echo "Next step: edit this file and add real credentials manually."
