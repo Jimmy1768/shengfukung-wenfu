@@ -80,9 +80,100 @@
 
 ### Phase A: Inventory + Policy Map
 
-- [ ] Inventory current `/api/*` and high-risk HTML POST endpoints.
-- [ ] Define endpoint classes and default thresholds.
-- [ ] Document override rules for especially sensitive endpoints.
+- [x] Inventory current `/api/*` and high-risk HTML POST endpoints.
+- [x] Define endpoint classes and default thresholds.
+- [x] Document override rules for especially sensitive endpoints.
+
+#### Phase A Inventory Snapshot (2026-03-02)
+
+Current API write endpoints:
+- `POST /api/v1/demo_contacts`
+- `POST /api/v1/temples/:slug/contact_temple_requests`
+- `POST /api/v1/payments/webhooks/:provider`
+- `PATCH /api/v1/account/preferences`
+
+Current high-risk HTML write endpoints:
+- `POST /account/contact_temple_requests`
+- `POST /account/register`
+- `POST /account/login`
+- `POST|DELETE /account/logout`
+- `POST /account/registrations/:id/start_fake_checkout`
+- `POST|PATCH /account/registrations`
+- `POST|PATCH|DELETE /account/dependents`
+- `PATCH|POST /account/profile`
+- `POST /admin/login`
+- `POST|DELETE /admin/logout`
+- `POST|PATCH /admin/temple/profile`
+- `POST /admin/payments`
+- `POST /admin/payments/fake_checkout`
+- `POST|PATCH /admin/events|services|gatherings/*`
+- `POST|PATCH /admin/news_posts|gallery_entries`
+- `POST /admin/media_uploads`
+- `POST /admin/patrons`
+- `POST /admin/patrons/:id/promote`
+- `DELETE /admin/patrons/:id/revoke`
+- `POST|DELETE /admin/patrons/:patron_id/metadata_values`
+
+#### Phase A Policy Map (Proposed Defaults)
+
+| Endpoint class | Initial mode | Suggested limit | Window | Primary key |
+| --- | --- | --- | --- | --- |
+| `api.public.read` | audit-only | 300 | 60s | ip |
+| `api.account.read` | audit-only | 240 | 60s | user_id -> ip |
+| `api.account.write` | enforce | 60 | 60s | user_id -> ip |
+| `api.admin.read` | audit-only | 180 | 60s | user_id -> ip |
+| `api.admin.write` | enforce | 45 | 60s | user_id -> ip |
+| `web.account.form_submit` | audit-only | 20 | 60s | user_id -> ip |
+| `web.account.form_submit.contact_temple` | enforce | 5 | 300s | user_id -> ip |
+| `web.admin.form_submit` | audit-only | 30 | 60s | user_id -> ip |
+| `api.webhook.ingest` | enforce | 120 | 60s | provider+ip |
+
+Notes:
+- `user_id -> ip` means authenticated requests key by `user_id`; anonymous fallback keys by IP.
+- Include `temple_slug` in key scope when present to avoid cross-tenant interference.
+- `api.webhook.ingest` should map specifically to `POST /api/v1/payments/webhooks/:provider`.
+
+#### Phase A Override Rules (Sensitive Endpoints)
+
+- Contact Temple:
+  - class: `web.account.form_submit.contact_temple`
+  - enforce immediately (not audit-only).
+  - throttle response should be user-safe and non-technical.
+- Auth/session routes (`/account/login`, `/admin/login`, `/account/register`):
+  - class: `web.account.form_submit` or `web.admin.form_submit` with stricter subkey overrides.
+  - recommendation: lower threshold than generic form submissions.
+- Payment mutation routes (`start_fake_checkout`, `admin/payments`, future live checkout endpoints):
+  - class: `api.account.write` or `web.*.form_submit` depending on surface.
+  - enforce from day 1 to reduce duplicate-intent bursts.
+- Webhook ingest:
+  - class: `api.webhook.ingest`
+  - do not share thresholds with user traffic classes.
+
+#### Decisions To Confirm Before Phase B
+
+- [x] Confirm initial enforcement matrix:
+  - enforce: `api.account.write`, `api.admin.write`, `web.account.form_submit.contact_temple`, `api.webhook.ingest`
+  - audit-only: remaining classes
+- [x] Confirm identity precedence: `user_id` first, fallback `ip`.
+- [x] Confirm whether auth endpoints get dedicated classes (`web.account.auth`, `web.admin.auth`) now or as Phase B follow-up.
+  - decision: keep under existing web form classes for Phase B; revisit dedicated auth classes after initial telemetry.
+- [x] Confirm API throttle response contract (`429` JSON + retry hint).
+- [x] Confirm HTML throttle response contract (redirect back + flash message).
+- [x] Confirm blacklist policy for Phase 1:
+  - manual-only deny entries
+  - no automatic blacklist writes until after threshold tuning data is collected.
+
+#### Phase B Design Decisions (Locked)
+
+- Configuration/constants live under `rails/app/lib/api_protection/` (dedicated subsystem folder, no broad utils merge).
+- Counter granularity for enforcement is per-minute buckets.
+- Limiter scope is system-wide:
+  - key precedence: authenticated `user_id`, fallback `ip`
+  - do not include `temple_slug` in key dimensions for Phase B
+- Middleware/guard must support surface-aware responses:
+  - API: `429` JSON with `Retry-After`
+  - HTML form submissions: redirect back with flash error
+- Fail-open behavior remains for internal logging/counter errors (request is not blocked due to telemetry write failure).
 
 ### Phase B: Middleware/Service Expansion
 
@@ -96,6 +187,19 @@
 - [ ] Enforce deny logic via `blacklist_entries`.
 - [ ] Improve structured logs in `api_usage_logs` (result, policy key, reason).
 - [ ] Add clear application logs for throttled/blocked requests.
+
+#### Data Retention Policy (Protection-First)
+
+- Primary goal is active protection; retention is secondary.
+- Keep high-frequency low-signal data short-lived:
+  - allow/audit-only counter rows: short TTL (target 24-72 hours)
+  - routine allow logs: short TTL (target 24-72 hours)
+- Keep high-signal security data longer:
+  - throttled/blocked log events
+  - blacklist entries + related decision traces
+  - repeated violation patterns
+- Add scheduled cleanup (daily) to prune low-signal rows automatically.
+- Do not auto-delete active blacklist records; expire/review through ops workflow.
 
 ### Phase D: Feature Adoption
 
