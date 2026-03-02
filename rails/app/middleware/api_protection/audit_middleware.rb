@@ -8,9 +8,10 @@ module ApiProtection
 
     def call(env)
       request = ActionDispatch::Request.new(env)
+      return @app.call(env) unless ApiProtection::RequestClassifier.api_request?(request)
 
-      block_response = ApiProtection::RequestAudit.call(request: request)
-      return block_response if block_response
+      result = ApiProtection::RequestAudit.call(request: request)
+      return ApiProtection::RequestAudit.rack_response_for(result) if result&.blocked?
 
       @app.call(env)
     end

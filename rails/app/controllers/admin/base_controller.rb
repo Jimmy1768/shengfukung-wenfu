@@ -2,6 +2,7 @@ module Admin
   class BaseController < ApplicationController
     include TempleContext
     include AdminPermissionEnforcer
+    include ApiProtection::ControllerGuard
 
     layout "admin"
 
@@ -19,6 +20,7 @@ module Admin
                   :admin_brand_name,
                   :admin_brand_slug
 
+    prepend_before_action :enforce_request_audit!
     before_action :authenticate_admin!
     before_action :ensure_admin_temple_scope
     before_action :assign_admin_theme

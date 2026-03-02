@@ -177,9 +177,26 @@ Notes:
 
 ### Phase B: Middleware/Service Expansion
 
-- [ ] Confirm current middleware responsibilities and boundaries.
-- [ ] Add support for selected non-API endpoints (or companion guard service for HTML controllers).
-- [ ] Normalize request classification (route -> endpoint key/class).
+- [x] Confirm current middleware responsibilities and boundaries.
+- [x] Add support for selected non-API endpoints (or companion guard service for HTML controllers).
+- [x] Normalize request classification (route -> endpoint key/class).
+
+Phase B implementation notes:
+- Added dedicated subsystem config/constants under `rails/app/lib/api_protection/`:
+  - `policy.rb` for class policy defaults and modes
+  - `request_classifier.rb` for route/method -> endpoint class mapping
+- Clarified boundary:
+  - Rack middleware handles `/api/*` requests only
+  - controller guard concern handles selected HTML write routes (`/account/*`, `/admin/*`)
+- Added `ApiProtection::ControllerGuard` concern and wired it via `prepend_before_action` in:
+  - `Account::BaseController`
+  - `Admin::BaseController`
+- Updated `ApiProtection::RequestAudit` to:
+  - classify requests via endpoint class map
+  - use per-minute buckets (`YYYYMMDDHHMM`) scoped by identity + endpoint class + method
+  - enforce user-first scope (`User` when present, otherwise `IpAddress`)
+  - emit structured `ApiUsageLog.metadata` fields (`endpoint_class`, `decision`, `reason`, `mode`, `limit`, `window_seconds`, scope keys)
+  - preserve fail-open behavior for logging/counter write errors
 
 ### Phase C: Enforcement + Observability
 

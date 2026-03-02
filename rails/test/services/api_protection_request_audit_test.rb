@@ -16,9 +16,11 @@ class ApiProtectionRequestAuditTest < ActiveSupport::TestCase
     env["warden"] = OpenStruct.new(user: @user)
     request = ActionDispatch::Request.new(env)
 
-    assert_nil ApiProtection::RequestAudit.call(request: request)
+    result = ApiProtection::RequestAudit.call(request: request)
+    assert_not result.blocked?
+    assert_equal "api.account.write", result.endpoint_class
     assert ApiUsageLog.exists?(request_path: "/api/v1/demo_contacts")
-    assert ApiRequestCounter.exists?(scope_type: "IpAddress")
+    assert ApiRequestCounter.where(scope_type: %w[User IpAddress]).exists?
   end
 
   test "blocks when IP is blacklisted" do
@@ -33,14 +35,21 @@ class ApiProtectionRequestAuditTest < ActiveSupport::TestCase
 
     env = Rack::MockRequest.env_for("/api/v1/demo_contacts", method: "GET", "REMOTE_ADDR" => ip)
     request = ActionDispatch::Request.new(env)
-    response = ApiProtection::RequestAudit.call(request: request)
-
-    assert response.is_a?(Array)
-    assert_equal 429, response[0]
+    result = ApiProtection::RequestAudit.call(request: request)
+    assert result.blocked?
+    assert_equal "blacklist_deny", result.decision
   end
 
   test "skips non-API paths" do
     request = ActionDispatch::Request.new(Rack::MockRequest.env_for("/marketing", method: "GET"))
     assert_nil ApiProtection::RequestAudit.call(request: request)
+  end
+
+  test "classifies account html write routes for controller guard usage" do
+    request = ActionDispatch::Request.new(Rack::MockRequest.env_for("/account/login", method: "POST"))
+    result = ApiProtection::RequestAudit.call(request: request)
+
+    assert_not result.blocked?
+    assert_equal "web.account.form_submit", result.endpoint_class
   end
 end

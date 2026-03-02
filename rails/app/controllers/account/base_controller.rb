@@ -2,6 +2,7 @@ module Account
   class BaseController < ApplicationController
     include TempleContext
     include Account::RegistrationIntent
+    include ApiProtection::ControllerGuard
     layout "account"
 
     helper Forms::LayoutHelper
@@ -15,6 +16,7 @@ module Account
       :current_account_locale,
       :account_locale_options
 
+    prepend_before_action :enforce_request_audit!
     before_action :assign_active_temple_slug
     before_action :ensure_temple_context
     before_action :assign_account_theme
