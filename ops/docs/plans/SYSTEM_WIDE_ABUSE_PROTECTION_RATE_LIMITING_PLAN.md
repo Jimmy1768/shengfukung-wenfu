@@ -35,6 +35,10 @@
 - Selected HTML POST endpoints (`/account/*`, later `/admin/*`) with abuse risk
 - Structured observability (logs + counters)
 
+## Reference Docs
+
+- `ops/docs/reference/platform_abuse_protection.md`
+
 ## Out of Scope (Phase 1)
 
 - Full WAF/bot detection
@@ -57,7 +61,7 @@
 - user id (when authenticated)
 - endpoint key / route class
 - request method
-- optional temple slug / tenant scope
+- optional temple slug / tenant scope (not used in current phase)
 
 ### Outcomes
 
@@ -130,7 +134,7 @@ Current high-risk HTML write endpoints:
 
 Notes:
 - `user_id -> ip` means authenticated requests key by `user_id`; anonymous fallback keys by IP.
-- Include `temple_slug` in key scope when present to avoid cross-tenant interference.
+- Limiter scope is system-wide for this phase; `temple_slug` is intentionally excluded from key dimensions.
 - `api.webhook.ingest` should map specifically to `POST /api/v1/payments/webhooks/:provider`.
 
 #### Phase A Override Rules (Sensitive Endpoints)
@@ -197,6 +201,25 @@ Phase B implementation notes:
   - enforce user-first scope (`User` when present, otherwise `IpAddress`)
   - emit structured `ApiUsageLog.metadata` fields (`endpoint_class`, `decision`, `reason`, `mode`, `limit`, `window_seconds`, scope keys)
   - preserve fail-open behavior for logging/counter write errors
+
+Phase B test execution log:
+- Command:
+  - `cd rails && bin/rails test test/services/api_protection_request_audit_test.rb test/integration/api_protection_middleware_test.rb test/integration/account/request_throttling_test.rb`
+- Result:
+  - `6 runs, 15 assertions, 0 failures, 0 errors, 0 skips`
+
+Progress status after Phase B:
+- Delivered:
+  - route/method endpoint classification
+  - per-minute class-aware counters
+  - user-first scope with IP fallback
+  - API JSON 429 + HTML redirect/flash throttling behavior
+  - blacklist deny checks on both API and protected HTML paths
+- Remaining (next phases):
+  - explicit threshold tuning from production-like telemetry
+  - retention cleanup job (daily prune) implementation
+  - ops/admin inspection + unblock tooling
+  - alerting thresholds for abuse spikes
 
 ### Phase C: Enforcement + Observability
 
