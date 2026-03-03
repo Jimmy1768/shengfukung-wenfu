@@ -3,7 +3,7 @@
 module ApiProtection
   class RequestAudit
     require "zlib"
-    Result = Struct.new(:blocked, :decision, :endpoint_class, :reason, :retry_after, keyword_init: true) do
+    Result = Struct.new(:blocked, :decision, :endpoint_class, :reason, :retry_after, :counter_value, :bucket, keyword_init: true) do
       def blocked?
         blocked
       end
@@ -31,12 +31,22 @@ module ApiProtection
             decision: "throttle",
             endpoint_class: endpoint_class,
             reason: "limit_exceeded",
-            retry_after: policy.fetch(:window_seconds)
+            retry_after: retry_after_seconds(policy.fetch(:window_seconds)),
+            counter_value: counter&.count,
+            bucket: counter&.bucket
           )
         else
-          Result.new(blocked: false, decision: policy.fetch(:mode).to_s, endpoint_class: endpoint_class, reason: "ok")
+          Result.new(
+            blocked: false,
+            decision: policy.fetch(:mode).to_s,
+            endpoint_class: endpoint_class,
+            reason: "ok",
+            counter_value: counter&.count,
+            bucket: counter&.bucket
+          )
         end
 
+        log_decision(request, result: result, identity: identity)
         log_usage(request, endpoint_class: endpoint_class, identity: identity, policy: policy, result: result)
         result
       end
@@ -68,7 +78,9 @@ module ApiProtection
             limit: policy.fetch(:limit),
             window_seconds: policy.fetch(:window_seconds),
             scope_type: identity[:scope_type],
-            scope_id: identity[:scope_id]
+            scope_id: identity[:scope_id],
+            counter_value: result.counter_value,
+            bucket: result.bucket
           }
         )
       rescue => e
@@ -100,7 +112,7 @@ module ApiProtection
           decision: "blacklist_deny",
           endpoint_class: endpoint_class,
           reason: "blacklist",
-          retry_after: policy.fetch(:window_seconds)
+          retry_after: retry_after_seconds(policy.fetch(:window_seconds))
         )
       end
 
@@ -131,8 +143,25 @@ module ApiProtection
         end
       end
 
+      def log_decision(request, result:, identity:)
+        return unless result.decision.in?(%w[throttle blacklist_deny])
+
+        Rails.logger.warn(
+          "[ApiProtection] #{result.decision} endpoint_class=#{result.endpoint_class} " \
+          "path=#{request.path} method=#{request.request_method} ip=#{request.ip} " \
+          "scope_type=#{identity[:scope_type]} scope_id=#{identity[:scope_id]} " \
+          "counter=#{result.counter_value} bucket=#{result.bucket} retry_after=#{result.retry_after}"
+        )
+      end
+
       def minute_bucket
         Time.current.utc.strftime("%Y%m%d%H%M")
+      end
+
+      def retry_after_seconds(window_seconds)
+        now = Time.current.utc.to_i
+        remainder = window_seconds - (now % window_seconds)
+        remainder <= 0 ? window_seconds : remainder
       end
 
       def scope_identifier(raw)

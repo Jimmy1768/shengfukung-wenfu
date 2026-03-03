@@ -90,6 +90,21 @@ RequestAudit
 - `window_seconds`
 - `scope_type`
 - `scope_id`
+- `counter_value`
+- `bucket`
+
+## Threshold Tuning Notes
+- Policy defaults are centralized in:
+  - `rails/app/lib/api_protection/policy.rb`
+- You can tune per endpoint class by editing:
+  - `limit`
+  - `window_seconds`
+  - `mode` (`audit_only` or `enforce`)
+- Recommended change cycle:
+  1. collect several days of telemetry
+  2. review throttle/deny distribution and false positives
+  3. adjust one class at a time
+  4. redeploy and re-check before widening enforcement
 
 ## Operator Runbook (Quick Checks)
 
@@ -110,11 +125,15 @@ cd rails && bin/rails runner "puts BlacklistEntry.where(active: true).where(\"ex
 
 ## Retention Policy (Planned)
 - Protection-first, storage-second:
-  - short TTL for routine allow/audit rows
-  - longer retention for throttled/blocked signal rows
-- Planned implementation:
-  - daily cleanup job for low-signal rows
-  - preserve active blacklist records until explicit review/expiry
+  - short TTL for routine allow/audit rows (48 hours)
+  - longer retention for throttled/blocked signal rows (60 days)
+- Implemented cleanup task:
+  - `cd rails && bin/rails api_protection:cleanup`
+  - optional env vars:
+    - `LOW_SIGNAL_HOURS` (default `48`)
+    - `HIGH_SIGNAL_DAYS` (default `60`)
+    - `DRY_RUN=true` for no-delete preview
+- Active blacklist records are not auto-removed by cleanup.
 
 ## Current Status Snapshot
 - Completed:

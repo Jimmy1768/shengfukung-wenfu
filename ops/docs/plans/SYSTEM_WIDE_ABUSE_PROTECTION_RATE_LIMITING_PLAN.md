@@ -223,10 +223,35 @@ Progress status after Phase B:
 
 ### Phase C: Enforcement + Observability
 
-- [ ] Enforce counters + throttling using `api_request_counters`.
-- [ ] Enforce deny logic via `blacklist_entries`.
-- [ ] Improve structured logs in `api_usage_logs` (result, policy key, reason).
-- [ ] Add clear application logs for throttled/blocked requests.
+- [x] Enforce counters + throttling using `api_request_counters`.
+- [x] Enforce deny logic via `blacklist_entries`.
+- [x] Improve structured logs in `api_usage_logs` (result, policy key, reason).
+- [x] Add clear application logs for throttled/blocked requests.
+
+Phase C implementation notes:
+- `RequestAudit` now computes dynamic `Retry-After` aligned to window rollover (instead of fixed static seconds).
+- Structured metadata now includes counter context:
+  - `counter_value`
+  - `bucket`
+- App-level warning logs now emit on throttle and blacklist-deny decisions with request path/method, scope, and retry hints.
+- Added daily cleanup task:
+  - `cd rails && bin/rails api_protection:cleanup`
+  - defaults: `LOW_SIGNAL_HOURS=48`, `HIGH_SIGNAL_DAYS=60`, optional `DRY_RUN=true`
+
+Phase C tuning notes (for later threshold changes):
+- Class limits/windows are centralized in:
+  - `rails/app/lib/api_protection/policy.rb`
+- Tuning workflow:
+  1. inspect `ApiUsageLog` decisions + counter distribution
+  2. adjust class-specific `limit`/`window_seconds`
+  3. deploy and monitor throttle false-positive rate
+  4. repeat until steady-state
+
+Phase C test execution log:
+- Command:
+  - `cd rails && bin/rails test test/services/api_protection_request_audit_test.rb test/integration/api_protection_middleware_test.rb test/integration/account/request_throttling_test.rb`
+- Result:
+  - `6 runs, 15 assertions, 0 failures, 0 errors, 0 skips`
 
 #### Data Retention Policy (Protection-First)
 
