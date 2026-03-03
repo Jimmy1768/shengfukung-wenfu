@@ -130,6 +130,25 @@ cd rails && bin/rails registrations:expire_unpaid
 
 # Optional dev recipient sink for app notifications/reminders
 export DEV_APP_NOTIFICATION_EMAIL=jimmy.chuang@outlook.com
+
+# API protection / abuse tooling (Phase E)
+# Inspect counters, blocked decisions, and active blacklist state
+cd rails && bin/rails api_protection:report WINDOW_MINUTES=60 LIMIT=25
+
+# Retention cleanup (preview first)
+cd rails && bin/rails api_protection:cleanup DRY_RUN=true
+cd rails && bin/rails api_protection:cleanup LOW_SIGNAL_HOURS=48 HIGH_SIGNAL_DAYS=60
+
+# Safe unblock workflows (require APPLY=true)
+cd rails && bin/rails api_protection:unblock_ip IP=203.0.113.5 APPLY=true
+cd rails && bin/rails api_protection:unblock_scope SCOPE_TYPE=User SCOPE_ID=123 APPLY=true
+
+# Safe counter reset (must include filter + APPLY=true)
+cd rails && bin/rails api_protection:reset_counters SCOPE_TYPE=User SCOPE_ID=123 ENDPOINT_CLASS=api.account.write APPLY=true
+
+# Abuse spike threshold checks (alerts use Notifications::Alerts::AlertSender)
+cd rails && bin/rails api_protection:alert_spikes DRY_RUN=true
+cd rails && bin/rails api_protection:alert_spikes WINDOW_MINUTES=15 MIN_EVENTS=40 MIN_UNIQUE_SCOPES=10
 ```
 
 ---

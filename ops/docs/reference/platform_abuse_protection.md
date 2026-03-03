@@ -147,6 +147,34 @@ Inspect active blacklist entries:
 cd rails && bin/rails runner "puts BlacklistEntry.where(active: true).where(\"expires_at IS NULL OR expires_at > ?\", Time.current).order(created_at: :desc).pluck(:scope_type, :scope_id, :reason, :expires_at)"
 ```
 
+Ops report helper (combined counters + decisions + blacklist):
+```bash
+cd rails && bin/rails api_protection:report WINDOW_MINUTES=60 LIMIT=25
+```
+
+Safe unblock workflows (require explicit apply):
+```bash
+# Preview/execute IP unblock
+cd rails && bin/rails api_protection:unblock_ip IP=203.0.113.5 APPLY=true
+
+# Preview/execute scope unblock
+cd rails && bin/rails api_protection:unblock_scope SCOPE_TYPE=User SCOPE_ID=123 APPLY=true
+```
+
+Safe counter reset (filtered + apply-gated):
+```bash
+cd rails && bin/rails api_protection:reset_counters SCOPE_TYPE=User SCOPE_ID=123 ENDPOINT_CLASS=api.account.write APPLY=true
+```
+
+Abuse spike alert threshold check:
+```bash
+# Dry run
+cd rails && bin/rails api_protection:alert_spikes DRY_RUN=true
+
+# Send alert if thresholds crossed
+cd rails && bin/rails api_protection:alert_spikes WINDOW_MINUTES=15 MIN_EVENTS=40 MIN_UNIQUE_SCOPES=10
+```
+
 ## Retention Policy (Planned)
 - Protection-first, storage-second:
   - short TTL for routine allow/audit rows (48 hours)
@@ -165,5 +193,6 @@ cd rails && bin/rails runner "puts BlacklistEntry.where(active: true).where(\"ex
   - Phase B middleware/controller boundary + classification
   - Phase C observability and retention cleanup task
   - Phase D feature-local throttle migration (Contact Temple)
+  - Phase E ops tooling, unblock/reset workflows, and spike alert thresholds
 - Pending:
-  - Phase E ops tooling and alerting
+  - operational threshold tuning from live telemetry

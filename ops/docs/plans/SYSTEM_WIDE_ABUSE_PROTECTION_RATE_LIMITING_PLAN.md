@@ -279,6 +279,7 @@ Phase C test execution log:
   - do not add new feature-local throttles.
 - Contact Temple migration:
   - run dual protection for one release (shared enforce + existing local fallback), then remove local limiter.
+  - status: local limiter has already been removed after rollout confidence.
 - Endpoint class scope:
   - keep current class set (no new fine-grained class types in this phase).
   - if future split is required, add class constants in `rails/app/lib/api_protection/policy.rb` and document mapping in `ops/docs/reference/platform_abuse_protection.md`.
@@ -313,9 +314,29 @@ Phase D execution status:
 
 ### Phase E: Hardening
 
-- [ ] Add admin/ops tooling to inspect counters/blacklist state.
-- [ ] Add safe reset/unblock workflows for support operations.
-- [ ] Add alerting thresholds for repeated abuse spikes.
+- [x] Add admin/ops tooling to inspect counters/blacklist state.
+- [x] Add safe reset/unblock workflows for support operations.
+- [x] Add alerting thresholds for repeated abuse spikes.
+
+Phase E implementation notes:
+- Added ops/admin tooling rake tasks:
+  - `api_protection:report` (counter/decision/blacklist visibility)
+  - `api_protection:unblock_ip` (safe unblock with `APPLY=true`)
+  - `api_protection:unblock_scope` (safe unblock with `APPLY=true`)
+  - `api_protection:reset_counters` (filtered counter reset with `APPLY=true`)
+- Added spike alerting threshold task:
+  - `api_protection:alert_spikes`
+  - uses `ApiProtection::SpikeAlertChecker`
+  - alerts via `Notifications::Alerts::AlertSender` when threshold conditions are met
+- Safety controls:
+  - destructive unblock/reset actions require `APPLY=true`
+  - spike alert task supports `DRY_RUN=true`
+
+Phase E test execution log:
+- Command:
+  - `cd rails && bin/rails test test/services/api_protection/spike_alert_checker_test.rb test/services/api_protection/request_classifier_test.rb test/services/api_protection_request_audit_test.rb test/integration/api_protection_middleware_test.rb test/integration/account/request_throttling_test.rb test/integration/account/contact_temple_requests_test.rb test/integration/api/v1/contact_temple_requests_test.rb`
+- Result:
+  - `21 runs, 55 assertions, 0 failures, 0 errors, 0 skips`
 
 ## Contact Temple Integration (Immediate Relevance)
 
