@@ -105,6 +105,26 @@ RequestAudit
   2. review throttle/deny distribution and false positives
   3. adjust one class at a time
   4. redeploy and re-check before widening enforcement
+- Audit-to-enforce promotion gate:
+  1. at least 7 days telemetry in `audit_only`
+  2. no confirmed false-positive incidents
+  3. owner approval
+  4. plan/reference docs updated in same change
+
+## Policy Governance
+- Source of truth:
+  - all new throttling policy belongs in shared `ApiProtection` subsystem
+  - no new feature-local throttles
+- Class and mapping centralization:
+  - class defaults and modes: `rails/app/lib/api_protection/policy.rb`
+  - route/method mapping: `rails/app/lib/api_protection/request_classifier.rb`
+  - operational explanation: this reference doc
+- Current class strategy:
+  - keep existing class set for now
+  - add finer classes only when behavior materially diverges
+  - when adding classes, update both policy constants and docs in the same PR
+- Ownership:
+  - policy changes are owner-approved before merge/deploy
 
 ## Operator Runbook (Quick Checks)
 
@@ -139,7 +159,7 @@ cd rails && bin/rails runner "puts BlacklistEntry.where(active: true).where(\"ex
 - Completed:
   - Phase A inventory/policy map
   - Phase B middleware/controller boundary + classification
+  - Phase C observability and retention cleanup task
 - Pending:
-  - Phase C tuning and cleanup automation
   - Phase D feature-local throttle migration
   - Phase E ops tooling and alerting

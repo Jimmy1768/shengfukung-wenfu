@@ -272,6 +272,34 @@ Phase C test execution log:
 - [ ] Add policy coverage for new high-risk POST endpoints.
 - [ ] Document how new features declare/choose endpoint classes.
 
+#### Phase D Decisions (Locked)
+
+- Source of truth:
+  - shared `ApiProtection` subsystem is the only place for new throttling policy.
+  - do not add new feature-local throttles.
+- Contact Temple migration:
+  - run dual protection for one release (shared enforce + existing local fallback), then remove local limiter.
+- Endpoint class scope:
+  - keep current class set (no new fine-grained class types in this phase).
+  - if future split is required, add class constants in `rails/app/lib/api_protection/policy.rb` and document mapping in `ops/docs/reference/platform_abuse_protection.md`.
+- Feature onboarding checklist (required for new high-risk endpoints):
+  1. endpoint class assignment
+  2. mode decision (`audit_only` vs `enforce`)
+  3. limit/window selection
+  4. tests updated
+  5. reference/plan docs updated
+- Migration priority:
+  1. auth/session writes
+  2. registration/payment writes
+  3. admin mutation forms
+- Audit-to-enforce gate:
+  - minimum 7 days telemetry in audit mode
+  - no confirmed false-positive incidents
+  - owner approval
+  - docs updated in plan/reference before switching to enforce
+- Policy ownership:
+  - single owner approval for policy/class threshold changes.
+
 ### Phase E: Hardening
 
 - [ ] Add admin/ops tooling to inspect counters/blacklist state.
