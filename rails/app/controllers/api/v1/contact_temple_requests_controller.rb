@@ -13,15 +13,6 @@ module Api
           return
         end
 
-        rate_limit = Contact::TempleInquiryRateLimiter.call(
-          user_id: "guest:#{form.email.downcase}",
-          ip: request.remote_ip
-        )
-        unless rate_limit.allowed?
-          render json: { error: "Please wait before sending another message." }, status: :too_many_requests
-          return
-        end
-
         result = Contact::TempleInquirySender.new(
           user: GuestUser.new(email: form.email, english_name: form.name, native_name: nil, id: nil),
           guest_name: form.name,

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "zlib"
 
 class Api::V1::ContactTempleRequestsTest < ActionDispatch::IntegrationTest
   FakeBrevoClient = Struct.new(:calls) do
@@ -73,23 +74,29 @@ class Api::V1::ContactTempleRequestsTest < ActionDispatch::IntegrationTest
     assert_includes response.parsed_body["error"], "Please check"
   end
 
-  test "public site rate limiting blocks abusive bursts" do
+  test "public site request is blocked by shared api protection when IP is blacklisted" do
     temple = create_temple
     fake_client = FakeBrevoClient.new([])
-    denied_result = Contact::TempleInquiryRateLimiter::Result.new(allowed?: false, reason: :ip_limit)
+    ip = "198.51.100.19"
+    BlacklistEntry.create!(
+      scope_type: "IpAddress",
+      scope_id: Zlib.crc32(ip),
+      reason: "test_block",
+      active: true,
+      expires_at: 1.hour.from_now
+    )
 
-    Contact::TempleInquiryRateLimiter.stub(:call, denied_result) do
-      Notifications::BrevoClient.stub(:new, fake_client) do
-        post "/api/v1/temples/#{temple.slug}/contact_temple_requests",
-          params: {
-            name: "Public Visitor",
-            email: "visitor@example.com",
-            subject: "Rate limit test",
-            message: "This message should be blocked by rate limiting.",
-            website: ""
-          },
-          as: :json
-      end
+    Notifications::BrevoClient.stub(:new, fake_client) do
+      post "/api/v1/temples/#{temple.slug}/contact_temple_requests",
+        params: {
+          name: "Public Visitor",
+          email: "visitor@example.com",
+          subject: "Rate limit test",
+          message: "This message should be blocked by shared api protection.",
+          website: ""
+        },
+        headers: { "REMOTE_ADDR" => ip },
+        as: :json
     end
 
     assert_response :too_many_requests

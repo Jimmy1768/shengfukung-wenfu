@@ -10,12 +10,6 @@ module Account
         return
       end
 
-      rate_limit = Contact::TempleInquiryRateLimiter.call(user_id: current_user.id, ip: request.remote_ip)
-      unless rate_limit.allowed?
-        render_profile_with_errors(status: :too_many_requests, alert: "Please wait before sending another message.")
-        return
-      end
-
       result = Contact::TempleInquirySender.new(
         user: current_user,
         temple: current_temple,

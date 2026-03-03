@@ -268,9 +268,9 @@ Phase C test execution log:
 
 ### Phase D: Feature Adoption
 
-- [ ] Migrate feature-local throttles into shared protection (e.g., Contact Temple).
-- [ ] Add policy coverage for new high-risk POST endpoints.
-- [ ] Document how new features declare/choose endpoint classes.
+- [x] Migrate feature-local throttles into shared protection (e.g., Contact Temple).
+- [x] Add policy coverage for new high-risk POST endpoints.
+- [x] Document how new features declare/choose endpoint classes.
 
 #### Phase D Decisions (Locked)
 
@@ -300,6 +300,17 @@ Phase C test execution log:
 - Policy ownership:
   - single owner approval for policy/class threshold changes.
 
+Phase D execution status:
+- Contact Temple now relies on shared `ApiProtection` only:
+  - local `Contact::TempleInquiryRateLimiter` removed
+  - account + public contact submit paths depend on endpoint-class policy enforcement
+- Added class-coverage tests for high-risk write surfaces:
+  - account login write
+  - admin login write
+  - account contact temple form submit
+  - API webhook ingest
+  - API contact temple submit
+
 ### Phase E: Hardening
 
 - [ ] Add admin/ops tooling to inspect counters/blacklist state.
@@ -308,8 +319,7 @@ Phase C test execution log:
 
 ## Contact Temple Integration (Immediate Relevance)
 
-- Phase 1 `Contact Temple` may ship with a small local throttle for speed.
-- It should later migrate into this framework under an endpoint class such as:
+- Contact Temple is now migrated into the shared framework under endpoint classes such as:
   - `web.account.form_submit.contact_temple`
 - This keeps email abuse protections consistent with the broader system.
 

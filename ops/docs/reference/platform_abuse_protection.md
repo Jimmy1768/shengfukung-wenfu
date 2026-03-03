@@ -126,6 +126,10 @@ RequestAudit
 - Ownership:
   - policy changes are owner-approved before merge/deploy
 
+## Phase D Migration State
+- Contact Temple is fully migrated to shared subsystem enforcement.
+- Legacy `Contact::TempleInquiryRateLimiter` has been removed.
+
 ## Operator Runbook (Quick Checks)
 
 Inspect recent throttle/blacklist decisions:
@@ -160,6 +164,6 @@ cd rails && bin/rails runner "puts BlacklistEntry.where(active: true).where(\"ex
   - Phase A inventory/policy map
   - Phase B middleware/controller boundary + classification
   - Phase C observability and retention cleanup task
+  - Phase D feature-local throttle migration (Contact Temple)
 - Pending:
-  - Phase D feature-local throttle migration
   - Phase E ops tooling and alerting

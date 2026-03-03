@@ -90,7 +90,7 @@ This document intentionally groups multiple related workflows under one topic in
 
 - Account flow requires authenticated account session.
 - Public flow is guest-capable and slug-scoped.
-- Local throttle is enforced via `Contact::TempleInquiryRateLimiter`.
+- Contact Temple throttling is enforced by shared `ApiProtection` endpoint-class policy.
 - Honeypot field is present on both account and public forms.
 
 ### Tests (Implemented)
@@ -103,11 +103,10 @@ This document intentionally groups multiple related workflows under one topic in
   - success
   - invalid payload
   - fallback recipient behavior
-  - throttle block behavior
+  - throttle/block behavior via shared `ApiProtection`
 
 ### Deferred Follow-ups
 
-- Generalized throttling integration
 - Queue + dedupe (Sidekiq)
 - Admin-side inbox/ticket UI
 - Webhook notifications (Slack/LINE/Discord)
