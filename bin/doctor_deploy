@@ -37,7 +37,15 @@ require "yaml"
 file, slug, path = ARGV
 entry = YAML.safe_load_file(file).fetch("temples").find { |t| t["slug"] == slug }
 abort("Unknown slug: #{slug}") unless entry
-value = path.split(".").reduce(entry) { |acc, key| acc.is_a?(Hash) ? acc[key] : nil }
+value = path.split(".").reduce(entry) do |acc, key|
+  if acc.is_a?(Hash)
+    acc[key]
+  elsif acc.is_a?(Array) && key.match?(/\A\d+\z/)
+    acc[key.to_i]
+  else
+    nil
+  end
+end
 puts value.to_s
 RUBY
 }

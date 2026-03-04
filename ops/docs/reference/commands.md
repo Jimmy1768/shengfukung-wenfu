@@ -10,7 +10,7 @@ ssh jimmy1768_user@174.138.18.211
 ```bash
 
 git add .
-git commit -m "corrected slug - shengfukung-wenfu"
+git commit -m "fixed doctor_deploy"
 git push
 
 git reset --hard HEAD
