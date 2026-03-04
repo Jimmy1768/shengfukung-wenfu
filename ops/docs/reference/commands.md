@@ -1,9 +1,16 @@
+# 🔐 SSH Access
+
+```bash
+
+# Droplet (digital ocean) templemate-web
+ssh jimmy1768_user@174.138.18.211
+
 ## 🔧 Git Commands
 
 ```bash
 
 git add .
-git commit -m "fixed/recovered demoshowcase"
+git commit -m "deploying to droplet"
 git push
 
 git reset --hard HEAD
