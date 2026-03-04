@@ -10,7 +10,7 @@ ssh jimmy1768_user@174.138.18.211
 ```bash
 
 git add .
-git commit -m "fixed manifest.yml"
+git commit -m "upgraded capture live configs"
 git push
 
 git reset --hard HEAD

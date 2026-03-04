@@ -11,10 +11,35 @@ PROJECT_CONFIG="$ROOT_DIR/shared/app_constants/project.json"
 
 NGINX_OUTPUT_DIR="$OPS_DIR/nginx"
 SYSTEMD_OUTPUT_DIR="$OPS_DIR/systemd"
+RUBY_BIN=""
+
+resolve_ruby() {
+  if command -v ruby >/dev/null 2>&1; then
+    RUBY_BIN="$(command -v ruby)"
+    return 0
+  fi
+
+  # When running under sudo, PATH often excludes rbenv shims.
+  if [[ -n "${SUDO_USER:-}" ]]; then
+    local sudo_home
+    sudo_home="$(eval echo "~${SUDO_USER}")"
+    if [[ -x "${sudo_home}/.rbenv/shims/ruby" ]]; then
+      RUBY_BIN="${sudo_home}/.rbenv/shims/ruby"
+      return 0
+    fi
+  fi
+
+  if [[ -x "/usr/bin/ruby" ]]; then
+    RUBY_BIN="/usr/bin/ruby"
+    return 0
+  fi
+
+  return 1
+}
 
 read_project_slug() {
   if [[ -f "$PROJECT_CONFIG" ]]; then
-    ruby -rjson -e 'data=JSON.parse(File.read(ARGV[0])); print(data["slug"] || "golden-template")' "$PROJECT_CONFIG"
+    "$RUBY_BIN" -rjson -e 'data=JSON.parse(File.read(ARGV[0])); print(data["slug"] || "golden-template")' "$PROJECT_CONFIG"
   else
     echo "golden-template"
   fi
@@ -53,6 +78,10 @@ USAGE
   fi
 
   require_root
+  if ! resolve_ruby; then
+    echo "Ruby runtime not found. Install Ruby or ensure rbenv shims are available for sudo." >&2
+    exit 1
+  fi
   local slug
   slug="$(read_project_slug)"
 
