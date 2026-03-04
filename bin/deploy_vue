@@ -12,7 +12,7 @@ fi
 read_manifest_field() {
   local slug="$1"
   local path="$2"
-  ruby <<'RUBY' "$MANIFEST_FILE" "$slug" "$path"
+  ruby - "$MANIFEST_FILE" "$slug" "$path" <<'RUBY'
 require "yaml"
 file, slug, path = ARGV
 data = YAML.safe_load_file(file).fetch("temples")
@@ -32,7 +32,7 @@ RUBY
 }
 
 read_default_slug() {
-  ruby <<'RUBY' "$MANIFEST_FILE"
+  ruby - "$MANIFEST_FILE" <<'RUBY'
 require "yaml"
 file = ARGV.first
 data = YAML.safe_load_file(file).fetch("temples")
