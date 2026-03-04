@@ -10,7 +10,7 @@ ssh jimmy1768_user@174.138.18.211
 ```bash
 
 git add .
-git commit -m "deploying to droplet"
+git commit -m "fixed .env template"
 git push
 
 git reset --hard HEAD

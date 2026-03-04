@@ -3,7 +3,7 @@
 module AppConstants
   module Origins
     DEV_MARKETING_ORIGIN = "http://localhost:5173/marketing".freeze
-    DEV_ADMIN_ORIGIN = "http://localhost:3001/marketing/admin".freeze
+    DEV_ADMIN_ORIGIN = "http://localhost:3002/marketing/admin".freeze
 
     PROD_MARKETING_FALLBACK = "/marketing".freeze
     PROD_ADMIN_FALLBACK = "/marketing/admin".freeze
