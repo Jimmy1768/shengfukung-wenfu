@@ -100,10 +100,16 @@ module CachePayloads
     end
 
     def build_result(bundle, from_cache:)
+      generated_at = begin
+        Time.zone.parse(bundle["generated_at"].to_s)
+      rescue StandardError
+        Time.current
+      end
+
       Result.new(
         state_key: state_key,
         version: bundle["version"],
-        generated_at: Time.zone.parse(bundle["generated_at"]) rescue Time.current,
+        generated_at: generated_at,
         payload: bundle["payload"],
         from_cache: from_cache
       )
