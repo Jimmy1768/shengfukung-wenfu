@@ -10,7 +10,7 @@ ssh jimmy1768_user@174.138.18.211
 ```bash
 
 git add .
-git commit -m "removed temple env scripts, manual workflow"
+git commit -m "fixed manifest.yml"
 git push
 
 git reset --hard HEAD
@@ -60,6 +60,11 @@ sudo bin/capture_live_configs
 
 # 5) After pulling those changes locally, update nginx templates from the rendered files
 bin/update_conf_template_after_certbot
+
+# Create first-time production env file from template (per temple slug)
+SLUG=shenfukung-wenfu
+sudo install -m 600 -o root -g root ops/env/template.temple.env /etc/default/${SLUG}-env
+sudo nano /etc/default/${SLUG}-env
 
 # One-time Rails setup on a new droplet (bundle install + db:setup + Vue deps)
 bin/setup_backend_once --force

@@ -6,6 +6,3 @@ temples:
     public_url: "https://shenfukung.com.tw"
     deploy:
       vue_dir: "/var/www/shenfukung-wenfu"
-    expo:
-      app_id: "com.jimmy1768.Mnemosyne"
-      dev_app_id: "com.jimmy1768.Mnemosyne.dev"
