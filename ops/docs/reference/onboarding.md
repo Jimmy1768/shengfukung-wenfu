@@ -16,40 +16,27 @@ Use this when you need representative data locally or on staging:
 
 > 🔐 **Per-temple env overrides**
 >
-> - Generate local env files from the shared template: `bin/init_temple_env <slug>`. This writes `etc/default/<slug>.env` with safe defaults/placeholders.
-> - Keep third-party credentials in `etc/default/<temple-slug>.env`. This folder is tracked via `.keep`, but the files themselves should not be committed.
+> - Use `ops/env/template.temple.env` as your non-secret checklist template.
+> - Keep third-party credentials out of git: local goes in `.env.development`; production goes in `/etc/default/<slug>-env`.
 > - Load a specific temple’s secrets by prefixing any command with `bin/load_temple_env <slug> -- <command>`. Example: `bin/load_temple_env shenfukung-wenfu -- (cd rails && bundle exec rails server -p 3001)`.
-> - The loader sources `.env`, `.env.<env>`, then `etc/default/<slug>.env` (falling back to `.env.development`), so Vue/Expo builds and Rails share the exact same credential set for the active temple.
-> - For initial server onboarding, push the local env file with `bin/push_temple_env <slug> <user@host>`, which installs it as `/etc/default/<slug>-env` on the target host.
+> - The loader sources `.env`, `.env.<env>`, then `/etc/default/<slug>-env` when readable (falling back to `.env.development`), so Vue/Expo builds and Rails share the same credential set for the active temple.
 
 ### Generate + Deploy Env Files
 
 Use this workflow whenever you onboard a new temple slug.
 
-1. Generate a local env file from the template:
-   ```bash
-   bin/init_temple_env <slug>
-   ```
-2. Open `etc/default/<slug>.env` and fill in real values (API keys, origins, payment provider credentials).
-3. Validate the app can boot with that env:
+1. Copy values from `ops/env/template.temple.env` into the target env file and fill real values (API keys, origins, payment provider credentials):
+   - local: `.env.development`
+   - production: `/etc/default/<slug>-env`
+2. Validate the app can boot with that env:
    ```bash
    bin/load_temple_env <slug> -- (cd rails && bundle exec rails runner "puts ENV.fetch('PROJECT_SLUG')")
    ```
-4. Push the env file to the server (initial onboarding):
-   ```bash
-   bin/push_temple_env <slug> <user@host>
-   ```
-   This copies `etc/default/<slug>.env` to `/etc/default/<slug>-env` with root-only permissions.
-5. Restart services that read the env file (for example Puma/Sidekiq) after pushing changes.
-
-Notes:
-- `bin/init_temple_env` refuses to overwrite existing files unless `--force` is passed.
-- `bin/push_temple_env` refuses to overwrite existing remote files unless `--force` is passed.
-- Use `--force` only for intentional rotations/updates.
+3. Restart services that read the env file (for example Puma/Sidekiq) after updating production env values.
 
 ### Template + Theme selection
 
-- Ensure `etc/default/<slug>.env` exists (recommended: `bin/init_temple_env <slug>`) and set the following keys before any build:
+- Ensure env values are set in your active file (`.env.development` locally or `/etc/default/<slug>-env` on server) before any build:
   ```
   VITE_TEMPLE_SLUG=<slug>
   VITE_TEMPLE_LAYOUT=classic
@@ -221,7 +208,7 @@ Production onboarding avoids creating real user passwords in seeds—only the te
 5. **Owner invites staff**
    - Inside the admin console (feature pending), the owner can invite additional admins scoped to their temple.
 6. **Financial onboarding**
-   - Gather LINE Pay channel ID/secret but keep them out of Git; store temporarily in `etc/default/<slug>.env` until vaulting is ready.
+   - Gather LINE Pay channel ID/secret but keep them out of Git; store in `.env.development` locally and `/etc/default/<slug>-env` on server until vaulting is ready.
    - Decide which staff get financial permissions and run `bin/rails "temple_financial:grant_permissions[slug,email]"`.
    - Cash entries live under `/admin/offerings/...` while we finish LINE Pay.
 7. **Mobile/API consumers**

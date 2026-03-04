@@ -10,7 +10,7 @@ ssh jimmy1768_user@174.138.18.211
 ```bash
 
 git add .
-git commit -m "fixed .env template"
+git commit -m "removed temple env scripts, manual workflow"
 git push
 
 git reset --hard HEAD
@@ -78,7 +78,7 @@ bin/reset_subsystem <name>
 # Initialize Expo/EAS once (creates project + records projectId)
 bin/setup_expo_once
 
-# Vue deploy: builds + syncs dist for a single slug (loads etc/default/<slug>.env)
+# Vue deploy: builds + syncs dist for a single slug (loads /etc/default/<slug>-env when readable, else .env.development)
 bin/deploy_vue <slug>
 
 # Vue deploy for every slug listed in rails/app/lib/temples/manifest.yml

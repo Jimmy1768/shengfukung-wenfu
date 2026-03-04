@@ -66,7 +66,7 @@ This document captures what exists in the admin portal today so future work can 
 
 ## Deployment & Onboarding
 
-- Each temple ships with its own `<slug>.env`, systemd units, and `bin/load_temple_env` helper so scripts/deployments run with the right credentials.
+- Each temple uses per-slug credentials (local `.env.development`, production `/etc/default/<slug>-env`), alongside systemd units and `bin/load_temple_env` so scripts/deployments run with the right values.
 - Deploy helpers (`bin/deploy_vue`, `bin/deploy_vue_all`, `bin/expo_prebuild`, `bin/expo_build`) automatically source the slug env. Smoke tests (`bin/run_smoke_tests`) hit the per-slug API to verify deployments.
 - `DEPLOYMENT_READINESS.md` outlines the droplet/nginx rollout plan once a temple graduates to production.
 

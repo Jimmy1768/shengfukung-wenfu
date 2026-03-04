@@ -8,7 +8,7 @@ local:
 
 # ActiveStorage expects credentials or ENV variables for third-party adapters.
 # Keep real bucket names/DBs in lib/profile/infrastructure.rb and override the
-# values via per-deployment ENV files (e.g., .env.development, etc/default/client_env).
+# values via per-deployment ENV files (e.g., .env.development, /etc/default/<slug>-env).
 amazon:
   service: S3
   access_key_id: <%= ENV["AWS_ACCESS_KEY_ID"] %>

@@ -32,6 +32,6 @@ Guidelines:
 
 5. **Shared blocks** – When creating new structural pieces, consider placing them under `src/components/site/` so other layouts can reuse them. Layout-only components can live inside the layout folder if they’re not meant to be shared.
 
-6. **Adding a layout** – After creating the folder, update `layouts/index.js` to import your route factory and map the new layout id. Set `VITE_TEMPLE_LAYOUT=<layout-id>` in `.env`/`etc/default/<slug>.env` to compile it.
+6. **Adding a layout** – After creating the folder, update `layouts/index.js` to import your route factory and map the new layout id. Set `VITE_TEMPLE_LAYOUT=<layout-id>` in `.env`/`.env.development` (or `/etc/default/<slug>-env` on server) to compile it.
 
 Following this structure ensures new templates stay consistent, never miss data from the API store, and remain palette-agnostic.

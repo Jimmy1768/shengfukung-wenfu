@@ -27,29 +27,20 @@ This is the go-live checklist for TempleMate (`shenfukung-wenfu`) staging deploy
   - `bin/apply_systemd_units`
   - `bin/apply_nginx_config`
   - `bin/run_smoke_tests`
-  - `bin/init_temple_env`
-  - `bin/push_temple_env`
 - [ ] Nginx/systemd templates render for slug without placeholder leaks.
 - [ ] Pass criteria: no local blockers before touching infra.
 
 ## 1. Environment File Bootstrap + Deploy
 
 - [ ] Owner: Ops + App engineer
-- [ ] Generate local env template:
-  ```bash
-  bin/init_temple_env shenfukung-wenfu
-  ```
-- [ ] Fill `etc/default/shenfukung-wenfu.env` with real staging values:
+- [ ] Copy values from `ops/env/template.temple.env` into `/etc/default/shenfukung-wenfu-env`.
+- [ ] Fill `/etc/default/shenfukung-wenfu-env` with real staging values:
   - project origins
   - payment provider settings (default `PAYMENTS_PROVIDER=fake` until real provider credentials are validated)
   - email provider keys
 - [ ] Validate env loads:
   ```bash
   bin/load_temple_env shenfukung-wenfu -- (cd rails && bundle exec rails runner "puts ENV.fetch('PROJECT_SLUG')")
-  ```
-- [ ] Push env to host:
-  ```bash
-  bin/push_temple_env shenfukung-wenfu <user@host>
   ```
 - [ ] Confirm remote file exists: `/etc/default/shenfukung-wenfu-env`
 - [ ] Pass criteria: env file installed with root-only permissions and expected key set.

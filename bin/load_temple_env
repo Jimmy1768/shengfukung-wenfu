@@ -2,14 +2,14 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-ENV_DIR="$ROOT_DIR/etc/default"
 DEFAULT_FALLBACK="$ROOT_DIR/.env.development"
 
 usage() {
   cat <<'USAGE'
 Usage: bin/load_temple_env <temple-slug> [-- <command...>]
 
-Loads .env, .env.<env>, and etc/default/<temple-slug>.env (falling back to .env.development)
+Loads .env, .env.<env>, and /etc/default/<temple-slug>-env (when readable),
+falling back to .env.development.
 before running the provided command. When no command is supplied it simply prints which
 file would be loaded so you can confirm the path before exporting any credentials.
 USAGE
@@ -29,12 +29,10 @@ if [[ $# -gt 0 ]]; then
   COMMAND=("$@")
 fi
 
-mkdir -p "$ENV_DIR"
-
 CURRENT_ENV="${APP_ENV:-${RAILS_ENV:-development}}"
 BASE_ENV="$ROOT_DIR/.env"
 ENV_SPECIFIC="$ROOT_DIR/.env.${CURRENT_ENV}"
-TEMPLE_ENV="$ENV_DIR/${TEMPLE_SLUG}.env"
+SYSTEM_ENV="/etc/default/${TEMPLE_SLUG}-env"
 
 load_env_file() {
   local file="$1"
@@ -51,8 +49,10 @@ echo "Loading environment for temple slug: ${TEMPLE_SLUG}"
 set -a
 load_env_file "$BASE_ENV" || true
 load_env_file "$ENV_SPECIFIC" || true
-if ! load_env_file "$TEMPLE_ENV"; then
-  echo "    (no ${TEMPLE_ENV} found, falling back to ${DEFAULT_FALLBACK})"
+if [[ -r "$SYSTEM_ENV" ]]; then
+  load_env_file "$SYSTEM_ENV" || true
+else
+  echo "    (no readable ${SYSTEM_ENV} found, falling back to ${DEFAULT_FALLBACK})"
   load_env_file "$DEFAULT_FALLBACK" || true
 fi
 set +a

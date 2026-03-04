@@ -52,3 +52,4 @@ rails/config/master.key
 rails/public/backend/assets/*.map
 
 # Ops staging
+/etc/default/*.env
