@@ -12,6 +12,7 @@
 2. **Design assets** – drop the client’s favicon pack into `shared/design-system/assets/favicons/` and their splash artwork into `shared/design-system/assets/splash/`, then adjust `shared/design-system/themes.json` if palettes changed. The Expo icon builder auto-samples the favicon edge color to paint adaptive backgrounds.
 3. **Sync shared assets** – run `node bin/sync_design_system.js`. This regenerates theme tokens for Vue/Rails/Expo, syncs favicons, updates the Expo icon/adaptive-icon files, emits a dev-badged `mobile/assets/dev-icon(.png)` + `dev-adaptive-icon(.png)` for the dev client, and compresses Vue splash placeholders.
 4. **Environment map** – set API endpoints in `shared/app_constants/env.json` (e.g., `local` → laptop IP, `production` → droplet domain). The Expo config helper reads this file to inject `extra.api.baseUrl`; update/copy it when cloning to a new client.
+4. **Droplet preflight doctor** – on the host, run `bin/doctor_deploy <slug>` before applying nginx/systemd or deploying Vue. It validates runtime toolchain versions, env key completeness, manifest/domain mapping, Rails tmp dirs, Vue target permissions, and nginx site conflicts.
 4. **Rebuild Rails CSS bundles** – run `bin/build_rails_css`. This uses Dart Sass to compile `app/stylesheets/account/`, `app/stylesheets/admin/`, and `showcase_ui/styles/` into the checked-in `rails/public/backend/assets/*.css` files that the server serves.
 4. **Rails backend (first run)** – execute `bin/setup_backend_once`. It installs gems and runs `bin/rails db:setup`, then records a marker so you don’t accidentally rerun it. Use `bin/reset_backend` or `bin/reset_subsystem` when you need a fresh dataset later.
 5. **Ops configs** – run `bin/stage_ops_configs [--slug client]` to render nginx/systemd templates into `ops/systemd/` and `ops/nginx/` (for example `ops/systemd/<slug>-puma.service` + `ops/nginx/<slug>.conf`), then copy them onto the droplet via `bin/apply_systemd_units` / `bin/apply_nginx_config`.
@@ -119,6 +120,29 @@
 ## Operational notes
 
 - `ops/nginx/template/golden-template.conf` documents the apex-domain pattern (Vue serves `/` + `/marketing`, Puma handles `/marketing/admin`, `/admin`, `/api`). Run `bin/stage_ops_configs` to produce `ops/nginx/<client>.conf`, then deploy that file (after reviewing certbot edits) to `/etc/nginx/sites-available/`. Keep `try_files $uri /index.html;` in place so `/marketing` deep links resolve within the SPA.
+- First-deploy hardening checklist (new droplet):
+  - Ensure `rails/app/lib/temples/manifest.yml` includes the real domain in `domains:` and `public_url:`. The config renderer now uses this to replace template `project.com` server names.
+  - In `/etc/default/<slug>-env`, set runtime keys explicitly: `PROJECT_SLUG`, `VITE_TEMPLE_SLUG`, `RAILS_ENV=production`, `RACK_ENV=production`, and `PUMA_PORT=3000`.
+  - Ensure Node meets Vite requirements (`node >= 20.19` or `>= 22.12`) before running `bin/deploy_vue`.
+  - Ensure Rails runtime dirs exist on the host (`rails/tmp/pids`, `rails/tmp/cache`, `rails/tmp/sockets`, `rails/log`) before starting Puma via systemd.
+  - Ensure Vue deploy target exists and is writable by the deploy user (`/var/www/<slug>`), otherwise `bin/deploy_vue` fails at rsync/mkdir.
+  - Verify nginx routes with host header before DNS cutover: `curl -I -H "Host: <domain>" http://127.0.0.1/api/v1/temples/<slug>`.
+  - If `/etc/nginx/sites-enabled/default` conflicts with custom routing, disable it and keep only the slug-specific site enabled.
+- Deploy doctor maintenance and pipeline placement:
+  - `bin/doctor_deploy` is the preflight guardrail for first deploys and client clones. Keep it in sync with real incident patterns (runtime/tooling drift, env gaps, nginx routing mismatches).
+  - When rebuilding/extending `bin/doctor_deploy` for future template clones:
+    - add new checks as explicit pass/fail/warn lines (avoid hidden assumptions),
+    - keep inputs slug-driven (`bin/doctor_deploy <slug>`),
+    - fail non-zero on hard blockers, warn on recoverable drift,
+    - update this document’s checklist and changelog in the same commit.
+  - Required pipeline position (for all new projects):
+    1. `bin/doctor_deploy <slug>` (preflight gate)
+    2. `bin/stage_ops_configs`
+    3. `bin/apply_systemd_units`
+    4. `bin/apply_nginx_config`
+    5. `bin/deploy_vue <slug>`
+    6. host-header smoke checks (`curl -H "Host: ..."`), then DNS/TLS.
+  - Template-porting reminder: include `bin/doctor_deploy <slug>` in `ops/docs/reference/commands.md` of the next project at the start of the Ops/deploy command block.
 - Rather than editing `AppConstants::Project`, rebrand by setting `PROJECT_SLUG`, `PROJECT_NAME`, and the optional marketing/systemd env vars before running `bin/stage_ops_configs` (which wraps `ops/scripts/render_ops_templates.rb`) so every client config inherits the same code.
 - If a repo evolves from a single-brand deployment into a shared multi-brand backend, do not feel obligated to rename the local git folder immediately. The folder/repo name is developer-facing and can remain a legacy first-project slug if it helps continuity. Prioritize clear runtime branding (`PROJECT_NAME`, `Profile::Identity`, email sender display name, admin titles) over cosmetic local-path churn.
 - After certbot (or any manual edits) changes `/etc/nginx/<slug>.conf`, run `bin/capture_live_configs` on the droplet to copy the live nginx/systemd configs back into `ops/`, commit/push them from the server, pull locally, then run `bin/update_conf_template_after_certbot` once so the template reflects the live state. Only rerun these capture/update scripts when the live configs change again.
@@ -203,3 +227,6 @@
 - 2026-02-28: Removed non-generic product example from Brevo policy and normalized shared repo path example to `sourcegrid-labs`.
 - 2026-02-28: Added generic naming convention for optional payment-core resources (`payments_transactions`, `payments_provider_events`) in deployment notes.
 - 2026-02-28: Added optional financial/payment-core migration pattern and minimum schema/index guidance for onboarding new projects.
+- 2026-03-04: Added first-deploy droplet hardening checklist (manifest domain mapping, runtime env keys, Node/Vite version requirements, Rails tmp dirs, Vue target permissions, and host-header nginx validation).
+- 2026-03-04: Added `bin/doctor_deploy` preflight command and documented it in the client bootstrap checklist.
+- 2026-03-04: Added `bin/doctor_deploy` maintenance guidance (how to extend checks, pipeline placement, and next-project `commands.md` inclusion requirement).

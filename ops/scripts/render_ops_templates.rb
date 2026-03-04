@@ -4,6 +4,8 @@
 require "fileutils"
 require "optparse"
 require "pathname"
+require "uri"
+require "yaml"
 
 ROOT_DIR = File.expand_path("../..", __dir__)
 
@@ -28,13 +30,42 @@ raise "AppConstants::Project not found" unless File.exist?(PROJECT_CONSTANTS)
 
 require PROJECT_CONSTANTS
 
-def render_placeholders(content, slug, human_name)
-  content
+def render_placeholders(content, slug, human_name, public_domain: nil)
+  rendered = content
     .gsub("{{project_slug}}", slug)
     .gsub("{{project_name}}", human_name)
     .gsub("Golden Template", human_name)
     .gsub("Golden-Template", human_name)
     .gsub("golden-template", slug)
+
+  return rendered if public_domain.to_s.strip.empty?
+
+  rendered
+    .gsub("{{public_domain}}", public_domain)
+    .gsub("project.com", public_domain)
+end
+
+def manifest_public_domain_for(slug)
+  manifest_path = File.join(ROOT_DIR, "rails", "app", "lib", "temples", "manifest.yml")
+  return nil unless File.exist?(manifest_path)
+
+  data = YAML.safe_load_file(manifest_path)
+  temples = data.is_a?(Hash) ? data["temples"] : nil
+  return nil unless temples.is_a?(Array)
+
+  entry = temples.find { |row| row.is_a?(Hash) && row["slug"].to_s == slug.to_s }
+  return nil unless entry
+
+  domains = entry["domains"]
+  primary = domains.first if domains.is_a?(Array) && !domains.empty?
+  return primary.to_s.strip unless primary.to_s.strip.empty?
+
+  public_url = entry["public_url"].to_s.strip
+  return nil if public_url.empty?
+
+  URI.parse(public_url).host
+rescue StandardError
+  nil
 end
 
 def activate_nginx_template(content)
@@ -90,6 +121,7 @@ parser.parse!
 
 slug = options[:slug] || ARGV.shift || AppConstants::Project::SLUG
 human_name = AppConstants::Project::NAME
+public_domain = manifest_public_domain_for(slug)
 output_root =
   if options[:output]
     File.expand_path(options[:output])
@@ -108,7 +140,7 @@ templates.each do |source, destination|
   next unless File.exist?(source)
 
   content = File.read(source)
-  rendered = render_placeholders(content, slug, human_name)
+  rendered = render_placeholders(content, slug, human_name, public_domain: public_domain)
 
   FileUtils.mkdir_p(File.dirname(destination))
   File.write(destination, rendered)
@@ -119,7 +151,7 @@ nginx_template = File.join(ROOT_DIR, "ops", "nginx", "template", "golden-templat
 nginx_destination = File.join(nginx_output_dir, "#{slug}.conf")
 if File.exist?(nginx_template)
   nginx_content = File.read(nginx_template)
-  rendered = render_placeholders(nginx_content, slug, human_name)
+  rendered = render_placeholders(nginx_content, slug, human_name, public_domain: public_domain)
   activated = activate_nginx_template(rendered)
 
   FileUtils.mkdir_p(File.dirname(nginx_destination))

@@ -49,6 +49,9 @@ _The following commands mirror the production checklist: render configs, apply t
 # 1) Render nginx/systemd configs from templates
 bin/stage_ops_configs
 
+# 1.5) Preflight droplet/runtime checks before apply/deploy
+bin/doctor_deploy <slug>
+
 # 2) Copy rendered systemd units to /etc/systemd/system + restart services
 sudo bin/apply_systemd_units
 

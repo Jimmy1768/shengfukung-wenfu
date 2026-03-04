@@ -1,0 +1,241 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+MANIFEST_FILE="$ROOT_DIR/rails/app/lib/temples/manifest.yml"
+RAILS_DIR="$ROOT_DIR/rails"
+
+FAILURES=0
+WARNINGS=0
+
+ok() { echo "[OK] $*"; }
+warn() { echo "[WARN] $*"; WARNINGS=$((WARNINGS + 1)); }
+fail() { echo "[FAIL] $*"; FAILURES=$((FAILURES + 1)); }
+
+require_cmd() {
+  local cmd="$1"
+  if command -v "$cmd" >/dev/null 2>&1; then
+    ok "Command available: $cmd"
+  else
+    fail "Missing command: $cmd"
+  fi
+}
+
+read_default_slug() {
+  ruby - "$MANIFEST_FILE" <<'RUBY'
+require "yaml"
+data = YAML.safe_load_file(ARGV.first).fetch("temples")
+puts data.first.fetch("slug")
+RUBY
+}
+
+read_manifest_field() {
+  local slug="$1"
+  local path="$2"
+  ruby - "$MANIFEST_FILE" "$slug" "$path" <<'RUBY'
+require "yaml"
+file, slug, path = ARGV
+entry = YAML.safe_load_file(file).fetch("temples").find { |t| t["slug"] == slug }
+abort("Unknown slug: #{slug}") unless entry
+value = path.split(".").reduce(entry) { |acc, key| acc.is_a?(Hash) ? acc[key] : nil }
+puts value.to_s
+RUBY
+}
+
+node_version_ok() {
+  local v raw major minor
+  raw="$(node -v 2>/dev/null || true)"
+  v="${raw#v}"
+  major="${v%%.*}"
+  minor="$(echo "$v" | cut -d. -f2)"
+  [[ -n "$major" && -n "$minor" ]] || return 1
+
+  # Vite 7 floor: >=20.19 or >=22.12
+  if (( major > 22 )); then
+    return 0
+  elif (( major == 22 && minor >= 12 )); then
+    return 0
+  elif (( major == 21 )); then
+    return 0
+  elif (( major == 20 && minor >= 19 )); then
+    return 0
+  fi
+  return 1
+}
+
+check_runtime() {
+  require_cmd ruby
+  require_cmd bundle
+  require_cmd node
+  require_cmd npm
+  require_cmd nginx
+  require_cmd systemctl
+
+  if [[ -f "$RAILS_DIR/.ruby-version" ]]; then
+    local expected actual
+    expected="$(tr -d '[:space:]' < "$RAILS_DIR/.ruby-version")"
+    actual="$(ruby -e 'print RUBY_VERSION' 2>/dev/null || true)"
+    if [[ -n "$expected" && "$actual" == "$expected" ]]; then
+      ok "Ruby version matches rails/.ruby-version ($actual)"
+    else
+      warn "Ruby version mismatch (expected $expected, got ${actual:-unknown})"
+    fi
+  fi
+
+  if node_version_ok; then
+    ok "Node version satisfies Vite 7 requirement ($(node -v))"
+  else
+    fail "Node version too old for Vite 7 ($(node -v 2>/dev/null || echo unknown)); need >=20.19 or >=22.12"
+  fi
+}
+
+load_env_for_checks() {
+  local slug="$1"
+  local env_file="/etc/default/${slug}-env"
+  if [[ -r "$env_file" ]]; then
+    ok "Readable env file: $env_file"
+    # shellcheck disable=SC1090
+    set -a && source "$env_file" && set +a
+  else
+    fail "Env file missing/unreadable: $env_file"
+  fi
+}
+
+check_env_keys() {
+  local slug="$1"
+  local required=(
+    PROJECT_SLUG
+    VITE_TEMPLE_SLUG
+    RAILS_ENV
+    RACK_ENV
+    PUMA_PORT
+    PGHOST
+    PGUSER
+    PGDATABASE
+    PGPASSWORD
+  )
+
+  for key in "${required[@]}"; do
+    if [[ -n "${!key:-}" ]]; then
+      ok "Env key present: $key"
+    else
+      fail "Missing env key: $key"
+    fi
+  done
+
+  [[ "${PROJECT_SLUG:-}" == "$slug" ]] || fail "PROJECT_SLUG must equal $slug"
+  [[ "${VITE_TEMPLE_SLUG:-}" == "$slug" ]] || fail "VITE_TEMPLE_SLUG must equal $slug"
+  [[ "${RAILS_ENV:-}" == "production" ]] || warn "RAILS_ENV is ${RAILS_ENV:-unset} (recommended: production)"
+  [[ "${PUMA_PORT:-}" == "3000" ]] || warn "PUMA_PORT is ${PUMA_PORT:-unset} (recommended: 3000)"
+}
+
+check_manifest() {
+  local slug="$1"
+  if [[ ! -f "$MANIFEST_FILE" ]]; then
+    fail "Missing manifest: $MANIFEST_FILE"
+    return
+  fi
+
+  if ruby -e "require 'yaml'; YAML.safe_load_file('$MANIFEST_FILE')"; then
+    ok "Manifest YAML parses"
+  else
+    fail "Manifest YAML invalid"
+    return
+  fi
+
+  local domain public_url
+  domain="$(read_manifest_field "$slug" "domains.0" || true)"
+  public_url="$(read_manifest_field "$slug" "public_url" || true)"
+
+  [[ -n "$domain" ]] && ok "Manifest domain found: $domain" || fail "Manifest missing domains[0] for $slug"
+  [[ -n "$public_url" ]] && ok "Manifest public_url found: $public_url" || warn "Manifest public_url missing for $slug"
+}
+
+check_rails_dirs() {
+  local dirs=("$RAILS_DIR/tmp/pids" "$RAILS_DIR/tmp/cache" "$RAILS_DIR/tmp/sockets" "$RAILS_DIR/log")
+  for dir in "${dirs[@]}"; do
+    if [[ -d "$dir" ]]; then
+      ok "Rails dir exists: $dir"
+    else
+      fail "Missing Rails dir: $dir"
+    fi
+  done
+}
+
+check_vue_target() {
+  local slug="$1"
+  local target parent
+  target="$(read_manifest_field "$slug" "deploy.vue_dir" || true)"
+  [[ -n "$target" ]] || target="/var/www/${slug}"
+  parent="$(dirname "$target")"
+
+  if [[ -d "$target" && -w "$target" ]]; then
+    ok "Vue target writable: $target"
+    return
+  fi
+
+  if [[ -d "$parent" && -w "$parent" ]]; then
+    warn "Vue target missing/not writable yet: $target (parent writable: $parent)"
+  else
+    fail "Vue target not writable and parent not writable: $target"
+  fi
+}
+
+check_nginx_sites() {
+  local slug="$1"
+  local enabled="/etc/nginx/sites-enabled/${slug}.conf"
+  local available="/etc/nginx/sites-available/${slug}.conf"
+  local default_enabled="/etc/nginx/sites-enabled/default"
+
+  [[ -e "$available" ]] && ok "Nginx available config present: $available" || warn "Nginx available config missing: $available"
+  [[ -L "$enabled" || -f "$enabled" ]] && ok "Nginx enabled config present: $enabled" || warn "Nginx enabled config missing: $enabled"
+  [[ -e "$default_enabled" ]] && warn "Default nginx site is enabled ($default_enabled); it may shadow custom routing"
+}
+
+usage() {
+  cat <<'USAGE'
+Usage: bin/doctor_deploy [slug]
+
+Checks first-deploy prerequisites for a droplet:
+- Runtime tools and versions (Ruby/Bundle/Node)
+- /etc/default/<slug>-env readability and required keys
+- Manifest/domain sanity
+- Rails runtime dirs
+- Vue deploy target permissions
+- Nginx enabled-site conflicts
+USAGE
+}
+
+main() {
+  if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    usage
+    exit 0
+  fi
+
+  if [[ ! -f "$MANIFEST_FILE" ]]; then
+    fail "Manifest missing at $MANIFEST_FILE"
+    echo
+    echo "Doctor summary: $FAILURES failure(s), $WARNINGS warning(s)"
+    exit 1
+  fi
+
+  local slug
+  slug="${1:-$(read_default_slug)}"
+  echo "Running deploy doctor for slug: $slug"
+
+  check_runtime
+  check_manifest "$slug"
+  load_env_for_checks "$slug"
+  check_env_keys "$slug"
+  check_rails_dirs
+  check_vue_target "$slug"
+  check_nginx_sites "$slug"
+
+  echo
+  echo "Doctor summary: $FAILURES failure(s), $WARNINGS warning(s)"
+  if (( FAILURES > 0 )); then
+    exit 1
+  fi
+}
+
+main "$@"
