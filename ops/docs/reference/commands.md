@@ -10,7 +10,7 @@ ssh jimmy1768_user@174.138.18.211
 ```bash
 
 git add .
-git commit -m "upgraded capture live configs"
+git commit -m "corrected slug - shengfukung-wenfu"
 git push
 
 git reset --hard HEAD
@@ -65,7 +65,7 @@ sudo bin/capture_live_configs
 bin/update_conf_template_after_certbot
 
 # Create first-time production env file from template (per temple slug)
-SLUG=shenfukung-wenfu
+SLUG=shengfukung-wenfu
 sudo install -m 600 -o root -g root ops/env/template.temple.env /etc/default/${SLUG}-env
 sudo nano /etc/default/${SLUG}-env
 
@@ -104,13 +104,13 @@ bin/run_smoke_tests
 # Registration period key governance (Phase B)
 # Audit invalid service/registration period keys and write a remediation report
 cd rails && bin/rails registration_period_keys:audit OUTPUT=tmp/registration_period_key_audit.json
-cd rails && bin/rails registration_period_keys:audit SLUG=shenfukung-wenfu OUTPUT=tmp/registration_period_key_audit.json
+cd rails && bin/rails registration_period_keys:audit SLUG=shengfukung-wenfu OUTPUT=tmp/registration_period_key_audit.json
 
 # Dry-run fallback remap (no writes)
-cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shenfukung-wenfu FALLBACK_KEY=perennial
+cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shengfukung-wenfu FALLBACK_KEY=perennial
 
 # Apply fallback remap (writes)
-cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shenfukung-wenfu FALLBACK_KEY=perennial APPLY=true
+cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shengfukung-wenfu FALLBACK_KEY=perennial APPLY=true
 
 # Registration period support workflow (Phase C)
 # 1) Edit rails/db/temples/<slug>.yml registration_periods (keys + labels)
@@ -118,26 +118,26 @@ cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shenfukung-wen
 ruby ops/scripts/sync_offering_configs.rb
 
 # 3) Re-seed temple YAML payload into DB for the target temple
-cd rails && bin/rails "temples:seed[shenfukung-wenfu]"
+cd rails && bin/rails "temples:seed[shengfukung-wenfu]"
 
 # 4) Validate no invalid period keys remain
-cd rails && bin/rails registration_period_keys:audit SLUG=shenfukung-wenfu OUTPUT=tmp/registration_period_key_audit.json
+cd rails && bin/rails registration_period_keys:audit SLUG=shengfukung-wenfu OUTPUT=tmp/registration_period_key_audit.json
 
 # 5) Deploy updated app artifacts
-bin/deploy_vue shenfukung-wenfu
+bin/deploy_vue shengfukung-wenfu
 
 # Registration period yearly rollover (Phase D)
 # Dry-run one temple (default: no writes)
-cd rails && bin/rails registration_period_keys:rollover_year SLUG=shenfukung-wenfu OUTPUT=tmp/registration_period_rollover.json
+cd rails && bin/rails registration_period_keys:rollover_year SLUG=shengfukung-wenfu OUTPUT=tmp/registration_period_rollover.json
 
 # Dry-run all temples
 cd rails && bin/rails registration_period_keys:rollover_year OUTPUT=tmp/registration_period_rollover.json
 
 # Apply YAML rollover for one temple
-cd rails && bin/rails registration_period_keys:rollover_year SLUG=shenfukung-wenfu WRITE=true OUTPUT=tmp/registration_period_rollover_apply.json
+cd rails && bin/rails registration_period_keys:rollover_year SLUG=shengfukung-wenfu WRITE=true OUTPUT=tmp/registration_period_rollover_apply.json
 
 # Apply YAML rollover + update existing services (explicit flag)
-cd rails && bin/rails registration_period_keys:rollover_year SLUG=shenfukung-wenfu WRITE=true UPDATE_SERVICES=true OUTPUT=tmp/registration_period_rollover_apply.json
+cd rails && bin/rails registration_period_keys:rollover_year SLUG=shengfukung-wenfu WRITE=true UPDATE_SERVICES=true OUTPUT=tmp/registration_period_rollover_apply.json
 
 # Registration lifecycle expiry automation
 # Runs expiring-soon notifications, cancels stale unpaid holds, then sends expired notifications.
@@ -208,7 +208,7 @@ bin/rails db:migrate
 
 - `bin/rails db:seed` now provisions a `Temple` record keyed by `AppConstants::Project.slug`, default pages/sections, and links the seeded owner admin to that temple. The temple-specific copy lives in `rails/db/temples/<slug>.yml`; add a file per client and run `bin/rails temples:seed[slug]` whenever you need to upsert another profile. Run that same command on the production droplet the first time you deploy a temple so the live DB matches the YAML baseline.
 - Marketing/demo console (`/marketing/admin`) still uses the `PROJECT_DEFAULT_ADMIN_*` env vars (`admin@<project-slug>.local` / `GoldenTemplate!123` by default).
-- The real temple admin console (`/admin`) now authenticates against the actual `User` records you seed (e.g., `bin/rails "admin_controls:seed_owner[shenfukung-wenfu,email@example.com,Password]"`). Use those seeded credentials when signing in.
+- The real temple admin console (`/admin`) now authenticates against the actual `User` records you seed (e.g., `bin/rails "admin_controls:seed_owner[shengfukung-wenfu,email@example.com,Password]"`). Use those seeded credentials when signing in.
 - Admin console → “Profile” lets you edit the copy/contact info surfaced on the Vue site. Form submissions append a `SystemAuditLog`.
 - The Vue app reads `http://localhost:3001/api/v1/temples/:slug` (set via `VITE_API_BASE_URL` + `VITE_TEMPLE_SLUG`). Copy `/vue/.env.example` into the repo root as `.env.development` (or merge into your existing `.env.development`) and adjust those keys when targeting another Rails host.
 - Expo builds now read `EXPO_PROJECT_SLUG`, `EXPO_PROJECT_SCHEME`, `EXPO_ANDROID_PACKAGE`, and `EXPO_IOS_BUNDLE_IDENTIFIER` (falling back to the shared keys when absent), so add those to `.env.*` alongside `MOBILE_API_BASE_URL`, `MOBILE_JWT_LOGIN_PATH`, and `MOBILE_JWT_REFRESH_PATH`.
@@ -320,12 +320,12 @@ ssh jimmy1768_user@143.198.91.24
 
 # Dummy Logins
 ```
-Owner Admin  – owner@shenfukung-wenfu.local  /  DemoPassword!23
-Staff Admin  – admin@shenfukung-wenfu.local  /  DemoPassword!23
-Patron Tester – patron@shenfukung-wenfu.local /  DemoPassword!23
-Dev Support  – dev@shenfukung-wenfu.local   /  DemoPassword!23
-Demo Client  – demo@shenfukung-wenfu.local  /  DemoPassword!23
-Guest Operator – guest@shenfukung-wenfu.local / DemoPassword!23
+Owner Admin  – owner@shengfukung-wenfu.local  /  DemoPassword!23
+Staff Admin  – admin@shengfukung-wenfu.local  /  DemoPassword!23
+Patron Tester – patron@shengfukung-wenfu.local /  DemoPassword!23
+Dev Support  – dev@shengfukung-wenfu.local   /  DemoPassword!23
+Demo Client  – demo@shengfukung-wenfu.local  /  DemoPassword!23
+Guest Operator – guest@shengfukung-wenfu.local / DemoPassword!23
 ```
 
 cd Projects/sourcegrid-labs

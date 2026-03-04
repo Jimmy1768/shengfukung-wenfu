@@ -7,7 +7,7 @@ module Seeds
     extend self
 
     OFFERINGS = {
-      "shenfukung-wenfu" => [
+      "shengfukung-wenfu" => [
         {
           slug: "lantern-lighting",
           kind: :event,
@@ -131,7 +131,7 @@ module Seeds
     }.freeze
 
     GATHERINGS = {
-      "shenfukung-wenfu" => [
+      "shengfukung-wenfu" => [
         {
           slug: "first-aid-workshop",
           title: "社群聚會：寺院急救工作坊",

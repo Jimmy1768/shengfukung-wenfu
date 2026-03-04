@@ -1,4 +1,4 @@
-# ops/systemd/shenfukung-wenfu-sidekiq.service
+# ops/systemd/shengfukung-wenfu-sidekiq.service
 #
 # Systemd unit for the Sidekiq worker process.
 
@@ -9,8 +9,8 @@ After=network.target
 [Service]
 Type=simple
 User=jimmy1768_user
-WorkingDirectory=/home/jimmy1768_user/Projects/shenfukung-wenfu/rails
-EnvironmentFile=/etc/default/shenfukung-wenfu-env
+WorkingDirectory=/home/jimmy1768_user/Projects/shengfukung-wenfu/rails
+EnvironmentFile=/etc/default/shengfukung-wenfu-env
 Environment=RBENV_ROOT=/home/jimmy1768_user/.rbenv
 Environment=PATH=/home/jimmy1768_user/.rbenv/shims:/home/jimmy1768_user/.rbenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ExecStart=/usr/bin/bash -lc 'bundle exec sidekiq -C config/sidekiq.yml'

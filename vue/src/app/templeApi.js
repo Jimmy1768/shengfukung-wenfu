@@ -1,6 +1,6 @@
 const DEFAULT_BASE_URL = 'http://localhost:3002';
 const DEFAULT_SLUG =
-  import.meta.env.VITE_TEMPLE_SLUG || 'shenfukung-wenfu';
+  import.meta.env.VITE_TEMPLE_SLUG || 'shengfukung-wenfu';
 
 function resolveBaseUrl(value) {
   const input =

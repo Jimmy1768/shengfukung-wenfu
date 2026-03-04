@@ -1,6 +1,6 @@
 # Deployment Readiness Plan
 
-This is the go-live checklist for TempleMate (`shenfukung-wenfu`) staging deployment. Use this as an execution runbook, not just a reference note.
+This is the go-live checklist for TempleMate (`shengfukung-wenfu`) staging deployment. Use this as an execution runbook, not just a reference note.
 
 ## Execution Rules
 
@@ -11,8 +11,8 @@ This is the go-live checklist for TempleMate (`shenfukung-wenfu`) staging deploy
 
 ## Release Metadata
 
-- Slug: `shenfukung-wenfu`
-- Staging domain: `shenfukung.com.tw`
+- Slug: `shengfukung-wenfu`
+- Staging domain: `shengfukung.com.tw`
 - Future production domain: `.org.tw` (pending client purchase)
 - Target host: `<user@host>`
 - Ops owner: `<name>`
@@ -33,23 +33,23 @@ This is the go-live checklist for TempleMate (`shenfukung-wenfu`) staging deploy
 ## 1. Environment File Bootstrap + Deploy
 
 - [ ] Owner: Ops + App engineer
-- [ ] Copy values from `ops/env/template.temple.env` into `/etc/default/shenfukung-wenfu-env`.
-- [ ] Fill `/etc/default/shenfukung-wenfu-env` with real staging values:
+- [ ] Copy values from `ops/env/template.temple.env` into `/etc/default/shengfukung-wenfu-env`.
+- [ ] Fill `/etc/default/shengfukung-wenfu-env` with real staging values:
   - project origins
   - payment provider settings (default `PAYMENTS_PROVIDER=fake` until real provider credentials are validated)
   - email provider keys
 - [ ] Validate env loads:
   ```bash
-  bin/load_temple_env shenfukung-wenfu -- (cd rails && bundle exec rails runner "puts ENV.fetch('PROJECT_SLUG')")
+  bin/load_temple_env shengfukung-wenfu -- (cd rails && bundle exec rails runner "puts ENV.fetch('PROJECT_SLUG')")
   ```
-- [ ] Confirm remote file exists: `/etc/default/shenfukung-wenfu-env`
+- [ ] Confirm remote file exists: `/etc/default/shengfukung-wenfu-env`
 - [ ] Pass criteria: env file installed with root-only permissions and expected key set.
 
 ## 2. Nginx Template Finalization
 
 - [ ] Owner: Ops
-- [ ] Ensure `ops/nginx/shenfukung-wenfu.conf` contains:
-  - staging `server_name shenfukung.com.tw`
+- [ ] Ensure `ops/nginx/shengfukung-wenfu.conf` contains:
+  - staging `server_name shengfukung.com.tw`
   - future production placeholder block/comments
   - upstream/socket references aligned with rendered systemd service names
   - correct Vue root (`/var/www/<slug>` style path)
@@ -72,17 +72,17 @@ This is the go-live checklist for TempleMate (`shenfukung-wenfu`) staging deploy
   sudo bin/apply_nginx_config
   ```
 - [ ] Ensure Vue target directory exists:
-  - `/var/www/shenfukung-wenfu` (or rendered equivalent)
+  - `/var/www/shengfukung-wenfu` (or rendered equivalent)
 - [ ] Pass criteria: Puma/Sidekiq services installed and nginx reload succeeds.
 
 ## 4. DNS + TLS
 
 - [ ] Owner: Ops / DNS admin
-- [ ] Point `shenfukung.com.tw` A record to droplet IP.
+- [ ] Point `shengfukung.com.tw` A record to droplet IP.
 - [ ] Wait for DNS propagation.
 - [ ] Issue cert:
   ```bash
-  sudo certbot --nginx -d shenfukung.com.tw
+  sudo certbot --nginx -d shengfukung.com.tw
   ```
 - [ ] Capture live certbot-managed config back into repo:
   ```bash
@@ -95,15 +95,15 @@ This is the go-live checklist for TempleMate (`shenfukung-wenfu`) staging deploy
 
 - [ ] Owner: App engineer
 - [ ] Update manifest public URL for slug:
-  - `rails/app/lib/temples/manifest.yml` -> `https://shenfukung.com.tw`
+  - `rails/app/lib/temples/manifest.yml` -> `https://shengfukung.com.tw`
 - [ ] Deploy Vue:
   ```bash
-  bin/deploy_vue shenfukung-wenfu
+  bin/deploy_vue shengfukung-wenfu
   ```
 - [ ] Restart services after env/config changes:
   ```bash
-  sudo systemctl restart shenfukung-wenfu-puma
-  sudo systemctl restart shenfukung-wenfu-sidekiq
+  sudo systemctl restart shengfukung-wenfu-puma
+  sudo systemctl restart shengfukung-wenfu-sidekiq
   ```
 - [ ] Optional: Expo builds via `bin/expo_prebuild` / `bin/expo_build` as release scope requires.
 - [ ] Pass criteria: site + API reachable from staging domain.
@@ -113,11 +113,11 @@ This is the go-live checklist for TempleMate (`shenfukung-wenfu`) staging deploy
 - [ ] Owner: QA + App engineer
 - [ ] Run platform smoke tests:
   ```bash
-  SMOKE_BASE_URL=https://shenfukung.com.tw bin/run_smoke_tests
+  SMOKE_BASE_URL=https://shengfukung.com.tw bin/run_smoke_tests
   ```
 - [ ] Manual checks:
   - home page loads with expected temple content
-  - `/api/v1/temples/shenfukung-wenfu` returns `200`
+  - `/api/v1/temples/shengfukung-wenfu` returns `200`
   - admin sign-in page reachable
   - one registration flow can be created in staging
 - [ ] Payments gate for this phase:

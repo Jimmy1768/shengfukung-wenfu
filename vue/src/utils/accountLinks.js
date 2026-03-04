@@ -1,4 +1,4 @@
-const DEFAULT_TEMPLE_SLUG = import.meta.env.VITE_TEMPLE_SLUG || 'shenfukung-wenfu';
+const DEFAULT_TEMPLE_SLUG = import.meta.env.VITE_TEMPLE_SLUG || 'shengfukung-wenfu';
 
 function resolveAccountBaseUrl() {
   const explicit = import.meta.env.VITE_ACCOUNT_BASE_URL || import.meta.env.VITE_API_BASE_URL;

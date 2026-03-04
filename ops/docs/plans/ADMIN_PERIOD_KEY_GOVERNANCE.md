@@ -25,9 +25,9 @@
 ### Phase B Runbook
 
 - Audit invalid keys (all temples): `cd rails && bin/rails registration_period_keys:audit OUTPUT=tmp/registration_period_key_audit.json`
-- Audit one temple: `cd rails && bin/rails registration_period_keys:audit SLUG=shenfukung-wenfu OUTPUT=tmp/registration_period_key_audit.json`
-- Dry-run fallback remap: `cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shenfukung-wenfu FALLBACK_KEY=perennial`
-- Apply fallback remap: `cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shenfukung-wenfu FALLBACK_KEY=perennial APPLY=true`
+- Audit one temple: `cd rails && bin/rails registration_period_keys:audit SLUG=shengfukung-wenfu OUTPUT=tmp/registration_period_key_audit.json`
+- Dry-run fallback remap: `cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shengfukung-wenfu FALLBACK_KEY=perennial`
+- Apply fallback remap: `cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shengfukung-wenfu FALLBACK_KEY=perennial APPLY=true`
 - Remap stores prior invalid keys in `metadata.legacy_registration_period_keys` on services + registrations before rewriting.
 
 ## Phase C — Ops Workflow
@@ -61,13 +61,13 @@ Reference commands: `ops/docs/reference/commands.md`.
 ### Phase D Rollover Runbook
 
 1. Dry-run one temple and inspect report:
-   - `cd rails && bin/rails registration_period_keys:rollover_year SLUG=shenfukung-wenfu OUTPUT=tmp/registration_period_rollover.json`
+   - `cd rails && bin/rails registration_period_keys:rollover_year SLUG=shengfukung-wenfu OUTPUT=tmp/registration_period_rollover.json`
 2. Dry-run all temples:
    - `cd rails && bin/rails registration_period_keys:rollover_year OUTPUT=tmp/registration_period_rollover.json`
 3. Apply YAML rollover for one temple:
-   - `cd rails && bin/rails registration_period_keys:rollover_year SLUG=shenfukung-wenfu WRITE=true OUTPUT=tmp/registration_period_rollover_apply.json`
+   - `cd rails && bin/rails registration_period_keys:rollover_year SLUG=shengfukung-wenfu WRITE=true OUTPUT=tmp/registration_period_rollover_apply.json`
 4. Apply YAML rollover + service key updates (explicit flag):
-   - `cd rails && bin/rails registration_period_keys:rollover_year SLUG=shenfukung-wenfu WRITE=true UPDATE_SERVICES=true OUTPUT=tmp/registration_period_rollover_apply.json`
+   - `cd rails && bin/rails registration_period_keys:rollover_year SLUG=shengfukung-wenfu WRITE=true UPDATE_SERVICES=true OUTPUT=tmp/registration_period_rollover_apply.json`
 5. Verify:
    - run `registration_period_keys:audit` and confirm no unexpected invalid keys were introduced
    - review service list in admin for expected period labels/keys

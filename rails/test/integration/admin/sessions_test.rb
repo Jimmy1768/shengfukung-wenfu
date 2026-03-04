@@ -2,7 +2,7 @@ require "test_helper"
 
 class AdminSessionsTest < ActionDispatch::IntegrationTest
   test "signs in with seeded admin credentials" do
-    temple = create_temple(slug: "shenfukung-wenfu")
+    temple = create_temple(slug: "shengfukung-wenfu")
     admin = create_admin_user(temple:)
 
     post admin_sessions_path, params: { session: { email: admin.email, password: "Password123!" } }

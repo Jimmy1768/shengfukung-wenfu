@@ -1,6 +1,6 @@
 # Temple Onboarding Runbook
 
-This file documents how we bring a new temple onto the Shenfukung Wenfu stack. It supersedes the generic Golden Template `DEPLOYMENT_NOTES.md`—keep this repo-specific checklist up to date as the workflow evolves.
+This file documents how we bring a new temple onto the Shengfukung Wenfu stack. It supersedes the generic Golden Template `DEPLOYMENT_NOTES.md`—keep this repo-specific checklist up to date as the workflow evolves.
 
 ## Vocabulary
 
@@ -18,7 +18,7 @@ Use this when you need representative data locally or on staging:
 >
 > - Use `ops/env/template.temple.env` as your non-secret checklist template.
 > - Keep third-party credentials out of git: local goes in `.env.development`; production goes in `/etc/default/<slug>-env`.
-> - Load a specific temple’s secrets by prefixing any command with `bin/load_temple_env <slug> -- <command>`. Example: `bin/load_temple_env shenfukung-wenfu -- (cd rails && bundle exec rails server -p 3001)`.
+> - Load a specific temple’s secrets by prefixing any command with `bin/load_temple_env <slug> -- <command>`. Example: `bin/load_temple_env shengfukung-wenfu -- (cd rails && bundle exec rails server -p 3001)`.
 > - The loader sources `.env`, `.env.<env>`, then `/etc/default/<slug>-env` when readable (falling back to `.env.development`), so Vue/Expo builds and Rails share the same credential set for the active temple.
 
 ### Generate + Deploy Env Files
@@ -43,7 +43,7 @@ Use this workflow whenever you onboard a new temple slug.
   VITE_TEMPLE_THEME=temple-1
   ```
   Layout defaults to `classic` until new templates are shipped; themes map to palette IDs defined in `shared/design-system/themes.json`.
-- Run Vue/Rails/Expo commands through `bin/load_temple_env <slug> -- …` so the same env file powers every surface. Example: `bin/load_temple_env shenfukung-wenfu -- (cd vue && npm run build)`.
+- Run Vue/Rails/Expo commands through `bin/load_temple_env <slug> -- …` so the same env file powers every surface. Example: `bin/load_temple_env shengfukung-wenfu -- (cd vue && npm run build)`.
 - When onboarding a new temple, confirm the slug + theme combo works locally:
   1. `bin/load_temple_env <slug> -- (cd vue && npm install && npm run dev)`
   2. Visit `http://localhost:5173` and verify copy/assets match the expected temple.
@@ -51,7 +51,7 @@ Use this workflow whenever you onboard a new temple slug.
 - Document the chosen layout/theme in the temple’s YAML or ops checklist so future deploys keep the same combo.
 
 1. **Author profile YAML**
-   - Copy `rails/db/temples/shenfukung-wenfu.yml` as a starting point.
+   - Copy `rails/db/temples/shengfukung-wenfu.yml` as a starting point.
    - Set `slug`, `name`, `contact`, `service_times`, and optional hero/about/meta copy.
    - Commit the file.
 2. **Seed the temple**
@@ -71,13 +71,13 @@ Use this workflow whenever you onboard a new temple slug.
    - Verify the temple profile shows the placeholder QR and owner-only panels.
    - Ensure audit logs are written when editing basic fields.
 5. **Seed financial events + services**
-   - `Seeds::TempleFinancials` now hydrates `temple_events`, `temple_services`, `temple_gatherings`, and corresponding `temple_registrations` + payments. Services also expect a `registration_period_key` (e.g., `"2026-ghost-month"`) so duplicate guardrails and reports know which cycle the registration belongs to. Define these keys per temple by adding `registration_periods` to the temple YAML (see `rails/db/temples/shenfukung-wenfu.yml` for examples). After editing the YAML or gathering seeds, run:
+   - `Seeds::TempleFinancials` now hydrates `temple_events`, `temple_services`, `temple_gatherings`, and corresponding `temple_registrations` + payments. Services also expect a `registration_period_key` (e.g., `"2026-ghost-month"`) so duplicate guardrails and reports know which cycle the registration belongs to. Define these keys per temple by adding `registration_periods` to the temple YAML (see `rails/db/temples/shengfukung-wenfu.yml` for examples). After editing the YAML or gathering seeds, run:
      ```bash
-     bin/rails "temple_financial:seed_offerings[shenfukung-wenfu]"
+     bin/rails "temple_financial:seed_offerings[shengfukung-wenfu]"
      ```
    - Grant staff financial permissions (owner already has them):
      ```bash
-     bin/rails "temple_financial:grant_permissions[shenfukung-wenfu,admin@shenfukung-wenfu.local]"
+     bin/rails "temple_financial:grant_permissions[shengfukung-wenfu,admin@shengfukung-wenfu.local]"
      ```
    - Cash-only pipeline: use `/admin/events/...`, `/admin/services/...`, or `/admin/gatherings/...` → Orders to capture registrations, then “Record cash payment” to log receipts + ledger entries. LINE Pay arrives after onsite validation.
 6. **Customize product templates per temple**

@@ -1,11 +1,11 @@
 {
   "companyName": "SourceGrid Labs",
   "name": "竹南鎮聖福宮",
-  "slug": "shenfukung-wenfu",
+  "slug": "shengfukung-wenfu",
   "defaultThemeKey": "temple-1",
-  "scheme": "shenfukungwenfu",
+  "scheme": "shengfukungwenfu",
   "easProjectId": "9bb5082f-2b35-4168-bcf7-5a09c61bd2e1",
-  "bundlePrefix": "com.shenfukungwenfu.console",
-  "marketingRoot": "/var/www/shenfukung-wenfu",
+  "bundlePrefix": "com.shengfukungwenfu.console",
+  "marketingRoot": "/var/www/shengfukung-wenfu",
   "systemdEnvDir": "/etc/default"
 }

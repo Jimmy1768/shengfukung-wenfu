@@ -1,4 +1,4 @@
-slug: shenfukung-wenfu
+slug: shengfukung-wenfu
 name: 竹南鎮聖福宮
 tagline: 清淨・莊嚴・在地信仰
 hero_copy: 用簡潔的段落說明本廟的宗旨、服務與交通資訊。
@@ -16,7 +16,7 @@ service_times:
   weekend: 07:30 – 18:00
   notes: 農曆初一、十五延長開放。
 metadata:
-  seed_profile: shenfukung-wenfu
+  seed_profile: shengfukung-wenfu
   visit_info:
     transportation: "火車：竹南車站下車步行 8 分鐘；公車 581（聖福里站）即達。自行開車可循台61線竹南交流道出口接公教路。"
     parking: "廟埕前保留敬老專用停車位，周邊可使用公教路公有停車場或仁愛街停車格，建議預留 10 分鐘找車位。"
