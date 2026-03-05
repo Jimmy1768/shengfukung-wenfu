@@ -14,7 +14,7 @@ Type=simple
 User=jimmy1768_user
 WorkingDirectory=/home/jimmy1768_user/Projects/shengfukung-wenfu/rails
 EnvironmentFile=/etc/default/shengfukung-wenfu-env
-ExecStart=/usr/bin/bash -lc 'bundle exec sidekiq -C config/sidekiq.yml'
+ExecStart=/usr/bin/bash -lc "/home/jimmy1768_user/.rbenv/bin/rbenv exec bundle exec sidekiq -C config/sidekiq.yml"
 Restart=always
 
 [Install]

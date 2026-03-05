@@ -15,7 +15,7 @@ Type=simple
 User=jimmy1768_user
 WorkingDirectory=/home/jimmy1768_user/Projects/shengfukung-wenfu/rails
 EnvironmentFile=/etc/default/shengfukung-wenfu-env
-ExecStart=/usr/bin/bash -lc 'bundle exec puma -C config/puma.rb'
+ExecStart=/usr/bin/bash -lc "/home/jimmy1768_user/.rbenv/bin/rbenv exec bundle exec puma -C config/puma.rb"
 Restart=always
 
 [Install]
