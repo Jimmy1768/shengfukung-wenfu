@@ -6,6 +6,13 @@ This plan is intentionally split into phases.
 - Decision: do not create temple-specific production OAuth clients now.
 - Policy: keep production OAuth disabled in temple deployments until centralized auth is ready.
 
+## Status Snapshot (2026-03-05)
+
+- [x] Agreed: no temple-specific production OAuth clients for `shengfukung-wenfu`.
+- [x] Agreed: keep localhost-only OAuth credentials in dev scope only.
+- [x] Drafted centralized auth direction and handed implementation to platform/sourcegrid project.
+- [ ] Temple runtime verification still pending (`OAUTH_*` empty + restart + login checks).
+
 ## Scope
 
 - Define what can be done immediately without creating provider client drift.
@@ -42,13 +49,13 @@ Provider buttons appear only when both client id + secret are present.
 
 ### A2. Preserve Environment Separation
 
-- [ ] Keep localhost-only OAuth client in dev project (`Golden-Template`) for local use only.
-- [ ] Do not reuse dev credentials in production env.
-- [ ] Do not create temple-domain production OAuth clients in this phase.
+- [x] Keep localhost-only OAuth client in dev project (`Golden-Template`) for local use only.
+- [x] Do not reuse dev credentials in production env.
+- [x] Do not create temple-domain production OAuth clients in this phase.
 
 ### A3. Document Central Auth Requirement
 
-- [ ] Central callback host must be one stable HTTPS domain (example placeholder):
+- [x] Central callback host must be one stable HTTPS domain (example placeholder):
   - `https://<central-auth-host>/auth/google_oauth2/callback`
   - `https://<central-auth-host>/auth/apple/callback`
   - `https://<central-auth-host>/auth/facebook/callback`
