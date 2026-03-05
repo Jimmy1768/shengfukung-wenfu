@@ -141,6 +141,10 @@ Rails.application.routes.draw do
     resources :uploads, only: :create
   end
 
+# --- Central auth bridge ----------------------------------------------------
+get "/auth/central/:provider/start", to: "auth/central_oauth#start", as: :central_oauth_start
+match "/auth/callback", to: "auth/central_oauth#callback", via: %i[get post], as: :central_oauth_callback
+
   # --- OmniAuth callbacks -----------------------------------------------------
   match "/auth/:provider/callback", to: "auth/omniauth#callback", via: %i[get post]
   match "/auth/failure", to: "auth/omniauth#failure", via: %i[get post]

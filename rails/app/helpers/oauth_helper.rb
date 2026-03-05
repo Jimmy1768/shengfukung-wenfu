@@ -7,14 +7,36 @@ module OAuthHelper
 
   def oauth_provider_links
     PROVIDER_SPECS.filter_map do |key, payload|
-      next unless AppConstants::OAuth.enabled?(key)
-
       strategy = AppConstants::OAuth::PROVIDERS[key][:strategy] || key
-      {
-        label: payload[:label],
-        strategy: strategy,
-        icon_path: payload[:icon_path]
-      }
+
+      if AppConstants::OAuth.central_auth_enabled?
+        {
+          label: payload[:label],
+          strategy: strategy,
+          icon_path: payload[:icon_path],
+          path: central_oauth_start_path(
+            provider: key,
+            surface: oauth_surface,
+            temple: params[:temple].presence,
+            origin: request.fullpath
+          )
+        }
+      else
+        next unless AppConstants::OAuth.enabled?(key)
+
+        {
+          label: payload[:label],
+          strategy: strategy,
+          icon_path: payload[:icon_path],
+          path: "/auth/#{strategy}"
+        }
+      end
     end
+  end
+
+  private
+
+  def oauth_surface
+    request.path.start_with?("/admin") ? "admin" : "account"
   end
 end

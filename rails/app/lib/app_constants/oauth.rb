@@ -27,6 +27,12 @@ module AppConstants
       }
     }.freeze
 
+    CENTRAL_AUTH_ENV_KEYS = %w[AUTH_BASE_URL AUTH_CLIENT_ID AUTH_CLIENT_SECRET].freeze
+
+    def self.central_auth_enabled?
+      CENTRAL_AUTH_ENV_KEYS.all? { |key| ENV[key].present? }
+    end
+
     def self.enabled_providers
       PROVIDERS.each_with_object([]) do |(provider, env_keys), memo|
         next if provider == :email
