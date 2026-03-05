@@ -53,7 +53,7 @@ module Backend
     # === Locale / Timezone defaults =========================================
     # You will override or finalize later, but let's keep a clean template.
     # config.time_zone = "Asia/Taipei"
-    config.i18n.default_locale = :en
+    config.i18n.default_locale = :"zh-TW"
     config.i18n.available_locales = %i[en zh-TW]
 
     # === Additional Paths (optional) ========================================

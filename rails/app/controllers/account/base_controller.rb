@@ -27,6 +27,7 @@ module Account
     ACCOUNT_TEMPLE_SESSION_KEY = "account_active_temple_slug"
     ACCOUNT_ENTRY_INTENT_SESSION_KEY = "account_entry_intent"
     ACCOUNT_LOCALE_SESSION_KEY = AppConstants::Sessions.key(:account_locale)
+    ACCOUNT_LOCALE_COOKIE_KEY = "account_locale"
 
     def assign_account_theme
       resolved = Themes::Policy.resolve(
@@ -88,14 +89,18 @@ module Account
     def establish_user_session!(user)
       preserved_temple_slug = @active_temple_slug.presence || session[ACCOUNT_TEMPLE_SESSION_KEY]
       preserved_intent = session[ACCOUNT_ENTRY_INTENT_SESSION_KEY]
+      preserved_locale = current_account_locale
       reset_session
       session[ACCOUNT_TEMPLE_SESSION_KEY] = preserved_temple_slug if preserved_temple_slug.present?
       session[ACCOUNT_ENTRY_INTENT_SESSION_KEY] = preserved_intent if preserved_intent.present?
+      session[ACCOUNT_LOCALE_SESSION_KEY] = preserved_locale if preserved_locale.present?
       session[AppConstants::Sessions.key(:account)] = user.id
     end
 
     def destroy_user_session!
+      preserved_locale = current_account_locale
       reset_session
+      session[ACCOUNT_LOCALE_SESSION_KEY] = preserved_locale if preserved_locale.present?
     end
 
     def account_theme_options
@@ -140,9 +145,27 @@ module Account
     def current_account_locale
       @current_account_locale ||= begin
         stored = session[ACCOUNT_LOCALE_SESSION_KEY]
-        locale = stored.presence || I18n.default_locale
+        cookie_locale = cookies[ACCOUNT_LOCALE_COOKIE_KEY]
+        locale = stored.presence || cookie_locale.presence || persisted_account_locale.presence || I18n.default_locale
         normalize_account_locale(locale)
       end
+    end
+
+    def persisted_account_locale
+      current_user&.user_preference&.locale
+    end
+
+    def persist_account_locale!(locale)
+      normalized = normalize_account_locale(locale)
+      session[ACCOUNT_LOCALE_SESSION_KEY] = normalized
+      cookies[ACCOUNT_LOCALE_COOKIE_KEY] = {
+        value: normalized.to_s,
+        expires: 1.year.from_now,
+        secure: Rails.env.production?,
+        httponly: false,
+        same_site: :lax
+      }
+      normalized
     end
 
     def normalize_account_locale(locale)

@@ -3,9 +3,14 @@ module Account
     skip_before_action :authenticate_user!
 
     def create
-      next_locale = normalize_account_locale(locale_params[:locale])
-      session[ACCOUNT_LOCALE_SESSION_KEY] = next_locale
+      next_locale = persist_account_locale!(locale_params[:locale])
       @current_account_locale = next_locale
+
+      if current_user
+        preference = UserPreference.for_user(current_user)
+        preference.update!(locale: next_locale.to_s)
+      end
+
       redirect_back(
         fallback_location: account_login_path,
         notice: I18n.t("account.language_selector.flash", locale: next_locale)
