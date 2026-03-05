@@ -74,7 +74,7 @@ validate_nginx_source() {
     "location ^~ /api"
     "location ^~ /admin"
     "location ^~ /marketing/admin"
-    "location ^~ /assets/"
+    "location ^~ /backend/assets/"
     "location ^~ /frontend/assets/"
     "server_name"
   )
@@ -161,7 +161,7 @@ deploy_nginx() {
     local domain
     domain="$(read_primary_domain "$source" || true)"
     if [[ -n "$domain" ]]; then
-      curl -ksI --resolve "$domain:443:127.0.0.1" "https://$domain/assets/admin.css" >/dev/null || true
+      curl -ksI --resolve "$domain:443:127.0.0.1" "https://$domain/backend/assets/admin.css" >/dev/null || true
     fi
   fi
 }
