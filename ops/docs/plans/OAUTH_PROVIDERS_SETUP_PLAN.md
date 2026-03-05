@@ -2,108 +2,104 @@
 
 This plan is intentionally split into phases.
 
-- Current state: centralized auth service is not implemented yet.
-- Decision: do not create temple-specific production OAuth clients now.
-- Policy: keep production OAuth disabled in temple deployments until centralized auth is ready.
+- Current decision: use centralized auth service (no per-temple provider clients).
+- Temple policy: temple runtimes must not store Google/Apple/Facebook provider secrets.
+- Temple runtimes only store central auth tenant credentials.
 
 ## Status Snapshot (2026-03-05)
 
 - [x] Agreed: no temple-specific production OAuth clients for `shengfukung-wenfu`.
 - [x] Agreed: keep localhost-only OAuth credentials in dev scope only.
-- [x] Drafted centralized auth direction and handed implementation to platform/sourcegrid project.
-- [ ] Temple runtime verification still pending (`OAUTH_*` empty + restart + login checks).
-
-## Scope
-
-- Define what can be done immediately without creating provider client drift.
-- Freeze production OAuth client creation until central auth host/service exists.
-- Prepare clean cutover steps for Google, Apple, Facebook later.
+- [x] Central auth handoff started in platform/sourcegrid project.
+- [x] Tenant registered in central auth DB for `shengfukung`.
+- [ ] Temple-side runtime wiring and verification still pending.
 
 ## Source Of Truth In Code
 
-- Provider env keys: `rails/app/lib/app_constants/oauth.rb`
-- OmniAuth middleware wiring: `rails/config/initializers/omniauth.rb`
-- Callback routes: `rails/config/routes.rb`
+- Local provider env keys (legacy direct OmniAuth): `rails/app/lib/app_constants/oauth.rb`
+- Local callback routes (legacy direct OmniAuth): `rails/config/routes.rb`
+- Central auth endpoints (new flow):
+  - `POST /oauth/start`
+  - `POST /oauth/token/exchange`
 
-## Provider Env Keys
+## Phase A: Hold Pattern (Completed)
 
-- `OAUTH_GOOGLE_CLIENT_ID`
-- `OAUTH_GOOGLE_CLIENT_SECRET`
-- `OAUTH_APPLE_CLIENT_ID`
-- `OAUTH_APPLE_CLIENT_SECRET`
-- `OAUTH_FACEBOOK_CLIENT_ID`
-- `OAUTH_FACEBOOK_CLIENT_SECRET`
+### A1. Keep Direct Provider OAuth Disabled In Temple Runtime
 
-Provider buttons appear only when both client id + secret are present.
-
-## Phase A: Hold Pattern (Do Now)
-
-### A1. Keep Production OAuth Disabled
-
-- [ ] Ensure all `OAUTH_*` vars are empty in `/etc/default/shengfukung-wenfu-env`.
-- [ ] Restart Puma after env updates:
-  ```bash
-  sudo systemctl restart shengfukung-wenfu-puma
-  ```
-- [ ] Confirm account/admin login still works via email/password.
+- [x] Do not create temple-domain production OAuth clients.
+- [x] Do not put provider secrets (`OAUTH_*`) into temple production env.
 
 ### A2. Preserve Environment Separation
 
 - [x] Keep localhost-only OAuth client in dev project (`Golden-Template`) for local use only.
 - [x] Do not reuse dev credentials in production env.
-- [x] Do not create temple-domain production OAuth clients in this phase.
 
-### A3. Document Central Auth Requirement
-
-- [x] Central callback host must be one stable HTTPS domain (example placeholder):
-  - `https://<central-auth-host>/auth/google_oauth2/callback`
-  - `https://<central-auth-host>/auth/apple/callback`
-  - `https://<central-auth-host>/auth/facebook/callback`
-- [ ] Temple domains will redirect into central auth flow and return to tenant origin after callback.
-
-## Phase B: Centralized Auth Cutover (Blocked Until Service Exists)
-
-Blocked by implementation in platform/core project.
+## Phase B: Centralized Auth Platform Work (Owned By Platform Project)
 
 ### B1. Prerequisites
 
-- [ ] Central auth service deployed and reachable.
-- [ ] DNS + TLS active for central auth host.
-- [ ] Tenant allowlist + signed state + nonce replay protection implemented.
-- [ ] Callback endpoints verified in production (`/auth/:provider/callback`).
+- [x] Central auth service deployed and reachable.
+- [x] Central auth tenant created for shengfukung.
+- [ ] Signed state/nonce replay controls validated end-to-end.
+- [ ] Final production monitoring/audit checks validated.
 
-### B2. Provider Client Creation (Once)
+### B2. Platform Contracts
 
-- [ ] Create production Google OAuth web client with central callback host.
-- [ ] Create production Apple web login config with central callback host.
-- [ ] Create production Facebook login config with central callback host.
-- [ ] Store secrets in centralized secret management + deployment env.
+- [x] Tenant backend must call:
+  - `POST /oauth/start`
+  - `POST /oauth/token/exchange`
+- [x] Tenant has allowlisted return URLs at central auth.
 
-### B3. Runtime Wiring
+## Phase C: Temple Runtime Wiring (This Repo)
 
-- [ ] Set `OAUTH_*` vars only in the central auth runtime env.
-- [ ] Keep temple runtimes free of provider secrets unless architecture explicitly requires otherwise.
+### C1. Add Central Auth Env Keys (Temple Runtime)
 
-### B4. Verification
+Add only these to `/etc/default/shengfukung-wenfu-env`:
 
-- [ ] Start OAuth from at least two temple domains.
-- [ ] Verify callback lands on central host.
-- [ ] Verify post-login return redirects to correct tenant domain/slug.
-- [ ] Verify audit logs and failure handling.
+- `AUTH_BASE_URL`
+- `AUTH_CLIENT_ID`
+- `AUTH_CLIENT_SECRET`
 
-## Acceptance Criteria For Enabling OAuth In Temples
+Notes:
 
-All must be true:
+- Keep `OAUTH_GOOGLE_*`, `OAUTH_APPLE_*`, `OAUTH_FACEBOOK_*` empty in this temple runtime.
+- Rotate `AUTH_CLIENT_SECRET` if shared in plaintext outside secure channel.
 
-- [ ] Central auth host/service is live in production.
-- [ ] Provider production clients point to central callback host.
-- [ ] Signed state validation is enforced.
-- [ ] Return URL allowlist is enforced per tenant.
-- [ ] End-to-end login verified for multiple temple domains.
+### C2. Wire Temple Login Flow To Central Auth
+
+- [ ] Login start path calls central `POST /oauth/start` from temple backend.
+- [ ] Temple callback endpoint receives auth code/token payload and calls central `POST /oauth/token/exchange` server-to-server.
+- [ ] Temple creates/updates session from exchanged claims.
+
+### C3. Return URL Rules
+
+Use only allowlisted return URLs for this tenant:
+
+- `https://shengfukung.com.tw/auth/callback`
+- `https://www.shengfukung.com.tw/auth/callback`
+
+Do not use unregistered callback URLs.
+
+### C4. Verification Checklist
+
+- [ ] `/account/login` starts OAuth through central auth.
+- [ ] Provider login returns to temple callback URL.
+- [ ] Session established after token exchange.
+- [ ] Admin/account pages load authenticated state correctly.
+- [ ] Logs show successful `/oauth/start` and `/oauth/token/exchange` with no 500s.
+
+## Acceptance Criteria
+
+All must be true before marking OAuth done for this temple:
+
+- [ ] Temple runtime contains only `AUTH_*` client credentials (no provider secrets).
+- [ ] Central auth flow works for both `shengfukung.com.tw` and `www.shengfukung.com.tw`.
+- [ ] Token exchange and session establishment are stable.
+- [ ] Error/denial paths are user-safe and logged.
 
 ## Security Notes
 
-- Never commit OAuth secrets.
-- Keep dev and production OAuth credentials separate.
-- Rotate secrets immediately if exposed.
-- Prefer one clean production client set per provider for centralized auth.
+- Never commit secrets.
+- Keep dev and production credentials separate.
+- Rotate credentials immediately if exposed.
+- Prefer one clean centralized provider client set per provider.
