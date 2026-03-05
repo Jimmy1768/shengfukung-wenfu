@@ -5,7 +5,7 @@ require "net/http"
 require "uri"
 
 module Auth
-  class CentralOauthClient
+  class CentralOAuthClient
     class Error < StandardError; end
     class ConfigError < Error; end
     class RequestError < Error; end

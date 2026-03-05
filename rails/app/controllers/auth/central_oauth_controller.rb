@@ -3,7 +3,7 @@
 require "securerandom"
 
 module Auth
-  class CentralOauthController < ActionController::Base
+  class CentralOAuthController < ActionController::Base
     protect_from_forgery with: :exception
     skip_before_action :verify_authenticity_token
 
@@ -48,11 +48,11 @@ module Auth
         response["auth_url"].presence ||
         response["url"].presence
 
-      raise Auth::CentralOauthClient::RequestError, "Missing redirect URL from central auth" if redirect_url.blank?
+      raise Auth::CentralOAuthClient::RequestError, "Missing redirect URL from central auth" if redirect_url.blank?
 
       redirect_to redirect_url, allow_other_host: true
     rescue StandardError => e
-      Rails.logger.error("[CentralOauthController#start] #{e.class}: #{e.message}")
+      Rails.logger.error("[CentralOAuthController#start] #{e.class}: #{e.message}")
       redirect_to fallback_login_path(requested_surface), alert: "OAuth login is unavailable right now."
     end
 
@@ -81,14 +81,14 @@ module Auth
 
       redirect_to resolve_post_login_path(pending), notice: "Signed in successfully."
     rescue StandardError => e
-      Rails.logger.error("[CentralOauthController#callback] #{e.class}: #{e.message}")
+      Rails.logger.error("[CentralOAuthController#callback] #{e.class}: #{e.message}")
       redirect_to fallback_login_path(pending["surface"]), alert: "OAuth callback failed. Please try again."
     end
 
     private
 
     def central_auth_client
-      @central_auth_client ||= Auth::CentralOauthClient.new
+      @central_auth_client ||= Auth::CentralOAuthClient.new
     end
 
     def requested_surface
