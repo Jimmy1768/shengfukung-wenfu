@@ -173,6 +173,7 @@ textarea,
 select,
 .form-control {
   width: 100%;
+  box-sizing: border-box;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
