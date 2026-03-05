@@ -129,6 +129,10 @@
   - Verify nginx routes with host header before DNS cutover: `curl -I -H "Host: <domain>" http://127.0.0.1/api/v1/temples/<slug>`.
   - Verify nginx asset split after each render/certbot change: `/frontend/assets/*` must serve Vue files, and `/assets/*` must proxy to Rails. Confirm with `curl -I https://<domain>/frontend/assets/<known-file>` and `curl -I https://<domain>/assets/<known-rails-css>`.
   - If `/etc/nginx/sites-enabled/default` conflicts with custom routing, disable it and keep only the slug-specific site enabled.
+- Nginx apply safety guard (important):
+  - `bin/apply_nginx_config` now blocks unsafe overwrites by default: it rejects rendered files that still contain example hosts (`web.example.com`, `project.com`, etc.) and rejects TLS downgrades (when the live site already has 443/certbot config but the rendered file does not).
+  - To intentionally bypass these checks (rare), pass `--force` explicitly: `sudo bin/apply_nginx_config --force`.
+  - Optional TLS policy override: `EXPECT_TLS=auto|yes|no` (default `auto`). Keep `auto` for normal workflows so existing HTTPS hosts are protected.
 - Deploy doctor maintenance and pipeline placement:
   - `bin/doctor_deploy` is the preflight guardrail for first deploys and client clones. Keep it in sync with real incident patterns (runtime/tooling drift, env gaps, nginx routing mismatches).
   - When rebuilding/extending `bin/doctor_deploy` for future template clones:

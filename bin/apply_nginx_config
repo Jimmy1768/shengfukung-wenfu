@@ -10,6 +10,30 @@ DEFAULT_NGINX_ENABLED="/etc/nginx/sites-enabled"
 
 NGINX_AVAILABLE_DIR="${NGINX_AVAILABLE_DIR:-$DEFAULT_NGINX_AVAILABLE}"
 NGINX_ENABLED_DIR="${NGINX_ENABLED_DIR:-$DEFAULT_NGINX_ENABLED}"
+EXPECT_TLS="${EXPECT_TLS:-auto}"
+FORCE=0
+
+STAGE_ARGS=()
+while (($#)); do
+  case "$1" in
+    --force)
+      FORCE=1
+      shift
+      ;;
+    --expect-tls=*)
+      EXPECT_TLS="${1#*=}"
+      shift
+      ;;
+    --expect-tls)
+      EXPECT_TLS="${2:-auto}"
+      shift 2
+      ;;
+    *)
+      STAGE_ARGS+=("$1")
+      shift
+      ;;
+  esac
+done
 
 require_root() {
   if [[ $EUID -ne 0 ]]; then
@@ -26,9 +50,87 @@ read_project_slug() {
   fi
 }
 
+read_primary_domain() {
+  local source="$1"
+  awk '/^[[:space:]]*server_name[[:space:]]+/ {print $2; exit}' "$source" | sed 's/;//g'
+}
+
 stage_configs() {
   echo "Rendering latest ops configs…"
-  "$ROOT_DIR/bin/stage_ops_configs" "$@"
+  "$ROOT_DIR/bin/stage_ops_configs" "${STAGE_ARGS[@]}"
+}
+
+validate_nginx_source() {
+  local source="$1"
+  local available_target="$2"
+  local slug="$3"
+
+  if [[ ! -f "$source" ]]; then
+    echo "Missing nginx config at $source. Run bin/stage_ops_configs first." >&2
+    exit 1
+  fi
+
+  local required_patterns=(
+    "location ^~ /api"
+    "location ^~ /admin"
+    "location ^~ /marketing/admin"
+    "location ^~ /assets/"
+    "location ^~ /frontend/assets/"
+    "server_name"
+  )
+
+  for pattern in "${required_patterns[@]}"; do
+    if ! grep -Fq "$pattern" "$source"; then
+      echo "Refusing to apply nginx config: missing required pattern '$pattern' in $source" >&2
+      exit 1
+    fi
+  done
+
+  local forbidden_patterns=(
+    "web.example.com"
+    "api.example.com"
+    "app.example.com"
+    "dev.example.com"
+    "project.com"
+  )
+
+  for pattern in "${forbidden_patterns[@]}"; do
+    if grep -Fq "$pattern" "$source"; then
+      echo "Refusing to apply nginx config: found example host '$pattern' in $source" >&2
+      echo "Fix template/render output first. Use --force only if you intentionally want this." >&2
+      [[ $FORCE -eq 1 ]] || exit 1
+    fi
+  done
+
+  local require_tls=0
+  case "$EXPECT_TLS" in
+    yes|true|1)
+      require_tls=1
+      ;;
+    no|false|0)
+      require_tls=0
+      ;;
+    auto)
+      if [[ -f "$available_target" ]] && grep -Eq 'listen[[:space:]]+443|ssl_certificate|letsencrypt' "$available_target"; then
+        require_tls=1
+      fi
+      ;;
+    *)
+      echo "Invalid EXPECT_TLS=$EXPECT_TLS (use auto|yes|no)." >&2
+      exit 1
+      ;;
+  esac
+
+  if [[ $require_tls -eq 1 ]] && ! grep -Eq 'listen[[:space:]]+443' "$source"; then
+    echo "Refusing to apply nginx config: live config expects TLS but rendered source has no 'listen 443'." >&2
+    echo "Use --force only if you intentionally want to remove TLS from this host." >&2
+    [[ $FORCE -eq 1 ]] || exit 1
+  fi
+
+  if [[ $require_tls -eq 1 ]] && grep -Eq 'listen[[:space:]]+443' "$source" && ! grep -Eq 'ssl_certificate|letsencrypt' "$source"; then
+    echo "Refusing to apply nginx config: source includes 443 listener but no ssl_certificate/letsencrypt directives." >&2
+    [[ $FORCE -eq 1 ]] || exit 1
+  fi
 }
 
 deploy_nginx() {
@@ -37,9 +139,12 @@ deploy_nginx() {
   local available_target="$NGINX_AVAILABLE_DIR/${slug}.conf"
   local enabled_target="$NGINX_ENABLED_DIR/${slug}.conf"
 
-  if [[ ! -f "$source" ]]; then
-    echo "Missing nginx config at $source. Run bin/stage_ops_configs first." >&2
-    exit 1
+  validate_nginx_source "$source" "$available_target" "$slug"
+
+  if [[ -f "$available_target" ]]; then
+    local backup_path="${available_target}.bak.$(date +%Y%m%d%H%M%S)"
+    echo "Backing up existing nginx config → $backup_path"
+    cp "$available_target" "$backup_path"
   fi
 
   echo "Copying nginx config → $available_target"
@@ -51,15 +156,23 @@ deploy_nginx() {
   nginx -t
   echo "Reloading nginx…"
   nginx -s reload
+
+  if ss -ltnp | grep -q ':443'; then
+    local domain
+    domain="$(read_primary_domain "$source" || true)"
+    if [[ -n "$domain" ]]; then
+      curl -ksI --resolve "$domain:443:127.0.0.1" "https://$domain/assets/admin.css" >/dev/null || true
+    fi
+  fi
 }
 
 main() {
   require_root
-  stage_configs "$@"
+  stage_configs
   local slug
   slug="$(read_project_slug)"
   deploy_nginx "$slug"
   echo "Nginx config applied successfully."
 }
 
-main "$@"
+main

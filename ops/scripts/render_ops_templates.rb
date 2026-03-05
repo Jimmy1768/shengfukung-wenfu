@@ -68,31 +68,77 @@ rescue StandardError
   nil
 end
 
-def activate_nginx_template(content)
-  directive_pattern =
-    /\A(?:upstream|server|listen|server_name|root|location|expires|add_header|try_files|proxy_pass|proxy_set_header|\{|\}|#)/i
+def uncomment(line)
+  line.sub(/\A#\s?/, "")
+end
 
-  active_lines = []
+def extract_upstream_block(lines)
+  output = []
+  in_block = false
+  depth = 0
 
-  content.each_line do |line|
-    if line.start_with?("#")
-      candidate = line.sub(/\A#\s?/, "")
-      trimmed = candidate.lstrip
+  lines.each do |line|
+    if !in_block
+      next unless line.match?(/^\s*#\s*upstream\s+rails_puma\s*\{/)
 
-      if trimmed.empty?
-        active_lines << "\n"
-        next
-      end
-
-      next unless trimmed.match?(directive_pattern)
-
-      active_lines << candidate
-    else
-      active_lines << line
+      candidate = uncomment(line)
+      output << candidate
+      in_block = true
+      depth = candidate.count("{") - candidate.count("}")
+      next
     end
+
+    candidate = uncomment(line)
+    output << candidate
+    depth += candidate.count("{") - candidate.count("}")
+    break if depth <= 0
   end
 
-  active_lines.join
+  output
+end
+
+def extract_public_server_block(lines)
+  output = []
+  in_public_section = false
+  in_server = false
+  depth = 0
+
+  lines.each do |line|
+    unless in_public_section
+      in_public_section = true if line.include?("Public site + marketing showcase")
+      next
+    end
+
+    if !in_server
+      next unless line.match?(/^\s*#\s*server\s*\{/)
+
+      candidate = uncomment(line)
+      output << candidate
+      in_server = true
+      depth = candidate.count("{") - candidate.count("}")
+      next
+    end
+
+    candidate = uncomment(line)
+    output << candidate
+    depth += candidate.count("{") - candidate.count("}")
+    break if depth <= 0
+  end
+
+  output
+end
+
+def activate_nginx_template(content)
+  lines = content.each_line.to_a
+
+  upstream = extract_upstream_block(lines)
+  public_server = extract_public_server_block(lines)
+
+  if upstream.empty? || public_server.empty?
+    raise "Could not extract upstream/public server blocks from nginx template. Keep template headings and commented structure intact."
+  end
+
+  ([*upstream, "\n", *public_server].join).strip + "\n"
 end
 
 options = {
