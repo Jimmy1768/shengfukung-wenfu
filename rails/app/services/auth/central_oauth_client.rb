@@ -28,7 +28,7 @@ module Auth
       [@base_url, @client_id, @client_secret].all?(&:present?)
     end
 
-    def start(provider:, return_url:, context: {})
+    def start(provider:, return_url:, tenant_slug: nil, context: {})
       ensure_configured!
 
       post_json(
@@ -36,22 +36,18 @@ module Auth
         {
           provider: provider,
           return_url: return_url,
-          client_id: @client_id,
-          client_secret: @client_secret,
+          tenant_slug: tenant_slug,
           context: context
-        }
+        }.compact
       )
     end
 
-    def exchange(params:)
+    def exchange(params:, tenant_slug: nil)
       ensure_configured!
 
       post_json(
         "/oauth/token/exchange",
-        params.merge(
-          client_id: @client_id,
-          client_secret: @client_secret
-        )
+        params.merge(tenant_slug: tenant_slug).compact
       )
     end
 
@@ -67,6 +63,7 @@ module Auth
       uri = URI.join(ensure_trailing_slash(@base_url), path.sub(%r{\A/+}, ""))
       request = Net::HTTP::Post.new(uri)
       request["Content-Type"] = "application/json"
+      request.basic_auth(@client_id, @client_secret)
       request.body = JSON.generate(payload)
 
       response = Net::HTTP.start(

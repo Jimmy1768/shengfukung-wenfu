@@ -39,6 +39,7 @@ module Auth
       response = central_auth_client.start(
         provider: provider,
         return_url: central_oauth_callback_url,
+        tenant_slug: central_tenant_slug(pending),
         context: pending
       )
 
@@ -46,7 +47,8 @@ module Auth
         response["redirect_url"].presence ||
         response["authorization_url"].presence ||
         response["auth_url"].presence ||
-        response["url"].presence
+        response["url"].presence ||
+        response["authorize_url"].presence
 
       raise Auth::CentralOAuthClient::RequestError, "Missing redirect URL from central auth" if redirect_url.blank?
 
@@ -74,7 +76,7 @@ module Auth
         query: request.query_parameters
       }.compact
 
-      response = central_auth_client.exchange(params: exchange_payload)
+      response = central_auth_client.exchange(params: exchange_payload, tenant_slug: central_tenant_slug(pending))
       identity = find_or_create_identity_from_exchange!(response)
 
       establish_session_for(identity.user, pending)
@@ -162,6 +164,10 @@ module Auth
     def extract_claims(response)
       value = response["claims"] || response["user"] || response["profile"] || {}
       value.is_a?(Hash) ? value : {}
+    end
+
+    def central_tenant_slug(pending)
+      ENV["AUTH_TENANT_SLUG"].presence || pending["tenant"].presence
     end
 
     def normalize_provider_param(value)
