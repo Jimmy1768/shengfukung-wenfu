@@ -1114,6 +1114,12 @@ button.pill-link {
   color: var(--text);
 }
 
+.account-contact-temple-modal .profile-form input,
+.account-contact-temple-modal .profile-form textarea {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
 .form-actions {
   margin-top: 1.5rem;
   display: flex;
