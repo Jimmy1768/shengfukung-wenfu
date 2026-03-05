@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "base64"
+require "json"
 require "securerandom"
 
 module Auth
@@ -137,15 +139,21 @@ module Auth
     end
 
     def find_or_create_identity_from_exchange!(response)
-      claims = extract_claims(response)
+      fields = extract_identity_fields(response)
+      provider = normalize_identity_provider(fields[:provider])
+      uid = fields[:uid]
+      email = fields[:email]
+      name = fields[:name]
 
-      provider = normalize_identity_provider(claims["provider"] || response["provider"])
-      uid = claims["provider_uid"] || claims["uid"] || claims["sub"] || response["provider_uid"] || response["uid"]
-      email = claims["email"] || response["email"]
-      name = claims["name"] || response["name"]
+      if provider.blank?
+        Rails.logger.error("[CentralOAuthController#callback] Missing provider in exchange response keys=#{response.keys}")
+        raise "OAuth exchange missing provider"
+      end
 
-      raise "OAuth exchange missing provider" if provider.blank?
-      raise "OAuth exchange missing uid" if uid.blank?
+      if uid.blank?
+        Rails.logger.error("[CentralOAuthController#callback] Missing uid in exchange response keys=#{response.keys}")
+        raise "OAuth exchange missing uid"
+      end
 
       identity = OAuthIdentity.find_or_initialize_by(provider: provider, provider_uid: uid.to_s)
       identity.user ||= find_or_create_user(email:, name:, provider:)
@@ -161,9 +169,82 @@ module Auth
       identity
     end
 
+    def extract_identity_fields(response)
+      claims = extract_claims(response)
+      id_token_claims = extract_id_token_claims(response)
+
+      {
+        provider: first_present(
+          claims["provider"],
+          response["provider"],
+          id_token_claims["provider"],
+          response.dig("identity", "provider")
+        ),
+        uid: first_present(
+          claims["provider_uid"],
+          claims["uid"],
+          claims["sub"],
+          claims["subject"],
+          response["provider_uid"],
+          response["uid"],
+          response["sub"],
+          response["subject"],
+          response.dig("identity", "provider_uid"),
+          response.dig("identity", "uid"),
+          response.dig("identity", "sub"),
+          id_token_claims["sub"],
+          id_token_claims["uid"]
+        ),
+        email: first_present(
+          claims["email"],
+          response["email"],
+          response.dig("identity", "email"),
+          response.dig("user", "email"),
+          id_token_claims["email"]
+        ),
+        name: first_present(
+          claims["name"],
+          response["name"],
+          response.dig("identity", "name"),
+          response.dig("user", "name"),
+          id_token_claims["name"]
+        )
+      }
+    end
+
     def extract_claims(response)
-      value = response["claims"] || response["user"] || response["profile"] || {}
+      value =
+        response["claims"] ||
+        response["user"] ||
+        response["profile"] ||
+        response.dig("identity", "claims") ||
+        response.dig("credentials", "claims") ||
+        {}
+
       value.is_a?(Hash) ? value : {}
+    end
+
+    def extract_id_token_claims(response)
+      token =
+        response["id_token"] ||
+        response.dig("credentials", "id_token") ||
+        response.dig("tokens", "id_token")
+
+      return {} if token.blank?
+
+      payload = token.to_s.split(".")[1]
+      return {} if payload.blank?
+
+      padded = payload + ("=" * ((4 - payload.length % 4) % 4))
+      decoded = Base64.urlsafe_decode64(padded)
+      parsed = JSON.parse(decoded)
+      parsed.is_a?(Hash) ? parsed : {}
+    rescue StandardError
+      {}
+    end
+
+    def first_present(*values)
+      values.find(&:present?)
     end
 
     def central_tenant_slug(pending)
