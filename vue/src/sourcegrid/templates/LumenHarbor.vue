@@ -2,6 +2,7 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import PricingPanel from '../components/PricingPanel.vue';
 import { buildHeroCtas } from './utils/buildHeroCtas';
+import { getEditorialAssetsForBrand } from './editorialAssets';
 import applyBrandCopy from './utils/applyBrandCopy';
 
 const props = defineProps({
@@ -20,31 +21,7 @@ const emit = defineEmits(['navigate', 'contact']);
 
 const resolvedBrand = computed(() => applyBrandCopy(props.brand, props.brandCopy));
 
-// Template-only collage assets (kept outside brand assets on purpose)
-const buildEditorialAssets = (basePath, overrides = {}) => ({
-  collageAnchor: new URL(`${basePath}/collage-anchor-suite-vertical.png`, import.meta.url).href,
-  collageOffset: new URL(`${basePath}/collage-offset-terrace-frame.png`, import.meta.url).href,
-  collageDetail: new URL(`${basePath}/collage-detail-ritual-hands.png`, import.meta.url).href,
-  collageAtmosphere: new URL(`${basePath}/collage-atmosphere-light-haze.png`, import.meta.url).href,
-  ambientLinen: new URL(`${basePath}/editorial-detail-linen-light.png`, import.meta.url).href,
-  ambientHorizon: new URL(`${basePath}/editorial-horizon-sunrise.png`, import.meta.url).href,
-  ...overrides
-});
-
-const editorialAssetSets = {
-  hotel: buildEditorialAssets('../../assets/media/hotel/editorial'),
-  ramen: buildEditorialAssets('../../assets/media/ramen/editorial'),
-  clothing: buildEditorialAssets('../../assets/media/clothing/editorial', {
-    collageOffset: new URL(
-      '../../assets/media/clothing/editorial/collage-offset-terrace-fram.png',
-      import.meta.url
-    ).href
-  })
-};
-
-const editorialAssets = computed(
-  () => editorialAssetSets[props.brand?.id] ?? editorialAssetSets.hotel
-);
+const editorialAssets = computed(() => getEditorialAssetsForBrand(props.brand?.id));
 
 const collagePieces = computed(() => {
   const assets = editorialAssets.value;

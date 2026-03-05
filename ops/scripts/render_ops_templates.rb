@@ -128,19 +128,6 @@ def extract_public_server_block(lines)
   output
 end
 
-def activate_nginx_template(content)
-  lines = content.each_line.to_a
-
-  upstream = extract_upstream_block(lines)
-  public_server = extract_public_server_block(lines)
-
-  if upstream.empty? || public_server.empty?
-    raise "Could not extract upstream/public server blocks from nginx template. Keep template headings and commented structure intact."
-  end
-
-  ([*upstream, "\n", *public_server].join).strip + "\n"
-end
-
 options = {
   slug: nil,
   output: nil
@@ -198,7 +185,15 @@ nginx_destination = File.join(nginx_output_dir, "#{slug}.conf")
 if File.exist?(nginx_template)
   nginx_content = File.read(nginx_template)
   rendered = render_placeholders(nginx_content, slug, human_name, public_domain: public_domain)
-  activated = activate_nginx_template(rendered)
+  lines = rendered.lines
+  upstream_block = extract_upstream_block(lines)
+  public_server_block = extract_public_server_block(lines)
+
+  if upstream_block.empty? || public_server_block.empty?
+    raise "Failed to extract required nginx blocks from #{nginx_template}"
+  end
+
+  activated = (upstream_block + ["\n"] + public_server_block).join
 
   FileUtils.mkdir_p(File.dirname(nginx_destination))
   File.write(nginx_destination, activated)
