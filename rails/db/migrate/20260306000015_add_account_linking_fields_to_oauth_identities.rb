@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddAccountLinkingFieldsToOauthIdentities < ActiveRecord::Migration[7.1]
+class AddAccountLinkingFieldsToOAuthIdentities < ActiveRecord::Migration[7.1]
   def up
     add_column :oauth_identities, :email_verified, :boolean
     add_column :oauth_identities, :linked_at, :datetime
