@@ -236,3 +236,14 @@
 - 2026-03-04: Added `bin/doctor_deploy` preflight command and documented it in the client bootstrap checklist.
 - 2026-03-04: Added `bin/doctor_deploy` maintenance guidance (how to extend checks, pipeline placement, and next-project `commands.md` inclusion requirement).
 - 2026-03-05: Fixed nginx asset split docs: Vue static assets are `/frontend/assets/*`, Rails asset pipeline routes are `/backend/assets/*`; added explicit post-render/certbot verification guidance.
+
+## CSS Debugging Checklist
+
+- Start with computed styles, not assumptions: inspect the target field in DevTools and record `padding-left`, `padding-right`, `box-sizing`, and the winning selector/file.
+- Confirm the active stylesheet URL in the page (`<link rel="stylesheet">`) before editing; this repo must load `/backend/assets/account.css` for account UI.
+- Keep form control primitives centralized in `rails/app/stylesheets/shared/_forms.scss`; prefer small scoped overrides in surface files (`account.scss`) only when needed.
+- For width + padding controls, enforce `box-sizing: border-box` to prevent overflow that looks like asymmetric padding.
+- After SCSS edits, rebuild checked-in CSS with `bin/build_rails_css` and verify the built output contains the new rule(s) in `rails/public/backend/assets/*.css`.
+- If UI still looks unchanged, compare `git rev-parse --short HEAD` and built CSS content on the running host; stale build artifacts and browser cache are the most common causes.
+- Use hard refresh after CSS deploys; avoid repeated style edits until computed values and loaded asset paths are verified.
+- 2026-03-05: Added a CSS debugging checklist (computed styles, active stylesheet verification, border-box rule, rebuild verification) to reduce style-change drift/debug time.
