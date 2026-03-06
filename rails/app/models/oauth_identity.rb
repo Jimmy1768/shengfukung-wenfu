@@ -9,6 +9,8 @@ class OAuthIdentity < ApplicationRecord
   validates :provider_uid, presence: true
   validates :user_id, uniqueness: { scope: :provider, message: "already linked to this provider" }
   validates :provider_uid, uniqueness: { scope: :provider }
+  validates :email_verified, inclusion: { in: [true, false] }, allow_nil: true
 
   scope :for_provider, ->(provider) { where(provider: provider) }
+  scope :recently_active, -> { order(last_login_at: :desc, updated_at: :desc) }
 end

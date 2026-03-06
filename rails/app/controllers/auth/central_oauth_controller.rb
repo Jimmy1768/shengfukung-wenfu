@@ -142,8 +142,6 @@ module Auth
       fields = extract_identity_fields(response)
       provider = normalize_identity_provider(fields[:provider])
       uid = fields[:uid]
-      email = fields[:email]
-      name = fields[:name]
 
       if provider.blank?
         Rails.logger.error("[CentralOAuthController#callback] Missing provider in exchange response keys=#{response.keys}")
@@ -155,18 +153,18 @@ module Auth
         raise "OAuth exchange missing uid"
       end
 
-      identity = OAuthIdentity.find_or_initialize_by(provider: provider, provider_uid: uid.to_s)
-      identity.user ||= find_or_create_user(email:, name:, provider:)
-      identity.email = email
-      identity.credentials = response["credentials"] || {}
-      identity.metadata = {
-        "central_auth" => response,
-        "updated_at" => Time.current.iso8601
-      }
-      identity.save!
+      result = Auth::OAuthIdentityResolver.resolve_or_link!(
+        provider: provider,
+        uid: uid,
+        email: fields[:email],
+        name: fields[:name],
+        email_verified: fields[:email_verified],
+        credentials: response["credentials"] || {},
+        metadata: { "central_auth" => response }
+      )
 
-      ensure_terms_acceptance(identity.user, provider)
-      identity
+      ensure_terms_acceptance(result.user, provider)
+      result.identity
     end
 
     def extract_identity_fields(response)
@@ -208,6 +206,13 @@ module Auth
           response.dig("identity", "name"),
           response.dig("user", "name"),
           id_token_claims["name"]
+        ),
+        email_verified: first_present(
+          claims["email_verified"],
+          response["email_verified"],
+          response.dig("identity", "email_verified"),
+          response.dig("user", "email_verified"),
+          id_token_claims["email_verified"]
         )
       }
     end
@@ -258,29 +263,6 @@ module Auth
     def normalize_identity_provider(value)
       mapped = PROVIDER_ALIASES[value.to_s]
       PROVIDER_TO_IDENTITY[mapped]
-    end
-
-    def find_or_create_user(email:, name:, provider:)
-      user = User.find_or_initialize_by(email: email.presence || generated_email(provider))
-      return user if user.persisted?
-
-      user.assign_attributes(
-        english_name: name.presence || "OAuth User",
-        encrypted_password: User.password_hash(SecureRandom.hex(16)),
-        metadata: (user.metadata || {}).merge(
-          {
-            oauth_seeded: true,
-            provider: provider,
-            central_oauth: true
-          }
-        )
-      )
-      user.save!
-      user
-    end
-
-    def generated_email(provider)
-      "#{provider}_#{SecureRandom.hex(8)}@#{AppConstants::Project.slug}.oauth"
     end
 
     def ensure_terms_acceptance(user, provider)
