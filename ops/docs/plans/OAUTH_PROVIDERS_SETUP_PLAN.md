@@ -6,13 +6,15 @@ This plan is intentionally split into phases.
 - Temple policy: temple runtimes must not store Google/Apple/Facebook provider secrets.
 - Temple runtimes only store central auth tenant credentials.
 
-## Status Snapshot (2026-03-05)
+## Status Snapshot (2026-03-06)
 
 - [x] Agreed: no temple-specific production OAuth clients for `shengfukung-wenfu`.
 - [x] Agreed: keep localhost-only OAuth credentials in dev scope only.
 - [x] Central auth handoff started in platform/sourcegrid project.
 - [x] Tenant registered in central auth DB for `shengfukung`.
-- [ ] Temple-side runtime wiring and verification still pending.
+- [x] Temple-side runtime wiring is active and verified for Google end-to-end.
+- [x] Apple provider is configured in Apple Developer + central auth `/oauth/start` returns `authorize_url`.
+- [ ] Apple full callback sign-in success test is still pending (intentionally deferred until account-linking is implemented).
 
 ## Source Of Truth In Code
 
@@ -82,11 +84,13 @@ Do not use unregistered callback URLs.
 
 ### C4. Verification Checklist
 
-- [ ] `/account/login` starts OAuth through central auth.
-- [ ] Provider login returns to temple callback URL.
-- [ ] Session established after token exchange.
-- [ ] Admin/account pages load authenticated state correctly.
-- [ ] Logs show successful `/oauth/start` and `/oauth/token/exchange` with no 500s.
+- [x] `/account/login` starts OAuth through central auth.
+- [x] Google login returns to temple callback URL.
+- [x] Google session established after token exchange.
+- [x] Admin/account pages load authenticated state correctly for Google flow.
+- [x] Logs show successful `/oauth/start` and `/oauth/token/exchange` with no 500s for Google flow.
+- [x] Apple `/oauth/start` returns valid `authorize_url` from central auth.
+- [ ] Apple callback and final sign-in success path is pending (deferred until account linking is built).
 
 ## Acceptance Criteria
 
