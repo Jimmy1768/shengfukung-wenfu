@@ -135,6 +135,7 @@ en:
         empty: "No dependent profiles yet."
     oauth:
       flash:
+        disabled: "Account linking is not enabled for this account yet."
         unavailable: "OAuth provider linking is unavailable right now."
         unlinked: "%{provider} has been unlinked from your account."
       index:

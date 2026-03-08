@@ -56,6 +56,10 @@ module Admin
     end
 
     def oauth_duplicates
+      unless oauth_account_linking_enabled?
+        return redirect_to admin_patrons_path, alert: t("admin.patrons.oauth_duplicates.disabled")
+      end
+
       @entries = Admin::OAuthDuplicateCandidatesReport.new.entries
     end
 

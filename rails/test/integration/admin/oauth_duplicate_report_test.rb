@@ -2,6 +2,10 @@ require "test_helper"
 
 module Admin
   class OauthDuplicateReportTest < ActionDispatch::IntegrationTest
+    setup do
+      Config::EntryResolver.upsert!(key: "oauth_account_linking", value: true)
+    end
+
     test "owner can review duplicate oauth candidates report" do
       temple = create_temple(slug: "duplicate-report-temple")
       admin_user = create_admin_user(temple: temple)
@@ -46,6 +50,17 @@ module Admin
       assert_includes response.body, "shared@example.com"
       assert_includes response.body, "First User"
       assert_includes response.body, "Second User"
+    end
+
+    test "duplicate report redirects when feature flag is disabled" do
+      temple = create_temple(slug: "duplicate-report-disabled-temple")
+      admin_user = create_admin_user(temple: temple)
+      Config::EntryResolver.upsert!(key: "oauth_account_linking", value: false)
+
+      sign_in_admin(admin_user)
+      get oauth_duplicates_admin_patrons_path
+
+      assert_redirected_to admin_patrons_path
     end
   end
 end

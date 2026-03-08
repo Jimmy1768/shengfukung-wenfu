@@ -267,6 +267,7 @@ en:
         subtitle: "Verified OAuth emails linked to more than one user account need manual review before any merge."
         hint: "Use this report to inspect historical duplicates. Never merge accounts automatically unless ownership is confirmed by support."
         back: "Back to patrons"
+        disabled: "OAuth duplicate review is not enabled for this account yet."
         empty: "No duplicate OAuth candidates were found."
         table:
           verified_email: "Verified email"

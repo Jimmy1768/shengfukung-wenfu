@@ -12,6 +12,10 @@ module Account
       end
     end
 
+    setup do
+      Config::EntryResolver.upsert!(key: "oauth_account_linking", value: true)
+    end
+
     test "signed in user can link another provider through central oauth callback" do
       temple = create_temple(slug: "oauth-linking-temple")
       user = User.create!(
@@ -38,6 +42,7 @@ module Account
         end
 
         assert_redirected_to "https://auth.example.test/oauth"
+        assert SystemAuditLog.exists?(action: "account.oauth.link_started", target: user)
       end
 
       exchange_response = {
@@ -110,6 +115,7 @@ module Account
       identity = OAuthIdentity.find_by!(provider: "google_oauth2", provider_uid: "shared-provider-uid")
       assert_equal other_user.id, identity.user_id
       assert_includes response.body, "already linked to another account"
+      assert SystemAuditLog.exists?(action: "account.oauth.link_conflict", target: current_user)
     end
 
     test "user can unlink provider when another login path remains" do
@@ -135,6 +141,7 @@ module Account
 
       assert_redirected_to account_oauth_identities_path
       assert_nil OAuthIdentity.find_by(id: identity.id)
+      assert SystemAuditLog.exists?(action: "account.oauth.unlinked", target: user)
     end
 
     test "oauth seeded user cannot unlink last provider" do
@@ -162,6 +169,23 @@ module Account
       assert OAuthIdentity.exists?(identity.id)
       follow_redirect!
       assert_includes response.body, "Add another sign-in method before unlinking this provider."
+    end
+
+    test "link management is unavailable when feature flag is off" do
+      temple = create_temple(slug: "oauth-flag-off-temple")
+      user = User.create!(
+        email: "flag-off@example.com",
+        english_name: "Flag Off",
+        encrypted_password: User.password_hash("Password123!"),
+        metadata: {}
+      )
+
+      sign_in_account(user, temple_slug: temple.slug)
+      Config::EntryResolver.upsert!(key: "oauth_account_linking", value: false)
+
+      get account_oauth_identities_path
+
+      assert_redirected_to account_profile_path
     end
   end
 end

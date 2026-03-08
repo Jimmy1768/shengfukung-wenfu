@@ -66,6 +66,13 @@ module Auth
       account_user = current_account_user
       pending = session.delete(PENDING_CONTEXT_SESSION_KEY) || {}
 
+      if link_intent?(pending) && !oauth_account_linking_enabled_for?(account_user)
+        return redirect_to(
+          fallback_redirect_path(pending),
+          alert: I18n.t("account.oauth.flash.disabled")
+        )
+      end
+
       if params[:error].present?
         return redirect_to(
           fallback_redirect_path(pending),
@@ -88,9 +95,25 @@ module Auth
         establish_session_for(user, pending)
       end
 
+      log_oauth_event(
+        link_intent?(pending) ? "account.oauth.linked" : "account.oauth.signed_in",
+        user: user,
+        pending: pending,
+        provider: identity.provider,
+        identity_id: identity.id,
+        linked_existing_user: link_result.respond_to?(:linked_existing_user) ? link_result.linked_existing_user : nil
+      )
+
       redirect_to success_redirect_path(pending), notice: success_notice(pending, link_result, identity)
     rescue Auth::OAuthIdentityLinker::ConflictError, Auth::OAuthIdentityLinker::ProviderAlreadyLinkedError => e
       Rails.logger.warn("[CentralOAuthController#callback] #{e.class}: #{e.message}")
+      log_oauth_event(
+        "account.oauth.link_conflict",
+        user: account_user,
+        pending: pending,
+        provider: normalize_provider_param(params[:provider]),
+        error: e.message
+      )
       redirect_to fallback_redirect_path(pending), alert: e.message
     rescue StandardError => e
       Rails.logger.error("[CentralOAuthController#callback] #{e.class}: #{e.message}")
@@ -295,6 +318,10 @@ module Auth
       User.find_by(id: user_id)
     end
 
+    def oauth_account_linking_enabled_for?(user)
+      FeatureFlags::Evaluator.enabled?("oauth_account_linking", actor: user)
+    end
+
     def fallback_redirect_path(pending)
       origin = pending["origin"].to_s
       return origin if origin.start_with?("/")
@@ -313,6 +340,20 @@ module Auth
       return "Your #{identity.provider.titleize} account is already linked." if link_result&.respond_to?(:already_linked) && link_result.already_linked
 
       "Linked #{identity.provider.titleize} to your account."
+    end
+
+    def log_oauth_event(action, user:, pending:, provider:, **metadata)
+      temple = Temple.find_by(slug: pending["temple"]) if pending["temple"].present?
+      actor = user || current_account_user
+      return if actor.blank?
+
+      SystemAuditLogger.log!(
+        action: action,
+        admin: actor,
+        target: actor,
+        metadata: metadata.merge(provider: provider, surface: pending["surface"], intent: pending["intent"]),
+        temple: temple
+      )
     end
 
     def normalize_provider_param(value)

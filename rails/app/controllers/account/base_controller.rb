@@ -8,6 +8,7 @@ module Account
     helper Forms::LayoutHelper
     helper_method :current_user,
       :user_signed_in?,
+      :oauth_account_linking_enabled?,
       :account_theme_options,
       :current_account_theme_label,
       :current_account_display_mode_id,
@@ -84,6 +85,10 @@ module Account
         else
           nil
         end
+    end
+
+    def oauth_account_linking_enabled?
+      FeatureFlags::Evaluator.enabled?("oauth_account_linking", actor: current_user)
     end
 
     def establish_user_session!(user)

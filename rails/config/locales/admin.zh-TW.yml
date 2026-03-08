@@ -267,6 +267,7 @@ zh-TW:
         subtitle: "同一組已驗證 OAuth Email 若連到多個使用者帳號，需先人工確認後才能處理。"
         hint: "此報表用於檢查歷史重複帳號。未完成身分確認前，請勿自動合併帳號。"
         back: "回到信眾名單"
+        disabled: "此帳號尚未開啟 OAuth 重複帳號檢視功能。"
         empty: "目前沒有發現重複的 OAuth 候選帳號。"
         table:
           verified_email: "已驗證 Email"

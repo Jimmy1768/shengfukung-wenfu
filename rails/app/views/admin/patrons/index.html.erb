@@ -48,7 +48,9 @@
           <p class="muted"><%= t("admin.patrons.index.results_hint") %></p>
         </div>
         <div class="form-actions">
-          <%= link_to t("admin.patrons.index.oauth_duplicates"), oauth_duplicates_admin_patrons_path, class: "btn btn-secondary" %>
+          <% if oauth_account_linking_enabled? %>
+            <%= link_to t("admin.patrons.index.oauth_duplicates"), oauth_duplicates_admin_patrons_path, class: "btn btn-secondary" %>
+          <% end %>
           <%= link_to t("admin.patrons.index.manage_permissions"), admin_permissions_path, class: "btn btn-secondary" %>
         </div>
       </header>

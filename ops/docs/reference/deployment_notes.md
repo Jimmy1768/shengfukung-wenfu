@@ -4,7 +4,7 @@
 # Adapt every path, domain, and placeholder to the project you copy this template into.
 #
 # ⚠️ Do not store secrets here.
-# Last updated: 2026-02-28
+# Last updated: 2026-03-08
 
 ## Client bootstrap checklist
 
@@ -12,12 +12,12 @@
 2. **Design assets** – drop the client’s favicon pack into `shared/design-system/assets/favicons/` and their splash artwork into `shared/design-system/assets/splash/`, then adjust `shared/design-system/themes.json` if palettes changed. The Expo icon builder auto-samples the favicon edge color to paint adaptive backgrounds.
 3. **Sync shared assets** – run `node bin/sync_design_system.js`. This regenerates theme tokens for Vue/Rails/Expo, syncs favicons, updates the Expo icon/adaptive-icon files, emits a dev-badged `mobile/assets/dev-icon(.png)` + `dev-adaptive-icon(.png)` for the dev client, and compresses Vue splash placeholders.
 4. **Environment map** – set API endpoints in `shared/app_constants/env.json` (e.g., `local` → laptop IP, `production` → droplet domain). The Expo config helper reads this file to inject `extra.api.baseUrl`; update/copy it when cloning to a new client.
-4. **Droplet preflight doctor** – on the host, run `bin/doctor_deploy <slug>` before applying nginx/systemd or deploying Vue. It validates runtime toolchain versions, env key completeness, manifest/domain mapping, Rails tmp dirs, Vue target permissions, and nginx site conflicts.
-4. **Rebuild Rails CSS bundles** – run `bin/build_rails_css`. This uses Dart Sass to compile `app/stylesheets/account/`, `app/stylesheets/admin/`, and `showcase_ui/styles/` into the checked-in `rails/public/backend/assets/*.css` files that the server serves.
-4. **Rails backend (first run)** – execute `bin/setup_backend_once`. It installs gems and runs `bin/rails db:setup`, then records a marker so you don’t accidentally rerun it. Use `bin/reset_backend` or `bin/reset_subsystem` when you need a fresh dataset later.
-5. **Ops configs** – run `bin/stage_ops_configs [--slug client]` to render nginx/systemd templates into `ops/systemd/` and `ops/nginx/` (for example `ops/systemd/<slug>-puma.service` + `ops/nginx/<slug>.conf`), then copy them onto the droplet via `bin/apply_systemd_units` / `bin/apply_nginx_config`.
-6. **Frontend deploy** – run `bin/deploy_vue <client-slug>` whenever you need to rebuild + sync the public site (landing pages + `/marketing`) to `/var/www/<client-slug>`.
-7. **Repeatable maintenance** – re-run `node bin/sync_design_system.js` when favicons, splash art, or themes change (it also regenerates the Expo + Vue splash assets), use `bin/deploy_vue` for frontend updates, and `bin/reset_backend`/`bin/reset_subsystem` if you need to reseed data locally.
+5. **Droplet preflight doctor** – on the host, run `bin/doctor_deploy <slug>` before applying nginx/systemd or deploying Vue. It validates runtime toolchain versions, env key completeness, manifest/domain mapping, Rails tmp dirs, Vue target permissions, and nginx site conflicts.
+6. **Rebuild Rails CSS bundles** – run `bin/build_rails_css`. This uses Dart Sass to compile `app/stylesheets/account/`, `app/stylesheets/admin/`, and `showcase_ui/styles/` into the checked-in `rails/public/backend/assets/*.css` files that the server serves.
+7. **Rails backend (first run)** – execute `bin/setup_backend_once`. It installs gems and runs `bin/rails db:setup`, then records a marker so you don’t accidentally rerun it. Use `bin/reset_backend` or `bin/reset_subsystem` when you need a fresh dataset later.
+8. **Ops configs** – run `bin/stage_ops_configs [--slug client]` to render nginx/systemd templates into `ops/systemd/` and `ops/nginx/` (for example `ops/systemd/<slug>-puma.service` + `ops/nginx/<slug>.conf`), then copy them onto the droplet via `bin/apply_systemd_units` / `bin/apply_nginx_config`.
+9. **Frontend deploy** – run `bin/deploy_vue <client-slug>` whenever you need to rebuild + sync the public site (landing pages + `/marketing`) to `/var/www/<client-slug>`.
+10. **Repeatable maintenance** – re-run `node bin/sync_design_system.js` when favicons, splash art, or themes change (it also regenerates the Expo + Vue splash assets), use `bin/deploy_vue` for frontend updates, and `bin/reset_backend`/`bin/reset_subsystem` if you need to reseed data locally.
 
 ## Code conventions
 
@@ -171,7 +171,7 @@
   * `compliance` (`20250101000010`) records `data_anomalies`, versioned `agreements`, and `agreement_acceptances` for consent tracking and quality alerts; the new seed inserts a sample anomaly plus an agreement/acceptance pair.
   * `analytics_exports` (`20250101000011`) creates `data_export_jobs` and `data_export_payloads` for BI/warehouse handoffs and now seeds a queued job plus payload record.
 - `bin/rails db:seed` runs every subsystem seed in that order; you can rerun an individual seed with `bin/rails db:seed:<subsystem>`.
-- After `bin/rails db:seed`, you can confirm each subsystem in `rails console` without resetting the database. See `ops/docs/COMMANDS.md` (“Subsystem smoke checks”) for the exact query snippets (cache control, record archives, config entries, background tasks, API protection, compliance, analytics exports, notifications, session/admin data).
+- After `bin/rails db:seed`, you can confirm each subsystem in `rails console` without resetting the database. See `ops/docs/reference/commands.md` (“Subsystem smoke checks”) for the exact query snippets (cache control, record archives, config entries, background tasks, API protection, compliance, analytics exports, notifications, session/admin data).
 - Drop/migrate/seed an entire subsystem with `bin/reset_subsystem <name>` (e.g., `bin/reset_subsystem auth_core`). The script covers `db:migrate:down/up` for the relevant migration and then invokes the matching `db:seed:<name>` task, so the tables and demo data reset cleanly. The command now accepts the full list above (`config_entries`, `background_tasks`, `api_protection`, `compliance`, `analytics_exports`, etc.).
 - Environment variables (`PROJECT_DEFAULT_ADMIN_*`, `PROJECT_PRIMARY_USER_EMAIL`, etc.) override the seeded credentials so you can brand each client while still running the same seed files. Keep those overrides documented in your client README.
 
@@ -209,9 +209,27 @@
 ## OAuth configuration
 
 - `rails/Gemfile` includes OmniAuth (`omniauth`, `omniauth-rails_csrf_protection`, `omniauth-google-oauth2`, `omniauth-facebook`, `omniauth-apple`). Run `bundle install` after cloning so the middleware is available.
-- Populate the env vars listed in `AppConstants::OAuth::PROVIDERS` (for example `OAUTH_GOOGLE_CLIENT_ID` / `_SECRET`) inside your `.env.*` files or `/etc/default/<slug>-env`. Providers with missing creds stay disabled automatically.
-- OAuth callbacks hit `Auth::OmniauthController` and persist identities to `OAuthIdentity`. Email/password sign-in continues to use the seeded admin account inside `db/seeds/auth_core.rb`; Golden Template does not auto-link OAuth identities during seeds to keep demos deterministic.
-- When wiring clients, update your frontend (Vue/Expo) to direct users to `/auth/<provider>`; the callback route already exists. Use the identity metadata to issue JWTs or sessions as you flesh out the auth service.
+- This template supports two OAuth shapes:
+  - direct provider OAuth in the temple app via `Auth::OmniauthController`
+  - central-auth handoff via `Auth::CentralOAuthController`
+- Direct provider mode is driven by `AppConstants::OAuth::PROVIDERS`. Populate the relevant `OAUTH_*` env vars in `.env.*` or `/etc/default/<slug>-env`; providers with missing creds stay disabled automatically.
+- Central-auth mode is enabled when `AUTH_BASE_URL`, `AUTH_CLIENT_ID`, and `AUTH_CLIENT_SECRET` are present. Temple runtimes should keep provider secrets out of production when central auth is the chosen architecture.
+- Callback routes already exist:
+  - direct provider: `/auth/:provider/callback`
+  - central auth bridge: `/auth/callback`
+- Frontends should start OAuth through the configured app routes (`/auth/<provider>` for direct mode, or the temple-managed central-auth start path when using central auth) rather than constructing provider URLs directly.
+- Email/password sign-in continues to use the seeded auth flow in `db/seeds/auth_core.rb`. Base OAuth sign-in should work independently of account-linking features.
+
+### OAuth account linking
+
+- Account linking is a continuation of the base OAuth system, not a prerequisite for initial provider sign-in.
+- Account-linking management is gated behind the `oauth_account_linking` feature flag (`ConfigEntry` key: `oauth_account_linking`), with optional percentage rollout via `FeatureFlagRollout`.
+- Normal OAuth sign-in remains available when the flag is off. The flag only gates in-session linking, unlinking, and the admin duplicate-review surface.
+- Identity resolution order is: existing `provider + provider_uid` first, verified-email match second only when unambiguous, and never auto-merge across different provider emails.
+- Different provider emails, including Apple private relay addresses, must be treated as separate identities until the user explicitly links them while signed in.
+- Account users manage linked providers at `/account/oauth/identities`.
+- Admin/support users review duplicate verified-email candidates at `Admin -> Patrons -> Review OAuth duplicates`.
+- Link/unlink/conflict events write `SystemAuditLog` records so rollout and support review have observable history.
 
 ## Useful commands
 - `node bin/sync_design_system.js` regenerates theme tokens, syncs favicons, and refreshes the Expo/Vue splash + icon assets.
@@ -221,9 +239,19 @@
 - `ops/scripts/deploy_vue_build.sh` lets you customize the deployment directory manually (useful for staging paths).
 - `bin/stage_ops_configs [--slug your-client]` renders nginx/systemd configs before copying them to `/etc` and reloading services.
 - `ops/scripts/render_ops_templates.rb --slug your-client` remains available for advanced usage if you need to bypass the wrapper.
-- `bin/project_info` prints the resolved slug/roots/service names after applying `PROJECT_*` overrides so you can sanity-check deployments.
 - `systemctl restart golden-template` / `systemctl restart golden-template-sidekiq` after deploys.
 - `tail -f log/notifications/*.log` for notifications logs that outlive the Rails process.
+
+## CSS Debugging Checklist
+
+- Start with computed styles, not assumptions: inspect the target field in DevTools and record `padding-left`, `padding-right`, `box-sizing`, and the winning selector/file.
+- Confirm the active stylesheet URL in the page (`<link rel="stylesheet">`) before editing; this repo must load `/backend/assets/account.css` for account UI.
+- Keep form control primitives centralized in `rails/app/stylesheets/shared/_forms.scss`; prefer small scoped overrides in surface files (`account.scss`) only when needed.
+- For width + padding controls, enforce `box-sizing: border-box` to prevent overflow that looks like asymmetric padding.
+- After SCSS edits, rebuild checked-in CSS with `bin/build_rails_css` and verify the built output contains the new rule(s) in `rails/public/backend/assets/*.css`.
+- If UI still looks unchanged, compare `git rev-parse --short HEAD` and built CSS content on the running host; stale build artifacts and browser cache are the most common causes.
+- Use hard refresh after CSS deploys; avoid repeated style edits until computed values and loaded asset paths are verified.
+- 2026-03-05: Added a CSS debugging checklist (computed styles, active stylesheet verification, border-box rule, rebuild verification) to reduce style-change drift/debug time.
 
 ## Change Log
 
@@ -236,14 +264,5 @@
 - 2026-03-04: Added `bin/doctor_deploy` preflight command and documented it in the client bootstrap checklist.
 - 2026-03-04: Added `bin/doctor_deploy` maintenance guidance (how to extend checks, pipeline placement, and next-project `commands.md` inclusion requirement).
 - 2026-03-05: Fixed nginx asset split docs: Vue static assets are `/frontend/assets/*`, Rails asset pipeline routes are `/backend/assets/*`; added explicit post-render/certbot verification guidance.
-
-## CSS Debugging Checklist
-
-- Start with computed styles, not assumptions: inspect the target field in DevTools and record `padding-left`, `padding-right`, `box-sizing`, and the winning selector/file.
-- Confirm the active stylesheet URL in the page (`<link rel="stylesheet">`) before editing; this repo must load `/backend/assets/account.css` for account UI.
-- Keep form control primitives centralized in `rails/app/stylesheets/shared/_forms.scss`; prefer small scoped overrides in surface files (`account.scss`) only when needed.
-- For width + padding controls, enforce `box-sizing: border-box` to prevent overflow that looks like asymmetric padding.
-- After SCSS edits, rebuild checked-in CSS with `bin/build_rails_css` and verify the built output contains the new rule(s) in `rails/public/backend/assets/*.css`.
-- If UI still looks unchanged, compare `git rev-parse --short HEAD` and built CSS content on the running host; stale build artifacts and browser cache are the most common causes.
-- Use hard refresh after CSS deploys; avoid repeated style edits until computed values and loaded asset paths are verified.
-- 2026-03-05: Added a CSS debugging checklist (computed styles, active stylesheet verification, border-box rule, rebuild verification) to reduce style-change drift/debug time.
+- 2026-03-08: Reorganized the OAuth section so core OAuth configuration comes first, account-linking is documented as an optional extension, and reference/ticket docs replace the completed account-linking plan.
+- 2026-03-08: Corrected stale reference-doc links, removed duplicate command entries, and moved the changelog back to the bottom of the file.

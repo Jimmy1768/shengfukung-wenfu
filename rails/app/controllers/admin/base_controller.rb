@@ -10,6 +10,7 @@ module Admin
     helper Admin::FiltersHelper
     helper_method :current_admin,
                   :admin_signed_in?,
+                  :oauth_account_linking_enabled?,
                   :available_admin_temples,
                   :allow_temple_switch?,
                   :admin_theme_options,
@@ -51,6 +52,10 @@ module Admin
         else
           nil
         end
+    end
+
+    def oauth_account_linking_enabled?
+      FeatureFlags::Evaluator.enabled?("oauth_account_linking", actor: current_admin)
     end
 
     def establish_admin_session!(user)
