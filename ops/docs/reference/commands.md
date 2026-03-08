@@ -5,6 +5,23 @@
 # Droplet (digital ocean) templemate-web
 ssh jimmy1768_user@174.138.18.211
 
+```
+---
+
+## 📂 Project Directory & Logs
+
+```bash
+cd Projects/shengfukung-wenfu
+# Puma
+tail -f log/production.log
+# Sidekiq
+tail -f log/sidekiq.log
+# Journal
+sudo journalctl -u puma.service -f
+```
+
+---
+
 ## 🔧 Git Commands
 
 ```bash
