@@ -6,7 +6,7 @@ This plan is intentionally split into phases.
 - Temple policy: temple runtimes must not store Google/Apple/Facebook provider secrets.
 - Temple runtimes only store central auth tenant credentials.
 
-## Status Snapshot (2026-03-06)
+## Status Snapshot (2026-03-08)
 
 - [x] Agreed: no temple-specific production OAuth clients for `shengfukung-wenfu`.
 - [x] Agreed: keep localhost-only OAuth credentials in dev scope only.
@@ -14,7 +14,7 @@ This plan is intentionally split into phases.
 - [x] Tenant registered in central auth DB for `shengfukung`.
 - [x] Temple-side runtime wiring is active and verified for Google end-to-end.
 - [x] Apple provider is configured in Apple Developer + central auth `/oauth/start` returns `authorize_url`.
-- [ ] Apple full callback sign-in success test is still pending (intentionally deferred until account-linking is implemented).
+- [ ] Apple full callback sign-in success is blocked in central auth (`auth.sourcegridlabs.com`) pending SourceGrid fix for `OpenSSL::PKey::ECError: invalid curve name` during `/auth/apple/callback`.
 
 ## Source Of Truth In Code
 
@@ -42,6 +42,7 @@ This plan is intentionally split into phases.
 
 - [x] Central auth service deployed and reachable.
 - [x] Central auth tenant created for shengfukung.
+- [ ] Central auth Apple callback path fixed in platform/sourcegrid production (`/auth/apple/callback` currently fails before `/oauth/token/exchange`).
 - [ ] Signed state/nonce replay controls validated end-to-end.
 - [ ] Final production monitoring/audit checks validated.
 
@@ -69,9 +70,9 @@ Notes:
 
 ### C2. Wire Temple Login Flow To Central Auth
 
-- [ ] Login start path calls central `POST /oauth/start` from temple backend.
-- [ ] Temple callback endpoint receives auth code/token payload and calls central `POST /oauth/token/exchange` server-to-server.
-- [ ] Temple creates/updates session from exchanged claims.
+- [x] Login start path calls central `POST /oauth/start` from temple backend.
+- [x] Temple callback endpoint is wired to receive provider return payload and call central `POST /oauth/token/exchange` server-to-server.
+- [x] Temple creates/updates session from exchanged claims for successful providers (Google verified in production).
 
 ### C3. Return URL Rules
 
@@ -90,7 +91,9 @@ Do not use unregistered callback URLs.
 - [x] Admin/account pages load authenticated state correctly for Google flow.
 - [x] Logs show successful `/oauth/start` and `/oauth/token/exchange` with no 500s for Google flow.
 - [x] Apple `/oauth/start` returns valid `authorize_url` from central auth.
-- [ ] Apple callback and final sign-in success path is pending (deferred until account linking is built).
+- [x] Apple central auth request uses the correct tenant (`shengfukung`) and return URL (`https://shengfukung.com.tw/auth/callback`).
+- [x] Apple posts back to central auth first (`POST /auth/apple/callback`) as designed.
+- [ ] Apple callback and final sign-in success remain blocked by central auth production error handling; current observed failure is `OpenSSL::PKey::ECError: invalid curve name` on SourceGrid infrastructure before temple `/auth/callback` or `/oauth/token/exchange`.
 
 ## Acceptance Criteria
 
@@ -100,6 +103,12 @@ All must be true before marking OAuth done for this temple:
 - [ ] Central auth flow works for both `shengfukung.com.tw` and `www.shengfukung.com.tw`.
 - [ ] Token exchange and session establishment are stable.
 - [ ] Error/denial paths are user-safe and logged.
+
+## Current Blocker
+
+- Temple-side config has been verified for Apple start: tenant slug, allowlisted return URLs, and central auth handoff are correct for `shengfukung`.
+- The remaining failure is outside this repo. SourceGrid central auth currently raises `OpenSSL::PKey::ECError: invalid curve name` inside `/auth/apple/callback`, then falls back to `/account/login?error=provider_error`.
+- Resume Apple callback remediation in the platform/sourcegrid project. Re-test this temple after the central auth fix is deployed.
 
 ## Security Notes
 

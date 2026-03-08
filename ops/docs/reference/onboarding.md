@@ -34,6 +34,12 @@ Use this workflow whenever you onboard a new temple slug.
    ```
 3. Restart services that read the env file (for example Puma/Sidekiq) after updating production env values.
 
+Slug convention:
+
+- `PROJECT_SLUG` is the app/deploy slug. Follow the temple-client naming convention here (for example `shengfukung-wenfu`). Use it for repo naming, env filenames, systemd service names, and deploy scripts.
+- `AUTH_TENANT_SLUG` is the central auth tenant identifier. Keep it client-level and stable (for example `shengfukung`) unless central auth explicitly needs a more granular split.
+- Do not assume `PROJECT_SLUG == AUTH_TENANT_SLUG`. They may match for simple cases, but they serve different scopes and should be configured deliberately.
+
 ### Template + Theme selection
 
 - Ensure env values are set in your active file (`.env.development` locally or `/etc/default/<slug>-env` on server) before any build:
