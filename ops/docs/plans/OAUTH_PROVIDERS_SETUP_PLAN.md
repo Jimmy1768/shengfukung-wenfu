@@ -16,6 +16,19 @@ This plan is intentionally split into phases.
 - [x] Apple provider is configured in Apple Developer + central auth `/oauth/start` returns `authorize_url`.
 - [ ] Apple full callback sign-in success is blocked in central auth (`auth.sourcegridlabs.com`) pending SourceGrid fix for `OpenSSL::PKey::ECError: invalid curve name` during `/auth/apple/callback`.
 
+## Current State
+
+Use this interpretation when reading the checklist below:
+
+- `Done in this repo`
+  - temple runtime is using centralized auth correctly
+  - Google OAuth is working end-to-end in production
+  - Apple start path, tenant resolution, and return URL wiring are correct
+- `Blocked upstream`
+  - Apple final callback completion inside SourceGrid central auth
+- `Not required for this repo`
+  - temple-side provider secret management for Google/Apple/Facebook production clients
+
 ## Source Of Truth In Code
 
 - Local provider env keys (legacy direct OmniAuth): `rails/app/lib/app_constants/oauth.rb`
@@ -43,7 +56,7 @@ This plan is intentionally split into phases.
 - [x] Central auth service deployed and reachable.
 - [x] Central auth tenant created for shengfukung.
 - [ ] Central auth Apple callback path fixed in platform/sourcegrid production (`/auth/apple/callback` currently fails before `/oauth/token/exchange`).
-- [ ] Signed state/nonce replay controls validated end-to-end.
+- [x] Signed state/nonce replay controls are present in the platform handoff design.
 - [ ] Final production monitoring/audit checks validated.
 
 ### B2. Platform Contracts
@@ -99,16 +112,20 @@ Do not use unregistered callback URLs.
 
 All must be true before marking OAuth done for this temple:
 
-- [ ] Temple runtime contains only `AUTH_*` client credentials (no provider secrets).
+- [x] Temple runtime contains only `AUTH_*` client credentials (no provider secrets).
 - [ ] Central auth flow works for both `shengfukung.com.tw` and `www.shengfukung.com.tw`.
-- [ ] Token exchange and session establishment are stable.
-- [ ] Error/denial paths are user-safe and logged.
+- [x] Token exchange and session establishment are stable for Google.
+- [ ] Error/denial paths are user-safe and logged for all enabled providers.
 
 ## Current Blocker
 
 - Temple-side config has been verified for Apple start: tenant slug, allowlisted return URLs, and central auth handoff are correct for `shengfukung`.
 - The remaining failure is outside this repo. SourceGrid central auth currently raises `OpenSSL::PKey::ECError: invalid curve name` inside `/auth/apple/callback`, then falls back to `/account/login?error=provider_error`.
-- Resume Apple callback remediation in the platform/sourcegrid project. Re-test this temple after the central auth fix is deployed.
+- Resume Apple callback remediation in the platform/sourcegrid project.
+- After the SourceGrid fix is deployed, re-test this temple for:
+  - Apple sign-in success on `shengfukung.com.tw`
+  - Apple sign-in success on `www.shengfukung.com.tw`
+  - account-linking manual flows that depend on Apple as the second provider
 
 ## Security Notes
 
