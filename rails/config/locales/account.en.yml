@@ -89,6 +89,12 @@ en:
         title: "Personal details"
         subtitle: "Update contact info and service notes so the temple can reach you."
         edit: "Edit profile"
+      oauth:
+        eyebrow: "Sign-in methods"
+        title: "Connected providers"
+        subtitle: "Review which social providers are linked to your account."
+        manage: "Manage sign-in methods"
+        empty: "No OAuth providers are linked yet."
       edit:
         eyebrow: "Profile"
         title: "Edit personal details"
@@ -127,6 +133,26 @@ en:
         delete: "Remove"
         delete_confirm: "Remove this dependent?"
         empty: "No dependent profiles yet."
+    oauth:
+      flash:
+        unavailable: "OAuth provider linking is unavailable right now."
+        unlinked: "%{provider} has been unlinked from your account."
+      index:
+        eyebrow: "Sign-in methods"
+        title: "Manage connected providers"
+        subtitle: "Link another provider for future sign-ins or remove one you no longer use."
+        back: "Back to profile"
+        last_used: "Last used"
+        unlink: "Unlink"
+        unlink_confirm: "Unlink %{provider} from this account?"
+        empty: "No providers are currently linked to this account."
+        available_eyebrow: "Available providers"
+        available_title: "Add another sign-in method"
+        available_subtitle: "Link a provider while signed in so future logins reach the same account."
+        available_hint: "Start a linking flow for this provider."
+        already_linked: "Already linked to this account."
+        linked_badge: "Linked"
+        link: "Link provider"
     contact_temple_modal:
       close_label: "Close contact form"
       identity_label: "Sending as"

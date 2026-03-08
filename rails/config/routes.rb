@@ -117,6 +117,9 @@ Rails.application.routes.draw do
 
     get "/dashboard", to: "dashboard#index", as: :dashboard
     resource :profile, only: %i[show edit update], controller: "profile"
+    get "/oauth/identities", to: "oauth_identities#index", as: :oauth_identities
+    post "/oauth/:provider/link", to: "oauth_identities#create", as: :oauth_link
+    delete "/oauth/:provider/unlink", to: "oauth_identities#destroy", as: :oauth_unlink
     resources :dependents, only: %i[new create edit update destroy]
     resources :registrations, only: %i[index show edit update new create] do
       member do

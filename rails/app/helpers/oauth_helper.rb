@@ -34,6 +34,15 @@ module OAuthHelper
     end
   end
 
+  def oauth_provider_label(provider)
+    PROVIDER_SPECS.each do |key, payload|
+      strategy = (AppConstants::OAuth::PROVIDERS[key][:strategy] || key).to_s
+      return payload[:label].sub(/\AContinue with /, "") if provider.to_s == strategy
+    end
+
+    provider.to_s.humanize
+  end
+
   private
 
   def oauth_surface

@@ -1,0 +1,70 @@
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow"><%= t("account.oauth.index.eyebrow") %></p>
+      <h2><%= t("account.oauth.index.title") %></h2>
+      <p><%= t("account.oauth.index.subtitle") %></p>
+    </div>
+    <%= link_to t("account.oauth.index.back"), account_profile_path, class: "pill-link secondary" %>
+  </header>
+
+  <% if @linked_identities.any? %>
+    <div class="dependent-grid">
+      <% @linked_identities.each do |identity| %>
+        <article class="dependent-card">
+          <div>
+            <h3><%= oauth_provider_label(identity.provider) %></h3>
+            <p class="muted"><%= identity.email.presence || t("account.profile.summary.not_provided") %></p>
+            <p class="muted"><%= t("account.oauth.index.last_used") %>：<%= l(identity.last_login_at || identity.updated_at, format: :long) %></p>
+          </div>
+          <div class="dependent-actions">
+            <%= button_to t("account.oauth.index.unlink"),
+              account_oauth_unlink_path(provider: identity.provider == "google_oauth2" ? "google" : identity.provider),
+              method: :delete,
+              data: { turbo_confirm: t("account.oauth.index.unlink_confirm", provider: oauth_provider_label(identity.provider)) },
+              class: "pill-link danger" %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="muted"><%= t("account.oauth.index.empty") %></p>
+  <% end %>
+</section>
+
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow"><%= t("account.oauth.index.available_eyebrow") %></p>
+      <h2><%= t("account.oauth.index.available_title") %></h2>
+      <p><%= t("account.oauth.index.available_subtitle") %></p>
+    </div>
+  </header>
+
+  <div class="dependent-grid">
+    <% @available_provider_keys.each do |provider_key| %>
+      <% strategy = AppConstants::OAuth::PROVIDERS.fetch(provider_key).fetch(:strategy).to_s %>
+      <% linked_identity = @linked_identities.find { |identity| identity.provider == strategy } %>
+      <article class="dependent-card">
+        <div>
+          <h3><%= oauth_provider_label(strategy) %></h3>
+          <% if linked_identity.present? %>
+            <p class="muted"><%= t("account.oauth.index.already_linked") %></p>
+          <% else %>
+            <p class="muted"><%= t("account.oauth.index.available_hint") %></p>
+          <% end %>
+        </div>
+        <div class="dependent-actions">
+          <% if linked_identity.present? %>
+            <span class="pill-link secondary"><%= t("account.oauth.index.linked_badge") %></span>
+          <% else %>
+            <%= button_to t("account.oauth.index.link"),
+              account_oauth_link_path(provider: provider_key),
+              method: :post,
+              class: "pill-link primary" %>
+          <% end %>
+        </div>
+      </article>
+    <% end %>
+  </div>
+</section>

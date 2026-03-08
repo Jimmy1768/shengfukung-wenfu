@@ -1,18 +1,18 @@
 # OAuth Account Linking Plan (Post-V1)
 
-## Execution Tracker (2026-03-06)
+## Execution Tracker (2026-03-08)
 
 - [x] Planning doc created and approved as post-v1 scope.
 - [x] Central OAuth provider plumbing in temple runtime is active (Google complete, Apple authorize step complete).
 - [x] Phase 1 kickoff: account-linking runtime fields + shared resolver service added in temple app.
-- [ ] Phase 2: add explicit in-session link/unlink endpoints + UI entry points.
+- [x] Phase 2: explicit in-session link/unlink endpoints + account UI entry points shipped in temple app.
 - [ ] Phase 3: conflict handling + support runbook for duplicate historical accounts.
 - [ ] Phase 4: staged rollout behind feature flag + production observability gates.
 
 This plan defines how one person can sign in with Google, Apple, and Facebook and still land in the same account.
 
 - Priority: post-v1 (not launch critical).
-- Scope: planning only. No implementation in this phase.
+- Scope: phased implementation. Phase 2 account-linking controls are now live in temple app; later phases remain pending.
 
 ## Problem Statement
 
@@ -32,6 +32,20 @@ Target behavior:
 5. Default auto-link by email is conservative:
    - Auto-link only when email is verified and not ambiguous.
    - Otherwise require explicit in-session linking confirmation.
+
+## Identity Resolution Policy
+
+- Primary match key is (`provider`, `provider_uid`). If that pair already exists, sign in the linked user.
+- Verified email can be used only as a secondary hint when it maps to exactly one existing user and policy allows linking.
+- Different provider emails must never be auto-merged, even if product intuition suggests they might belong to the same person.
+- Apple private relay addresses are treated as ordinary provider emails for matching purposes; they are not enough to infer ownership of a different Google/Facebook/email-password account.
+- When provider emails differ, the system must require explicit in-session account linking or create a separate account/identity until the user proves ownership.
+
+Rationale:
+
+- Same human != same provider email.
+- Different humans may control similar or forwarded inboxes.
+- A false-positive account merge is harder to recover from than a duplicate account that later gets linked intentionally.
 
 ## Data Model Plan
 
@@ -100,14 +114,14 @@ Constraints:
 4. Run controlled merge tooling (manual approval) for legacy duplicates.
 5. Switch resolver to provider-link-first logic after data confidence.
 
-## API / Controller Work (Future)
+## API / Controller Work
 
 - Account settings endpoints:
-  - `POST /account/oauth/:provider/link`
-  - `DELETE /account/oauth/:provider/unlink`
-  - `GET /account/oauth/identities`
-- Auth callback resolver updates to consult `oauth_identities`.
-- Central auth callback contract validation for provider claims completeness.
+  - [x] `POST /account/oauth/:provider/link`
+  - [x] `DELETE /account/oauth/:provider/unlink`
+  - [x] `GET /account/oauth/identities`
+- [x] Auth callback supports explicit in-session provider linking when central auth returns to temple callback with link intent.
+- [ ] Central auth callback contract validation for provider claims completeness.
 
 ## Test Plan (When Implementing)
 

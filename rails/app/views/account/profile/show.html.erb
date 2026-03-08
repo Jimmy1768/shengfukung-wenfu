@@ -36,6 +36,30 @@
 <section class="account-section">
   <header class="section-header">
     <div>
+      <p class="eyebrow"><%= t("account.profile.oauth.eyebrow") %></p>
+      <h2><%= t("account.profile.oauth.title") %></h2>
+      <p><%= t("account.profile.oauth.subtitle") %></p>
+    </div>
+    <%= link_to t("account.profile.oauth.manage"), account_oauth_identities_path, class: "pill-link primary" %>
+  </header>
+
+  <% if @oauth_identities.any? %>
+    <div class="profile-summary">
+      <% @oauth_identities.each do |identity| %>
+        <div>
+          <span class="label"><%= oauth_provider_label(identity.provider) %></span>
+          <p><%= identity.email.presence || t("account.profile.summary.not_provided") %></p>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="muted"><%= t("account.profile.oauth.empty") %></p>
+  <% end %>
+</section>
+
+<section class="account-section">
+  <header class="section-header">
+    <div>
       <p class="eyebrow"><%= t("account.profile.dependents.eyebrow") %></p>
       <h2><%= t("account.profile.dependents.title") %></h2>
       <p><%= t("account.profile.dependents.subtitle") %></p>

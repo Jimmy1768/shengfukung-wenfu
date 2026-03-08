@@ -11,6 +11,7 @@ module Auth
 
     PENDING_CONTEXT_SESSION_KEY = "central_oauth_pending"
     ACCOUNT_TEMPLE_SESSION_KEY = "account_active_temple_slug"
+    ACCOUNT_SESSION_KEY = AppConstants::Sessions.key(:account)
     ADMIN_TEMPLE_SESSION_KEY = AppConstants::Sessions.key(:admin_temple)
 
     PROVIDER_ALIASES = {
@@ -34,6 +35,7 @@ module Auth
         "surface" => requested_surface,
         "temple" => params[:temple].presence,
         "origin" => params[:origin].presence,
+        "intent" => normalized_intent(params[:intent]),
         "nonce" => SecureRandom.hex(8)
       }.compact
       session[PENDING_CONTEXT_SESSION_KEY] = pending
@@ -61,11 +63,12 @@ module Auth
     end
 
     def callback
+      account_user = current_account_user
       pending = session.delete(PENDING_CONTEXT_SESSION_KEY) || {}
 
       if params[:error].present?
         return redirect_to(
-          fallback_login_path(pending["surface"]),
+          fallback_redirect_path(pending),
           alert: "OAuth login failed: #{params[:error]}"
         )
       end
@@ -79,14 +82,16 @@ module Auth
       }.compact
 
       response = central_auth_client.exchange(params: exchange_payload, tenant_slug: central_tenant_slug(pending))
-      identity = find_or_create_identity_from_exchange!(response)
+      identity, user, link_result = resolve_identity_from_exchange!(response, pending, account_user)
 
-      establish_session_for(identity.user, pending)
+      unless link_intent?(pending)
+        establish_session_for(user, pending)
+      end
 
-      redirect_to resolve_post_login_path(pending), notice: "Signed in successfully."
+      redirect_to success_redirect_path(pending), notice: success_notice(pending, link_result, identity)
     rescue StandardError => e
       Rails.logger.error("[CentralOAuthController#callback] #{e.class}: #{e.message}")
-      redirect_to fallback_login_path(pending["surface"]), alert: "OAuth callback failed. Please try again."
+      redirect_to fallback_redirect_path(pending), alert: "OAuth callback failed. Please try again."
     end
 
     private
@@ -138,7 +143,7 @@ module Auth
       user.admin_account.temples.order(:name).limit(1).pluck(:slug).first
     end
 
-    def find_or_create_identity_from_exchange!(response)
+    def resolve_identity_from_exchange!(response, pending, account_user)
       fields = extract_identity_fields(response)
       provider = normalize_identity_provider(fields[:provider])
       uid = fields[:uid]
@@ -153,18 +158,33 @@ module Auth
         raise "OAuth exchange missing uid"
       end
 
-      result = Auth::OAuthIdentityResolver.resolve_or_link!(
-        provider: provider,
-        uid: uid,
-        email: fields[:email],
-        name: fields[:name],
-        email_verified: fields[:email_verified],
-        credentials: response["credentials"] || {},
-        metadata: { "central_auth" => response }
-      )
+      result =
+        if link_intent?(pending)
+          raise "You must be signed in to link a provider." if account_user.blank?
 
-      ensure_terms_acceptance(result.user, provider)
-      result.identity
+          Auth::OAuthIdentityLinker.link!(
+            user: account_user,
+            provider: provider,
+            uid: uid,
+            email: fields[:email],
+            email_verified: fields[:email_verified],
+            credentials: response["credentials"] || {},
+            metadata: { "central_auth" => response }
+          )
+        else
+          Auth::OAuthIdentityResolver.resolve_or_link!(
+            provider: provider,
+            uid: uid,
+            email: fields[:email],
+            name: fields[:name],
+            email_verified: fields[:email_verified],
+            credentials: response["credentials"] || {},
+            metadata: { "central_auth" => response }
+          )
+        end
+
+      ensure_terms_acceptance(link_intent?(pending) ? account_user : result.user, provider)
+      [result.identity, link_intent?(pending) ? account_user : result.user, result]
     end
 
     def extract_identity_fields(response)
@@ -254,6 +274,42 @@ module Auth
 
     def central_tenant_slug(pending)
       ENV["AUTH_TENANT_SLUG"].presence || pending["tenant"].presence
+    end
+
+    def normalized_intent(value)
+      intent = value.to_s
+      intent == "link" ? "link" : nil
+    end
+
+    def link_intent?(pending)
+      pending["intent"].to_s == "link"
+    end
+
+    def current_account_user
+      user_id = session[ACCOUNT_SESSION_KEY]
+      return nil if user_id.blank?
+
+      User.find_by(id: user_id)
+    end
+
+    def fallback_redirect_path(pending)
+      origin = pending["origin"].to_s
+      return origin if origin.start_with?("/")
+
+      fallback_login_path(pending["surface"])
+    end
+
+    def success_redirect_path(pending)
+      return fallback_redirect_path(pending) if link_intent?(pending)
+
+      resolve_post_login_path(pending)
+    end
+
+    def success_notice(pending, link_result, identity)
+      return "Signed in successfully." unless link_intent?(pending)
+      return "Your #{identity.provider.titleize} account is already linked." if link_result&.respond_to?(:already_linked) && link_result.already_linked
+
+      "Linked #{identity.provider.titleize} to your account."
     end
 
     def normalize_provider_param(value)
