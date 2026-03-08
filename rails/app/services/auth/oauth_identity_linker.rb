@@ -37,7 +37,7 @@ module Auth
 
       existing = OAuthIdentity.find_by(provider: @provider, provider_uid: @uid)
       if existing.present? && existing.user_id != @user.id
-        raise ConflictError, "That #{provider_label} identity is already linked to another account."
+        raise ConflictError, "That #{provider_label} identity is already linked to another account. Sign in with that provider instead or contact support for help merging accounts."
       end
 
       identity = existing || @user.oauth_identities.find_or_initialize_by(provider: @provider)

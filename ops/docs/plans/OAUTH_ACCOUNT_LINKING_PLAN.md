@@ -6,7 +6,7 @@
 - [x] Central OAuth provider plumbing in temple runtime is active (Google complete, Apple authorize step complete).
 - [x] Phase 1 kickoff: account-linking runtime fields + shared resolver service added in temple app.
 - [x] Phase 2: explicit in-session link/unlink endpoints + account UI entry points shipped in temple app.
-- [ ] Phase 3: conflict handling + support runbook for duplicate historical accounts.
+- [x] Phase 3: conflict handling + support duplicate-account review surface shipped in temple app/admin.
 - [ ] Phase 4: staged rollout behind feature flag + production observability gates.
 
 This plan defines how one person can sign in with Google, Apple, and Facebook and still land in the same account.
@@ -110,7 +110,7 @@ Constraints:
 
 1. Introduce table + write path without changing existing sign-in resolution.
 2. Dual-write link records during normal OAuth login.
-3. Build admin report for possible duplicate users by verified email.
+3. [x] Build admin report for possible duplicate users by verified email.
 4. Run controlled merge tooling (manual approval) for legacy duplicates.
 5. Switch resolver to provider-link-first logic after data confidence.
 
@@ -121,7 +121,16 @@ Constraints:
   - [x] `DELETE /account/oauth/:provider/unlink`
   - [x] `GET /account/oauth/identities`
 - [x] Auth callback supports explicit in-session provider linking when central auth returns to temple callback with link intent.
+- [x] Link conflicts now return a support-oriented message instead of a generic callback failure when a provider is already attached elsewhere.
 - [ ] Central auth callback contract validation for provider claims completeness.
+
+## Support Runbook
+
+- Start from `Admin -> Patrons -> Review OAuth duplicates` to inspect verified OAuth emails linked to multiple user accounts.
+- Treat the report as a manual review queue only; it is not proof that two accounts belong to the same person.
+- Confirm ownership of both sign-in methods before any merge or provider reassignment.
+- If ownership cannot be proven, leave the accounts separate and direct the member to sign in with the provider that is already linked.
+- Keep merges manual and auditable; automatic duplicate cleanup remains out of scope.
 
 ## Test Plan (When Implementing)
 

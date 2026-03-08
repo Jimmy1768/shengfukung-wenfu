@@ -109,7 +109,7 @@ module Account
 
       identity = OAuthIdentity.find_by!(provider: "google_oauth2", provider_uid: "shared-provider-uid")
       assert_equal other_user.id, identity.user_id
-      assert_includes response.body, "OAuth callback failed"
+      assert_includes response.body, "already linked to another account"
     end
 
     test "user can unlink provider when another login path remains" do

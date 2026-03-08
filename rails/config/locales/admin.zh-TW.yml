@@ -244,6 +244,7 @@ zh-TW:
         hint: "僅顯示最近 25 筆符合的結果，若要升為管理員請前往權限頁面操作。"
         results_title: "搜尋結果"
         results_hint: "如需縮小範圍，請輸入更多關鍵字。"
+        oauth_duplicates: "檢視 OAuth 重複帳號"
         manage_permissions: "開啟管理員權限"
         filters:
           all: "所有信眾"
@@ -261,6 +262,20 @@ zh-TW:
           phone: "電話"
           actions: "操作"
         empty: "沒有符合條件的信眾。"
+      oauth_duplicates:
+        title: "可能重複的 OAuth 帳號"
+        subtitle: "同一組已驗證 OAuth Email 若連到多個使用者帳號，需先人工確認後才能處理。"
+        hint: "此報表用於檢查歷史重複帳號。未完成身分確認前，請勿自動合併帳號。"
+        back: "回到信眾名單"
+        empty: "目前沒有發現重複的 OAuth 候選帳號。"
+        table:
+          verified_email: "已驗證 Email"
+          accounts: "帳號"
+          providers: "提供者"
+          last_seen: "最近活動"
+          actions: "操作"
+        actions:
+          view_records: "查看紀錄"
       flash:
         promoted: "%{name} 已加入管理員。"
         revoked: "%{name} 的管理權限已移除。"

@@ -1,0 +1,63 @@
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item stack-item--fluid admin-table-card">
+      <header class="admin-section-header">
+        <div>
+          <h1><%= t("admin.patrons.oauth_duplicates.title") %></h1>
+          <p class="muted"><%= t("admin.patrons.oauth_duplicates.subtitle") %></p>
+        </div>
+        <%= link_to t("admin.patrons.oauth_duplicates.back"), admin_patrons_path, class: "btn btn-secondary" %>
+      </header>
+
+      <p class="muted"><%= t("admin.patrons.oauth_duplicates.hint") %></p>
+
+      <% if @entries.any? %>
+        <div class="table-scroll">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th><%= t("admin.patrons.oauth_duplicates.table.verified_email") %></th>
+                <th><%= t("admin.patrons.oauth_duplicates.table.accounts") %></th>
+                <th><%= t("admin.patrons.oauth_duplicates.table.providers") %></th>
+                <th><%= t("admin.patrons.oauth_duplicates.table.last_seen") %></th>
+                <th><%= t("admin.patrons.oauth_duplicates.table.actions") %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @entries.each do |entry| %>
+                <tr>
+                  <td><%= entry.verified_email %></td>
+                  <td>
+                    <% entry.identities.each do |identity| %>
+                      <div>
+                        <strong><%= identity.user.english_name.presence || identity.user.email %></strong>
+                        <span class="muted">(#<%= identity.user.id %>)</span>
+                        <div class="muted"><%= identity.user.email %></div>
+                      </div>
+                    <% end %>
+                  </td>
+                  <td><%= entry.providers.map { |provider| oauth_provider_label(provider) }.join(", ") %></td>
+                  <td>
+                    <% latest = entry.identities.map { |identity| identity.last_login_at || identity.updated_at }.compact.max %>
+                    <%= latest.present? ? l(latest, format: :long) : "—" %>
+                  </td>
+                  <td>
+                    <% entry.identities.each do |identity| %>
+                      <div>
+                        <%= link_to t("admin.patrons.oauth_duplicates.actions.view_records"),
+                          records_admin_patron_path(identity.user, view: "all"),
+                          class: "btn btn-secondary btn-small" %>
+                      </div>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="muted"><%= t("admin.patrons.oauth_duplicates.empty") %></p>
+      <% end %>
+    </section>
+  </div>
+</div>

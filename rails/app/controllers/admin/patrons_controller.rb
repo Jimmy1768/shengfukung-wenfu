@@ -3,7 +3,7 @@
 module Admin
   class PatronsController < BaseController
     before_action :require_patron_access!, only: :index
-    before_action :require_manage_permissions!, only: %i[promote revoke create]
+    before_action :require_manage_permissions!, only: %i[promote revoke create oauth_duplicates]
     before_action :set_patron, only: %i[promote revoke records]
 
     def index
@@ -53,6 +53,10 @@ module Admin
     def records
       require_patron_access!
       @registrations = patron_registrations.includes(:offering, :temple_payments).order(created_at: :desc)
+    end
+
+    def oauth_duplicates
+      @entries = Admin::OAuthDuplicateCandidatesReport.new.entries
     end
 
     private

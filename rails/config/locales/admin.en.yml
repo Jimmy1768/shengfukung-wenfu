@@ -244,6 +244,7 @@ en:
         hint: "Search returns the latest 25 matches. Use the permissions page to promote someone into an admin role."
         results_title: "Latest matches"
         results_hint: "Add more keywords above to narrow the list."
+        oauth_duplicates: "Review OAuth duplicates"
         manage_permissions: "Open admin permissions"
         filters:
           all: "All patrons"
@@ -261,6 +262,20 @@ en:
           phone: "Phone"
           actions: "Actions"
         empty: "No patrons match this search."
+      oauth_duplicates:
+        title: "Potential duplicate OAuth accounts"
+        subtitle: "Verified OAuth emails linked to more than one user account need manual review before any merge."
+        hint: "Use this report to inspect historical duplicates. Never merge accounts automatically unless ownership is confirmed by support."
+        back: "Back to patrons"
+        empty: "No duplicate OAuth candidates were found."
+        table:
+          verified_email: "Verified email"
+          accounts: "Accounts"
+          providers: "Providers"
+          last_seen: "Last activity"
+          actions: "Actions"
+        actions:
+          view_records: "View records"
       flash:
         promoted: "%{name} is now an admin."
         revoked: "%{name} no longer has admin access."

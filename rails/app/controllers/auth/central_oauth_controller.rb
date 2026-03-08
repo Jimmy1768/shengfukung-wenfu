@@ -89,6 +89,9 @@ module Auth
       end
 
       redirect_to success_redirect_path(pending), notice: success_notice(pending, link_result, identity)
+    rescue Auth::OAuthIdentityLinker::ConflictError, Auth::OAuthIdentityLinker::ProviderAlreadyLinkedError => e
+      Rails.logger.warn("[CentralOAuthController#callback] #{e.class}: #{e.message}")
+      redirect_to fallback_redirect_path(pending), alert: e.message
     rescue StandardError => e
       Rails.logger.error("[CentralOAuthController#callback] #{e.class}: #{e.message}")
       redirect_to fallback_redirect_path(pending), alert: "OAuth callback failed. Please try again."

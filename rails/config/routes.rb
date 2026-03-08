@@ -92,6 +92,10 @@ Rails.application.routes.draw do
     get "/archives/certificates", to: "archives#certificates_export", defaults: { format: :csv }, as: :archive_certificates_export
     resources :permissions, only: %i[index update], param: :admin_account_id
     resources :patrons, only: %i[index create] do
+      collection do
+        get :oauth_duplicates
+      end
+
       member do
         post :promote
         delete :revoke
