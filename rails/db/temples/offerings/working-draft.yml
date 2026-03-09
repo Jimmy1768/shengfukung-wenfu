@@ -1,0 +1,189 @@
+catalogs:
+  lamp_types:
+  - 光明燈
+  - 文昌燈
+  - 財神燈
+  - 太歲燈
+  ritual_bucket_positions:
+  - 總斗主
+  - 福德正神斗
+  - 七星斗
+  - 東斗
+  - 西斗
+  - 南斗
+  - 北斗
+  - 中斗
+  - 五路財神斗
+  - 天上聖母斗
+  - 文昌帝君斗
+  - 玄天上帝斗
+  - 關聖帝君斗
+  - 王天君斗
+  - 李府王爺斗
+  - 朱府王爺斗
+  - 池府王爺斗
+  - 中壇元帥斗
+  - 虎爺將軍斗
+  - 合家平安斗
+  - 九天玄女斗
+  - 濟公禪師斗
+  - 三清道祖斗
+  - 斗姥元君斗
+  liberation_types:
+  - 拔薦歷代祖先
+  - 拔薦親友亡魂
+  - 拔薦冤親債主
+  - 拔薦嬰靈
+offerings:
+- slug: incense-donation
+  label: 香油捐獻
+  type: donation
+  registration_period: perennial
+  fields:
+    amount:
+      type: currency
+      required: true
+    notes:
+      type: preset_select_or_text
+      presets:
+      - 福宴
+      - 祝壽
+      - 壽塔
+      - 頂燈
+      - 金牌壹面1份
+      - 金牌壹面3分
+      - 金牌壹面5分
+      - 金牌壹面1錢
+      - 金身：濟公禪師
+      - 進香贊助
+      - 環保金爐
+      - 白米10斤
+      - 貨車油資
+      - 平安座週年慶
+- slug: lamp-service
+  label: 點燈作業
+  type: ritual_service
+  registration_period: yearly
+  structure:
+    registration:
+    - persons:
+        fields:
+        - name
+        - birthdate
+        - gender
+        - phone
+        - mobile_phone
+        - address
+        - lunar_calendar:
+            type: boolean
+            default: true
+        - leap_month:
+            type: boolean
+            default: false
+        - mail_certificate:
+            type: boolean
+            default: false
+        lamps:
+          type: catalog_boolean
+          catalog: lamp_types
+  derived:
+  - age
+  - zodiac
+  - heavenly_stem_earthly_branch
+- slug: peace-opera-household
+  label: 平安戲丁口捐
+  type: ritual_service
+  registration_period: yearly
+  structure:
+    household_fields:
+    - household_representative_name
+    - phone
+    - mobile_phone
+    - address
+    ritual_fields:
+    - ritual_bucket_position:
+        type: select
+        catalog: ritual_bucket_positions
+    - ritual_type:
+        example: 合家平安斗
+    - amount:
+        type: currency
+        default: 1500
+    persons:
+    - name
+    - birthdate
+    - gender
+    - zodiac
+    - heavenly_stem_earthly_branch
+    - lunar_calendar:
+        type: boolean
+        default: true
+    - leap_month:
+        type: boolean
+        default: false
+  derived:
+  - age
+- slug: ghost-festival-table
+  label: 普渡供桌
+  type: ritual_service
+  registration_period: festival_specific
+  festival: 中元普渡
+  structure:
+    sponsor:
+    - sponsor_name
+    - organization_name:
+        optional: true
+    - representative_name:
+        optional: true
+    - phone
+    - mobile_phone
+    - address
+    table:
+    - table_number
+    - table_position
+    - amount:
+        type: currency
+        default: 1500
+    - notes:
+        optional: true
+  public_report_fields:
+  - table_number
+  - display_name
+- slug: liberation-ritual
+  label: 拔薦
+  type: ritual_service
+  registration_period: event_specific
+  base_fields:
+  - year
+  - donation_date
+  - donation_amount
+  - donor_name
+  - donor_phone
+  - secondary_contact_name
+  - secondary_contact_phone
+  - contact_address
+  - postal_code
+  - certificate_number
+  - invalid_record:
+      type: boolean
+      default: false
+  ritual_type:
+    type: select
+    catalog: liberation_types
+  variants:
+    拔薦歷代祖先:
+      display_text: 家歷代祖先
+    拔薦親友亡魂:
+      fields:
+      - deceased_name
+      - birth_year
+      - birth_month
+      - birth_day
+      - death_year
+      - death_month
+      - death_day
+      - age_at_death
+    拔薦冤親債主:
+      display_text: 冤親債主
+    拔薦嬰靈:
+      display_text: 嬰靈
