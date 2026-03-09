@@ -137,11 +137,12 @@ Current interpretation after production Google OAuth validation:
 
 ## 6. Verification + Smoke Tests
 
-- [ ] Owner: QA + App engineer
-- [ ] Run platform smoke tests:
+- [x] Owner: QA + App engineer
+- [x] Run platform smoke tests:
   ```bash
   SMOKE_BASE_URL=https://shengfukung.com.tw bin/run_smoke_tests
   ```
+- [x] Smoke result: `https://shengfukung.com.tw/api/v1/temples/shengfukung-wenfu` returned `200` and `bin/run_smoke_tests` completed successfully.
 - [x] Manual checks:
   - home page loads with expected temple content
   - `/api/v1/temples/shengfukung-wenfu` returns `200`

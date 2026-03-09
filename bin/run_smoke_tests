@@ -12,7 +12,7 @@ fi
 DEFAULT_FALLBACK_URL="${SMOKE_DEFAULT_BASE_URL:-http://localhost:3001}"
 EXPECTED_STATUS="${SMOKE_EXPECTED_STATUS:-200}"
 
-mapfile -t TEMPLES < <(ruby <<'RUBY' "$MANIFEST_FILE"
+mapfile -t TEMPLES < <(ruby - "$MANIFEST_FILE" <<'RUBY'
 require "yaml"
 file = ARGV.first
 data = YAML.safe_load_file(file).fetch("temples")
