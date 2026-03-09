@@ -26,7 +26,7 @@ Use these labels consistently when updating the checklist:
 - `Blocked externally`: cannot complete inside this repo because an upstream dependency is still broken.
 - `Untested`: not yet verified on this project, even if infrastructure exists.
 
-Current interpretation after production Google OAuth validation:
+Current interpretation after production Google OAuth validation and shared-DB cleanup:
 
 - `Done`
   - staging host is live
@@ -35,10 +35,18 @@ Current interpretation after production Google OAuth validation:
   - Rails API is reachable from `https://shengfukung.com.tw`
   - account namespace is wired and reachable
   - central-auth Google OAuth works end-to-end
+  - admin sign-in works after promoting a real OAuth-backed user
+  - admin console pages/actions are reachable and responsive
+  - shared production DB has been cleaned back to the intended baseline state
+  - both temple rows remain present with only slug/name retained
+  - blank unpublished temple profile is the correct pre-onboarding state
 - `Blocked externally`
   - Apple OAuth final callback path, due to SourceGrid central auth `OpenSSL::PKey::ECError: invalid curve name`
 - `Untested`
   - email/password account flows
+  - admin-driven temple profile/content entry from blank state
+  - publish flow after admin content entry
+  - one real registration flow after temple content is prepared
   - account linking manual validation after Apple fix
   - payments beyond fake provider mode
   - S3/media uploads
@@ -144,12 +152,16 @@ Current interpretation after production Google OAuth validation:
   ```
 - [x] Smoke result: `https://shengfukung.com.tw/api/v1/temples/shengfukung-wenfu` returned `200` and `bin/run_smoke_tests` completed successfully.
 - [x] Manual checks:
-  - home page loads with expected temple content
+  - public site and temple API load from the staging domain
   - `/api/v1/temples/shengfukung-wenfu` returns `200`
   - account sign-in flow is reachable and Google OAuth succeeds end-to-end
+  - admin sign-in works with promoted account
+  - admin console pages/buttons respond correctly
+  - shared DB cleanup completed and temples are now intentionally blank/unpublished until onboarding
 - [ ] Manual checks still pending:
-  - admin sign-in page reachable
-  - one registration flow can be created in staging
+  - admin-driven temple profile/content entry from blank baseline
+  - publish flow for temple profile
+  - one registration flow can be created in staging after onboarding content exists
   - email/password account flow
   - Apple OAuth callback after SourceGrid fix
 - [x] Payments gate for this phase:
@@ -175,6 +187,7 @@ Current interpretation after production Google OAuth validation:
 
 ## Post-Staging Follow-Ups
 
+- Use admin onboarding flow to populate temple profile/content, then publish when client is ready.
 - Follow up with SourceGrid central auth team on Apple OAuth fix, then rerun manual provider tests.
 - Run account-linking manual validation after Apple is fixed.
 - Wire production `.org.tw` once client purchases domain.
