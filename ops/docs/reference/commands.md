@@ -32,7 +32,7 @@ RAILS_ENV=production rails console
 ```bash
 
 git add .
-git commit -m "fixed doctor_deploy"
+git commit -m "added rails/public/icons"
 git push
 
 git reset --hard HEAD

@@ -4,6 +4,8 @@
 
 - `registration_period_key` is required for service-cycle duplicate guardrails and reporting.
 - Temple YAML is the source of truth for allowed period keys and labels.
+- Offering template YAML must only reference keys defined in the matching temple YAML.
+- `perennial` is a real evergreen period key, not a placeholder; use it for year-round services that are not tied to a specific seasonal cycle.
 - Allowing ad-hoc "Other" keys in admin creates config drift and inconsistent patron labels.
 
 ## Scope
@@ -38,11 +40,12 @@
 ### Phase C Support Workflow (Temples Requesting New Periods)
 
 1. Edit `rails/db/temples/<slug>.yml` and update `registration_periods` with the new key + labels.
-2. Sync offering template configs so service templates stay aligned: `ruby ops/scripts/sync_offering_configs.rb`.
-3. Re-seed that temple from YAML: `cd rails && bin/rails "temples:seed[<slug>]"`.
-4. Run governance audit for that temple and save report: `cd rails && bin/rails registration_period_keys:audit SLUG=<slug> OUTPUT=tmp/registration_period_key_audit.json`.
-5. If audit finds historical invalid keys, run remap dry-run first, then apply using approved fallback key.
-6. Deploy updated app artifacts (`bin/deploy_vue <slug>`) and complete normal backend deploy flow.
+2. Edit `rails/db/temples/offerings/<slug>.yml` so every service `registration_period_key` still points at a valid key from step 1.
+3. Sync offering template configs so existing DB-backed offerings stay aligned: `ruby ops/scripts/sync_offering_configs.rb`.
+4. Re-seed that temple from YAML if temple profile records also changed: `cd rails && bin/rails "temples:seed[<slug>]"`.
+5. Run governance audit for that temple and save report: `cd rails && bin/rails registration_period_keys:audit SLUG=<slug> OUTPUT=tmp/registration_period_key_audit.json`.
+6. If audit finds historical invalid keys, run remap dry-run first, then apply using approved fallback key.
+7. Deploy updated app artifacts (`bin/deploy_vue <slug>`) and complete normal backend deploy flow.
 
 Reference commands: `ops/docs/reference/commands.md`.
 
@@ -69,6 +72,7 @@ Reference commands: `ops/docs/reference/commands.md`.
 4. Apply YAML rollover + service key updates (explicit flag):
    - `cd rails && bin/rails registration_period_keys:rollover_year SLUG=shengfukung-wenfu WRITE=true UPDATE_SERVICES=true OUTPUT=tmp/registration_period_rollover_apply.json`
 5. Verify:
+   - confirm `rails/db/temples/offerings/<slug>.yml` service `registration_period_key` values still match the rolled temple periods
    - run `registration_period_keys:audit` and confirm no unexpected invalid keys were introduced
    - review service list in admin for expected period labels/keys
    - deploy normally after verification
