@@ -1,0 +1,307 @@
+services:
+  - slug: incense-donation
+    label: "香油捐獻"
+    registration_period_key: "perennial"
+    defaults:
+      offering_type: "donation"
+      currency: "TWD"
+      fulfillment_method: "廟方代辦"
+    attributes:
+      currency: "TWD"
+      description: "敬獻香油以支持廟務運作，廟方依祈願安排上香儀程。"
+    options:
+      fulfillment_method:
+        - "廟方代辦"
+        - "信眾親領"
+    form_fields:
+      basics:
+        title: "供品設定"
+        fields:
+          - offering_type
+          - price_cents
+          - currency
+          - description
+      fulfillment:
+        title: "捐獻用途"
+        fields:
+          - fulfillment_method
+          - logistics_notes
+    registration_form:
+      sections:
+        order:
+          fields: [quantity, unit_price_cents, currency]
+        contact:
+          fields: [primary_contact, phone, email, notes]
+        logistics: false
+        ritual_metadata:
+          fields: [dedication_message]
+      defaults:
+        order:
+          quantity: 1
+      field_settings:
+        dedication_message:
+          options:
+            - "福宴"
+            - "祝壽"
+            - "壽塔"
+            - "頂燈"
+            - "金牌壹面1份"
+            - "金牌壹面3分"
+            - "金牌壹面5分"
+            - "金牌壹面1錢"
+            - "金身：濟公禪師"
+            - "進香贊助"
+            - "環保金爐"
+            - "白米10斤"
+            - "貨車油資"
+            - "平安座週年慶"
+          allow_multiple: true
+
+  - slug: lamp-service
+    label: "點燈作業"
+    registration_period_key: "2026-lantern"
+    defaults:
+      offering_type: "lamp"
+      currency: "TWD"
+      lamp_type: "光明燈"
+      fulfillment_method: "廟方代辦"
+      preferred_slot: "白天"
+    attributes:
+      currency: "TWD"
+      description: "依燈別登記點燈祈福資料，廟方安排燈位、祈福與後續證書處理。"
+    options:
+      lamp_type:
+        - "光明燈"
+        - "文昌燈"
+        - "財神燈"
+        - "太歲燈"
+      fulfillment_method:
+        - "廟方代辦"
+        - "親至現場確認"
+    form_fields:
+      basics:
+        title: "燈位設定"
+        fields:
+          - offering_type
+          - price_cents
+          - currency
+          - description
+      lamp_details:
+        title: "燈位資訊"
+        fields:
+          - lamp_type
+          - lamp_location
+          - certificate_hint
+      fulfillment:
+        title: "作業方式"
+        fields:
+          - fulfillment_method
+          - logistics_notes
+    registration_form:
+      sections:
+        order:
+          fields: [quantity, unit_price_cents, currency, certificate_number]
+        contact:
+          fields: [primary_contact, phone, email, notes]
+        logistics:
+          fields: [preferred_date, preferred_slot]
+        ritual_metadata:
+          fields: [ancestor_placard_name, dedication_message, certificate_notes]
+      defaults:
+        order:
+          quantity: 1
+        logistics:
+          preferred_slot: "白天"
+      field_settings:
+        preferred_slot:
+          options: ["白天", "晚上"]
+        ancestor_placard_name:
+          allow_multiple: true
+        dedication_message:
+          allow_multiple: true
+
+  - slug: peace-opera-household
+    label: "平安戲丁口捐"
+    registration_period_key: "perennial"
+    defaults:
+      offering_type: "ritual"
+      currency: "TWD"
+    attributes:
+      price_cents: 1500
+      currency: "TWD"
+      description: "以戶為單位登記平安祈福，廟方依斗位安排戲丁口捐與誦經祝禱。"
+    options:
+      blessing_target_type:
+        - "合家平安斗"
+        - "總斗主"
+        - "福德正神斗"
+        - "七星斗"
+        - "東斗"
+        - "西斗"
+        - "南斗"
+        - "北斗"
+        - "中斗"
+        - "五路財神斗"
+        - "天上聖母斗"
+        - "文昌帝君斗"
+        - "玄天上帝斗"
+        - "關聖帝君斗"
+        - "王天君斗"
+        - "李府王爺斗"
+        - "朱府王爺斗"
+        - "池府王爺斗"
+        - "中壇元帥斗"
+        - "虎爺將軍斗"
+        - "九天玄女斗"
+        - "濟公禪師斗"
+        - "三清道祖斗"
+        - "斗姥元君斗"
+    form_fields:
+      basics:
+        title: "丁口捐設定"
+        fields:
+          - offering_type
+          - price_cents
+          - currency
+          - description
+      ritual:
+        title: "斗位與對象"
+        fields:
+          - blessing_target_type
+          - blessing_names
+          - certificate_hint
+    registration_form:
+      sections:
+        order:
+          fields: [quantity, unit_price_cents, currency]
+        contact:
+          fields: [primary_contact, phone, email, notes]
+        logistics: false
+        ritual_metadata:
+          fields: [dedication_message, certificate_notes]
+      defaults:
+        order:
+          quantity: 1
+      field_settings:
+        dedication_message:
+          allow_multiple: true
+
+  - slug: ghost-festival-table
+    label: "普渡供桌"
+    registration_period_key: "2026-ghost-month"
+    defaults:
+      offering_type: "table"
+      currency: "TWD"
+      table_size: "標準桌"
+      fulfillment_method: "廟方統一配置"
+      ceremony_location: "戶外祭壇"
+    attributes:
+      price_cents: 1500
+      currency: "TWD"
+      description: "中元普渡專用供桌，含供品配置與桌位安排。"
+    options:
+      table_size:
+        - "標準桌"
+        - "大桌"
+      fulfillment_method:
+        - "廟方統一配置"
+        - "依現場調整"
+    form_fields:
+      basics:
+        title: "供桌設定"
+        fields:
+          - offering_type
+          - price_cents
+          - currency
+          - description
+      table_details:
+        title: "供桌內容"
+        fields:
+          - table_size
+          - table_items
+          - fulfillment_method
+      sponsor:
+        title: "登記說明"
+        fields:
+          - certificate_hint
+    registration_form:
+      sections:
+        order:
+          fields: [quantity, unit_price_cents, currency]
+        contact:
+          fields: [primary_contact, phone, email, notes]
+        logistics:
+          fields: [preferred_date, ceremony_location]
+        ritual_metadata:
+          fields: [dedication_message]
+      defaults:
+        order:
+          quantity: 1
+        logistics:
+          ceremony_location: "戶外祭壇"
+      field_settings:
+        ceremony_location:
+          options: ["戶外祭壇", "本殿入口", "後殿"]
+        dedication_message:
+          allow_multiple: true
+
+  - slug: liberation-ritual
+    label: "拔薦"
+    registration_period_key: "2026-ghost-month"
+    defaults:
+      offering_type: "ritual"
+      currency: "TWD"
+      fulfillment_method: "廟方代辦"
+    attributes:
+      currency: "TWD"
+      description: "依拔薦類別登記亡者或祖先資料，供法會誦經與超薦儀式使用。"
+    options:
+      fulfillment_method:
+        - "廟方代辦"
+        - "現場確認"
+    form_fields:
+      basics:
+        title: "拔薦設定"
+        fields:
+          - offering_type
+          - price_cents
+          - currency
+          - description
+      ritual:
+        title: "拔薦內容"
+        fields:
+          - fulfillment_method
+          - certificate_hint
+          - logistics_notes
+      variant:
+        title: "拔薦類別"
+        fields:
+          - blessing_target_type
+          - blessing_names
+    registration_form:
+      sections:
+        order:
+          fields: [quantity, unit_price_cents, currency, certificate_number]
+        contact:
+          fields: [primary_contact, phone, email, notes]
+        logistics:
+          fields: [preferred_date, ceremony_location]
+        ritual_metadata:
+          fields: [ancestor_placard_name, dedication_message, certificate_notes]
+      defaults:
+        order:
+          quantity: 1
+        logistics:
+          ceremony_location: "本殿"
+      field_settings:
+        ceremony_location:
+          options: ["本殿", "後殿", "戶外祭壇"]
+        ancestor_placard_name:
+          allow_multiple: true
+        dedication_message:
+          options:
+            - "拔薦歷代祖先"
+            - "拔薦親友亡魂"
+            - "拔薦冤親債主"
+            - "拔薦嬰靈"
+          allow_multiple: true
