@@ -18,6 +18,11 @@ tail -f log/production.log
 tail -f log/sidekiq.log
 # Journal
 sudo journalctl -u puma.service -f
+
+set -a
+source /etc/default/shengfukung-wenfu-env
+set +a
+RAILS_ENV=production rails console
 ```
 
 ---
@@ -229,7 +234,7 @@ bin/rails db:migrate
 - Admin console → “Profile” lets you edit the copy/contact info surfaced on the Vue site. Form submissions append a `SystemAuditLog`.
 - The Vue app reads `http://localhost:3001/api/v1/temples/:slug` (set via `VITE_API_BASE_URL` + `VITE_TEMPLE_SLUG`). Copy `/vue/.env.example` into the repo root as `.env.development` (or merge into your existing `.env.development`) and adjust those keys when targeting another Rails host.
 - Expo builds now read `EXPO_PROJECT_SLUG`, `EXPO_PROJECT_SCHEME`, `EXPO_ANDROID_PACKAGE`, and `EXPO_IOS_BUNDLE_IDENTIFIER` (falling back to the shared keys when absent), so add those to `.env.*` alongside `MOBILE_API_BASE_URL`, `MOBILE_JWT_LOGIN_PATH`, and `MOBILE_JWT_REFRESH_PATH`.
-- Offering templates (per-temple form configs) live in `rails/db/temples/offerings/<slug>.yml`. After editing those YAML files, run `ruby ops/scripts/sync_offering_configs.rb` to push the metadata (`form_fields`, defaults, options) into each `TempleOffering` so the admin form reflects the changes.
+- Offering templates (per-temple form configs) live in `rails/db/temples/offerings/<slug>.yml`. Use `rails/db/temples/offerings/working-draft.yml` as the persistent staging scratch file for each new temple, then convert that draft into the finalized `<slug>.yml`. After editing the real temple YAML, run `ruby ops/scripts/sync_offering_configs.rb` to push the metadata (`form_fields`, defaults, options) into each `TempleOffering` so the admin form reflects the changes.
 
 ---
 

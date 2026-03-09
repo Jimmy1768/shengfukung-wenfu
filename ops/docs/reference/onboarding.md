@@ -88,6 +88,8 @@ Slug convention:
    - Cash-only pipeline: use `/admin/events/...`, `/admin/services/...`, or `/admin/gatherings/...` → Orders to capture registrations, then “Record cash payment” to log receipts + ledger entries. LINE Pay arrives after onsite validation.
 6. **Customize product templates per temple**
    - Each offering entry stores its form definition in metadata. Use `form_fields` + `registration_form` to describe which inputs render and how registration payloads are structured.
+   - Keep `rails/db/temples/offerings/working-draft.yml` as the reusable onboarding scratch file. Paste each new temple's raw offerings config there first, then convert it into the finalized per-temple file at `rails/db/temples/offerings/<slug>.yml`.
+   - Do not delete `working-draft.yml`. Overwrite it during each new temple onboarding cycle as the current staging draft.
    - During onboarding, create `rails/db/temples/offerings/<slug>.yml` with a strict split shape:
      ```yaml
      schema_version: 2
