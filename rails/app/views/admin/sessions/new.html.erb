@@ -17,7 +17,7 @@
           <% oauth_links.each do |provider| %>
             <%= link_to provider[:path], class: "btn btn-secondary oauth-btn" do %>
               <% if provider[:icon_path].present? %>
-                <img src="<%= provider[:icon_path] %>" alt="" class="oauth-icon" />
+                <%= image_tag provider[:icon_path], alt: "", class: "oauth-icon", width: 28, height: 28 %>
               <% end %>
               <span><%= provider[:label] %></span>
             <% end %>
