@@ -19,6 +19,18 @@
   - recurring patron/contact data once, then save it back to `users.metadata`
   - offering-specific ritual/logistics data only when needed for fulfillment
 - Patron/admin registration entry should reuse saved patron metadata on future registrations.
+- Offerings split into `services` and `events`, and can also be treated as either:
+  - fixed-price products
+  - donations
+- V1 pricing rule:
+  - if the temple supplied a concrete amount in YAML, treat it as a fixed-price product and prefill/lock that commercial intent into the offering
+  - if the amount is blank in YAML, treat it as a donation-style offering where the amount may be entered later by staff/donor
+  - YAML remains the source of truth, so future pricing-policy changes should happen by editing YAML and re-syncing offerings rather than ad hoc runtime drift
+- One real registrant maps to one registration:
+  - one account/self registrant = one registration
+  - one dependent registrant = one registration
+- Registration and payment should stay effectively one-to-one for clean accounting.
+- If a ritual needs extra names or offline execution notes beyond the core registrant, capture them as offering-specific metadata fields in the template/registration form. Do not extend base code with nested multi-person registration structures for temple-specific edge cases.
 
 ## Current Repo Reality
 
@@ -141,6 +153,78 @@ These should become selector-backed field settings in the finalized YAML rather 
 - deceased / ancestor ritual metadata
 - table number / ceremony placement
 
+## Complex Offering Review Tracks
+
+Treat these three as explicit review items before calling the Shengfukung config stable. If the answer is unknown, capture it as a clarification question for the temple admin rather than guessing.
+
+### A. `lamp-service`
+
+Current concern:
+
+- The raw draft implies one registration may include multiple people plus lamp-specific ritual details, but the v1 design should keep one real registrant per registration and move extra names into ritual metadata / notes.
+
+Review goals:
+
+- [x] Keep one order = one registrant = one registration.
+- [ ] Decide which extra ritual names/details, if any, still need to be captured as freeform metadata for temple staff.
+- [ ] Confirm whether certificate mailing is a per-order flag.
+- [ ] Confirm whether lamp selection is one lamp type per registration.
+
+Temple-admin clarification questions:
+
+- [x] One 點燈 registration should represent one real registrant only.
+- [ ] What extra names or notes, if any, does the temple still need staff to write down outside the core registrant identity?
+- [ ] Is `mail_certificate` handled once per registration?
+- [ ] Is lamp type chosen once per registration?
+
+### B. `peace-opera-household`
+
+Current concern:
+
+- The raw draft implies household-level registration plus multiple named family members, but the v1 design should keep one real registrant per registration and move extra family names into ritual metadata / notes.
+
+Review goals:
+
+- [x] Keep one order = one registrant = one registration.
+- [ ] Decide what extra family/member names or details should be captured as freeform metadata only.
+- [ ] Confirm whether bucket position is:
+  - required
+  - selected from a fixed list
+  - one per order only
+- [ ] Confirm whether the amount is fixed at `1500` or configurable.
+- [x] Extra household/member names should live in freeform offering / ritual metadata, not in a nested repeated people structure.
+
+Temple-admin clarification questions:
+
+- [x] 平安戲丁口捐 should stay one registrant per registration.
+- [ ] What additional family/member names, if any, should staff still record as freeform notes on the registration?
+- [ ] Is the斗位 always chosen from the current fixed list, or can staff type a custom value?
+- [ ] Is `1500` the fixed standard amount for every order?
+
+### C. `liberation-ritual`
+
+Current concern:
+
+- The draft contains multiple variant types with different data requirements, especially for `拔薦親友亡魂`, but the v1 design should keep one real registrant per registration and prefer variant selector + ritual notes over new base-schema fields.
+
+Review goals:
+
+- [x] Keep one order = one registrant = one registration.
+- [x] Make variant type a required selector-backed choice.
+- [ ] Confirm whether deceased details can stay as formatted ritual notes instead of new base-schema fields.
+- [ ] Confirm whether this service is always tied to ghost-month cycle or can also be perennial.
+
+Temple-admin clarification questions:
+
+- [ ] Must the user explicitly choose among:
+  - `拔薦歷代祖先`
+  - `拔薦親友亡魂`
+  - `拔薦冤親債主`
+  - `拔薦嬰靈`
+- [ ] For `拔薦親友亡魂`, which deceased details are operationally required?
+- [ ] Are those deceased details used for internal ritual preparation only, or also shown on any public/admin-facing printout?
+- [ ] Is 拔薦 only offered during `2026-ghost-month` style cycles, or can it be ordered year-round?
+
 ## Phase 4: Sync + Validation
 
 - [ ] Run:
@@ -167,8 +251,9 @@ These should become selector-backed field settings in the finalized YAML rather 
 ## Open Decisions
 
 - [ ] Which draft fields should map into normalized built-in columns versus remain inside `ritual_metadata`.
-- [ ] Whether household/person-list ritual offerings need richer repeatable nested data than the current registration schema supports.
+- [x] Keep household/person-list ritual offerings inside the current one-registrant model; do not add richer repeatable nested registration structures in v1.
 - [ ] Whether some Shengfukung services should be split into multiple simpler templates instead of one complex all-purpose template.
+- [ ] Whether `incense-donation` should eventually rename its registration field concept from `dedication_message` to a clearer semantic like `donation_purpose`.
 
 ## Acceptance Criteria
 

@@ -92,6 +92,7 @@ services:
           - lamp_type
           - lamp_location
           - certificate_hint
+          - blessing_names
       fulfillment:
         title: "作業方式"
         fields:
@@ -170,6 +171,7 @@ services:
           - blessing_target_type
           - blessing_names
           - certificate_hint
+          - logistics_notes
     registration_form:
       sections:
         order:
@@ -183,6 +185,8 @@ services:
         order:
           quantity: 1
       field_settings:
+        blessing_names:
+          allow_multiple: true
         dedication_message:
           allow_multiple: true
 
@@ -252,6 +256,7 @@ services:
       offering_type: "ritual"
       currency: "TWD"
       fulfillment_method: "廟方代辦"
+      blessing_target_type: "拔薦歷代祖先"
     attributes:
       currency: "TWD"
       description: "依拔薦類別登記亡者或祖先資料，供法會誦經與超薦儀式使用。"
@@ -259,6 +264,11 @@ services:
       fulfillment_method:
         - "廟方代辦"
         - "現場確認"
+      blessing_target_type:
+        - "拔薦歷代祖先"
+        - "拔薦親友亡魂"
+        - "拔薦冤親債主"
+        - "拔薦嬰靈"
     form_fields:
       basics:
         title: "拔薦設定"
@@ -278,6 +288,7 @@ services:
         fields:
           - blessing_target_type
           - blessing_names
+          - logistics_notes
     registration_form:
       sections:
         order:
@@ -299,9 +310,6 @@ services:
         ancestor_placard_name:
           allow_multiple: true
         dedication_message:
-          options:
-            - "拔薦歷代祖先"
-            - "拔薦親友亡魂"
-            - "拔薦冤親債主"
-            - "拔薦嬰靈"
+          allow_multiple: true
+        certificate_notes:
           allow_multiple: true
