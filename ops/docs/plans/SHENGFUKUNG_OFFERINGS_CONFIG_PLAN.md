@@ -52,11 +52,11 @@ Deliver a finalized `rails/db/temples/offerings/shengfukung-wenfu.yml` that:
 ## Phase 1: Source Mapping
 
 - [x] Review every entry in `rails/db/temples/offerings/working-draft.yml`.
-- [ ] Classify each offering into:
+- [x] Classify each offering into:
   - `events:` for scheduled/in-person participation
   - `services:` for proxy ritual / temple-handled fulfillment
-- [ ] Translate draft `registration_period` values into real `registration_period_key` values that exist in `rails/db/temples/shengfukung-wenfu.yml`.
-- [ ] Decide which draft catalogs become reusable selector lists in YAML `field_settings.options`.
+- [x] Translate draft `registration_period` values into real `registration_period_key` values that exist in `rails/db/temples/shengfukung-wenfu.yml`.
+- [x] Decide which draft catalogs become reusable selector lists in YAML `field_settings.options`.
 
 ### Known Mapping Notes
 
@@ -94,8 +94,8 @@ These should become selector-backed field settings in the finalized YAML rather 
 
 ## Phase 2: YAML Contract Conversion
 
-- [ ] Create `rails/db/temples/offerings/shengfukung-wenfu.yml`.
-- [ ] Convert draft entries from the current custom `catalogs:` / `offerings:` shape into the app-supported template shape:
+- [x] Create `rails/db/temples/offerings/shengfukung-wenfu.yml`.
+- [x] Convert draft entries from the current custom `catalogs:` / `offerings:` shape into the app-supported template shape:
   - `events:`
   - `services:`
   - `label`
@@ -105,8 +105,8 @@ These should become selector-backed field settings in the finalized YAML rather 
   - `form_fields`
   - `registration_form`
   - `field_settings`
-- [ ] Keep `working-draft.yml` intact as the reusable scratch file.
-- [ ] Remove dependency on the misspelled `shenfukung-wenfu.yml` once the real file is in place.
+- [x] Keep `working-draft.yml` intact as the reusable scratch file.
+- [x] Remove dependency on the misspelled `shenfukung-wenfu.yml` once the real file is in place.
 
 ### Conversion Guidance
 
@@ -127,12 +127,12 @@ These should become selector-backed field settings in the finalized YAML rather 
 
 ## Phase 3: Registration UX Design
 
-- [ ] For each offering, decide which fields are:
+- [x] For each offering, decide which fields are:
   - reusable patron profile data
   - per-registration ritual data
   - temporary/transient scheduling data
-- [ ] Ensure reusable patron data maps cleanly to the existing user metadata sync path.
-- [ ] Avoid asking admins or patrons to type data that can be:
+- [x] Ensure reusable patron data maps cleanly to the existing user metadata sync path.
+- [x] Avoid asking admins or patrons to type data that can be:
   - inferred
   - selected
   - defaulted
@@ -153,6 +153,34 @@ These should become selector-backed field settings in the finalized YAML rather 
 - deceased / ancestor ritual metadata
 - table number / ceremony placement
 
+### Shengfukung Phase 3 Decisions
+
+- Reusable patron/profile data for V1:
+  - `primary_contact`
+  - `phone`
+  - `email`
+  - `address`
+- These fields should be treated as account/dependent-facing identity/contact data and saved back into `users.metadata` for later prefill.
+- Per-registration ritual metadata for V1:
+  - `dedication_message`
+  - `blessing_names`
+  - `ancestor_placard_name`
+  - `blessing_target_type`
+  - `certificate_notes`
+  - `table_items`
+  - `table_size`
+  - `lamp_type`
+  - `lamp_location`
+  - `certificate_hint`
+- Temporary scheduling / fulfillment data for V1:
+  - `preferred_date`
+  - `preferred_slot`
+  - `ceremony_location`
+  - `fulfillment_method`
+  - `logistics_notes`
+- Shengfukung V1 keeps all extra family / ancestor / household / deceased names inside ritual metadata fields rather than expanding the base registration model.
+- The registration form should prefer selector-backed values first and free text second. Free text remains acceptable where temple staff simply need something to copy into offline ritual prep.
+
 ## Complex Offering Review Tracks
 
 Treat these three as explicit review items before calling the Shengfukung config stable. If the answer is unknown, capture it as a clarification question for the temple admin rather than guessing.
@@ -166,16 +194,23 @@ Current concern:
 Review goals:
 
 - [x] Keep one order = one registrant = one registration.
-- [ ] Decide which extra ritual names/details, if any, still need to be captured as freeform metadata for temple staff.
+- [x] Decide which extra ritual names/details, if any, still need to be captured as freeform metadata for temple staff.
 - [ ] Confirm whether certificate mailing is a per-order flag.
-- [ ] Confirm whether lamp selection is one lamp type per registration.
+- [x] Confirm whether lamp selection is one lamp type per registration.
 
 Temple-admin clarification questions:
 
 - [x] One 點燈 registration should represent one real registrant only.
-- [ ] What extra names or notes, if any, does the temple still need staff to write down outside the core registrant identity?
+- [x] What extra names or notes, if any, does the temple still need staff to write down outside the core registrant identity?
 - [ ] Is `mail_certificate` handled once per registration?
-- [ ] Is lamp type chosen once per registration?
+- [x] Is lamp type chosen once per registration?
+
+Phase 3 decision:
+
+- `lamp-service` keeps one real registrant.
+- Any extra names the temple still wants written down should live in `blessing_names`.
+- Lamp selection stays one choice per registration.
+- Certificate handling remains one-per-registration unless temple later says otherwise.
 
 ### B. `peace-opera-household`
 
@@ -186,20 +221,27 @@ Current concern:
 Review goals:
 
 - [x] Keep one order = one registrant = one registration.
-- [ ] Decide what extra family/member names or details should be captured as freeform metadata only.
+- [x] Decide what extra family/member names or details should be captured as freeform metadata only.
 - [ ] Confirm whether bucket position is:
   - required
   - selected from a fixed list
   - one per order only
-- [ ] Confirm whether the amount is fixed at `1500` or configurable.
+- [x] Confirm whether the amount is fixed at `1500` or configurable.
 - [x] Extra household/member names should live in freeform offering / ritual metadata, not in a nested repeated people structure.
 
 Temple-admin clarification questions:
 
 - [x] 平安戲丁口捐 should stay one registrant per registration.
-- [ ] What additional family/member names, if any, should staff still record as freeform notes on the registration?
+- [x] What additional family/member names, if any, should staff still record as freeform notes on the registration?
 - [ ] Is the斗位 always chosen from the current fixed list, or can staff type a custom value?
-- [ ] Is `1500` the fixed standard amount for every order?
+- [x] Is `1500` the fixed standard amount for every order?
+
+Phase 3 decision:
+
+- `peace-opera-household` keeps one real registrant.
+- Extra household/member names stay in `blessing_names` / ritual notes only.
+- `1500` is treated as the temple-supplied fixed-price default for V1.
+- Different pricing should be modeled by a different offering or later YAML revision, not by drifting per-registration structure.
 
 ### C. `liberation-ritual`
 
@@ -211,7 +253,7 @@ Review goals:
 
 - [x] Keep one order = one registrant = one registration.
 - [x] Make variant type a required selector-backed choice.
-- [ ] Confirm whether deceased details can stay as formatted ritual notes instead of new base-schema fields.
+- [x] Confirm whether deceased details can stay as formatted ritual notes instead of new base-schema fields.
 - [ ] Confirm whether this service is always tied to ghost-month cycle or can also be perennial.
 
 Temple-admin clarification questions:
@@ -222,8 +264,15 @@ Temple-admin clarification questions:
   - `拔薦冤親債主`
   - `拔薦嬰靈`
 - [ ] For `拔薦親友亡魂`, which deceased details are operationally required?
-- [ ] Are those deceased details used for internal ritual preparation only, or also shown on any public/admin-facing printout?
+- [x] Are those deceased details used for internal ritual preparation only, or also shown on any public/admin-facing printout?
 - [ ] Is 拔薦 only offered during `2026-ghost-month` style cycles, or can it be ordered year-round?
+
+Phase 3 decision:
+
+- `liberation-ritual` keeps one real registrant.
+- The specific拔薦類別 should remain a selector-backed choice.
+- Deceased / ancestor / related extra names stay in ritual metadata (`blessing_names`, `ancestor_placard_name`, `dedication_message`, `certificate_notes`) rather than new base-schema fields.
+- For V1, treat those details as operational ritual-prep notes, not as a new normalized record type.
 
 ## Phase 4: Sync + Validation
 

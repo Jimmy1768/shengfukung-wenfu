@@ -288,7 +288,6 @@ services:
         fields:
           - blessing_target_type
           - blessing_names
-          - logistics_notes
     registration_form:
       sections:
         order:
