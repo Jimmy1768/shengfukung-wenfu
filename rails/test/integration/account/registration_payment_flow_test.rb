@@ -34,7 +34,7 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_response :success
-    assert_includes response.body, "Pay with LINE Pay"
+    assert_includes response.body, "使用 LINE Pay 付款"
     assert_includes response.body, offering.title
   end
 
@@ -71,7 +71,7 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_response :success
-    assert_includes response.body, "This registration is free"
+    assert_includes response.body, "此報名不需付費，已完成。"
   end
 
   test "start fake checkout creates pending payment and stays on payment page" do
@@ -94,5 +94,61 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
     assert_equal "fake", payment.provider
     assert_equal TemplePayment::STATUSES[:pending], payment.status
     assert_equal TempleRegistration::PAYMENT_STATUSES[:pending], registration.reload.payment_status
+  end
+
+  test "repeat-enabled service allows multiple registrations for the same user" do
+    temple = create_temple(
+      metadata: {
+        "registration_periods" => [
+          { "key" => "perennial", "label_zh" => "常年供燈", "label_en" => "Perennial" }
+        ]
+      }
+    )
+    offering = temple.temple_services.create!(
+      slug: "incense-donation",
+      title: "香油捐獻",
+      description: "敬獻香油",
+      currency: "TWD",
+      price_cents: 300,
+      status: "published",
+      registration_period_key: "perennial",
+      period_label: "常年供燈",
+      metadata: {
+        "allow_repeat_registrations" => true
+      }
+    )
+    user = User.create!(
+      email: "repeat@example.com",
+      english_name: "Repeat Member",
+      encrypted_password: User.password_hash("Password123!")
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+
+    assert_difference -> { TempleEventRegistration.count }, 1 do
+      post account_registrations_path, params: {
+        offering: offering.slug,
+        account_action: "service",
+        account_registration_intake_form: {
+          contact_name: "Repeat Member",
+          quantity: 1
+        }
+      }
+    end
+
+    assert_difference -> { TempleEventRegistration.count }, 1 do
+      post account_registrations_path, params: {
+        offering: offering.slug,
+        account_action: "service",
+        account_registration_intake_form: {
+          contact_name: "Repeat Member",
+          quantity: 1
+        }
+      }
+    end
+
+    registrations = TempleEventRegistration.where(user: user, registrable: offering).order(:created_at)
+    assert_equal 2, registrations.count
+    assert_redirected_to payment_account_registration_path(registrations.last)
   end
 end

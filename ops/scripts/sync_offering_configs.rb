@@ -24,8 +24,10 @@ Temple.find_each do |temple|
       offering.metadata['form_fields'] = entry[:form_fields] if entry[:form_fields]
       offering.metadata['form_defaults'] = entry[:defaults] if entry[:defaults]
       offering.metadata['form_options'] = entry[:options] if entry[:options]
+      offering.metadata['form_ui'] = entry[:ui] if entry[:ui]
       offering.metadata['form_label'] = entry[:label] if entry[:label]
       offering.metadata['registration_form'] = entry[:registration_form] if entry[:registration_form]
+      offering.metadata['allow_repeat_registrations'] = entry[:allow_repeat_registrations] unless entry[:allow_repeat_registrations].nil?
       offering.save!
       puts "Updated #{kind} #{offering.slug} for #{temple.slug}"
     end

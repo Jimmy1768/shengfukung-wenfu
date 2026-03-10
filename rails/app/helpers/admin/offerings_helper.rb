@@ -149,19 +149,21 @@ module Admin
     end
 
     def render_text_field(form, field, label, value = nil)
+      resolved_value = metadata_backed_field?(form, field) ? metadata_field_value(form, field, value) : value
       content_tag(:div, class: "field") do
         safe_join([
           form.label(field, label),
-          form.text_field(field, value: value)
+          metadata_backed_field?(form, field) ? text_field_tag(metadata_field_name(form, field), resolved_value) : form.text_field(field, value: resolved_value)
         ])
       end
     end
 
     def render_number_field(form, field, label)
+      resolved_value = metadata_backed_field?(form, field) ? metadata_field_value(form, field) : nil
       content_tag(:div, class: "field") do
         safe_join([
           form.label(field, label),
-          form.number_field(field)
+          metadata_backed_field?(form, field) ? number_field_tag(metadata_field_name(form, field), resolved_value) : form.number_field(field)
         ])
       end
     end
@@ -169,11 +171,12 @@ module Admin
     def render_select_field(form, field, label, options, selected = nil)
       options = Array.wrap(options)
       return render_text_field(form, field, label, selected) if options.empty?
+      resolved_selected = metadata_backed_field?(form, field) ? metadata_field_value(form, field, selected) : selected
 
       content_tag(:div, class: "field") do
         safe_join([
           form.label(field, label),
-          form.select(field, options_for_select(options, selected))
+          metadata_backed_field?(form, field) ? select_tag(metadata_field_name(form, field), options_for_select(options, resolved_selected)) : form.select(field, options_for_select(options, resolved_selected))
         ])
       end
     end
@@ -183,20 +186,27 @@ module Admin
     end
 
     def render_text_area(form, field, label)
+      resolved_value = metadata_backed_field?(form, field) ? metadata_field_value(form, field) : nil
       content_tag(:div, class: "field") do
         safe_join([
           form.label(field, label),
-          form.text_area(field, rows: 3)
+          metadata_backed_field?(form, field) ? text_area_tag(metadata_field_name(form, field), resolved_value, rows: 3) : form.text_area(field, rows: 3)
         ])
       end
     end
 
     def render_checkbox_field(form, field, label)
-      selected_value = ActiveModel::Type::Boolean.new.cast(form.object.public_send(field)) ? "1" : "0"
+      current_value =
+        if metadata_backed_field?(form, field)
+          metadata_field_value(form, field)
+        else
+          form.object.public_send(field)
+        end
+      selected_value = ActiveModel::Type::Boolean.new.cast(current_value) ? "1" : "0"
 
       render(
         "admin/shared/segmented_boolean",
-        name: "#{form.object_name}[#{field}]",
+        name: metadata_backed_field?(form, field) ? metadata_field_name(form, field) : "#{form.object_name}[#{field}]",
         id_prefix: "#{form.object_name}_#{field}",
         label:,
         selected_value:,
@@ -205,10 +215,11 @@ module Admin
     end
 
     def render_date_field(form, field, label)
+      resolved_value = metadata_backed_field?(form, field) ? metadata_field_value(form, field) : nil
       content_tag(:div, class: "field") do
         safe_join([
           form.label(field, label),
-          form.date_field(field)
+          metadata_backed_field?(form, field) ? date_field_tag(metadata_field_name(form, field), resolved_value) : form.date_field(field)
         ])
       end
     end
@@ -245,6 +256,22 @@ module Admin
 
     def currency_options
       Currency::Symbols.options
+    end
+
+    def metadata_backed_field?(form, field)
+      object = form.object
+      return false unless object.respond_to?(:has_attribute?)
+
+      !object.has_attribute?(field)
+    end
+
+    def metadata_field_name(form, field)
+      "#{form.object_name}[metadata_settings][#{field}]"
+    end
+
+    def metadata_field_value(form, field, fallback = nil)
+      metadata = form.object.respond_to?(:metadata) ? (form.object.metadata || {}).with_indifferent_access : {}
+      metadata[field].presence || fallback
     end
 
     def admin_offering_path_for(offering)

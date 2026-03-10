@@ -72,6 +72,9 @@ module Admin
         metadata_settings: {}
       )
       permitted[:currency] = permitted[:currency].presence || "TWD"
+      if permitted.key?(:price_cents)
+        permitted[:price_cents] = Currency::Symbols.admin_input_to_amount_cents(permitted[:price_cents], permitted[:currency])
+      end
       permitted[:metadata] = merge_metadata_settings(permitted.delete(:metadata_settings))
       permitted
     end
@@ -105,6 +108,7 @@ module Admin
       offering.metadata["form_ui"] = template[:ui]
       offering.metadata["form_label"] = template[:label]
       offering.metadata["registration_form"] = template[:registration_form]
+      offering.metadata["allow_repeat_registrations"] = template[:allow_repeat_registrations] unless template[:allow_repeat_registrations].nil?
       offering.slug ||= template[:slug]
     end
 

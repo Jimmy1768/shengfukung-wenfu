@@ -87,7 +87,9 @@ module Admin
         :free_gathering
       )
       permitted[:currency] = permitted[:currency].presence || "TWD"
-      permitted[:price_cents] = nt_dollars_to_cents(permitted[:price_cents])
+      if permitted.key?(:price_cents)
+        permitted[:price_cents] = Currency::Symbols.admin_input_to_amount_cents(permitted[:price_cents], permitted[:currency])
+      end
       permitted[:price_cents] = 0 if free_gathering_param
       permitted[:ends_on] = permitted[:ends_on].presence
       permitted[:start_time] = permitted[:start_time].presence
@@ -104,12 +106,6 @@ module Admin
     def free_gathering_param
       value = params.dig(:temple_gathering, :free_gathering)
       ActiveModel::Type::Boolean.new.cast(value)
-    end
-
-    def nt_dollars_to_cents(value)
-      return 0 if value.blank?
-
-      value.to_i * 100
     end
 
     def apply_free_pricing(record)

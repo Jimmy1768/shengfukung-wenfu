@@ -49,6 +49,15 @@ Deliver a finalized `rails/db/temples/offerings/shengfukung-wenfu.yml` that:
 - maps registration fields to the current admin/account registration schema
 - syncs cleanly into offering metadata via `ruby ops/scripts/sync_offering_configs.rb`
 
+## Status Summary
+
+- [x] Shengfukung V1 offerings YAML is in place and replaces the dummy file.
+- [x] Admin offering creation now reads the YAML correctly, with template-owned lifecycle UI and TWD whole-unit pricing input.
+- [x] Duplicate-policy behavior is now modeled as an offering-level template/runtime flag (`allow_repeat_registrations`).
+- [ ] Duplicate-policy behavior still needs end-to-end validation on the patron registration path.
+- [ ] Patron-side registration reuse / write-back still needs full validation against the finalized Shengfukung templates.
+- [ ] Production rollout still needs temple bootstrap + first real offering creation on the droplet.
+
 ## Phase 1: Source Mapping
 
 - [x] Review every entry in `rails/db/temples/offerings/working-draft.yml`.
@@ -184,6 +193,7 @@ These should become selector-backed field settings in the finalized YAML rather 
 ### First-Pass Duplicate Policy
 
 - Duplicate guard should not be universal. It must follow offering intent, not just `registration_period_key`.
+- V1 implementation uses `allow_repeat_registrations: true` on templates that should bypass duplicate lookup at runtime.
 - V1 policy for Shengfukung:
   - `incense-donation`: allow repeated registrations
   - `lamp-service`: allow repeated registrations
@@ -290,18 +300,20 @@ Phase 3 decision:
 
 ## Phase 4: Sync + Validation
 
-- [ ] Run:
+- [ ] Run, only if updating already-created local/dev offering rows instead of creating fresh ones:
   ```bash
   ruby ops/scripts/sync_offering_configs.rb
   ```
-- [ ] Confirm each Shengfukung offering receives updated metadata:
+- [x] Confirm fresh Shengfukung offering creation reads updated template metadata:
   - `form_fields`
   - `form_defaults`
   - `form_options`
   - `form_label`
   - `registration_form`
-- [ ] Verify the admin offering form renders the expected controls with minimal manual typing.
+- [x] Verify the admin offering form renders the expected controls with minimal manual typing.
 - [ ] Verify registration creation pulls defaults correctly for both admin-assisted and patron-side flows.
+- [x] Implement offering-level repeat policy flag for offerings that should not be duplicate-guarded (`incense-donation`, `lamp-service`, `liberation-ritual`).
+- [ ] Verify repeatable-registration behavior end to end for the repeat-enabled offerings.
 
 ## Phase 5: Manual QA
 
@@ -320,8 +332,8 @@ Phase 3 decision:
 
 ## Acceptance Criteria
 
-- [ ] `rails/db/temples/offerings/shengfukung-wenfu.yml` exists and matches the real slug.
-- [ ] YAML uses the current loader contract (`events:` / `services:`), not the legacy fallback shape.
-- [ ] Admin forms are largely prefilled and selector-driven.
+- [x] `rails/db/temples/offerings/shengfukung-wenfu.yml` exists and matches the real slug.
+- [x] YAML uses the current loader contract (`events:` / `services:`), not the legacy fallback shape.
+- [x] Admin forms are largely prefilled and selector-driven.
 - [ ] Patron registration reuses saved profile data and persists reusable inputs back to user metadata.
-- [ ] Dummy offerings config is fully replaced for Shengfukung.
+- [x] Dummy offerings config is fully replaced for Shengfukung.

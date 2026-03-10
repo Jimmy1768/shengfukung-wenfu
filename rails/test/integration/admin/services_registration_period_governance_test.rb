@@ -59,7 +59,8 @@ class AdminServicesRegistrationPeriodGovernanceTest < ActionDispatch::Integratio
     service = @temple.temple_services.order(created_at: :desc).first
     assert_redirected_to admin_service_path(service)
     assert_equal "2026-ghost-month", service.registration_period_key
-    assert_equal "2026 Ghost Month", service.period_label
+    assert_equal "2026 普渡月", service.period_label
+    assert_equal 80_000, service.price_cents
   end
 
   test "rejects unknown registration period key on update" do

@@ -138,7 +138,7 @@
       <div class="field-row">
         <div class="field-panel">
           <%= form.label :price_cents, t("admin.registration_form.fields.unit_price") %>
-          <%= form.number_field :price_cents, min: 0 %>
+          <%= form.number_field :price_cents, min: 0, value: Currency::Symbols.admin_input_value(@offering.price_cents, @offering.currency || "TWD") %>
         </div>
         <div class="field-panel">
           <%= form.label :currency, t("admin.offering_form.fields.currency") %>

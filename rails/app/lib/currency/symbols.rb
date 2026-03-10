@@ -33,6 +33,24 @@ module Currency
       PRECISION[code.to_s.upcase]
     end
 
+    def zero_decimal_currency?(code)
+      precision_for(code).zero?
+    end
+
+    def admin_input_to_amount_cents(value, code)
+      return nil if value.nil?
+      return 0 if value.respond_to?(:blank?) && value.blank?
+
+      numeric = value.to_i
+      zero_decimal_currency?(code) ? numeric * 100 : numeric
+    end
+
+    def admin_input_value(amount_cents, code)
+      return nil if amount_cents.nil?
+
+      zero_decimal_currency?(code) ? (amount_cents.to_i / 100) : amount_cents
+    end
+
     def format_amount(amount_cents, code)
       amount = amount_cents.to_f / 100.0
       number_to_currency(

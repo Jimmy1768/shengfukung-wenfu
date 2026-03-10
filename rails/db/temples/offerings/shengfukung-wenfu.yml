@@ -2,6 +2,7 @@ services:
   - slug: incense-donation
     label: "香油捐獻"
     registration_period_key: "perennial"
+    allow_repeat_registrations: true
     ui:
       show_availability_window: false
       lock_registration_period_key: true
@@ -63,6 +64,7 @@ services:
   - slug: lamp-service
     label: "點燈作業"
     registration_period_key: "2026-lantern"
+    allow_repeat_registrations: true
     ui:
       show_availability_window: false
       lock_registration_period_key: true
@@ -264,6 +266,7 @@ services:
   - slug: liberation-ritual
     label: "拔薦"
     registration_period_key: "2026-ghost-month"
+    allow_repeat_registrations: true
     ui:
       show_availability_window: false
       lock_registration_period_key: true

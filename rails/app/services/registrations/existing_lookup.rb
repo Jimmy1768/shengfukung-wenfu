@@ -13,6 +13,7 @@ module Registrations
 
     def find
       return nil if scope.blank? || offering.blank? || user_id.blank?
+      return nil if allow_repeat_registrations?
 
       query = scope
         .where(user_id:)
@@ -37,6 +38,11 @@ module Registrations
 
     def dependent_selected?
       registrant_scope.to_s == "dependent" && dependent_id.present?
+    end
+
+    def allow_repeat_registrations?
+      metadata = offering.respond_to?(:metadata) ? (offering.metadata || {}).with_indifferent_access : {}
+      ActiveModel::Type::Boolean.new.cast(metadata[:allow_repeat_registrations])
     end
   end
 end
