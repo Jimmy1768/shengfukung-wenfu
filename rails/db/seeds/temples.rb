@@ -23,6 +23,13 @@ module Seeds
       puts "Temple profile ready (#{temple.slug})." # rubocop:disable Rails/Output
     end
 
+    def bootstrap(slug: AppConstants::Project.slug)
+      config = profile_config(slug)
+      puts "Bootstrapping temple row for #{config.fetch('slug')}..." # rubocop:disable Rails/Output
+      temple = ensure_bootstrap_temple(config)
+      puts "Temple bootstrap ready (#{temple.slug})." # rubocop:disable Rails/Output
+    end
+
     private
 
     def profile_config(slug)
@@ -59,6 +66,36 @@ module Seeds
           published: config.fetch("published", true),
           metadata: metadata_payload.merge(seed_metadata)
         )
+        record.save!
+      end
+    end
+
+    def ensure_bootstrap_temple(config)
+      Temple.find_or_initialize_by(slug: config.fetch("slug")).tap do |record|
+        metadata_payload = (record.metadata || {}).deep_dup
+        metadata_payload["registration_periods"] = Array(config["registration_periods"]) if config["registration_periods"].present?
+
+        attrs = {
+          name: config.fetch("name"),
+          metadata: metadata_payload
+        }
+
+        unless record.persisted?
+          attrs.merge!(
+            tagline: nil,
+            hero_copy: nil,
+            primary_image_url: nil,
+            about_html: nil,
+            hero_images: {},
+            contact_info: {},
+            service_times: {},
+            payment_mode: "temple",
+            payment_provider_settings: {},
+            published: false
+          )
+        end
+
+        record.assign_attributes(attrs)
         record.save!
       end
     end

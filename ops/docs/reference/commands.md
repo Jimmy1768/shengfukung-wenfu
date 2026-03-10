@@ -139,8 +139,8 @@ cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shengfukung-we
 # 2) Sync offering template metadata into temple offerings
 ruby ops/scripts/sync_offering_configs.rb
 
-# 3) Re-seed temple YAML payload into DB for the target temple
-cd rails && bin/rails "temples:seed[shengfukung-wenfu]"
+# 3) Re-bootstrap temple identity + registration periods into DB for the target temple
+cd rails && bin/rails "temples:bootstrap[shengfukung-wenfu]"
 
 # 4) Validate no invalid period keys remain
 cd rails && bin/rails registration_period_keys:audit SLUG=shengfukung-wenfu OUTPUT=tmp/registration_period_key_audit.json

@@ -211,12 +211,18 @@ module Admin
 
     def render_static_field(form, field, label, default)
       value = form.object.send(field) || default
+      display_value =
+        if field.to_sym == :offering_type
+          I18n.t("admin.offerings.types.#{value}", default: value.to_s.humanize)
+        else
+          value
+        end
       safe_join([
         form.hidden_field(field, value: value),
         content_tag(:div, class: "field") do
           safe_join([
             content_tag(:label, label),
-            content_tag(:p, value, class: "static-value")
+            content_tag(:p, display_value, class: "static-value")
           ])
         end
       ])

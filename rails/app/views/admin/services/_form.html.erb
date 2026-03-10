@@ -40,7 +40,10 @@
   <% end %>
 
 <% metadata = (@offering.metadata || {}).with_indifferent_access %>
+<% form_ui = metadata["form_ui"].is_a?(Hash) ? metadata["form_ui"].with_indifferent_access : {} %>
 <% template_locked = params[:template_slug].present? && !@offering.persisted? %>
+<% show_availability_window = form_ui.key?(:show_availability_window) ? form_ui[:show_availability_window] : false %>
+<% lock_registration_period_key = form_ui.key?(:lock_registration_period_key) ? form_ui[:lock_registration_period_key] : @offering.registration_period_key.present? %>
 
   <section class="card form-section">
     <header>
@@ -75,16 +78,21 @@
     </header>
     <div class="field-row">
       <div class="field-panel">
-        <%= form.label :registration_period_key, t("admin.services.form.fields.registration_period_key") %>
+        <%= form.label :registration_period_key, (lock_registration_period_key ? t("admin.services.form.fields.period_label") : t("admin.services.form.fields.registration_period_key")) %>
         <% period_options =
              current_temple.registration_periods.map do |entry|
                label = current_temple.registration_period_label(entry)
                [label, entry[:key], { "data-label": label }]
              end %>
-        <%= form.select :registration_period_key,
-          options_for_select(period_options, @offering.registration_period_key),
-          { include_blank: t("admin.services.form.fields.registration_period_blank") },
-          disabled: period_options.empty?, data: { period_selector: true } %>
+        <% if lock_registration_period_key %>
+          <%= form.hidden_field :registration_period_key %>
+          <%= text_field_tag nil, current_temple.registration_period_label_for(@offering.registration_period_key), readonly: true %>
+        <% else %>
+          <%= form.select :registration_period_key,
+            options_for_select(period_options, @offering.registration_period_key),
+            { include_blank: t("admin.services.form.fields.registration_period_blank") },
+            disabled: period_options.empty?, data: { period_selector: true } %>
+        <% end %>
       </div>
       <div class="field-panel">
         <%= form.label :period_label, t("admin.services.form.fields.period_label") %>
@@ -95,16 +103,18 @@
         <%= form.number_field :quantity_limit, min: 0 %>
       </div>
     </div>
-    <div class="field-row">
-      <div class="field-panel">
-        <%= form.label :available_from, t("admin.services.form.fields.available_from") %>
-        <%= form.date_field :available_from, class: "admin-date-input" %>
+    <% if show_availability_window %>
+      <div class="field-row">
+        <div class="field-panel">
+          <%= form.label :available_from, t("admin.services.form.fields.available_from") %>
+          <%= form.date_field :available_from, class: "admin-date-input" %>
+        </div>
+        <div class="field-panel">
+          <%= form.label :available_until, t("admin.services.form.fields.available_until") %>
+          <%= form.date_field :available_until, class: "admin-date-input" %>
+        </div>
       </div>
-      <div class="field-panel">
-        <%= form.label :available_until, t("admin.services.form.fields.available_until") %>
-        <%= form.date_field :available_until, class: "admin-date-input" %>
-      </div>
-    </div>
+    <% end %>
     <div class="field-row">
       <div class="field-panel">
         <%= form.label :default_location, t("admin.services.form.fields.default_location") %>

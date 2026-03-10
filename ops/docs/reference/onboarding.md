@@ -60,9 +60,14 @@ Slug convention:
    - Copy `rails/db/temples/shengfukung-wenfu.yml` as a starting point.
    - Set `slug`, `name`, `contact`, `service_times`, and optional hero/about/meta copy.
    - Commit the file.
-2. **Seed the temple**
-   - Run `bin/rails temples:seed[slug]`.
-   - The task creates/updates the `Temple`, `TemplePage`, and `TempleSection` records.
+2. **Bootstrap the temple row**
+   - Run `bin/rails temples:bootstrap[slug]`.
+   - This creates or updates the minimal `Temple` row used for real onboarding:
+     - `slug`
+     - `name`
+     - `metadata.registration_periods`
+   - Existing admin-edited profile fields are preserved on rerun.
+   - Use `bin/rails temples:seed[slug]` only when you explicitly want the broader placeholder profile/pages/news/gallery seed data.
 3. **Seed baseline accounts**
    - `bin/rails db:seed` now provisions:
      - Owner admin: `owner@<slug>.local`
@@ -200,7 +205,7 @@ Slug convention:
 Production onboarding avoids creating real user passwords in seeds—only the temple record is automated.
 
 1. **Author profile YAML** – same as dev (make sure secrets stay out of Git).
-2. **Seed the temple** – `bin/rails temples:seed[slug]` on the droplet. Confirm the record exists via `rails console`.
+2. **Bootstrap the temple** – `bin/rails temples:bootstrap[slug]` on the droplet. Confirm the record exists via `rails console`.
 3. **Owner self-signup**
    - Have the temple contact sign in via OAuth/password on `/account` to create their `User` row.
 4. **Promote owner**
@@ -238,7 +243,7 @@ Keep this matrix in sync with UI checks (`current_admin.admin_account.owner?` / 
 ## Checklist Summary
 
 - [ ] YAML authored + committed.
-- [ ] `bin/rails temples:seed[slug]` run (dev + prod).
+- [ ] `bin/rails temples:bootstrap[slug]` run (dev + prod).
 - [ ] Payment onboarding planned (LINE Pay credentials collected, offerings TBD).
 - [ ] Owner admin provisioned (dev task or manual promote).
 - [ ] Admin UI tested (profile edit, audit log, QR display).

@@ -8,4 +8,10 @@ namespace :temples do
     slug = args[:slug] || AppConstants::Project.slug
     Seeds::Temples.seed(slug:)
   end
+
+  desc "Create or update the minimal temple row from db/temples/<slug>.yml (name + registration periods only)"
+  task :bootstrap, [:slug] => :environment do |_task, args|
+    slug = args[:slug] || AppConstants::Project.slug
+    Seeds::Temples.bootstrap(slug:)
+  end
 end

@@ -181,6 +181,20 @@ These should become selector-backed field settings in the finalized YAML rather 
 - Shengfukung V1 keeps all extra family / ancestor / household / deceased names inside ritual metadata fields rather than expanding the base registration model.
 - The registration form should prefer selector-backed values first and free text second. Free text remains acceptable where temple staff simply need something to copy into offline ritual prep.
 
+### First-Pass Duplicate Policy
+
+- Duplicate guard should not be universal. It must follow offering intent, not just `registration_period_key`.
+- V1 policy for Shengfukung:
+  - `incense-donation`: allow repeated registrations
+  - `lamp-service`: allow repeated registrations
+  - `peace-opera-household`: keep duplicate guard
+  - `ghost-festival-table`: keep duplicate guard and rely on `quantity` for multi-table sponsorship
+  - `liberation-ritual`: allow repeated registrations
+- Rationale:
+  - donation and case-based ritual requests can recur for the same registrant within the same period
+  - household/cycle-bound offerings should remain one-per-registrant unless the temple later says otherwise
+  - `lamp-service` uses one shared offering template with multiple lamp types, so repeated registrations must be allowed unless lamp types are later split into separate offerings
+
 ## Complex Offering Review Tracks
 
 Treat these three as explicit review items before calling the Shengfukung config stable. If the answer is unknown, capture it as a clarification question for the temple admin rather than guessing.

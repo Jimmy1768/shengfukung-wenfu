@@ -2,6 +2,9 @@ services:
   - slug: incense-donation
     label: "香油捐獻"
     registration_period_key: "perennial"
+    ui:
+      show_availability_window: false
+      lock_registration_period_key: true
     defaults:
       offering_type: "donation"
       currency: "TWD"
@@ -60,6 +63,9 @@ services:
   - slug: lamp-service
     label: "點燈作業"
     registration_period_key: "2026-lantern"
+    ui:
+      show_availability_window: false
+      lock_registration_period_key: true
     defaults:
       offering_type: "lamp"
       currency: "TWD"
@@ -124,6 +130,9 @@ services:
   - slug: peace-opera-household
     label: "平安戲丁口捐"
     registration_period_key: "perennial"
+    ui:
+      show_availability_window: false
+      lock_registration_period_key: true
     defaults:
       offering_type: "ritual"
       currency: "TWD"
@@ -193,6 +202,9 @@ services:
   - slug: ghost-festival-table
     label: "普渡供桌"
     registration_period_key: "2026-ghost-month"
+    ui:
+      show_availability_window: false
+      lock_registration_period_key: true
     defaults:
       offering_type: "table"
       currency: "TWD"
@@ -252,6 +264,9 @@ services:
   - slug: liberation-ritual
     label: "拔薦"
     registration_period_key: "2026-ghost-month"
+    ui:
+      show_availability_window: false
+      lock_registration_period_key: true
     defaults:
       offering_type: "ritual"
       currency: "TWD"

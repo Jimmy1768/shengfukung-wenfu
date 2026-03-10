@@ -105,6 +105,7 @@ module Admin
       offering.metadata["form_fields"] = template[:form_fields]
       offering.metadata["form_defaults"] = template[:defaults]
       offering.metadata["form_options"] = template[:options]
+      offering.metadata["form_ui"] = template[:ui]
       offering.metadata["form_label"] = template[:label]
       offering.metadata["registration_form"] = template[:registration_form]
       offering.slug ||= template[:slug]
