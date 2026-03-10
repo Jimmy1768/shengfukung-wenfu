@@ -146,10 +146,15 @@ module Admin
         :fulfillment_notes,
         :status,
         :hero_image_url,
+        :registration_period_key,
         metadata_settings: {}
       )
       permitted[:currency] = permitted[:currency].presence || "TWD"
       permitted[:metadata] = merge_metadata_settings(@offering&.metadata, permitted.delete(:metadata_settings))
+      if permitted[:registration_period_key].present?
+        offered_period = current_temple.registration_period_label_for(permitted[:registration_period_key])
+        permitted[:period_label] = offered_period if offered_period.present?
+      end
       permitted
     end
 
@@ -179,6 +184,8 @@ module Admin
       offering.metadata["form_label"] = template[:label]
       offering.metadata["registration_form"] = template[:registration_form]
       offering.slug ||= template[:slug]
+      offering.registration_period_key ||= template[:registration_period_key] if offering.respond_to?(:registration_period_key=)
+      apply_period_label(offering) if offering.respond_to?(:registration_period_key)
 
       attribute_defaults = template[:attributes] || {}
       attribute_defaults.each do |attr, value|
@@ -189,6 +196,13 @@ module Admin
 
         offering.public_send(writer, value)
       end
+    end
+
+    def apply_period_label(offering)
+      return unless offering.respond_to?(:registration_period_key)
+      return unless offering.registration_period_key.present?
+
+      offering.period_label = current_temple.registration_period_label_for(offering.registration_period_key)
     end
 
     def log_offering_event(action)

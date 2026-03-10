@@ -39,7 +39,8 @@
     <%= hidden_field_tag key, value %>
   <% end %>
 
-  <% metadata = (@offering.metadata || {}).with_indifferent_access %>
+<% metadata = (@offering.metadata || {}).with_indifferent_access %>
+<% template_locked = params[:template_slug].present? && !@offering.persisted? %>
 
   <section class="card form-section">
     <header>
@@ -49,7 +50,7 @@
     <div class="field-row">
       <div class="field-panel">
         <%= form.label :title, t("admin.offering_form.fields.title") %>
-        <%= form.text_field :title %>
+        <%= form.text_field :title, readonly: template_locked %>
       </div>
     </div>
     <div class="field-row">
