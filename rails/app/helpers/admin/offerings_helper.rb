@@ -19,6 +19,10 @@ module Admin
       end.compact)
     end
 
+    def localized_offering_type(value)
+      I18n.t("admin.offerings.types.#{value}", default: value.to_s.humanize)
+    end
+
     private
 
     def render_offering_section(form, section_key, config, defaults, option_map, metadata, skip_fields, skip_sections)
@@ -213,7 +217,7 @@ module Admin
       value = form.object.send(field) || default
       display_value =
         if field.to_sym == :offering_type
-          I18n.t("admin.offerings.types.#{value}", default: value.to_s.humanize)
+          localized_offering_type(value)
         else
           value
         end

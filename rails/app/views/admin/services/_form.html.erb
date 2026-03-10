@@ -43,6 +43,7 @@
 <% form_ui = metadata["form_ui"].is_a?(Hash) ? metadata["form_ui"].with_indifferent_access : {} %>
 <% template_locked = params[:template_slug].present? && !@offering.persisted? %>
 <% show_availability_window = form_ui.key?(:show_availability_window) ? form_ui[:show_availability_window] : false %>
+<% show_default_location = form_ui.key?(:show_default_location) ? form_ui[:show_default_location] : false %>
 <% lock_registration_period_key = form_ui.key?(:lock_registration_period_key) ? form_ui[:lock_registration_period_key] : @offering.registration_period_key.present? %>
 
   <section class="card form-section">
@@ -116,10 +117,12 @@
       </div>
     <% end %>
     <div class="field-row">
-      <div class="field-panel">
-        <%= form.label :default_location, t("admin.services.form.fields.default_location") %>
-        <%= form.text_field :default_location %>
-      </div>
+      <% if show_default_location %>
+        <div class="field-panel">
+          <%= form.label :default_location, t("admin.services.form.fields.default_location") %>
+          <%= form.text_field :default_location %>
+        </div>
+      <% end %>
       <div class="field-panel">
         <%= form.label :fulfillment_notes, t("admin.services.form.fields.fulfillment_notes") %>
         <%= form.text_area :fulfillment_notes, rows: 2 %>
@@ -127,35 +130,41 @@
     </div>
   </section>
 
-  <section class="card form-section">
-    <header>
-      <h2><%= t("admin.services.form.sections.pricing") %></h2>
-    </header>
-    <div class="field-row">
-      <div class="field-panel">
-        <%= form.label :price_cents, t("admin.registration_form.fields.unit_price") %>
-        <%= form.number_field :price_cents, min: 0 %>
+  <div class="offering-form-stage">
+    <section class="card form-section offering-form-stage__primary">
+      <header>
+        <h2><%= t("admin.services.form.sections.pricing") %></h2>
+      </header>
+      <div class="field-row">
+        <div class="field-panel">
+          <%= form.label :price_cents, t("admin.registration_form.fields.unit_price") %>
+          <%= form.number_field :price_cents, min: 0 %>
+        </div>
+        <div class="field-panel">
+          <%= form.label :currency, t("admin.offering_form.fields.currency") %>
+          <%= form.select :currency, options_for_select(Currency::Symbols.options, @offering.currency || "TWD") %>
+        </div>
       </div>
-      <div class="field-panel">
-        <%= form.label :currency, t("admin.offering_form.fields.currency") %>
-        <%= form.select :currency, options_for_select(Currency::Symbols.options, @offering.currency || "TWD") %>
+      <div class="field">
+        <%= form.label :status, t("admin.services.form.fields.status") %>
+        <%= form.select :status, options_for_select([["Draft", "draft"], ["Published", "published"], ["Archived", "archived"]], @offering.status) %>
       </div>
-    </div>
-    <div class="field">
-      <%= form.label :status, t("admin.services.form.fields.status") %>
-      <%= form.select :status, options_for_select([["Draft", "draft"], ["Published", "published"], ["Archived", "archived"]], @offering.status) %>
-    </div>
-  </section>
+    </section>
 
-  <div class="offering-form-grid">
-    <%= render_offering_sections(
-          form,
-          metadata,
-          skip_fields: %i[
-            title subtitle hero_image_url description period_label registration_period_key quantity_limit available_from available_until default_location fulfillment_notes price_cents currency status
-          ]
-        ) %>
+    <div class="offering-form-stage__secondary-list">
+      <%= render_offering_sections(
+            form,
+            metadata,
+            skip_fields: %i[
+              title subtitle hero_image_url description period_label registration_period_key quantity_limit available_from available_until default_location fulfillment_notes price_cents currency status offering_type
+            ]
+          ) %>
+    </div>
   </div>
+
+  <% if Rails.env.development? && metadata.dig("form_defaults", "offering_type").present? %>
+    <p class="muted offering-form-dev-hint">Dev hint: offering_type = <%= localized_offering_type(metadata.dig("form_defaults", "offering_type")) %> (<%= metadata.dig("form_defaults", "offering_type") %>)</p>
+  <% end %>
 
   <% if show_form_actions %>
     <div class="form-actions">

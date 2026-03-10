@@ -143,8 +143,12 @@
   </section>
 
   <div class="offering-form-grid">
-    <%= render_offering_sections(form, metadata) %>
+    <%= render_offering_sections(form, metadata, skip_fields: %i[offering_type]) %>
   </div>
+
+  <% if Rails.env.development? && metadata.dig("form_defaults", "offering_type").present? %>
+    <p class="muted">Dev hint: offering_type = <%= localized_offering_type(metadata.dig("form_defaults", "offering_type")) %> (<%= metadata.dig("form_defaults", "offering_type") %>)</p>
+  <% end %>
 
   <% if show_form_actions %>
     <div class="form-actions">
