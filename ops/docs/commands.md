@@ -60,7 +60,7 @@ sudo systemctl restart shengfukung-wenfu-sidekiq
 ```bash
 
 git add .
-git commit -m "added rails/public/icons"
+git commit -m "built internal access"
 git push
 
 git reset --hard HEAD
@@ -245,7 +245,7 @@ bundle install
 # Setup DB (creates, migrates, seeds)
 bin/rails db:setup
 
-# Run Rails server (defaults to http://localhost:3001)
+# Run Rails server (defaults to http://localhost:3002)
 bundle exec rails server -p 3002 -b 0.0.0.0
 
 # Run any pending migrations
