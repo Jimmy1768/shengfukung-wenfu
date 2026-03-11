@@ -6,9 +6,26 @@ This file documents how we bring a new temple onto the Shengfukung Wenfu stack. 
 
 - **Profile YAML** – `rails/db/temples/<slug>.yml`. Source of truth for public copy (name, tagline, contact, service times, about text, metadata). Required before seeding anything.
 - **Owner admin** – first administrator for the temple. Gets elevated privileges (manage admins, manage other admins, payment routing). Stored as a `User` + `AdminAccount(role: owner)` + `AdminTempleMembership`.
+- **Staff admin** – temple-scoped operator for daily work. Staff should not manage other admins or permissions. Stored as the same core records as owner admin, but with a lower temple role/permission set.
+- **Temple membership** – admin access is granted per temple through `AdminTempleMembership`. One user/admin identity can hold memberships for many temples.
 - **Events vs Services** – events (`TempleEvent`) are in-person programs with schedules/capacity; services (`TempleService`) cover proxy rituals (lanterns, placards, etc.). Both are configured from the per-temple YAML templates and seeded through `Seeds::TempleFinancials`. Onboarding configs must use top-level `events:` and `services:` sections so entries are classified by section (not by per-entry `kind` flags).
 - **TempleRegistration** – unified polymorphic registration model (table: `temple_registrations`). Every onsite order/payment flows through this table regardless of whether the source is an event, service, or gathering.
 - **Gatherings** – `TempleGathering` records for non-offering community events (e.g., workshops). They share the registration/payment stack but are managed separately from offerings.
+
+## Admin access model
+
+- Use a temple-scoped split:
+  - `staff` handles daily operations
+  - `owner` can manage admins and permissions for that temple
+- Do not introduce a global super-admin role for client temples by default.
+- Operational platform access should use:
+  - one internal admin identity
+  - plus one `AdminTempleMembership` per temple
+- This is intentionally more explicit than a global admin switch:
+  - lower blast radius if an account is compromised
+  - clearer audit trail for who had access to which temple
+  - simpler per-temple offboarding
+- During initial spin-up, it is acceptable for the platform operator (`jimmy1768`) to hold an `owner` membership on the temple until the real temple owner is promoted.
 
 ## Dev / Staging Flow
 
