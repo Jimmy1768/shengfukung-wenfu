@@ -1,0 +1,77 @@
+<div class="internal-access-page">
+  <section class="dashboard-hero">
+    <div>
+      <p class="eyebrow">Internal access</p>
+      <h1><%= @temple.name %></h1>
+      <p>Temple admin accounts for <code><%= @temple.slug %></code>.</p>
+    </div>
+  </section>
+
+  <section class="admin-card">
+    <header class="section-header">
+      <div>
+        <p class="eyebrow">Temple admins</p>
+        <h2>Current access list</h2>
+        <p>Only accounts with temple admin access are shown here.</p>
+      </div>
+      <div>
+        <%= link_to "Back to temples", internal_temple_access_path, class: "btn btn-ghost" %>
+      </div>
+    </header>
+
+    <div class="table-shell">
+      <table class="data-table internal-access-table internal-access-table--admins">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Can manage permissions</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @temple_admin_memberships.each do |membership| %>
+            <% admin_account = membership.admin_account %>
+            <% user = admin_account.user %>
+            <% permission = admin_account.permissions_for(@temple) %>
+            <tr>
+              <td><%= user.english_name %></td>
+              <td><%= user.email %></td>
+              <td>
+                <% role_label = case membership.role
+                   when "staff" then "Admin"
+                   when "owner" then "Owner"
+                   when "support" then "Support"
+                   else membership.role.to_s.humanize
+                   end %>
+                <%= role_label %>
+              </td>
+              <td><%= permission.allow?(:manage_permissions) ? "Yes" : "No" %></td>
+              <td>
+                <% if membership.role == "owner" %>
+                  <span>Already owner</span>
+                <% else %>
+                  <%= button_to "Make owner",
+                    internal_promote_temple_access_owner_path(temple_id: @temple.id, admin_account_id: admin_account.id),
+                    method: :post,
+                    class: "btn btn-primary btn-small",
+                    form: {
+                      data: {
+                        confirm: "Make #{user.email} an owner for #{@temple.name}?"
+                      }
+                    } %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+          <% if @temple_admin_memberships.empty? %>
+            <tr>
+              <td colspan="5">No temple admin accounts found.</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

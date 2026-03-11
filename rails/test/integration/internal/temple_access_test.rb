@@ -82,6 +82,74 @@ class InternalTempleAccessTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "operator can view temple admins for a temple" do
+    temple = create_temple(slug: "demo-lotus", name: "Demo Lotus")
+    operator = create_operator!
+    admin_user = create_admin_user(
+      temple: temple,
+      role: "staff",
+      membership_role: "staff",
+      permission_overrides: { manage_permissions: false }
+    )
+    outsider = User.create!(
+      email: "outsider@example.com",
+      encrypted_password: User.password_hash("Password123!"),
+      english_name: "Outsider"
+    )
+
+    with_env("INTERNAL_PLATFORM_OPERATOR_EMAIL" => "operator@example.com") do
+      sign_in_admin(operator)
+
+      get internal_temple_access_temple_path(temple_id: temple.id)
+
+      assert_response :success
+      assert_includes response.body, admin_user.email
+      assert_includes response.body, "Make owner"
+      assert_not_includes response.body, outsider.email
+    end
+  end
+
+  test "temple admin detail shows inherited manage permissions for owner accounts" do
+    temple = create_temple(slug: "demo-lotus", name: "Demo Lotus")
+    operator = create_operator!
+    owner_user = create_admin_user(temple: temple, role: "owner")
+    AdminPermission.find_by(admin_account: owner_user.admin_account, temple: temple)&.destroy!
+
+    with_env("INTERNAL_PLATFORM_OPERATOR_EMAIL" => "operator@example.com") do
+      sign_in_admin(operator)
+
+      get internal_temple_access_temple_path(temple_id: temple.id)
+
+      assert_response :success
+      assert_match(/#{Regexp.escape(owner_user.email)}.*?Owner.*?Yes/m, response.body)
+    end
+  end
+
+  test "operator can promote an existing temple admin into owner" do
+    temple = create_temple(slug: "demo-lotus", name: "Demo Lotus")
+    operator = create_operator!
+    admin_user = create_admin_user(
+      temple: temple,
+      role: "staff",
+      membership_role: "staff",
+      permission_overrides: { manage_permissions: false }
+    )
+
+    with_env("INTERNAL_PLATFORM_OPERATOR_EMAIL" => "operator@example.com") do
+      sign_in_admin(operator)
+
+      post internal_promote_temple_access_owner_path(temple_id: temple.id, admin_account_id: admin_user.admin_account.id)
+
+      assert_redirected_to internal_temple_access_temple_path(temple_id: temple.id)
+      membership = admin_user.admin_account.admin_temple_memberships.find_by!(temple:)
+      assert_equal "owner", membership.role
+
+      permission = AdminPermission.find_by!(admin_account: admin_user.admin_account, temple:)
+      assert_equal true, permission.manage_permissions
+      assert SystemAuditLog.exists?(action: "internal.temple_access.promote_owner", target: admin_user)
+    end
+  end
+
   test "non-operator admin is redirected away" do
     temple = create_temple(slug: "shengfukung-wenfu")
     user = create_admin_user(temple: temple, password: "Password123!", role: "owner")

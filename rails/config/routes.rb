@@ -111,7 +111,11 @@ Rails.application.routes.draw do
 
   namespace :internal, defaults: { format: :html } do
     get "/temples/access", to: "temple_access#index", as: :temple_access
+    get "/temples/access/:temple_id", to: "temple_access#show", as: :temple_access_temple
     post "/temples/access/:temple_id/grant", to: "temple_access#grant", as: :grant_temple_access
+    post "/temples/access/:temple_id/admins/:admin_account_id/owner",
+      to: "temple_access#promote_owner",
+      as: :promote_temple_access_owner
     delete "/temples/access/:temple_id/revoke", to: "temple_access#revoke", as: :revoke_temple_access
   end
 

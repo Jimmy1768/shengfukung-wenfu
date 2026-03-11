@@ -1,79 +1,88 @@
-<section class="dashboard-hero">
-  <div>
-    <p class="eyebrow">Internal access</p>
-    <h1>Temple access</h1>
-    <p>Review temple-scoped access for the internal operator account before adding grant/revoke actions.</p>
-  </div>
-</section>
-
-<section class="admin-card">
-  <header class="section-header">
+<div class="internal-access-page">
+  <section class="dashboard-hero">
     <div>
-      <p class="eyebrow">Operator</p>
-      <h2><%= current_admin.email %></h2>
-      <p>Configured operator email: <%= internal_operator_email %></p>
+      <p class="eyebrow">Internal access</p>
+      <h1>Temple access</h1>
+      <p>Review operator access and open each temple to manage existing admin accounts.</p>
     </div>
-  </header>
+  </section>
 
-  <div class="table-shell">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Temple</th>
-          <th>Slug</th>
-          <th>Published</th>
-          <th>Access state</th>
-          <th>Role</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @temples.each do |temple| %>
-          <% membership = @memberships_by_temple_id[temple.id] %>
+  <section class="admin-card">
+    <header class="section-header">
+      <div>
+        <p class="eyebrow">Operator</p>
+        <h2><%= current_admin.email %></h2>
+        <p>Configured operator email: <%= internal_operator_email %></p>
+      </div>
+    </header>
+
+    <div class="table-shell">
+      <table class="data-table internal-access-table internal-access-table--temples">
+        <thead>
           <tr>
-            <td><%= temple.name %></td>
-            <td><code><%= temple.slug %></code></td>
-            <td><%= temple.published? ? "Yes" : "No" %></td>
-            <td><%= membership.present? ? "Has access" : "No access" %></td>
-            <td>
-              <% role_label = case membership&.role
-                 when "staff" then "Admin"
-                 when "owner" then "Owner"
-                 when "support" then "Support"
-                 else "—"
-                 end %>
-              <%= role_label %>
-            </td>
-            <td>
-              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <% unless membership&.role == "owner" %>
-                  <%= button_to "Grant owner",
-                    internal_grant_temple_access_path(temple_id: temple.id, role: "owner"),
-                    method: :post,
-                    class: "btn btn-primary btn-sm" %>
-                <% end %>
-                <% unless membership&.role == "staff" %>
-                  <%= button_to "Grant admin",
-                    internal_grant_temple_access_path(temple_id: temple.id, role: "admin"),
-                    method: :post,
-                    class: "btn btn-secondary btn-sm" %>
-                <% end %>
-                <% if membership.present? %>
-                  <%= button_to "Revoke",
-                    internal_revoke_temple_access_path(temple_id: temple.id),
-                    method: :delete,
-                    class: "btn btn-ghost btn-sm",
-                    form: {
-                      data: {
-                        confirm: "Revoke access for #{temple.name}?"
-                      }
-                    } %>
-                <% end %>
-              </div>
-            </td>
+            <th>Temple</th>
+            <th>Slug</th>
+            <th>Published</th>
+            <th>Access state</th>
+            <th>Role</th>
+            <th>Actions</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-</section>
+        </thead>
+        <tbody>
+          <% @temples.each do |temple| %>
+            <% membership = @memberships_by_temple_id[temple.id] %>
+            <tr>
+              <td><%= temple.name %></td>
+              <td><code><%= temple.slug %></code></td>
+              <td><%= temple.published? ? "Yes" : "No" %></td>
+              <td><%= membership.present? ? "Has access" : "No access" %></td>
+              <td>
+                <% role_label = case membership&.role
+                   when "staff" then "Admin"
+                   when "owner" then "Owner"
+                   when "support" then "Support"
+                   else "—"
+                   end %>
+                <%= role_label %>
+              </td>
+              <td>
+                <div class="internal-access-actions">
+                  <div class="internal-access-actions__primary">
+                    <% unless membership&.role == "owner" %>
+                      <%= button_to "Grant owner",
+                        internal_grant_temple_access_path(temple_id: temple.id, role: "owner"),
+                        method: :post,
+                        class: "btn btn-primary btn-small" %>
+                    <% end %>
+                    <% unless membership&.role == "staff" %>
+                      <%= button_to "Grant admin",
+                        internal_grant_temple_access_path(temple_id: temple.id, role: "admin"),
+                        method: :post,
+                        class: "btn btn-secondary btn-small" %>
+                    <% end %>
+                    <%= link_to "Temple admins",
+                      internal_temple_access_temple_path(temple_id: temple.id),
+                      class: "btn btn-secondary btn-small" %>
+                  </div>
+                  <div class="internal-access-actions__secondary">
+                    <% if membership.present? %>
+                      <%= button_to "Revoke",
+                        internal_revoke_temple_access_path(temple_id: temple.id),
+                        method: :delete,
+                        class: "btn btn-ghost btn-small",
+                        form: {
+                          data: {
+                            confirm: "Revoke access for #{temple.name}?"
+                          }
+                        } %>
+                    <% end %>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

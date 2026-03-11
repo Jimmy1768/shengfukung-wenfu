@@ -1150,6 +1150,12 @@ body.admin-body input[type=time]::-webkit-calendar-picker-indicator {
   margin: 0 auto;
 }
 
+body.admin-body--internal .admin-layout--public .admin-main {
+  max-width: min(1180px, 100vw - var(--spacing-lg) * 2);
+  width: 100%;
+  margin: 0 auto;
+}
+
 .admin-sidebar {
   width: 100%;
   max-width: 240px;
@@ -1835,6 +1841,81 @@ body.admin-body input[type=time]::-webkit-calendar-picker-indicator {
   font-size: 0.8rem;
   max-height: 180px;
   overflow: auto;
+}
+
+.internal-access-table {
+  table-layout: auto;
+}
+.internal-access-table th,
+.internal-access-table td {
+  white-space: nowrap;
+}
+
+.internal-access-page {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.internal-access-page .table-shell {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.internal-access-table--temples th:nth-child(1),
+.internal-access-table--temples td:nth-child(1) {
+  min-width: 180px;
+}
+.internal-access-table--temples th:nth-child(2),
+.internal-access-table--temples td:nth-child(2) {
+  min-width: 180px;
+}
+.internal-access-table--temples th:nth-child(4),
+.internal-access-table--temples td:nth-child(4) {
+  min-width: 80px;
+}
+.internal-access-table--temples th:nth-child(6),
+.internal-access-table--temples td:nth-child(6) {
+  min-width: 260px;
+}
+
+.internal-access-table--admins th:nth-child(1),
+.internal-access-table--admins td:nth-child(1) {
+  min-width: 140px;
+}
+.internal-access-table--admins th:nth-child(2),
+.internal-access-table--admins td:nth-child(2) {
+  min-width: 280px;
+}
+.internal-access-table--admins th:nth-child(4),
+.internal-access-table--admins td:nth-child(4) {
+  min-width: 150px;
+}
+.internal-access-table--admins th:nth-child(5),
+.internal-access-table--admins td:nth-child(5) {
+  min-width: 120px;
+}
+
+.internal-access-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem 0.75rem;
+  align-items: start;
+}
+
+.internal-access-actions form {
+  margin: 0;
+}
+
+.internal-access-actions__primary,
+.internal-access-actions__secondary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.internal-access-actions__secondary {
+  min-width: 0;
 }
 
 .field-row {

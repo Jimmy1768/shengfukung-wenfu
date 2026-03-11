@@ -233,6 +233,15 @@ Status:
 - Add revoke/demotion path as needed
 - Audit those actions
 
+Status:
+
+- In progress.
+- `/internal/temples/access/:temple_id` now exists as a per-temple detail page.
+- The detail page currently lists only temple accounts that already have admin access.
+- Non-owner temple admins can now be promoted to `owner` from the internal screen.
+- Owner promotion updates the selected temple membership, enables `manage_permissions`, and writes a `SystemAuditLog`.
+- Eligible patron promotion, admin promotion, and revoke/demotion controls are still pending.
+
 ### Phase 4
 
 - Polish UI

@@ -526,6 +526,12 @@ body.admin-body input[type="time"]::-webkit-calendar-picker-indicator {
   }
 }
 
+body.admin-body--internal .admin-layout--public .admin-main {
+  max-width: min(1180px, calc(100vw - (var(--spacing-lg) * 2)));
+  width: 100%;
+  margin: 0 auto;
+}
+
 .admin-sidebar {
   width: 100%;
   max-width: 240px;
