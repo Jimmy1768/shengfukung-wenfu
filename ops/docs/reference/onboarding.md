@@ -5,8 +5,8 @@ This file documents how we bring a new temple onto the Shengfukung Wenfu stack. 
 ## Vocabulary
 
 - **Profile YAML** – `rails/db/temples/<slug>.yml`. Source of truth for public copy (name, tagline, contact, service times, about text, metadata). Required before seeding anything.
-- **Owner admin** – first administrator for the temple. Gets elevated privileges (manage admins, manage other admins, payment routing). Stored as a `User` + `AdminAccount(role: owner)` + `AdminTempleMembership`.
-- **Staff admin** – temple-scoped operator for daily work. Staff should not manage other admins or permissions. Stored as the same core records as owner admin, but with a lower temple role/permission set.
+- **Owner admin** – first administrator for the temple. Gets elevated privileges (manage permissions/admin roles, payment routing). Stored as a `User` + `AdminAccount(role: owner)` + `AdminTempleMembership`.
+- **Temple admin** – temple-scoped operator for daily work. Temple admins should not manage other admins or permissions. Stored as the same core records as owner admin, but with a lower temple role/permission set.
 - **Temple membership** – admin access is granted per temple through `AdminTempleMembership`. One user/admin identity can hold memberships for many temples.
 - **Events vs Services** – events (`TempleEvent`) are in-person programs with schedules/capacity; services (`TempleService`) cover proxy rituals (lanterns, placards, etc.). Both are configured from the per-temple YAML templates and seeded through `Seeds::TempleFinancials`. Onboarding configs must use top-level `events:` and `services:` sections so entries are classified by section (not by per-entry `kind` flags).
 - **TempleRegistration** – unified polymorphic registration model (table: `temple_registrations`). Every onsite order/payment flows through this table regardless of whether the source is an event, service, or gathering.
@@ -15,7 +15,7 @@ This file documents how we bring a new temple onto the Shengfukung Wenfu stack. 
 ## Admin access model
 
 - Use a temple-scoped split:
-  - `staff` handles daily operations
+  - `admin` handles daily operations
   - `owner` can manage admins and permissions for that temple
 - Do not introduce a global super-admin role for client temples by default.
 - Operational platform access should use:
@@ -29,7 +29,7 @@ This file documents how we bring a new temple onto the Shengfukung Wenfu stack. 
 - Internal operator access review page:
   - `/internal/temples/access`
   - intended for the platform operator only
-  - use it to confirm whether your internal admin identity already has temple membership on a temple before promoting staff or owner accounts there
+  - use it to confirm whether your internal admin identity already has temple membership on a temple before promoting temple admins or owners there
 
 ## Dev / Staging Flow
 
@@ -92,7 +92,7 @@ Slug convention:
 3. **Seed baseline accounts**
    - `bin/rails db:seed` now provisions:
      - Owner admin: `owner@<slug>.local`
-     - Staff admin (promoted patron): `admin@<slug>.local`
+     - Temple admin (promoted patron): `admin@<slug>.local`
      - Patron tester: `patron@<slug>.local`
      - Dev support admin: `dev@<slug>.local`
      - Demo client + guest operator for account portal flows
@@ -107,7 +107,7 @@ Slug convention:
      ```bash
      bin/rails "temple_financial:seed_offerings[shengfukung-wenfu]"
      ```
-   - Grant staff financial permissions (owner already has them):
+   - Grant temple-admin financial permissions (owner already has them):
      ```bash
      bin/rails "temple_financial:grant_permissions[shengfukung-wenfu,admin@shengfukung-wenfu.local]"
      ```
@@ -240,8 +240,9 @@ Production onboarding avoids creating real user passwords in seeds—only the te
    - If needed, first confirm your own internal operator access at `/internal/temples/access` before promoting the temple owner.
    - Email the owner once `/admin` access is ready.
    - Remind them to sign in with that email/password; the marketing demo credentials are only for `/marketing/admin`.
-5. **Owner invites staff**
-   - Inside the admin console (feature pending), the owner can invite additional admins scoped to their temple.
+5. **Promote first temple admin**
+   - After the first admin/staff person signs up as a normal patron account, use the internal console to promote them to temple `admin`.
+   - Keep bootstrap role elevation centralized in `/internal/temples/access`.
 6. **Financial onboarding**
    - Gather LINE Pay channel ID/secret but keep them out of Git; store in `.env.development` locally and `/etc/default/<slug>-env` on server until vaulting is ready.
    - Decide which staff get financial permissions and run `bin/rails "temple_financial:grant_permissions[slug,email]"`.
@@ -252,7 +253,7 @@ Production onboarding avoids creating real user passwords in seeds—only the te
 
 ## Owner Privileges
 
-| Capability                 | Owner | Staff |
+| Capability                 | Owner | Admin |
 |---------------------------|:-----:|:-----:|
 | Edit temple profile       |   ✓   |   ✓   |
 | Upload/payment QR         |   ✓   |   ✗   |
@@ -267,6 +268,6 @@ Keep this matrix in sync with UI checks (`current_admin.admin_account.owner?` / 
 - [ ] YAML authored + committed.
 - [ ] `bin/rails temples:bootstrap[slug]` run (dev + prod).
 - [ ] Payment onboarding planned (LINE Pay credentials collected, offerings TBD).
-- [ ] Owner admin provisioned (dev task or manual promote).
+- [ ] Owner admin provisioned (internal console or manual promote).
 - [ ] Admin UI tested (profile edit, audit log, QR display).
 - [ ] Deployment notes updated only for template-level changes; keep temple-specific updates here.

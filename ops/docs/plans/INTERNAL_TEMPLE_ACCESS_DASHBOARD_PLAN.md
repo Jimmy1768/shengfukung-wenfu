@@ -2,16 +2,16 @@
 
 ## Goal
 
-Create an internal-only ops dashboard that lets the platform operator (`jimmy1768`) grant or revoke temple-scoped owner access for their own internal admin identity without introducing a global super-admin role.
+Create an internal-only ops dashboard that lets the platform operator (`jimmy1768`) bootstrap temple access without introducing a global super-admin role.
 
-This is an operations convenience tool, not a client-facing admin feature.
+This is an operations console, not a client-facing admin feature.
 
 ## Product rules
 
 - Do **not** add a true global super-admin bypass.
 - Keep temple access explicit and auditable through `AdminTempleMembership`.
 - Use one internal platform admin identity that can hold memberships on many temples.
-- The dashboard should help grant/revoke those memberships quickly.
+- Keep role elevation for temple people centralized in the internal ops surface.
 
 ## Why this exists
 
@@ -21,54 +21,64 @@ Current model:
 - one `AdminAccount`
 - one `AdminTempleMembership` per temple
 
-This is the safer architecture, but it becomes tedious when onboarding many temples.
+This is the safer architecture, but onboarding still requires manual steps:
 
-The internal dashboard solves the operations friction while preserving:
+- give the operator access to the new temple
+- identify the first real temple owner/admin after they sign up
+- promote those users into temple admins
 
-- least privilege
-- per-temple auditability
-- clear offboarding and revocation
+This is currently done through Rails console or ad hoc admin actions. That does not scale cleanly as more temples are onboarded.
 
 ## Scope
 
 ### In scope
 
 - Internal-only page listing temples
-- Per-temple action:
-  - grant `owner` membership to internal platform account
-  - revoke membership
+- Per-temple operator actions:
+  - grant `owner` access to the platform operator account
+  - grant `admin` access to the platform operator account
+  - revoke the operator’s temple access
+- Internal temple bootstrap actions:
+  - inspect temple patrons/admins
+  - promote an existing patron to temple `owner`
+  - promote an existing patron to temple `admin`
+  - revoke temple admin access when needed
 - Simple visibility into current access state
-- Audit logging for every grant/revoke
+- Audit logging for every grant/revoke/promotion action
 
 ### Out of scope
 
 - Global cross-tenant permission bypass
 - Client-facing admin tooling
 - Bulk-import automation for all staff
-- Non-platform self-service role escalation
+- Temple-owner self-service role escalation inside normal `/admin`
 
 ## Current gap
 
-Today, the underlying access model is correct but the operator workflow is still manual:
+Today, the access model is correct but the workflow is split awkwardly:
 
-- create or identify the internal `User`
-- ensure `AdminAccount` exists
-- add `AdminTempleMembership`
-- optionally add `AdminPermission`
+- operator self-access is manual without the internal page
+- bootstrap promotion of the first owner/admin is still manual or ad hoc
 
-This is currently done through Rails console or ad hoc admin actions. That is workable for one temple, but it does not scale cleanly as more temples are onboarded.
+The internal dashboard should be the single place for platform-run bootstrap actions.
 
 ## User story
 
-As the platform operator, I want to click once on a temple and grant myself owner-level access for that temple so I can perform setup, debugging, and recovery work without manually using Rails console each time.
+As the platform operator, I want to:
+
+- grant myself temple access
+- inspect a temple’s people
+- promote the first owner/admin
+
+without using Rails console.
 
 ## Security model
 
 - Dashboard must be internal-only.
 - Only the platform operator account should be allowed to use it.
 - Every change must create a `SystemAuditLog` entry.
-- Granting access should create explicit temple membership rows, not hidden bypass logic.
-- Revocation should remove or deactivate the corresponding membership cleanly.
+- Access should be temple-scoped only.
+- Promotion actions should update only the selected temple’s membership/permission rows.
 
 Recommended guard:
 
@@ -90,17 +100,39 @@ For each temple row show:
 
 Actions:
 
-- `Grant owner access`
-- `Grant support access`
-- `Revoke access`
-- optional: `Open admin as this temple`
+- `Grant owner`
+- `Grant admin`
+- `Revoke`
+- `Manage temple people`
 
-### Button behavior
+### Page: Internal Temple Access Detail
 
-- If no membership exists, `Grant owner access` creates one with role `owner`
-- `Grant support access` does the same but with role `support`
-- If membership exists, show current state and `Revoke access`
-- Every destructive action should require confirmation
+For the selected temple show:
+
+- temple name / slug
+- whether the operator currently has access
+- current temple admins and their roles
+- current patrons eligible for promotion
+
+Actions:
+
+- `Promote to owner`
+- `Promote to admin`
+- `Revoke temple admin access`
+
+## Role model
+
+Temple-facing product roles should be:
+
+- `owner`
+- `admin`
+
+Meaning:
+
+- `owner` can operate and manage permissions/admins
+- `admin` can operate but cannot manage permissions/admins
+
+Current runtime may still map non-owner to the legacy stored role `staff` until the role-model simplification refactor lands. Internal UI should still present `admin`.
 
 ## Data model
 
@@ -110,13 +142,14 @@ Expected behavior:
 
 1. Find the internal platform `User`
 2. Ensure it has an `AdminAccount`
-3. Create or update `AdminTempleMembership` for selected temple with role `owner`
-4. Optionally ensure matching `AdminPermission` defaults exist if required by current owner UX
+3. Create or update `AdminTempleMembership` for selected temple
+4. Ensure matching `AdminPermission` defaults exist for that temple
+5. For temple bootstrap promotions, create or update the selected user’s temple membership and temple permission row only
 
 Preferred role behavior:
 
-- `owner` grant should also ensure `AdminPermission.manage_permissions = true`
-- `support` grant should create the membership without owner-level permission management
+- `owner` grant/promotion should ensure `manage_permissions = true`
+- `admin` grant/promotion should ensure `manage_permissions = false`
 - same `AdminAccount` is reused across all temples for the internal operator identity
 
 ## Routing / surface
@@ -124,28 +157,34 @@ Preferred role behavior:
 Recommended:
 
 - keep this under a clearly internal namespace, not the normal temple admin dashboard
-- examples:
+- route:
   - `/internal/temples/access`
-  - `/ops/temples/access`
 
-Do **not** place it in the normal client-facing `/admin` navigation for temple users.
+Do **not** place these controls in the normal client-facing `/admin` navigation for temple users.
 
-Recommended implementation:
+## Ownership model clarification
 
-- controller namespace: `Internal::TempleAccessController`
-- layout: reuse admin layout for speed, but brand it clearly as internal ops
-- nav entry: none in client-facing admin
+- Temple owners should not receive a separate owner-promotion console inside normal `/admin` for now.
+- Owner/admin bootstrap and role assignment remains centralized in `/internal/temples/access`.
+- Normal temple admins operate inside `/admin`; platform-controlled role elevation stays inside the internal ops surface.
 
 ## Audit requirements
 
-Every grant / revoke action should record:
+Every self-access grant/revoke should record:
 
 - acting admin/user
 - target temple
 - target internal admin account
-- action (`grant_owner_access`, `revoke_owner_access`)
 - previous state
 - resulting state
+
+Every temple bootstrap promotion/revocation should record:
+
+- acting admin/user
+- target temple
+- target user/admin account
+- previous role
+- resulting role
 
 ## Implementation phases
 
@@ -155,33 +194,51 @@ Every grant / revoke action should record:
 - Add list view of all temples
 - Resolve internal platform account from env/config
 - Decide internal env var name:
-  - suggested: `INTERNAL_PLATFORM_OPERATOR_EMAIL`
+  - `INTERNAL_PLATFORM_OPERATOR_EMAIL`
+
+Status:
+
+- Built.
 
 ### Phase 2
 
-- Add grant action
-- Create `AdminAccount` if missing
-- Create/update `AdminTempleMembership(role: owner)`
+- Add operator self-access actions:
+  - grant `owner`
+  - grant `admin`
+  - revoke
+- Persist explicit temple permission defaults
 - Write audit log
-- Add support-role grant path at the same time to avoid owner overuse
+
+Status:
+
+- Built.
+- `/internal/temples/access` now supports:
+  - `Grant owner`
+  - `Grant admin`
+  - `Revoke`
+- Grant actions create/update the operator membership and persist explicit `AdminPermission` rows.
+- `owner` grants include `manage_permissions = true`.
+- `admin` grants keep operational permissions but explicitly leave `manage_permissions = false`.
+- Revoke deletes both the temple membership and temple-scoped permission row for that operator/temple pair.
+- Every grant/revoke writes a `SystemAuditLog`.
 
 ### Phase 3
 
-- Add revoke action
-- Remove or deactivate temple membership
-- Confirm temple no longer appears in accessible list for that account
-- Define revocation behavior:
-  - default recommendation: delete membership row, keep `AdminAccount`
+- Add per-temple detail page
+- List current temple admins
+- List eligible patrons for promotion
+- Add bootstrap promotion actions:
+  - patron -> owner
+  - patron -> admin
+- Add revoke/demotion path as needed
+- Audit those actions
 
 ### Phase 4
 
 - Polish UI
 - Add confirmation modal
 - Add “open temple admin” shortcut if useful
-- Add status badges:
-  - no access
-  - support
-  - owner
+- Add clearer role/status badges
 
 ## Suggested defaults
 
@@ -189,7 +246,7 @@ Every grant / revoke action should record:
 - grants should be temple-scoped only
 - revocation should delete membership rows rather than inventing another inactive state unless the existing schema already supports inactive memberships cleanly
 - operator should be able to grant either:
-  - `support`
+  - `admin`
   - `owner`
 
 ## First build target
@@ -198,21 +255,22 @@ Build the smallest useful slice first:
 
 1. internal-only list of temples
 2. detect current operator access state
-3. one-click `Grant owner access`
-4. one-click `Revoke access`
+3. one-click `Grant owner`
+4. one-click `Revoke`
 5. audit log for both actions
 
-That is enough to remove the current console dependency.
+That is enough to remove the current console dependency for operator self-access.
 
 ## Open questions
 
 - Should revoke remove only membership, or also clean `AdminPermission` rows for that temple?
 - Should “open temple admin” just redirect into normal `/admin` with temple slug context, or also set temple session explicitly?
-- Do we want a dev-only fallback operator email when env var is absent?
+- For the temple detail page, should the operator see all patrons or just a filtered subset with no admin membership yet?
 
 ## Success criteria
 
-- Platform operator can grant themselves owner access to a temple in one click
+- Platform operator can grant themselves temple access in one click
+- Platform operator can promote the first temple owner/admin without Rails console
 - Access still remains temple-scoped
 - No global super-admin role is introduced
 - Every change is auditable

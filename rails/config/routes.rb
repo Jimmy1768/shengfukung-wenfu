@@ -109,6 +109,12 @@ Rails.application.routes.draw do
     resource :theme, only: :create, controller: "themes"
   end
 
+  namespace :internal, defaults: { format: :html } do
+    get "/temples/access", to: "temple_access#index", as: :temple_access
+    post "/temples/access/:temple_id/grant", to: "temple_access#grant", as: :grant_temple_access
+    delete "/temples/access/:temple_id/revoke", to: "temple_access#revoke", as: :revoke_temple_access
+  end
+
   # --- User account console --------------------------------------------------
   namespace :account, defaults: { format: :html } do
     get "/", to: redirect("/account/dashboard")
