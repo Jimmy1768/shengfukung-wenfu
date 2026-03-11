@@ -749,6 +749,7 @@ en:
           unpaid_payment: "Unpaid"
           no_payment_required: "No payment required"
           reference_hint: "Reference %{reference}"
+          empty: "No registrations match the current filters."
       statuses:
         pending: "Pending"
         paid: "Paid"

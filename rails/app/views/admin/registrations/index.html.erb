@@ -35,11 +35,23 @@
             else
               t("admin.events.index.title")
             end %>
+          <% secondary_meta =
+            case offering
+            when TempleService
+              current_temple.registration_period_label_for(offering.registration_period_key).presence
+            when TempleGathering
+              [offering.starts_on&.strftime("%Y/%m/%d"), offering.location_name.presence].compact.first
+            else
+              [offering.starts_on&.strftime("%Y/%m/%d"), offering.location_name.presence].compact.first
+            end %>
           <%= link_to new_admin_offering_order_path_for(offering), class: "btn template-card-button registration-target-card" do %>
             <div class="template-card-body">
               <div>
                 <h3><%= offering.title %></h3>
                 <p class="template-meta"><%= prefix %></p>
+                <% if secondary_meta.present? %>
+                  <p class="template-meta"><%= secondary_meta %></p>
+                <% end %>
               </div>
             </div>
           <% end %>
@@ -78,11 +90,23 @@
           else
             t("admin.events.index.title")
           end %>
+        <% secondary_meta =
+          case offering
+          when TempleService
+            current_temple.registration_period_label_for(offering.registration_period_key).presence
+          when TempleGathering
+            [offering.starts_on&.strftime("%Y/%m/%d"), offering.location_name.presence].compact.first
+          else
+            [offering.starts_on&.strftime("%Y/%m/%d"), offering.location_name.presence].compact.first
+          end %>
         <%= link_to new_admin_offering_order_path_for(offering), class: "btn template-card-button registration-target-card" do %>
           <div class="template-card-body">
             <div>
               <h3><%= offering.title %></h3>
               <p class="template-meta"><%= prefix %></p>
+              <% if secondary_meta.present? %>
+                <p class="template-meta"><%= secondary_meta %></p>
+              <% end %>
             </div>
           </div>
         <% end %>

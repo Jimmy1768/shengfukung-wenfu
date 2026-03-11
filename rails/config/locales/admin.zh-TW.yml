@@ -319,7 +319,7 @@ zh-TW:
       next_steps:
         title: "下一步"
         subtitle: "快速完成宮廟上線時會用到的幾個任務。"
-        fill_profile: "前往填寫宮廟資料 →"
+        fill_profile: "前往填寫宮廟資料"
         setup_offerings: "發佈第一個活動或服務"
         promote_admin_from_patron: "從信眾名單挑選並建立管理員"
         manage_permissions: "檢視並調整管理員權限"
@@ -636,6 +636,7 @@ zh-TW:
           unpaid_payment: "未付款"
           no_payment_required: "無需付款"
           reference_hint: "訂單編號 %{reference}"
+          empty: "目前篩選條件下沒有符合的報名。"
       statuses:
         pending: "待付款"
         paid: "已付款"

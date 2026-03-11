@@ -38,7 +38,7 @@ module Admin
       ]
       @queue_metrics = [
         { label: I18n.t("admin.dashboard.metrics.entries.expiring_unpaid_holds_24h"), value: expiring_unpaid_holds_count }
-      ]
+      ].select { |metric| metric[:value].to_i.positive? }
       @next_steps = build_next_steps
     end
 

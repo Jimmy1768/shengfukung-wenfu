@@ -1034,6 +1034,34 @@ body.admin-body input[type="time"]::-webkit-calendar-picker-indicator {
   }
 }
 
+.next-step-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.next-step-button {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  justify-content: space-between;
+  text-align: left;
+  white-space: normal;
+}
+
+.next-step-button--static {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.7rem 0.95rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  box-sizing: border-box;
+}
+
 .idea-list {
   list-style: none;
   padding: 0;

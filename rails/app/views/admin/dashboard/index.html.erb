@@ -57,17 +57,15 @@
         </header>
       <% end %>
       <% if @next_steps.any? %>
-        <ul class="idea-list">
+        <div class="next-step-actions">
           <% @next_steps.each do |step| %>
-            <li>
-              <% if step[:url].present? %>
-                <%= link_to step[:label], step[:url], class: "link" %>
-              <% else %>
-                <span><%= step[:label] %></span>
-              <% end %>
-            </li>
+            <% if step[:url].present? %>
+              <%= link_to step[:label], step[:url], class: "btn btn-secondary next-step-button" %>
+            <% else %>
+              <div class="next-step-button next-step-button--static"><%= step[:label] %></div>
+            <% end %>
           <% end %>
-        </ul>
+        </div>
       <% else %>
         <header>
           <h2><%= t("admin.dashboard.next_steps.complete_heading") %></h2>
