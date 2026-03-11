@@ -9,7 +9,7 @@ module Account
     attribute :password, :string
     attribute :password_confirmation, :string
 
-    attr_reader :user
+    attr_reader :user, :existing_user, :existing_oauth_providers
 
     validates :email, presence: true
     validates :password, presence: true, confirmation: true, length: { minimum: 8 }
@@ -37,9 +37,15 @@ module Account
 
     def email_available
       return if normalized_email.blank?
-      return unless User.exists?(email: normalized_email)
+      return unless (@existing_user = User.find_by(email: normalized_email))
 
-      errors.add(:email, "is already taken")
+      @existing_oauth_providers =
+        @existing_user.oauth_identities
+          .where.not(provider: "email")
+          .distinct
+          .pluck(:provider)
+
+      errors.add(:base, I18n.t("account.signups.form.existing_account_guidance"))
     end
 
     def derived_name

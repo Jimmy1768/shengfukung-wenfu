@@ -36,6 +36,7 @@ module Auth
         "temple" => params[:temple].presence,
         "origin" => params[:origin].presence,
         "intent" => normalized_intent(params[:intent]),
+        "after_sign_in" => normalized_after_sign_in(params[:after_sign_in]),
         "nonce" => SecureRandom.hex(8)
       }.compact
       session[PENDING_CONTEXT_SESSION_KEY] = pending
@@ -131,6 +132,10 @@ module Auth
       surface == "admin" ? "admin" : "account"
     end
 
+    def normalized_after_sign_in(value)
+      value.to_s == "settings" ? "settings" : nil
+    end
+
     def fallback_login_path(surface)
       surface.to_s == "admin" ? admin_login_path : account_login_path
     end
@@ -139,6 +144,8 @@ module Auth
       if pending["surface"].to_s == "admin"
         return admin_dashboard_path
       end
+
+      return account_settings_path if pending["after_sign_in"].to_s == "settings"
 
       account_dashboard_path
     end

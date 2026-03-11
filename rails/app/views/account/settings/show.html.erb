@@ -1,0 +1,55 @@
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow"><%= t("account.settings.header.eyebrow") %></p>
+      <h2><%= t("account.settings.header.title") %></h2>
+      <p><%= t("account.settings.header.subtitle") %></p>
+    </div>
+    <%= link_to t("account.settings.header.back"), account_profile_path, class: "pill-link secondary" %>
+  </header>
+
+  <div class="profile-summary">
+    <div>
+      <span class="label"><%= t("account.settings.summary.email") %></span>
+      <p><%= current_user.email %></p>
+    </div>
+    <div>
+      <span class="label"><%= t("account.settings.summary.password_status") %></span>
+      <p><%= @password_form.password_enabled? ? t("account.settings.summary.enabled") : t("account.settings.summary.not_enabled") %></p>
+    </div>
+  </div>
+</section>
+
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow"><%= t("account.settings.password.eyebrow") %></p>
+      <h2><%= t("account.settings.password.title") %></h2>
+      <p><%= t("account.settings.password.subtitle") %></p>
+    </div>
+  </header>
+
+  <% if @password_form.password_enabled? %>
+    <p class="muted"><%= t("account.settings.password.already_enabled") %></p>
+    <p class="muted"><%= link_to t("account.settings.password.reset_link"), new_password_path, class: "pill-link secondary" %></p>
+  <% else %>
+    <%= render "shared/form_errors", form: @password_form %>
+
+    <%= form_with url: account_settings_path, method: :patch, scope: :account_password_settings_form, local: true, class: "profile-form" do |form| %>
+      <div class="single-row-grid">
+        <div class="field">
+          <%= form.label :password, t("account.settings.password.password_label") %>
+          <%= form.password_field :password, required: true, autocomplete: "new-password" %>
+        </div>
+        <div class="field">
+          <%= form.label :password_confirmation, t("account.settings.password.password_confirmation_label") %>
+          <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password" %>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <%= form.submit t("account.settings.password.submit"), class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  <% end %>
+</section>

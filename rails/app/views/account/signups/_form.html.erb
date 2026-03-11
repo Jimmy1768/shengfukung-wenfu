@@ -1,4 +1,7 @@
 <%= form_with url: account_register_path, scope: :registration, model: form, local: true, class: "login-form" do |f| %>
+  <% if @after_sign_in.present? || params[:after_sign_in].present? %>
+    <%= hidden_field_tag :after_sign_in, @after_sign_in.presence || params[:after_sign_in].presence %>
+  <% end %>
   <div class="form-field">
     <%= f.label :email, t("account.signups.form.email_label") %>
     <%= f.email_field :email, required: true, autocomplete: "email" %>

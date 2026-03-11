@@ -203,7 +203,7 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
     }
 
     assert_response :unprocessable_content
-    assert_includes response.body, "You already have a registration for this offering."
+    assert_includes response.body, I18n.t("account.registrations.new.duplicate_error")
     registration.reload
     assert_equal "self", registration.metadata["registrant_scope"]
     assert_nil registration.metadata["dependent_id"]

@@ -59,6 +59,7 @@ module Account
       clear_account_entry_intent!
 
       return account_dashboard_path if intent.blank?
+      return account_settings_path if intent[:after_sign_in].to_s == "settings"
 
       if intent[:registration_reference].present?
         if (registration = find_registration_by_reference(intent[:registration_reference]))

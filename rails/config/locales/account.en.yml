@@ -89,6 +89,14 @@ en:
         title: "Personal details"
         subtitle: "Update contact info and service notes so the temple can reach you."
         edit: "Edit profile"
+      password:
+        eyebrow: "Password login"
+        title: "Email sign-in"
+        subtitle: "Enable password login for this account after signing in with your existing provider."
+        manage: "Manage password"
+        status_label: "Password login"
+        enabled: "Enabled"
+        not_enabled: "Not enabled yet"
       oauth:
         eyebrow: "Sign-in methods"
         title: "Connected providers"
@@ -154,6 +162,32 @@ en:
         already_linked: "Already linked to this account."
         linked_badge: "Linked"
         link: "Link provider"
+    settings:
+      header:
+        eyebrow: "Account settings"
+        title: "Password settings"
+        subtitle: "Manage whether this account can sign in with email and password."
+        back: "Back to profile"
+      summary:
+        email: "Email"
+        password_status: "Password login"
+        enabled: "Enabled"
+        not_enabled: "Not enabled yet"
+      password:
+        eyebrow: "Password"
+        title: "Add password"
+        subtitle: "After you add a password, you can sign in with either your social provider or your email and password."
+        already_enabled: "Password login is already enabled for this account. Use password reset if you need to change it."
+        reset_link: "Reset password"
+        password_label: "New password"
+        password_confirmation_label: "Confirm password"
+        submit: "Enable password login"
+      flash:
+        password_enabled: "Password login is now enabled for this account."
+        update_failed: "We could not update password settings yet."
+      errors:
+        already_enabled: "Password login is already enabled for this account."
+        unknown: "We could not update password settings."
     contact_temple_modal:
       close_label: "Close contact form"
       identity_label: "Sending as"
@@ -323,6 +357,9 @@ en:
           title: "Social sign in"
           subtitle: "Tap a provider to continue instantly."
           empty: "OAuth providers are not configured yet."
+          existing_account_intro: "This email already has an account."
+          existing_account_providers: "Sign in with: %{providers}"
+          existing_account_settings_hint: "After social sign-in, you'll go straight to Account Settings to add a password."
         email:
           title: "Email sign in"
           subtitle: "Use your password to continue."
@@ -346,6 +383,7 @@ en:
         password_label: "Password"
         password_confirmation_label: "Confirm password"
         submit: "Create account"
+        existing_account_guidance: "We found an existing account for this email. If you previously used Google, Apple, or Facebook, sign in with that provider first. After signing in, you can add a password from Account Settings."
     passwords:
       request:
         eyebrow: "Security"

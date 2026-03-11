@@ -96,6 +96,14 @@ zh-TW:
         title: "個人資料"
         subtitle: "更新聯絡方式與備註，方便寺廟聯繫。"
         edit: "編輯資料"
+      password:
+        eyebrow: "密碼登入"
+        title: "電子郵件登入"
+        subtitle: "若此帳號原本使用社群登入，可在登入後補上密碼登入方式。"
+        manage: "管理密碼"
+        status_label: "密碼登入"
+        enabled: "已啟用"
+        not_enabled: "尚未啟用"
       oauth:
         eyebrow: "登入方式"
         title: "已連結的登入方式"
@@ -161,6 +169,32 @@ zh-TW:
         already_linked: "已綁定到此帳號。"
         linked_badge: "已綁定"
         link: "連結提供者"
+    settings:
+      header:
+        eyebrow: "帳號設定"
+        title: "密碼設定"
+        subtitle: "管理此帳號是否可使用電子郵件與密碼登入。"
+        back: "回到個人資料"
+      summary:
+        email: "Email"
+        password_status: "密碼登入"
+        enabled: "已啟用"
+        not_enabled: "尚未啟用"
+      password:
+        eyebrow: "密碼"
+        title: "新增密碼"
+        subtitle: "新增後即可同時使用社群登入或電子郵件密碼登入。"
+        already_enabled: "此帳號已啟用密碼登入。若需變更密碼，請使用重設密碼功能。"
+        reset_link: "重設密碼"
+        password_label: "新密碼"
+        password_confirmation_label: "確認密碼"
+        submit: "啟用密碼登入"
+      flash:
+        password_enabled: "此帳號已啟用密碼登入。"
+        update_failed: "目前無法更新密碼設定。"
+      errors:
+        already_enabled: "此帳號已啟用密碼登入。"
+        unknown: "目前無法更新密碼設定。"
     contact_temple_modal:
       close_label: "關閉聯絡表單"
       identity_label: "寄件身份"
@@ -330,6 +364,9 @@ zh-TW:
           title: "社群登入"
           subtitle: "點選授權的帳號即可快速登入。"
           empty: "尚未設定社群登入選項。"
+          existing_account_intro: "這個 Email 已經有帳號。"
+          existing_account_providers: "請使用以下方式登入：%{providers}"
+          existing_account_settings_hint: "完成社群登入後，系統會直接帶您到帳號設定頁面新增密碼。"
         email:
           title: "電子郵件登入"
           subtitle: "輸入註冊時的電子郵件與密碼。"
@@ -353,6 +390,7 @@ zh-TW:
         password_label: "密碼"
         password_confirmation_label: "再次輸入密碼"
         submit: "建立帳號"
+        existing_account_guidance: "我們發現這個 Email 已經有帳號。如果您先前使用 Google、Apple 或 Facebook，請先用原本的提供者登入；登入後，可在帳號設定中新增密碼登入。"
     passwords:
       request:
         eyebrow: "安全"

@@ -10,6 +10,7 @@ module OAuthHelper
       strategy = AppConstants::OAuth::PROVIDERS[key][:strategy] || key
 
       if AppConstants::OAuth.central_auth_enabled?
+        after_sign_in = params[:after_sign_in].presence || @after_sign_in.presence
         {
           label: payload[:label],
           strategy: strategy,
@@ -18,7 +19,8 @@ module OAuthHelper
             provider: key,
             surface: oauth_surface,
             temple: params[:temple].presence,
-            origin: request.fullpath
+            origin: request.fullpath,
+            after_sign_in: after_sign_in
           )
         }
       else

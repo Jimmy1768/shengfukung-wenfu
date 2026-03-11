@@ -37,12 +37,12 @@
 
 ## Phase 1: Better Email Signup Collision Messaging
 
-- [ ] Replace generic `email is already taken` on account registration with a user-facing message that explains the likely cause.
-- [ ] Message should tell the user:
+- [x] Replace generic `email is already taken` on account registration with a user-facing message that explains the likely cause.
+- [x] Message should tell the user:
   - this email already has an account
   - if they previously used Google / Apple / Facebook, they should sign in with that provider
   - after signing in, they can add a password from account settings
-- [ ] Keep the response generic enough to avoid turning the signup form into an account enumeration oracle.
+- [x] Keep the response generic enough to avoid turning the signup form into an account enumeration oracle.
 
 ### Suggested Copy Direction
 
@@ -53,21 +53,21 @@
 
 ## Phase 2: Add Password In Account Settings
 
-- [ ] Add a new `/account/settings` section for password management.
-- [ ] If the signed-in user does not have a usable password yet, show:
+- [x] Add a new `/account/settings` section for password management.
+- [x] If the signed-in user does not have a usable password yet, show:
   - new password
   - confirm password
   - submit action
-- [ ] Require the user to already be authenticated before setting a password on an OAuth-seeded account.
-- [ ] Save the password to `users.encrypted_password` using existing hashing conventions.
-- [ ] Show a success message that confirms email login is now enabled.
+- [x] Require the user to already be authenticated before setting a password on an OAuth-seeded account.
+- [x] Save the password to `users.encrypted_password` using existing hashing conventions.
+- [x] Show a success message that confirms email login is now enabled.
 
 ### Behavior Rules
 
-- [ ] For OAuth-seeded users with no known password, allow password creation without requiring current password.
-- [ ] For existing email/password users, reuse the stricter change-password rules if/when that UI is added later.
-- [ ] Do not create a second `User`.
-- [ ] Do not change linked OAuth identities.
+- [x] For OAuth-seeded users with no known password, allow password creation without requiring current password.
+- [x] For existing email/password users, reuse the stricter change-password rules if/when that UI is added later.
+- [x] Do not create a second `User`.
+- [x] Do not change linked OAuth identities.
 
 ## Phase 3: Login / Recovery Integration
 

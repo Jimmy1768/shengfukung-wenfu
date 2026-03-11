@@ -33,6 +33,24 @@
   </div>
 </section>
 
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow"><%= t("account.profile.password.eyebrow") %></p>
+      <h2><%= t("account.profile.password.title") %></h2>
+      <p><%= t("account.profile.password.subtitle") %></p>
+    </div>
+    <%= link_to t("account.profile.password.manage"), account_settings_path, class: "pill-link primary" %>
+  </header>
+
+  <div class="profile-summary">
+    <div>
+      <span class="label"><%= t("account.profile.password.status_label") %></span>
+      <p><%= @password_form.password_enabled? ? t("account.profile.password.enabled") : t("account.profile.password.not_enabled") %></p>
+    </div>
+  </div>
+</section>
+
 <% if oauth_account_linking_enabled? %>
   <section class="account-section">
     <header class="section-header">

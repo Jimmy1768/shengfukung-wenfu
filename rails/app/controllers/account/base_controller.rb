@@ -192,9 +192,14 @@ module Account
         temple: params[:temple].presence,
         account_action: params[:account_action].presence,
         offering_slug: params[:offering].presence,
-        registration_reference: registration_ref
+        registration_reference: registration_ref,
+        after_sign_in: normalized_after_sign_in(params[:after_sign_in])
       }.compact
       store_account_entry_intent!(intent) if intent.present?
+    end
+
+    def normalized_after_sign_in(value)
+      value.to_s == "settings" ? "settings" : nil
     end
 
     def find_registration_by_reference(reference_code)
@@ -208,6 +213,7 @@ module Account
       clear_account_entry_intent!
 
       return account_dashboard_path if intent.blank?
+      return account_settings_path if intent[:after_sign_in].to_s == "settings"
 
       if intent[:registration_reference].present?
         if (registration = find_registration_by_reference(intent[:registration_reference]))
