@@ -47,7 +47,7 @@
 6. If audit finds historical invalid keys, run remap dry-run first, then apply using approved fallback key.
 7. Deploy updated app artifacts (`bin/deploy_vue <slug>`) and complete normal backend deploy flow.
 
-Reference commands: `ops/docs/reference/commands.md`.
+Reference commands: `ops/docs/commands.md`.
 
 ## Phase D — Yearly Period Rollover Automation
 

@@ -147,7 +147,7 @@
     4. `bin/apply_nginx_config`
     5. `bin/deploy_vue <slug>`
     6. host-header smoke checks (`curl -H "Host: ..."`), then DNS/TLS.
-  - Template-porting reminder: include `bin/doctor_deploy <slug>` in `ops/docs/reference/commands.md` of the next project at the start of the Ops/deploy command block.
+  - Template-porting reminder: include `bin/doctor_deploy <slug>` in `ops/docs/commands.md` of the next project at the start of the Ops/deploy command block.
 - Rather than editing `AppConstants::Project`, rebrand by setting `PROJECT_SLUG`, `PROJECT_NAME`, and the optional marketing/systemd env vars before running `bin/stage_ops_configs` (which wraps `ops/scripts/render_ops_templates.rb`) so every client config inherits the same code.
 - If a repo evolves from a single-brand deployment into a shared multi-brand backend, do not feel obligated to rename the local git folder immediately. The folder/repo name is developer-facing and can remain a legacy first-project slug if it helps continuity. Prioritize clear runtime branding (`PROJECT_NAME`, `Profile::Identity`, email sender display name, admin titles) over cosmetic local-path churn.
 - After certbot (or any manual edits) changes `/etc/nginx/<slug>.conf`, run `bin/capture_live_configs` on the droplet to copy the live nginx/systemd configs back into `ops/`, commit/push them from the server, pull locally, then run `bin/update_conf_template_after_certbot` once so the template reflects the live state. Only rerun these capture/update scripts when the live configs change again.
@@ -171,7 +171,7 @@
   * `compliance` (`20250101000010`) records `data_anomalies`, versioned `agreements`, and `agreement_acceptances` for consent tracking and quality alerts; the new seed inserts a sample anomaly plus an agreement/acceptance pair.
   * `analytics_exports` (`20250101000011`) creates `data_export_jobs` and `data_export_payloads` for BI/warehouse handoffs and now seeds a queued job plus payload record.
 - `bin/rails db:seed` runs every subsystem seed in that order; you can rerun an individual seed with `bin/rails db:seed:<subsystem>`.
-- After `bin/rails db:seed`, you can confirm each subsystem in `rails console` without resetting the database. See `ops/docs/reference/commands.md` (“Subsystem smoke checks”) for the exact query snippets (cache control, record archives, config entries, background tasks, API protection, compliance, analytics exports, notifications, session/admin data).
+- After `bin/rails db:seed`, you can confirm each subsystem in `rails console` without resetting the database. See `ops/docs/commands.md` (“Subsystem smoke checks”) for the exact query snippets (cache control, record archives, config entries, background tasks, API protection, compliance, analytics exports, notifications, session/admin data).
 - Drop/migrate/seed an entire subsystem with `bin/reset_subsystem <name>` (e.g., `bin/reset_subsystem auth_core`). The script covers `db:migrate:down/up` for the relevant migration and then invokes the matching `db:seed:<name>` task, so the tables and demo data reset cleanly. The command now accepts the full list above (`config_entries`, `background_tasks`, `api_protection`, `compliance`, `analytics_exports`, etc.).
 - Environment variables (`PROJECT_DEFAULT_ADMIN_*`, `PROJECT_PRIMARY_USER_EMAIL`, etc.) override the seeded credentials so you can brand each client while still running the same seed files. Keep those overrides documented in your client README.
 
