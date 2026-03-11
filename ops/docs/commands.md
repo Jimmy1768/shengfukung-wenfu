@@ -168,6 +168,7 @@ cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shengfukung-we
 ruby ops/scripts/sync_offering_configs.rb
 
 # 3) Re-bootstrap temple identity + registration periods into DB for the target temple
+cd rails && bin/rails "temples:cleanup[shengfukung-wenfu]"
 cd rails && bin/rails "temples:bootstrap[shengfukung-wenfu]"
 
 # 4) Validate no invalid period keys remain

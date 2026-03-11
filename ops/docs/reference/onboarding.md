@@ -82,6 +82,7 @@ Slug convention:
    - Set `slug`, `name`, `contact`, `service_times`, and optional hero/about/meta copy.
    - Commit the file.
 2. **Bootstrap the temple row**
+   - If you need a real fresh state first, run `bin/rails "temples:cleanup[slug]"` to remove existing temple events, services, gatherings, and their registrations/payments.
    - Run `bin/rails temples:bootstrap[slug]`.
    - This creates or updates the minimal `Temple` row used for real onboarding:
      - `slug`

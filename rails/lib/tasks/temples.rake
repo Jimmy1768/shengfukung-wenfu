@@ -14,4 +14,18 @@ namespace :temples do
     slug = args[:slug] || AppConstants::Project.slug
     Seeds::Temples.bootstrap(slug:)
   end
+
+  desc "Remove temple-scoped financial records for a fresh bootstrap state"
+  task :cleanup, [:slug] => :environment do |_task, args|
+    slug = args[:slug] || AppConstants::Project.slug
+    result = Temples::Cleanup.call(slug:)
+
+    puts(
+      "Temple cleanup complete for #{slug}: " \
+      "#{result.registrations} registrations, " \
+      "#{result.events} events, " \
+      "#{result.services} services, " \
+      "#{result.gatherings} gatherings removed."
+    )
+  end
 end
