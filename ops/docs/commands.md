@@ -44,6 +44,15 @@ sudo systemctl restart shengfukung-wenfu-puma
 sudo systemctl restart shengfukung-wenfu-sidekiq
 ```
 
+## Internal operator pages
+
+- Internal temple access dashboard: `http://localhost:3002/internal/temples/access`
+- Intended use:
+  - internal-only ops page
+  - review whether your platform operator account already has temple membership
+  - later used to grant/revoke temple-scoped admin access
+- Access is restricted to the admin email configured in `INTERNAL_PLATFORM_OPERATOR_EMAIL`
+
 ---
 
 ## 🔧 Git Commands

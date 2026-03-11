@@ -26,6 +26,10 @@ This file documents how we bring a new temple onto the Shengfukung Wenfu stack. 
   - clearer audit trail for who had access to which temple
   - simpler per-temple offboarding
 - During initial spin-up, it is acceptable for the platform operator (`jimmy1768`) to hold an `owner` membership on the temple until the real temple owner is promoted.
+- Internal operator access review page:
+  - `/internal/temples/access`
+  - intended for the platform operator only
+  - use it to confirm whether your internal admin identity already has temple membership on a temple before promoting staff or owner accounts there
 
 ## Dev / Staging Flow
 
@@ -233,6 +237,7 @@ Production onboarding avoids creating real user passwords in seeds—only the te
      admin = AdminAccount.find_or_create_by!(user: user) { |a| a.role = :owner }
      AdminTempleMembership.find_or_create_by!(temple: temple, admin_account: admin) { |m| m.role = :owner }
      ```
+   - If needed, first confirm your own internal operator access at `/internal/temples/access` before promoting the temple owner.
    - Email the owner once `/admin` access is ready.
    - Remind them to sign in with that email/password; the marketing demo credentials are only for `/marketing/admin`.
 5. **Owner invites staff**
