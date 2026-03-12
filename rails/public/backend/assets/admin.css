@@ -1696,7 +1696,7 @@ body.admin-body--internal .admin-layout--public .admin-main {
 
 .patron-actions-menu {
   position: absolute;
-  top: calc(100% + 0.35rem);
+  bottom: calc(100% + 0.35rem);
   right: 0;
   display: none;
   flex-direction: column;
