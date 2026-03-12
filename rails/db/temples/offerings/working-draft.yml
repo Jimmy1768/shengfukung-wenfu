@@ -93,10 +93,38 @@ offerings:
 - slug: peace-opera-household
   label: 平安戲丁口捐
   type: ritual_service
-  registration_period: yearly
+  registration_period: perennial
   structure:
     household_fields:
     - household_representative_name
+    - phone
+    - mobile_phone
+    - address
+    household_members:
+      type: repeatable_person_list
+      fields:
+      - name
+      # TODO: confirm whether birthdate is required here or only on 禮斗法會.
+      - birthdate:
+          optional: true
+      # TODO: confirm whether member-level address ever differs from household address.
+      - notes:
+          optional: true
+    summary_fields:
+    - people_count:
+        type: integer
+        optional: true
+    - amount:
+        type: currency
+        default: 1500
+- slug: ritual-bucket-ceremony
+  label: 禮斗法會
+  type: ritual_service
+  registration_period: event_specific
+  # TODO: confirm exact seasonal/period key naming once temple finalizes this year's ceremony window.
+  structure:
+    sponsor_fields:
+    - sponsor_name
     - phone
     - mobile_phone
     - address
@@ -104,25 +132,30 @@ offerings:
     - ritual_bucket_position:
         type: select
         catalog: ritual_bucket_positions
-    - ritual_type:
-        example: 合家平安斗
     - amount:
         type: currency
         default: 1500
-    persons:
-    - name
-    - birthdate
-    - gender
-    - zodiac
-    - heavenly_stem_earthly_branch
-    - lunar_calendar:
-        type: boolean
-        default: true
-    - leap_month:
-        type: boolean
-        default: false
+    registrants:
+      type: repeatable_person_list
+      fields:
+      - name
+      - birthdate
+      - gender
+      - calendar_type:
+          type: select
+          options:
+          - lunar
+          - solar
+          default: lunar
+      - leap_month:
+          type: boolean
+          default: false
+    notes:
+      type: text
+      optional: true
   derived:
-  - age
+  - zodiac
+  - heavenly_stem_earthly_branch
 - slug: ghost-festival-table
   label: 普渡供桌
   type: ritual_service
