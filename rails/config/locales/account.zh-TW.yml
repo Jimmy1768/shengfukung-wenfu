@@ -204,9 +204,9 @@ zh-TW:
     events:
       offerings:
         eyebrow: "活動與法會"
-        title: "法會供品"
-        subtitle: "列出近期開放的法會供品，方便提前規劃與報名。"
-        empty: "目前沒有開放的法會供品。"
+        title: "法會項目"
+        subtitle: "列出近期開放的法會項目，方便提前規劃與報名。"
+        empty: "目前沒有開放的法會項目。"
       gatherings:
         eyebrow: "活動與法會"
         title: "社群活動"
@@ -294,7 +294,7 @@ zh-TW:
       index:
         eyebrow: "我的報名"
         title: "參與紀錄"
-        subtitle: "檢視每個法會供品、祈福供品或社群活動的狀態與憑證。"
+        subtitle: "檢視每個法會項目、祈福服務或社群活動的狀態與憑證。"
         table:
           reference: "編號"
           offering: "項目"

@@ -34,7 +34,7 @@ catalogs:
   - 拔薦親友亡魂
   - 拔薦冤親債主
   - 拔薦嬰靈
-offerings:
+services:
 - slug: incense-donation
   label: 香油捐獻
   type: donation

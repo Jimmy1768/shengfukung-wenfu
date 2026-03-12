@@ -39,7 +39,7 @@ module Admin
       {
         key: :offerings,
         label: "Offerings",
-        description: "管理法會供品與祈福供品",
+        description: "管理法會項目與祈福服務",
         path: -> { admin_offerings_path }
       },
       {

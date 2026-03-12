@@ -17,7 +17,7 @@ zh-TW:
       gallery_entries: "活動回顧"
       gallery: "活動回顧"
       offerings: "供品管理"
-      gatherings: "社群聚會"
+      gatherings: "社群活動"
       orders: "訂單"
       payments: "收款資料"
       patrons: "信眾與管理員"
@@ -28,16 +28,16 @@ zh-TW:
         label: "搜尋"
         placeholder: "輸入信眾姓名、Email 或訂單編號"
       offering:
-        label: "法會活動 / 祈福服務 / 社群聚會"
+        label: "法會項目 / 祈福服務 / 社群活動"
         kind_label: "類型"
         kind_all: "全部類型"
-        kind_event: "法會活動"
+        kind_event: "法會項目"
         kind_service: "祈福服務"
-        kind_gathering: "社群聚會"
+        kind_gathering: "社群活動"
         all: "全部供品"
-        event_prefix: "法會活動"
+        event_prefix: "法會項目"
         service_prefix: "祈福服務"
-        gathering_prefix: "社群聚會"
+        gathering_prefix: "社群活動"
       payment_method:
         label: "付款方式"
         all: "全部方式"
@@ -218,7 +218,7 @@ zh-TW:
         payments:
           label: "收款資料"
         gatherings:
-          label: "社群聚會"
+          label: "社群活動"
         offerings:
           label: "供品管理"
         temple_profile:
@@ -397,7 +397,7 @@ zh-TW:
       hero_tabs:
         home: "首頁"
         about: "關於本廟"
-        events: "法會活動"
+        events: "法會項目"
         event: "活動詳情"
         archive: "活動回顧"
         news: "最新消息"
@@ -474,7 +474,7 @@ zh-TW:
         table: "供桌"
       new:
         title: "新增供品"
-        body: "請先選擇模板，再填寫法會活動或祈福服務的詳細設定。"
+        body: "請先選擇模板，再填寫法會項目或祈福服務的詳細設定。"
         template_open: "挑選供品模板"
         template_change: "更換模板"
         template_modal_title: "選擇供品模板"
@@ -497,9 +497,9 @@ zh-TW:
         edit_offering: "編輯供品"
     events:
       index:
-        title: "法會活動"
-        body: "設定即將到來的法會、禮懺、共修與節慶。"
-        new_button: "建立法會活動"
+        title: "法會項目"
+        body: "設定即將到來的法會、禮懺、共修與節慶項目。"
+        new_button: "建立法會項目"
         table:
           title: "名稱"
           schedule: "檔期"
@@ -513,18 +513,18 @@ zh-TW:
         published: "已發布"
         archived: "封存"
       new:
-        title: "建立法會活動"
+        title: "建立法會項目"
         body: "從模板載入欄位，保持證書／物流設定一致。"
-        template_open: "選擇法會活動模板"
+        template_open: "選擇法會項目模板"
         template_change: "更換模板"
-        template_modal_title: "選擇法會活動模板"
+        template_modal_title: "選擇法會項目模板"
         template_close: "關閉"
         template_use: "使用此模板"
         template_period: "預設檔期：%{period}"
         template_selected: "已選擇：%{name}"
         template_prompt: "請先挑選模板再開始編輯。"
       edit:
-        title: "編輯法會活動"
+        title: "編輯法會項目"
       show:
         type: "類型"
         price: "金額"
@@ -536,7 +536,7 @@ zh-TW:
         capacity: "名額"
         capacity_open: "不限名額"
         manage_registrations: "管理報名"
-        edit_event: "編輯法會活動"
+        edit_event: "編輯法會項目"
       form:
         sections:
           basics: "基本資訊"
@@ -645,12 +645,12 @@ zh-TW:
     registrations:
       index:
         title: "報名作業"
-        body: "從這裡開始建立報名。先選擇法會活動、祈福服務或社群聚會，再直接進入報名表。"
+        body: "從這裡開始建立報名。先選擇法會項目、祈福服務或社群活動，再直接進入報名表。"
         pick_heading: "快速選擇"
         pick_body: "請選擇要建立報名的項目。"
         quick_pick_limit_hint: "先顯示最近使用的 %{count} 個項目；按「建立新報名」可查看全部。"
         recent_heading: "最新報名"
-        recent_body: "跨法會活動、祈福服務與社群聚會的最新報名紀錄。"
+        recent_body: "跨法會項目、祈福服務與社群活動的最新報名紀錄。"
         actions:
           new_registration: "建立新報名"
           view_orders: "查看訂單"
@@ -739,7 +739,7 @@ zh-TW:
       empty: "目前尚無活動回顧。"
     gatherings:
       index:
-        title: "社群聚會"
+        title: "社群活動"
         body: "管理未套用供品模板、但仍需運用報名與收款流程的交流聚會。"
       new:
         title: "新增聚會"

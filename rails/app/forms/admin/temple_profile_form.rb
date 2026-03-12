@@ -70,11 +70,11 @@ module Admin
     end
 
     def contact
-      super || {}
+      normalized_hash(super)
     end
 
     def service_times
-      super || {}
+      normalized_hash(super)
     end
 
     def hero_images
@@ -82,7 +82,7 @@ module Admin
     end
 
     def visit_info
-      super || {}
+      normalized_hash(super)
     end
 
     def about
@@ -147,6 +147,17 @@ module Admin
             end
           buffer[key] = normalized if normalized.present?
         end
+      else
+        {}
+      end
+    end
+
+    def normalized_hash(value)
+      case value
+      when ActionController::Parameters
+        value.to_unsafe_h.deep_stringify_keys
+      when Hash
+        value.deep_stringify_keys
       else
         {}
       end
@@ -303,7 +314,11 @@ module Admin
       return key if key.present?
 
       title = card[:title] || card["title"]
-      %w[沿革 主祀 / 配祀 參拜禮儀].zip(%w[history deities etiquette]).to_h[title]
+      {
+        "沿革" => "history",
+        "主祀 / 配祀" => "deities",
+        "參拜禮儀" => "etiquette"
+      }[title]
     end
   end
 end

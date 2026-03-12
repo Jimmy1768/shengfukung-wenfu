@@ -132,19 +132,74 @@ services:
   - slug: peace-opera-household
     label: "平安戲丁口捐"
     registration_period_key: "perennial"
+    allow_repeat_registrations: true
     ui:
       show_availability_window: false
       lock_registration_period_key: true
     defaults:
       offering_type: "ritual"
       currency: "TWD"
+      fulfillment_method: "廟方代辦"
     attributes:
       price_cents: 1500
       currency: "TWD"
-      description: "以戶為單位登記平安祈福，廟方依斗位安排戲丁口捐與誦經祝禱。"
+      description: "以戶為單位登記平安祈福，廟方依戶口資料安排戲丁口捐與誦經祝禱。"
     options:
+      fulfillment_method:
+        - "廟方代辦"
+        - "現場確認"
+    form_fields:
+      basics:
+        title: "丁口捐設定"
+        fields:
+          - offering_type
+          - price_cents
+          - currency
+          - description
+      household:
+        title: "戶口與辦理方式"
+        fields:
+          - fulfillment_method
+          - logistics_notes
+    registration_form:
+      sections:
+        order:
+          fields: [quantity, unit_price_cents, currency]
+        contact:
+          fields: [primary_contact, phone, email, notes]
+        logistics: false
+        ritual_metadata:
+          fields: [blessing_names, dedication_message, certificate_notes]
+      defaults:
+        order:
+          quantity: 1
+      field_settings:
+        blessing_names:
+          allow_multiple: true
+        dedication_message:
+          allow_multiple: true
+
+  - slug: ritual-bucket-ceremony
+    label: "禮斗法會"
+    registration_period_key: "perennial"
+    allow_repeat_registrations: true
+    # TODO: switch to a dedicated seasonal registration period key once the temple adds one.
+    ui:
+      show_availability_window: false
+      lock_registration_period_key: true
+    defaults:
+      offering_type: "ritual"
+      currency: "TWD"
+      fulfillment_method: "廟方代辦"
+    attributes:
+      price_cents: 1500
+      currency: "TWD"
+      description: "依斗位與報名人資料登記禮斗法會，供法會誦經與安斗作業使用。"
+    options:
+      fulfillment_method:
+        - "廟方代辦"
+        - "現場確認"
       blessing_target_type:
-        - "合家平安斗"
         - "總斗主"
         - "福德正神斗"
         - "七星斗"
@@ -164,41 +219,47 @@ services:
         - "池府王爺斗"
         - "中壇元帥斗"
         - "虎爺將軍斗"
+        - "合家平安斗"
         - "九天玄女斗"
         - "濟公禪師斗"
         - "三清道祖斗"
         - "斗姥元君斗"
     form_fields:
       basics:
-        title: "丁口捐設定"
+        title: "禮斗法會設定"
         fields:
           - offering_type
           - price_cents
           - currency
           - description
       ritual:
-        title: "斗位與對象"
+        title: "斗位與登記資料"
         fields:
           - blessing_target_type
-          - blessing_names
+          - fulfillment_method
           - certificate_hint
           - logistics_notes
     registration_form:
       sections:
         order:
-          fields: [quantity, unit_price_cents, currency]
+          fields: [quantity, unit_price_cents, currency, certificate_number]
         contact:
           fields: [primary_contact, phone, email, notes]
-        logistics: false
+        logistics:
+          fields: [preferred_date]
         ritual_metadata:
-          fields: [dedication_message, certificate_notes]
+          fields: [blessing_names, ancestor_placard_name, dedication_message, certificate_notes]
       defaults:
         order:
           quantity: 1
       field_settings:
         blessing_names:
           allow_multiple: true
+        ancestor_placard_name:
+          allow_multiple: true
         dedication_message:
+          allow_multiple: true
+        certificate_notes:
           allow_multiple: true
 
   - slug: ghost-festival-table

@@ -2550,6 +2550,39 @@ body.admin-body--internal .admin-layout--public .admin-main {
   padding: var(--spacing-lg);
 }
 
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--spacing-md), 2.2vw, var(--spacing-lg));
+}
+
+.form-stack > .field,
+.form-stack > .segmented-field,
+.form-stack > .grid-2,
+.form-stack > .form-section,
+.form-stack > .card-grid,
+.form-stack > .admin-stack__row {
+  margin: 0;
+}
+
+.form-card > header,
+.form-section > header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0;
+}
+
+.form-card > header + .field,
+.form-card > header + .grid-2,
+.form-card > header + .about-card-fields,
+.form-card > header + .derived-contact,
+.form-card > header + .hero-image-grid,
+.form-section > header + .field,
+.form-section > header + .grid-2 {
+  margin-top: 0.25rem;
+}
+
 .form-actions {
   display: flex;
   flex-wrap: wrap;
@@ -2624,6 +2657,23 @@ body.admin-body--internal .admin-layout--public .admin-main {
 @media (min-width: 900px) {
   .card-grid.temple-profile-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.about-card-fields {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--spacing-md), 2vw, var(--spacing-lg));
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(var(--spacing-md), 2vw, var(--spacing-lg));
+}
+
+@media (max-width: 900px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
   }
 }
 .form-section {
@@ -2821,14 +2871,15 @@ body.admin-body--internal .admin-layout--public .admin-main {
 
 .hero-image-header {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-md);
-  justify-content: space-between;
-  align-items: flex-end;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  text-align: left;
 }
 
 .hero-image-fallback-hint {
   margin: 0;
+  max-width: none;
 }
 
 .hero-image-item {
