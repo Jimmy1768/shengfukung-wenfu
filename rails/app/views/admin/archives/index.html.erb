@@ -72,6 +72,13 @@
               <h2><%= archive_heading_title %></h2>
               <p class="muted"><%= archive_heading_hint %></p>
             </div>
+            <% if allow_archive_exports? %>
+              <div class="page-header-actions">
+                <%= link_to t("admin.archives.payments.exports.payments"), admin_archive_payments_export_path(**archive_export_filter_params), class: "btn btn-secondary" %>
+                <%= link_to t("admin.archives.payments.exports.registrations"), admin_archive_registrations_export_path(**archive_export_filter_params), class: "btn btn-secondary" %>
+                <%= link_to t("admin.archives.payments.exports.certificates"), admin_archive_certificates_export_path(**archive_export_filter_params), class: "btn btn-secondary" %>
+              </div>
+            <% end %>
           </header>
 
           <%= render "admin/payments/ledger_table",

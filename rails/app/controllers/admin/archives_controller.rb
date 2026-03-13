@@ -2,18 +2,17 @@
 
 module Admin
   class ArchivesController < BaseController
-    helper_method :allow_archive_details?, :allow_archive_exports?, :archive_heading_title, :archive_heading_hint, :archive_month_presets
+    helper_method :allow_archive_details?, :allow_archive_exports?, :archive_heading_title, :archive_heading_hint, :archive_month_presets, :archive_export_filter_params
 
     before_action :require_archive_access!, only: :index
     before_action :require_archive_exports!, only: %i[registrations_export payments_export certificates_export]
+    before_action :prepare_archive_context, only: %i[index registrations_export payments_export certificates_export]
 
     def index
-      @filters = normalized_filter_params
       @filter_hidden_fields = filter_hidden_params
       @filter_offerings = current_temple.temple_events.order(:title).to_a + current_temple.temple_services.order(:title).to_a
       @filter_payment_methods = TemplePayment::PAYMENT_METHODS.values
       @filter_errors = []
-      @resolved_patron = resolve_archive_patron
       @awaiting_range = @filters[:start_date].blank? && @filters[:end_date].blank? && @resolved_patron.blank?
       if allow_archive_details?
         if archive_range_selected? || @resolved_patron.present?
@@ -38,19 +37,22 @@ module Admin
     end
 
     def registrations_export
-      exporter = Archives::RegistrationsCsvExporter.new(registrations: lookup.registrations)
+      exporter = Archives::RegistrationsCsvExporter.new(registrations: archive_registration_scope)
       log_export!("registrations")
       send_archive(exporter.to_csv, "registrations")
     end
 
     def payments_export
-      exporter = Reporting::PaymentsCsvExporter.new(payments: lookup.payments)
+      exporter = Reporting::PaymentsCsvExporter.new(payments: archive_payment_scope)
       log_export!("payments")
       send_archive(exporter.to_csv, "payments")
     end
 
     def certificates_export
-      exporter = Archives::RegistrationsCsvExporter.new(registrations: lookup.certificates, include_certificate: true)
+      exporter = Archives::RegistrationsCsvExporter.new(
+        registrations: archive_registration_scope.with_certificate_number,
+        include_certificate: true
+      )
       log_export!("certificates")
       send_archive(exporter.to_csv, "certificates")
     end
@@ -69,6 +71,15 @@ module Admin
       scope = current_temple.temple_payments
         .merge(TemplePayment.admin_filtered(@filters))
         .order(Arel.sql("COALESCE(temple_payments.processed_at, temple_payments.created_at) DESC"))
+      return scope unless @resolved_patron.present? && !archive_range_selected?
+
+      scope.where(user: @resolved_patron)
+    end
+
+    def archive_registration_scope
+      scope = current_temple.temple_event_registrations
+        .merge(TempleRegistration.admin_filtered(@filters))
+        .order(created_at: :desc)
       return scope unless @resolved_patron.present? && !archive_range_selected?
 
       scope.where(user: @resolved_patron)
@@ -103,6 +114,10 @@ module Admin
           filters: preset_filters_for(1.month.ago.beginning_of_month.to_date, 1.month.ago.end_of_month.to_date)
         }
       ]
+    end
+
+    def archive_export_filter_params
+      { filter: @filters.compact_blank }
     end
 
     def allow_archive_details?
@@ -141,7 +156,12 @@ module Admin
     end
 
     def send_archive(payload, label)
-      filename = "archives-#{label}-#{selected_year}-#{Time.current.strftime('%Y%m%d')}.csv"
+      filename = [
+        "archives",
+        label,
+        archive_filename_scope,
+        Time.current.strftime("%Y%m%d")
+      ].compact.join("-") + ".csv"
       send_data payload, filename:, type: "text/csv"
     end
 
@@ -150,7 +170,12 @@ module Admin
         action: "admin.archives.export",
         admin: current_admin,
         temple: current_temple,
-        metadata: { export_kind: kind, year: selected_year }
+        metadata: {
+          export_kind: kind,
+          year: selected_year,
+          filters: @filters.compact_blank,
+          resolved_patron_id: @resolved_patron&.id
+        }
       )
     end
 
@@ -217,6 +242,27 @@ module Admin
         completed_count: 0,
         refunded_count: 0
       }
+    end
+
+    def prepare_archive_context
+      @filters = normalized_filter_params
+      @resolved_patron = resolve_archive_patron
+    end
+
+    def archive_filename_scope
+      if @resolved_patron.present? && !archive_range_selected?
+        patron_label = @resolved_patron.english_name.presence
+        parameterized = parameterize_filename_segment(patron_label)
+        parameterized == "patron-history" ? parameterize_filename_segment(@resolved_patron.email) : parameterized
+      elsif archive_range_selected?
+        "#{@filters[:start_date]}-to-#{@filters[:end_date]}"
+      else
+        selected_year.to_s
+      end
+    end
+
+    def parameterize_filename_segment(value)
+      value.to_s.parameterize(separator: "-").presence || "patron-history"
     end
   end
 end

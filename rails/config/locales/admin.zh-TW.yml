@@ -921,6 +921,10 @@ zh-TW:
         presets:
           this_month: "本月"
           last_month: "上月"
+        exports:
+          payments: "匯出付款"
+          registrations: "匯出報名"
+          certificates: "匯出證書"
         summary:
           total_amount: "總收款"
           payments_logged: "付款筆數"

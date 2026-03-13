@@ -98,6 +98,27 @@ class Admin::ArchivesAccessTest < ActionDispatch::IntegrationTest
     assert_match "Archive history for 謝文福", response.body
   end
 
+  test "payments export respects resolved patron query without date range" do
+    owner = create_admin_user(temple: @temple)
+    user = User.create!(
+      email: "archive-export@example.com",
+      english_name: "彭雅玲",
+      encrypted_password: User.password_hash("Password123!"),
+      metadata: { "phone" => "0912-000-000" }
+    )
+    @registration.update!(user: user, contact_payload: { "name" => "彭雅玲" })
+    @registration.temple_payments.first.update!(user: user)
+
+    sign_in_admin(owner)
+
+    get admin_archive_payments_export_path(format: :csv), params: { filter: { query: "彭雅玲" } }
+
+    assert_response :success
+    assert_match "text/csv", response.media_type
+    assert_includes response.headers["Content-Disposition"], "archive-export-example-com"
+    assert_includes response.body, "彭雅玲"
+  end
+
   test "owner must refine patron query when multiple archive patrons match without date range" do
     owner = create_admin_user(temple: @temple)
 
