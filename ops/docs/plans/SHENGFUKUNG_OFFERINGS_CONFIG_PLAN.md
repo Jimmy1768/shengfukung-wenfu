@@ -5,10 +5,15 @@
 - Replace the current dummy / placeholder offerings config for `shengfukung-wenfu` with the real temple offering definitions.
 - Preserve YAML as the single source of truth for offering templates.
 - Make the admin onboarding flow low-friction: prefill as much as possible, prefer selectors over free text, and keep repeated patron data flowing through user metadata.
+- Follow the canonical model in `ops/docs/plans/TEMPLE_OFFERING_SYSTEM_SPEC.md` when translating temple-filled worksheets into YAML/runtime structures.
 
 ## Product Rules
 
 - `rails/db/temples/offerings/<slug>.yml` is the single source of truth for offering template shape.
+- Do not encode year inside offering template names.
+- Do not use one offering form to represent multiple unrelated offerings.
+- Shared option catalogs (deity / bucket lists, etc.) should be centralized and referenced.
+- Generated outputs (receipt, certificate, lamp placard, table placard, ritual list, memorial document) are output artifacts, not registration fields.
 - Admin offering creation should start from YAML-backed templates, not from blank forms.
 - Predetermined values belong in YAML whenever possible:
   - `attributes` for core event/service columns
@@ -49,6 +54,15 @@ Deliver a finalized `rails/db/temples/offerings/shengfukung-wenfu.yml` that:
 - maps registration fields to the current admin/account registration schema
 - syncs cleanly into offering metadata via `ruby ops/scripts/sync_offering_configs.rb`
 
+And do so without breaking the long-term separation between:
+
+- `offering_family`
+- `offering_template`
+- `offering_variant`
+- `offering_instance`
+- `registration`
+- `output_artifact`
+
 ## Status Summary
 
 - [x] Shengfukung V1 offerings YAML is in place and replaces the dummy file.
@@ -61,6 +75,11 @@ Deliver a finalized `rails/db/temples/offerings/shengfukung-wenfu.yml` that:
 ## Phase 1: Source Mapping
 
 - [x] Review every entry in `rails/db/temples/offerings/working-draft.yml`.
+- [ ] Use the temple-filled onboarding worksheet to resolve each entry into:
+  - canonical offering template
+  - offering family
+  - optional offering variant set
+  - expected output artifacts
 - [x] Classify each offering into:
   - `events:` for scheduled/in-person participation
   - `services:` for proxy ritual / temple-handled fulfillment
@@ -72,9 +91,37 @@ Deliver a finalized `rails/db/temples/offerings/shengfukung-wenfu.yml` that:
 - `incense-donation` is a `service`.
 - `lamp-service` is a `service`.
 - `peace-opera-household` is a `service`.
+- `ritual-bucket-ceremony` is a `service` for the current app, while remaining a period-specific offering instance in the long-term model.
 - `ghost-festival-table` is a `service`.
 - `liberation-ritual` is a `service`.
 - If Shengfukung later adds real scheduled gatherings/events, those should be modeled separately instead of forcing ritual services into `events:`.
+
+### Canonical Shengfukung Template Set
+
+Temple-confirmed canonical templates:
+
+1. `香油捐獻`
+2. `平安戲丁口捐`
+3. `點燈作業`
+4. `祖先拔薦`
+5. `禮斗法會`
+6. `普渡供桌`
+
+These are canonical templates. Year/season labels belong on offering instances, not template names.
+
+### Template / Variant / Instance Guidance
+
+- `點燈作業` should remain one template with selector-backed variants such as:
+  - `光明燈`
+  - `文昌燈`
+  - `財神燈`
+  - `太歲燈`
+- `祖先拔薦` should remain one template with selector-backed variants such as:
+  - `歷代祖先`
+  - `親友亡魂`
+  - `冤親債主`
+  - `嬰靈`
+- `禮斗法會 114年正月` style naming is an offering instance concern, not a template concern.
 
 ### Phase 1 Findings (2026-03-09)
 
@@ -189,6 +236,7 @@ These should become selector-backed field settings in the finalized YAML rather 
   - `logistics_notes`
 - Shengfukung V1 keeps all extra family / ancestor / household / deceased names inside ritual metadata fields rather than expanding the base registration model.
 - The registration form should prefer selector-backed values first and free text second. Free text remains acceptable where temple staff simply need something to copy into offline ritual prep.
+- Generated artifacts such as certificates, placards, ritual lists, and memorial printouts should be modeled as downstream outputs, not as form sections.
 
 ### First-Pass Duplicate Policy
 
@@ -329,6 +377,13 @@ Phase 3 decision:
 - [x] Keep household/person-list ritual offerings inside the current one-registrant model; do not add richer repeatable nested registration structures in v1.
 - [ ] Whether some Shengfukung services should be split into multiple simpler templates instead of one complex all-purpose template.
 - [ ] Whether `incense-donation` should eventually rename its registration field concept from `dedication_message` to a clearer semantic like `donation_purpose`.
+- [ ] Which output artifacts each canonical template must generate:
+  - receipt
+  - certificate
+  - lamp placard
+  - table placard
+  - ritual list
+  - memorial document
 
 ## Acceptance Criteria
 
