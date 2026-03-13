@@ -24,7 +24,7 @@ module Admin
           @archived_payments = TemplePayment.none
           @archive_summary = empty_archive_summary
           if partial_range_selected?
-            @filter_errors << "Please select both a start and end date to load archives."
+            @filter_errors << I18n.t("admin.archives.payments.errors.partial_range")
           elsif @filters[:query].present?
             @filter_errors << archive_query_error_message
           end
@@ -88,7 +88,7 @@ module Admin
 
     def archive_heading_title
       if @resolved_patron.present? && !archive_range_selected?
-        "Archive history for #{@resolved_patron.english_name.presence || @resolved_patron.email}"
+        I18n.t("admin.archives.payments.patron_heading", patron: @resolved_patron.english_name.presence || @resolved_patron.email)
       else
         I18n.t("admin.archives.payments.range_heading", start: @filters[:start_date], end: @filters[:end_date])
       end
@@ -96,7 +96,7 @@ module Admin
 
     def archive_heading_hint
       if @resolved_patron.present? && !archive_range_selected?
-        "Showing all archived payments for the matched patron across all dates."
+        I18n.t("admin.archives.payments.patron_hint")
       else
         I18n.t("admin.archives.payments.range_hint")
       end
@@ -147,13 +147,13 @@ module Admin
     def require_archive_access!
       return if allow_archive_access?
 
-      redirect_to admin_dashboard_path, alert: "You do not have permission to access archives."
+      redirect_to admin_dashboard_path, alert: t("admin.archives.flash.forbidden")
     end
 
     def require_archive_exports!
       return if allow_archive_exports?
 
-      redirect_to admin_archives_path(year: selected_year), alert: "You do not have permission to export archives."
+      redirect_to admin_archives_path(year: selected_year), alert: t("admin.archives.flash.export_forbidden")
     end
 
     def send_archive(payload, label)
@@ -214,9 +214,9 @@ module Admin
         .count
 
       if matches.zero?
-        "No matching patron was found. Add a date range or refine the patron search."
+        I18n.t("admin.archives.payments.errors.no_patron")
       else
-        "Multiple patrons matched that search. Refine the patron search or add a date range."
+        I18n.t("admin.archives.payments.errors.multiple_patrons")
       end
     end
 

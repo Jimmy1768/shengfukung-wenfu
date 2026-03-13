@@ -11,7 +11,7 @@ module Admin
 
       if can_sign_in?(user, credentials[:password])
         establish_admin_session!(user)
-        redirect_to admin_dashboard_path, notice: "Signed in to the admin console."
+        redirect_to admin_dashboard_path, notice: t("admin.sessions.flash.signed_in")
       else
         flash.now[:alert] = login_failure_message(user)
         render :new, status: :unprocessable_entity
@@ -20,7 +20,7 @@ module Admin
 
     def destroy
       destroy_admin_session!
-      redirect_to admin_login_path, notice: "Signed out."
+      redirect_to admin_login_path, notice: t("admin.sessions.flash.signed_out")
     end
 
     private
@@ -33,13 +33,13 @@ module Admin
 
     def login_failure_message(user)
       if user.nil?
-        "Those credentials did not match. Use an active admin account."
+        t("admin.sessions.flash.invalid_credentials")
       elsif user.admin_account.nil?
-        "That account hasn't been granted temple admin access yet. Ask your owner admin to invite you."
+        t("admin.sessions.flash.not_admin")
       elsif !user.admin_account.active?
-        "Your temple admin access is inactive. Contact your owner admin for help."
+        t("admin.sessions.flash.inactive")
       else
-        "Those credentials did not match. Use an active admin account."
+        t("admin.sessions.flash.invalid_credentials")
       end
     end
 

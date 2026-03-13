@@ -95,6 +95,11 @@ Primary workflow should support:
 
 Add a dedicated monthly reporting mode under existing finance/admin surfaces:
 
+- primary entry point:
+  - `/admin/payments`
+- supporting lookup/history surface:
+  - `/admin/archives`
+
 - default filter preset:
   - current month
 - quick presets:
@@ -189,10 +194,9 @@ This prevents accidental broad unbounded archive queries while matching staff wo
 
 ### Phase 1 — Workflow Definition
 
-- [ ] Define the exact monthly report screen entry point:
-  - extend `/admin/payments`
-  - or extend `/admin/archives`
-  - or add a dedicated monthly reports screen
+- [x] Define the exact monthly report screen entry point:
+  - primary monthly reporting lives in `/admin/payments`
+  - `/admin/archives` remains the history / troubleshooting surface
 - [ ] Confirm the minimum monthly summary metrics.
 - [ ] Confirm whether CSV is acceptable for v1 monthly handoff.
 
@@ -228,7 +232,7 @@ This prevents accidental broad unbounded archive queries while matching staff wo
 
 ## Open Decisions
 
-- [ ] Should monthly reporting live under `Payments` or `Archives`?
+- [x] Monthly reporting lives under `Payments`; `Archives` is the lookup/history surface.
 - [ ] Is CSV sufficient for temple accounting handoff, or is `.xlsx` required?
 - [ ] Should patron resolution show a picker list when 2-5 matches exist, or force search refinement?
 - [ ] For one matched patron, should archive history include:
@@ -261,6 +265,11 @@ This prevents accidental broad unbounded archive queries while matching staff wo
   - amount
   - currency
   - recorded by
+
+## Product Direction Confirmed
+
+- `Payments` is the monthly reporting entry point because monthly reporting is normal operating work.
+- `Archives` is the historical lookup surface used to dig up past records, especially when staff are investigating an issue.
 
 ## Regression Coverage Implemented
 

@@ -37,7 +37,7 @@ module Admin
 
     def create
       unless @offering_kind
-        redirect_to new_admin_offering_path, alert: "Please select a template before saving." and return
+        redirect_to new_admin_offering_path, alert: t("admin.offerings.flash.select_template") and return
       end
 
       attributes = offering_params
@@ -49,7 +49,7 @@ module Admin
 
       if missing_fields.empty? && @offering.save
         log_offering_event("admin.offerings.create")
-        redirect_to offering_path_for(@offering), notice: "Offering created successfully."
+        redirect_to offering_path_for(@offering), notice: t("admin.offerings.flash.created")
       else
         render :new, status: :unprocessable_entity
       end

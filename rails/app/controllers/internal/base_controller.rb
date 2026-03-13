@@ -24,13 +24,13 @@ module Internal
     def authenticate_admin!
       return if current_admin&.admin_account&.active?
 
-      redirect_to admin_login_path, alert: "Please sign in to access internal tools."
+      redirect_to admin_login_path, alert: t("admin.internal.base.alerts.sign_in_required")
     end
 
     def authorize_internal_operator!
       return if internal_operator_email.present? && current_admin&.email == internal_operator_email
 
-      redirect_to admin_dashboard_path, alert: "You do not have access to internal tools."
+      redirect_to admin_dashboard_path, alert: t("admin.internal.base.alerts.forbidden")
     end
 
     def internal_operator_email

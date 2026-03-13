@@ -2323,6 +2323,45 @@ body.admin-body--internal .admin-layout--public .admin-main {
   max-width: 960px;
 }
 
+.payments-report-card {
+  width: min(100%, 840px);
+  max-width: min(100%, 840px);
+}
+
+.payments-report-card--summary,
+.payments-report-card--filters {
+  width: min(100%, 840px);
+  max-width: min(100%, 840px);
+}
+
+.payments-report-card--breakdowns {
+  width: min(100%, 840px);
+  max-width: min(100%, 840px);
+}
+
+.payments-report-card--breakdowns header {
+  margin-bottom: var(--spacing-sm);
+}
+
+.payments-report-metrics {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  justify-content: stretch;
+  width: 100%;
+}
+
+.payments-report-metrics .metric {
+  min-width: 0;
+}
+
+.payments-report-metrics .metric strong {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 860px) {
+  .payments-report-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2335,18 +2374,23 @@ body.admin-body--internal .admin-layout--public .admin-main {
   }
 }
 .metrics-grid--pill-row {
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   justify-content: stretch;
   width: 100%;
-  max-width: 960px;
+  max-width: 840px;
 }
 
 .metrics-grid-container {
   width: 100%;
-  max-width: 960px;
-  margin: var(--spacing-md) auto 0 auto;
+  max-width: 840px;
+  margin: var(--spacing-sm) 0 0 0;
 }
 
+@media (max-width: 900px) {
+  .metrics-grid--pill-row {
+    grid-template-columns: 1fr;
+  }
+}
 .metric-card--list {
   gap: var(--spacing-sm);
 }

@@ -4,19 +4,19 @@ module Admin
   class TempleSwitchesController < BaseController
     def create
       unless allow_temple_switch?
-        redirect_back fallback_location: admin_dashboard_path, alert: "Temple switching is limited to owner accounts."
+        redirect_back fallback_location: admin_dashboard_path, alert: t("admin.temple_switches.flash.owner_only")
         return
       end
 
       temple = available_admin_temples.find { |record| record.slug == requested_slug }
       unless temple
-        redirect_back fallback_location: admin_dashboard_path, alert: "You do not have access to that temple."
+        redirect_back fallback_location: admin_dashboard_path, alert: t("admin.temple_switches.flash.forbidden")
         return
       end
 
       set_admin_selected_temple_slug(temple.slug)
       @current_temple = temple
-      redirect_back fallback_location: admin_dashboard_path, notice: "Now viewing #{temple.name}."
+      redirect_back fallback_location: admin_dashboard_path, notice: t("admin.temple_switches.flash.switched", temple: temple.name)
     end
 
     private

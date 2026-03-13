@@ -29,7 +29,7 @@ module Admin
 
       if missing_fields.empty? && @offering.save
         log_offering_event("admin.offerings.create")
-        redirect_to admin_service_path(@offering), notice: "Service created successfully."
+        redirect_to admin_service_path(@offering), notice: t("admin.services.flash.created")
       else
         render :new, status: :unprocessable_entity
       end
@@ -40,7 +40,7 @@ module Admin
     def update
       if @offering.update(offering_params)
         log_offering_event("admin.offerings.update")
-        redirect_to admin_service_path(@offering), notice: "Service updated successfully."
+        redirect_to admin_service_path(@offering), notice: t("admin.services.flash.updated")
       else
         render :edit, status: :unprocessable_entity
       end

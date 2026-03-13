@@ -57,7 +57,7 @@ module Admin
       @payment = recorder.record!
 
       redirect_to offering_order_path(@registration.offering, @registration),
-        notice: "Payment recorded."
+        notice: t("admin.payments.flash.recorded")
     rescue ActiveRecord::RecordInvalid => e
       @payment = e.record
       render :new, status: :unprocessable_entity
@@ -78,13 +78,13 @@ module Admin
       )
 
       notice = if result.reused
-                 "Fake checkout already exists for this registration."
+                 t("admin.payments.flash.fake_checkout_reused")
                else
-                 "Fake checkout started. Awaiting webhook confirmation."
+                 t("admin.payments.flash.fake_checkout_started")
                end
       redirect_to offering_order_path(@registration.offering, @registration), notice: notice
     rescue StandardError => e
-      redirect_to offering_order_path(@registration.offering, @registration), alert: "Unable to start fake checkout: #{e.message}"
+      redirect_to offering_order_path(@registration.offering, @registration), alert: t("admin.payments.flash.fake_checkout_failed", error: e.message)
     end
 
     private

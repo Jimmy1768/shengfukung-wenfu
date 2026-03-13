@@ -20,11 +20,11 @@ class InternalTempleAccessTest < ActionDispatch::IntegrationTest
       get internal_temple_access_path
 
       assert_response :success
-      assert_includes response.body, "Temple access"
+      assert_includes response.body, I18n.t("admin.internal.temple_access.index.title")
       assert_includes response.body, operator_temple.slug
       assert_includes response.body, other_temple.slug
-      assert_includes response.body, "Has access"
-      assert_includes response.body, "No access"
+      assert_includes response.body, I18n.t("admin.internal.temple_access.index.access.has_access")
+      assert_includes response.body, I18n.t("admin.internal.temple_access.index.access.no_access")
     end
   end
 
@@ -104,7 +104,7 @@ class InternalTempleAccessTest < ActionDispatch::IntegrationTest
 
       assert_response :success
       assert_includes response.body, admin_user.email
-      assert_includes response.body, "Make owner"
+      assert_includes response.body, I18n.t("admin.internal.temple_access.show.actions.make_owner")
       assert_not_includes response.body, outsider.email
     end
   end
@@ -121,7 +121,7 @@ class InternalTempleAccessTest < ActionDispatch::IntegrationTest
       get internal_temple_access_temple_path(temple_id: temple.id)
 
       assert_response :success
-      assert_match(/#{Regexp.escape(owner_user.email)}.*?Owner.*?Yes/m, response.body)
+      assert_match(/#{Regexp.escape(owner_user.email)}.*?擁有者.*?是/m, response.body)
     end
   end
 

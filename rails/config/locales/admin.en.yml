@@ -173,9 +173,9 @@ en:
         offering_type: "Offering type"
         period: "Period"
         certificate_prefix: "Certificate prefix"
-        certificate_hint: "證書說明"
-        ancestor_placard_hint: "牌位指引"
-        logistics_notes: "物流備註"
+        certificate_hint: "Certificate guidance"
+        ancestor_placard_hint: "Placard guidance"
+        logistics_notes: "Logistics notes"
         currency: "Currency"
         starts_on: "Starts on"
         ends_on: "Ends on"
@@ -234,6 +234,87 @@ en:
           label: "Archives"
         permissions:
           label: "Permissions"
+    base:
+      alerts:
+        sign_in_required: "Please sign in to access the admin console."
+        no_temples: "Your account is not assigned to any temples yet."
+    sessions:
+      flash:
+        signed_in: "Signed in to the admin console."
+        signed_out: "Signed out."
+        invalid_credentials: "Those credentials did not match. Use an active admin account."
+        not_admin: "That account hasn't been granted temple admin access yet. Ask your owner admin to invite you."
+        inactive: "Your temple admin access is inactive. Contact your owner admin for help."
+    temple_switches:
+      flash:
+        owner_only: "Temple switching is limited to owner accounts."
+        forbidden: "You do not have access to that temple."
+        switched: "Now viewing %{temple}."
+    internal:
+      layout:
+        brand: "Internal Tools"
+        back_to_admin: "Temple admin"
+      shared:
+        "yes": "Yes"
+        "no": "No"
+        none: "—"
+        roles:
+          owner: "Owner"
+          admin: "Admin"
+          support: "Support"
+      base:
+        alerts:
+          sign_in_required: "Please sign in to access internal tools."
+          forbidden: "You do not have access to internal tools."
+      temple_access:
+        flash:
+          granted: "%{temple}: granted %{role} access."
+          already_owner: "%{email} is already an owner."
+          promoted_owner: "%{email}: promoted to owner."
+          no_access_to_revoke: "%{temple}: no access to revoke."
+          revoked: "%{temple}: access revoked."
+        errors:
+          unsupported_role: "Unsupported role."
+        index:
+          eyebrow: "Internal access"
+          title: "Temple access"
+          subtitle: "Review operator access and open each temple to manage existing admin accounts."
+          operator_eyebrow: "Operator"
+          operator_email: "Configured operator email: %{email}"
+          access:
+            has_access: "Has access"
+            no_access: "No access"
+          table:
+            temple: "Temple"
+            slug: "Slug"
+            published: "Published"
+            access_state: "Access state"
+            role: "Role"
+            actions: "Actions"
+          actions:
+            grant_owner: "Grant owner"
+            grant_admin: "Grant admin"
+            temple_admins: "Temple admins"
+            revoke: "Revoke"
+            revoke_confirm: "Revoke access for %{temple}?"
+        show:
+          eyebrow: "Internal access"
+          subtitle_html: "Temple admin accounts for <code>%{slug}</code>."
+          admins_eyebrow: "Temple admins"
+          current_access_list: "Current access list"
+          current_access_hint: "Only accounts with temple admin access are shown here."
+          back: "Back to temples"
+          table:
+            name: "Name"
+            email: "Email"
+            role: "Role"
+            manage_permissions: "Can manage permissions"
+            actions: "Actions"
+          actions:
+            already_owner: "Already owner"
+            make_owner: "Make owner"
+            make_owner_confirm: "Make %{email} an owner for %{temple}?"
+          empty: "No temple admin accounts found."
     patrons:
       index:
         title: "Member directory"
@@ -327,6 +408,10 @@ en:
         complete_heading: "Congratulations!"
         complete: "All onboarding tasks are done. Use the navigation to continue."
     temple_profile:
+      flash:
+        updated: "Temple profile updated."
+        review_errors: "Please review the errors below."
+        not_found: "Temple profile not found. Please run db:seed."
       hero:
         eyebrow: "Temple profile"
         title: "Update site copy"
@@ -558,6 +643,9 @@ en:
         errors: "%{count} issues prevented saving"
       empty: "No gatherings yet."
     offerings:
+      flash:
+        select_template: "Please select a template before saving."
+        created: "Offering created successfully."
       index:
         title: "Temple Offerings"
         new_button: "New Offering"
@@ -609,6 +697,9 @@ en:
         manage_registrations: "Manage registrations"
         edit_offering: "Edit offering"
     events:
+      flash:
+        created: "Event created successfully."
+        updated: "Event updated successfully."
       index:
         title: "Temple Events"
         body: "Set up upcoming ceremonies, retreats, and seasonal festivals."
@@ -667,6 +758,9 @@ en:
           capacity_total: "Capacity"
           status: "Status"
     services:
+      flash:
+        created: "Service created successfully."
+        updated: "Service updated successfully."
       index:
         title: "Temple Services"
         body: "Manage recurring lamp, table, and scripture services."
@@ -772,6 +866,12 @@ en:
           title: "Create new registration"
           close: "Close selector"
     offering_orders:
+      flash:
+        existing_redirect: "Existing registration found. Redirected to edit."
+        created: "Registration created."
+        duplicate: "A matching registration already exists for this registrant."
+        updated: "Registration updated."
+        gathering_read_only: "Gathering attendance entries are read-only after creation."
       index:
         eyebrow: "Onsite desk"
         title: "Registrations for %{offering}"
@@ -811,6 +911,11 @@ en:
           view: "View"
           edit: "Edit"
     payments:
+      flash:
+        recorded: "Payment recorded."
+        fake_checkout_reused: "Fake checkout already exists for this registration."
+        fake_checkout_started: "Fake checkout started. Awaiting webhook confirmation."
+        fake_checkout_failed: "Unable to start fake checkout: %{error}"
       statuses:
         pending: "Pending"
         completed: "Completed"
@@ -819,7 +924,7 @@ en:
       index:
         eyebrow: "Payments"
         title: "Payment reporting"
-        body: "Totals update in real time as payments are recorded. Export CSVs for finance teams from here."
+        body: "Use this as the primary monthly reporting screen: review the current payment summary first, then narrow filters and export CSV for finance handoff."
         export: "Download CSV export"
         presets:
           this_month: "This month"
@@ -827,8 +932,10 @@ en:
         empty: "No payments recorded yet."
         system_fallback: "System"
         metrics:
-          total_received: "Total received"
-          payments_logged: "Payments logged"
+          completed_amount: "Completed amount"
+          completed_count: "Completed payments"
+          pending_count: "Pending payments"
+          refunded_count: "Refunded payments"
         breakdowns:
           eyebrow: "Breakdowns"
           title: "By method / offering / day"
@@ -864,6 +971,9 @@ en:
         credit_card: "Credit card"
         line_pay: "LINE Pay"
     archives:
+      flash:
+        forbidden: "You do not have permission to access archives."
+        export_forbidden: "You do not have permission to export archives."
       hero:
         eyebrow: "Archives · %{temple}"
         title: "Historical records"
@@ -924,12 +1034,33 @@ en:
         body_html: "You’re viewing the annual snapshots. Detailed history requires an owner role or the financials capability. Contact the head administrator if you need to review individual records."
       payments:
         title: "Search payment archives"
-        subtitle: "Use a date range to audit historical ledger entries across offerings and payment methods."
+        subtitle: "Enter a date range, or use a month shortcut, to audit historical ledger entries across offerings and payment methods."
         awaiting_range: "Select a date range to view archived payments."
         range_heading: "Payments from %{start} to %{end}"
         range_hint: "No default window is applied here—archives return everything in the selected range."
+        patron_heading: "Archive history for %{patron}"
+        patron_hint: "Showing all archived payments for the matched patron across all dates."
         empty_range: "No archived payments for this range."
+        presets:
+          this_month: "This month"
+          last_month: "Last month"
+        errors:
+          partial_range: "Please select both a start and end date to load archives."
+          no_patron: "No matching patron was found. Add a date range or refine the patron search."
+          multiple_patrons: "Multiple patrons matched that search. Refine the patron search or add a date range."
+        exports:
+          payments: "Export payments"
+          registrations: "Export registrations"
+          certificates: "Export certificates"
+        summary:
+          total_amount: "Total amount"
+          payments_logged: "Payments logged"
+          completed: "Completed"
+          refunded: "Refunded"
     permissions:
+      flash:
+        updated: "Permissions updated for %{name}."
+        review_errors: "Please review the highlighted errors."
       index:
         eyebrow: "Permissions"
         title: "Admin capabilities"
@@ -985,3 +1116,10 @@ en:
         draft: "Draft"
         enabled: "Enabled"
         disabled: "Disabled"
+      yes: "Yes"
+      no: "No"
+      none: "—"
+      roles:
+        owner: "Owner"
+        admin: "Admin"
+        support: "Support"

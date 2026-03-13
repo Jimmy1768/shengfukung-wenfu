@@ -95,7 +95,7 @@ class Admin::ArchivesAccessTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".empty-state-card", false
     assert_select ".admin-table-card table tbody tr", minimum: 1
-    assert_match "Archive history for 謝文福", response.body
+    assert_match I18n.t("admin.archives.payments.patron_heading", patron: "謝文福"), response.body
   end
 
   test "payments export respects resolved patron query without date range" do
@@ -173,7 +173,7 @@ class Admin::ArchivesAccessTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".empty-state-card", text: /請先選擇日期區間以檢視封存紀錄。/
-    assert_select ".filter-error-list li", text: /Multiple patrons matched/
+    assert_select ".filter-error-list li", text: /有多位信眾符合這個搜尋/
   end
 
   test "owner sees empty state when no archive patron matches without date range" do
@@ -184,7 +184,7 @@ class Admin::ArchivesAccessTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".empty-state-card", text: /請先選擇日期區間以檢視封存紀錄。/
-    assert_select ".filter-error-list li", text: /No matching patron was found/
+    assert_select ".filter-error-list li", text: /找不到符合的信眾/
   end
 
   test "staff without archive permissions is redirected" do

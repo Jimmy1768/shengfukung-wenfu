@@ -47,7 +47,7 @@ module Internal
         }
       )
 
-      redirect_to internal_temple_access_path, notice: "#{@temple.name}: granted #{role} access."
+      redirect_to internal_temple_access_path, notice: t("admin.internal.temple_access.flash.granted", temple: @temple.name, role: t("admin.internal.shared.roles.#{role}"))
     end
 
     def promote_owner
@@ -55,7 +55,7 @@ module Internal
       previous_role = @target_membership.role
 
       if previous_role == "owner"
-        return redirect_to internal_temple_access_temple_path(@temple), alert: "#{admin_account.user.email} is already an owner."
+        return redirect_to internal_temple_access_temple_path(@temple), alert: t("admin.internal.temple_access.flash.already_owner", email: admin_account.user.email)
       end
 
       AdminTempleMembership.transaction do
@@ -79,7 +79,7 @@ module Internal
         }
       )
 
-      redirect_to internal_temple_access_temple_path(@temple), notice: "#{admin_account.user.email}: promoted to owner."
+      redirect_to internal_temple_access_temple_path(@temple), notice: t("admin.internal.temple_access.flash.promoted_owner", email: admin_account.user.email)
     end
 
     def revoke
@@ -87,7 +87,7 @@ module Internal
       membership = admin_account.admin_temple_memberships.find_by(temple: @temple)
 
       unless membership
-        return redirect_to internal_temple_access_path, alert: "#{@temple.name}: no access to revoke."
+        return redirect_to internal_temple_access_path, alert: t("admin.internal.temple_access.flash.no_access_to_revoke", temple: @temple.name)
       end
 
       previous_role = membership.role
@@ -108,7 +108,7 @@ module Internal
         }
       )
 
-      redirect_to internal_temple_access_path, notice: "#{@temple.name}: access revoked."
+      redirect_to internal_temple_access_path, notice: t("admin.internal.temple_access.flash.revoked", temple: @temple.name)
     end
 
     private
@@ -125,7 +125,7 @@ module Internal
       role = params[:role].to_s
       return role if %w[owner admin].include?(role)
 
-      raise ActionController::BadRequest, "Unsupported role"
+      raise ActionController::BadRequest, t("admin.internal.temple_access.errors.unsupported_role")
     end
 
     def apply_permission_defaults!(permission, role)

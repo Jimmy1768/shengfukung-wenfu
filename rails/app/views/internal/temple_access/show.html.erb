@@ -1,21 +1,21 @@
 <div class="internal-access-page">
   <section class="dashboard-hero">
     <div>
-      <p class="eyebrow">Internal access</p>
+      <p class="eyebrow"><%= t("admin.internal.temple_access.show.eyebrow") %></p>
       <h1><%= @temple.name %></h1>
-      <p>Temple admin accounts for <code><%= @temple.slug %></code>.</p>
+      <p><%= t("admin.internal.temple_access.show.subtitle_html", slug: @temple.slug) %></p>
     </div>
   </section>
 
   <section class="admin-card">
     <header class="section-header">
       <div>
-        <p class="eyebrow">Temple admins</p>
-        <h2>Current access list</h2>
-        <p>Only accounts with temple admin access are shown here.</p>
+        <p class="eyebrow"><%= t("admin.internal.temple_access.show.admins_eyebrow") %></p>
+        <h2><%= t("admin.internal.temple_access.show.current_access_list") %></h2>
+        <p><%= t("admin.internal.temple_access.show.current_access_hint") %></p>
       </div>
       <div>
-        <%= link_to "Back to temples", internal_temple_access_path, class: "btn btn-ghost" %>
+        <%= link_to t("admin.internal.temple_access.show.back"), internal_temple_access_path, class: "btn btn-ghost" %>
       </div>
     </header>
 
@@ -23,11 +23,11 @@
       <table class="data-table internal-access-table internal-access-table--admins">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Can manage permissions</th>
-            <th>Actions</th>
+            <th><%= t("admin.internal.temple_access.show.table.name") %></th>
+            <th><%= t("admin.internal.temple_access.show.table.email") %></th>
+            <th><%= t("admin.internal.temple_access.show.table.role") %></th>
+            <th><%= t("admin.internal.temple_access.show.table.manage_permissions") %></th>
+            <th><%= t("admin.internal.temple_access.show.table.actions") %></th>
           </tr>
         </thead>
         <tbody>
@@ -40,25 +40,25 @@
               <td><%= user.email %></td>
               <td>
                 <% role_label = case membership.role
-                   when "staff" then "Admin"
-                   when "owner" then "Owner"
-                   when "support" then "Support"
+                   when "staff" then t("admin.internal.shared.roles.admin")
+                   when "owner" then t("admin.internal.shared.roles.owner")
+                   when "support" then t("admin.internal.shared.roles.support")
                    else membership.role.to_s.humanize
                    end %>
                 <%= role_label %>
               </td>
-              <td><%= permission.allow?(:manage_permissions) ? "Yes" : "No" %></td>
+              <td><%= permission.allow?(:manage_permissions) ? t("admin.internal.shared.yes") : t("admin.internal.shared.no") %></td>
               <td>
                 <% if membership.role == "owner" %>
-                  <span>Already owner</span>
+                  <span><%= t("admin.internal.temple_access.show.actions.already_owner") %></span>
                 <% else %>
-                  <%= button_to "Make owner",
+                  <%= button_to t("admin.internal.temple_access.show.actions.make_owner"),
                     internal_promote_temple_access_owner_path(temple_id: @temple.id, admin_account_id: admin_account.id),
                     method: :post,
                     class: "btn btn-primary btn-small",
                     form: {
                       data: {
-                        confirm: "Make #{user.email} an owner for #{@temple.name}?"
+                        confirm: t("admin.internal.temple_access.show.actions.make_owner_confirm", email: user.email, temple: @temple.name)
                       }
                     } %>
                 <% end %>
@@ -67,7 +67,7 @@
           <% end %>
           <% if @temple_admin_memberships.empty? %>
             <tr>
-              <td colspan="5">No temple admin accounts found.</td>
+              <td colspan="5"><%= t("admin.internal.temple_access.show.empty") %></td>
             </tr>
           <% end %>
         </tbody>

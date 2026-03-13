@@ -20,10 +20,10 @@ module Admin
 
       if @permission_form.save(current_admin:)
         mark_permissions_reviewed!
-        redirect_to admin_permissions_path, notice: "Permissions updated for #{admin_account.user.english_name}."
+        redirect_to admin_permissions_path, notice: t("admin.permissions.flash.updated", name: admin_account.user.english_name)
       else
         @permission_forms = build_permission_forms(overrides: { admin_account.id => @permission_form })
-        flash.now[:alert] = "Please review the highlighted errors."
+        flash.now[:alert] = t("admin.permissions.flash.review_errors")
         render :index, status: :unprocessable_entity
       end
     end

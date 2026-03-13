@@ -14,6 +14,22 @@ module Reporting
       @total_count ||= scoped_payments.count
     end
 
+    def completed_amount_cents
+      @completed_amount_cents ||= scoped_payments.where(status: TemplePayment::STATUSES[:completed]).sum(:amount_cents)
+    end
+
+    def completed_count
+      @completed_count ||= scoped_payments.where(status: TemplePayment::STATUSES[:completed]).count
+    end
+
+    def pending_count
+      @pending_count ||= scoped_payments.where(status: TemplePayment::STATUSES[:pending]).count
+    end
+
+    def refunded_count
+      @refunded_count ||= scoped_payments.where(status: TemplePayment::STATUSES[:refunded]).count
+    end
+
     def totals_by_method
       @totals_by_method ||= group_and_format(scoped_payments.group(:payment_method).sum(:amount_cents))
     end

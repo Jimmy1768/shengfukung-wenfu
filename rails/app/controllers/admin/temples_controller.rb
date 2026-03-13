@@ -14,9 +14,9 @@ module Admin
       @form = Admin::TempleProfileForm.new(temple: current_temple, params: temple_params)
 
       if @form.save(current_admin:)
-        redirect_to admin_temple_profile_path, notice: "Temple profile updated."
+        redirect_to admin_temple_profile_path, notice: t("admin.temple_profile.flash.updated")
       else
-        flash.now[:alert] = "Please review the errors below."
+        flash.now[:alert] = t("admin.temple_profile.flash.review_errors")
         render :edit, status: :unprocessable_entity
       end
     end
@@ -47,7 +47,7 @@ module Admin
     def ensure_temple!
       return if current_temple.present?
 
-      redirect_to admin_dashboard_path, alert: "Temple profile not found. Please run db:seed."
+      redirect_to admin_dashboard_path, alert: t("admin.temple_profile.flash.not_found")
     end
   end
 end

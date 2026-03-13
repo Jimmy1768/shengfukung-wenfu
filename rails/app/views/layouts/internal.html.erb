@@ -12,7 +12,7 @@
       <header class="admin-nav">
         <div class="nav-leading">
           <div class="brand">
-            <span class="brand-name">Internal Tools</span>
+            <span class="brand-name"><%= t("admin.internal.layout.brand") %></span>
           </div>
           <% if flash.any? %>
             <div class="admin-flash-tray">
@@ -23,7 +23,7 @@
           <% end %>
         </div>
         <div class="nav-links">
-          <%= link_to "Temple admin", admin_dashboard_path, class: "pill-link secondary" %>
+          <%= link_to t("admin.internal.layout.back_to_admin"), admin_dashboard_path, class: "pill-link secondary" %>
         </div>
       </header>
       <div class="admin-layout admin-layout--public">

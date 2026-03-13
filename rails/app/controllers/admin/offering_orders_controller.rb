@@ -32,7 +32,7 @@ module Admin
       normalize_registrant_selection!(attrs)
 
       if (existing = existing_registration_for(attrs))
-        redirect_to offering_order_path(@offering, existing), notice: "Existing registration found. Redirected to edit."
+        redirect_to offering_order_path(@offering, existing), notice: t("admin.offering_orders.flash.existing_redirect")
         return
       end
 
@@ -44,7 +44,7 @@ module Admin
       )
 
       @registration = builder.create
-      redirect_to offering_order_path(@offering, @registration), notice: "Registration created."
+      redirect_to offering_order_path(@offering, @registration), notice: t("admin.offering_orders.flash.created")
     rescue ActiveRecord::RecordInvalid => e
       @registration = e.record
       prepare_registration_payloads
@@ -68,7 +68,7 @@ module Admin
 
       if registration_lifecycle_policy.core_fields_editable? &&
           (existing = existing_registration_for(attrs, excluding_id: @registration.id))
-        redirect_to offering_order_path(@offering, existing), alert: "A matching registration already exists for this registrant."
+        redirect_to offering_order_path(@offering, existing), alert: t("admin.offering_orders.flash.duplicate")
         return
       end
 
@@ -85,7 +85,7 @@ module Admin
       )
       @registration.save!
 
-      redirect_to offering_order_path(@offering, @registration), notice: "Registration updated."
+      redirect_to offering_order_path(@offering, @registration), notice: t("admin.offering_orders.flash.updated")
     rescue ActiveRecord::RecordInvalid => e
       @registration = e.record
       prepare_registration_payloads
@@ -119,7 +119,7 @@ module Admin
     def redirect_gathering_edits!
       return if registration_lifecycle_policy.gathering_editable?
 
-      redirect_to offering_order_path(@offering, @registration), alert: "Gathering attendance entries are read-only after creation."
+      redirect_to offering_order_path(@offering, @registration), alert: t("admin.offering_orders.flash.gathering_read_only")
     end
 
     def require_manage_registrations!

@@ -234,6 +234,87 @@ zh-TW:
           label: "年度資料"
         permissions:
           label: "管理員權限"
+    base:
+      alerts:
+        sign_in_required: "請先登入管理後台。"
+        no_temples: "此帳號尚未被指派任何宮廟。"
+    sessions:
+      flash:
+        signed_in: "已登入管理後台。"
+        signed_out: "已登出。"
+        invalid_credentials: "帳號或密碼不正確，請使用有效的管理員帳號。"
+        not_admin: "此帳號尚未取得宮廟管理權限，請聯絡擁有者管理員。"
+        inactive: "此管理權限目前為停用狀態，請聯絡擁有者管理員。"
+    temple_switches:
+      flash:
+        owner_only: "只有擁有者帳號可以切換宮廟。"
+        forbidden: "你沒有該宮廟的存取權限。"
+        switched: "目前正在查看 %{temple}。"
+    internal:
+      layout:
+        brand: "內部工具"
+        back_to_admin: "返回宮廟管理"
+      shared:
+        "yes": "是"
+        "no": "否"
+        none: "—"
+        roles:
+          owner: "擁有者"
+          admin: "管理員"
+          support: "支援"
+      base:
+        alerts:
+          sign_in_required: "請先登入以使用內部工具。"
+          forbidden: "你沒有使用內部工具的權限。"
+      temple_access:
+        flash:
+          granted: "%{temple}：已授予 %{role} 權限。"
+          already_owner: "%{email} 已經是擁有者。"
+          promoted_owner: "%{email}：已升為擁有者。"
+          no_access_to_revoke: "%{temple}：目前沒有可移除的權限。"
+          revoked: "%{temple}：已移除權限。"
+        errors:
+          unsupported_role: "不支援的角色。"
+        index:
+          eyebrow: "內部存取"
+          title: "宮廟存取"
+          subtitle: "檢視平台操作員的宮廟權限，並進入各宮廟管理現有管理員帳號。"
+          operator_eyebrow: "操作員"
+          operator_email: "設定中的操作員 email：%{email}"
+          access:
+            has_access: "已有權限"
+            no_access: "尚無權限"
+          table:
+            temple: "宮廟"
+            slug: "Slug"
+            published: "已發布"
+            access_state: "權限狀態"
+            role: "角色"
+            actions: "操作"
+          actions:
+            grant_owner: "授予擁有者"
+            grant_admin: "授予管理員"
+            temple_admins: "宮廟管理員"
+            revoke: "移除"
+            revoke_confirm: "確定要移除 %{temple} 的權限嗎？"
+        show:
+          eyebrow: "內部存取"
+          subtitle_html: "<code>%{slug}</code> 的宮廟管理員帳號。"
+          admins_eyebrow: "宮廟管理員"
+          current_access_list: "目前權限名單"
+          current_access_hint: "這裡只顯示已具備宮廟管理權限的帳號。"
+          back: "返回宮廟列表"
+          table:
+            name: "姓名"
+            email: "Email"
+            role: "角色"
+            manage_permissions: "可管理權限"
+            actions: "操作"
+          actions:
+            already_owner: "已是擁有者"
+            make_owner: "設為擁有者"
+            make_owner_confirm: "確定要將 %{email} 設為 %{temple} 的擁有者嗎？"
+          empty: "找不到任何宮廟管理員帳號。"
     patrons:
       index:
         title: "信眾名單"
@@ -327,6 +408,10 @@ zh-TW:
         complete_heading: "恭喜！"
         complete: "已完成主要任務，接著可透過左側選單繼續操作。"
     temple_profile:
+      flash:
+        updated: "宮廟資料已更新。"
+        review_errors: "請檢查下方標示的欄位。"
+        not_found: "找不到宮廟資料，請先執行 db:seed。"
       hero:
         eyebrow: "宮廟資料"
         title: "更新官網文案"
@@ -445,6 +530,9 @@ zh-TW:
         errors: "%{count} 項問題需修正"
       empty: "尚未建立任何公告。"
     offerings:
+      flash:
+        select_template: "儲存前請先選擇一個範本。"
+        created: "供品已建立。"
       index:
         title: "供品管理"
         new_button: "新增供品"
@@ -497,6 +585,9 @@ zh-TW:
         manage_registrations: "管理報名"
         edit_offering: "編輯供品"
     events:
+      flash:
+        created: "法會項目已建立。"
+        updated: "法會項目已更新。"
       index:
         title: "法會項目"
         body: "設定即將到來的法會、禮懺、共修與節慶項目。"
@@ -555,6 +646,9 @@ zh-TW:
           capacity_total: "名額上限"
           status: "狀態"
     services:
+      flash:
+        created: "祈福服務已建立。"
+        updated: "祈福服務已更新。"
       index:
         title: "祈福服務"
         body: "管理常態性服務，如點燈、供桌、疏文或代念。"
@@ -659,6 +753,12 @@ zh-TW:
           title: "建立新報名"
           close: "關閉選擇視窗"
     offering_orders:
+      flash:
+        existing_redirect: "已找到相同報名，已改為前往編輯畫面。"
+        created: "報名已建立。"
+        duplicate: "此報名對象已存在相同報名。"
+        updated: "報名已更新。"
+        gathering_read_only: "社群活動的出席紀錄建立後不可再編輯。"
       index:
         eyebrow: "現場報到"
         title: "%{offering} 的報名紀錄"
@@ -809,6 +909,11 @@ zh-TW:
         errors: "%{count} 項問題需要修正"
       empty: "尚未建立任何聚會。"
     payments:
+      flash:
+        recorded: "已登記付款。"
+        fake_checkout_reused: "此報名已存在測試結帳。"
+        fake_checkout_started: "已啟動測試結帳，等待 webhook 確認。"
+        fake_checkout_failed: "無法啟動測試結帳：%{error}"
       statuses:
         pending: "待付款"
         completed: "已完成"
@@ -817,7 +922,7 @@ zh-TW:
       index:
         eyebrow: "收款"
         title: "付款報表"
-        body: "收款資料會即時更新，可在此下載 CSV 給財務彙整。"
+        body: "每月帳務以此頁為主，先看本月收款摘要，再依條件縮小並匯出 CSV 給財務彙整。"
         export: "下載 CSV 匯出"
         presets:
           this_month: "本月"
@@ -825,8 +930,10 @@ zh-TW:
         empty: "尚未有任何付款紀錄。"
         system_fallback: "系統"
         metrics:
-          total_received: "已收總額"
-          payments_logged: "紀錄筆數"
+          completed_amount: "已完成收款"
+          completed_count: "已完成筆數"
+          pending_count: "待付款筆數"
+          refunded_count: "已退款筆數"
         breakdowns:
           eyebrow: "分類總覽"
           title: "依付款方式／供品／日期"
@@ -862,6 +969,9 @@ zh-TW:
         credit_card: "信用卡"
         line_pay: "LINE Pay"
     archives:
+      flash:
+        forbidden: "你沒有查看封存資料的權限。"
+        export_forbidden: "你沒有匯出封存資料的權限。"
       hero:
         eyebrow: "資料封存 · %{temple}"
         title: "歷史資料"
@@ -926,10 +1036,16 @@ zh-TW:
         awaiting_range: "請先選擇日期區間以檢視封存紀錄。"
         range_heading: "%{start} 至 %{end} 的付款紀錄"
         range_hint: "封存區塊不套用視窗限制，會回傳所選區間的所有資料。"
+        patron_heading: "%{patron} 的歷史付款紀錄"
+        patron_hint: "顯示此信眾跨所有日期的封存付款紀錄。"
         empty_range: "此日期區間沒有封存的付款紀錄。"
         presets:
           this_month: "本月"
           last_month: "上月"
+        errors:
+          partial_range: "請同時選擇開始與結束日期後再載入封存資料。"
+          no_patron: "找不到符合的信眾，請改用日期區間或再縮小搜尋條件。"
+          multiple_patrons: "有多位信眾符合這個搜尋，請縮小條件或改用日期區間。"
         exports:
           payments: "匯出付款"
           registrations: "匯出報名"
@@ -940,6 +1056,9 @@ zh-TW:
           completed: "已完成"
           refunded: "已退款"
     permissions:
+      flash:
+        updated: "已更新 %{name} 的權限。"
+        review_errors: "請檢查標示出的錯誤。"
       index:
         eyebrow: "權限"
         title: "管理員權限"
@@ -995,3 +1114,10 @@ zh-TW:
         draft: "草稿"
         enabled: "啟用"
         disabled: "停用"
+      yes: "是"
+      no: "否"
+      none: "—"
+      roles:
+        owner: "擁有者"
+        admin: "管理員"
+        support: "支援"

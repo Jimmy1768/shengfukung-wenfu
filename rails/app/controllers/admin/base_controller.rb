@@ -35,7 +35,7 @@ module Admin
     def authenticate_admin!
       return if admin_signed_in?
 
-      redirect_to admin_login_path, alert: "Please sign in to access the admin console."
+      redirect_to admin_login_path, alert: t("admin.base.alerts.sign_in_required")
     end
 
     def admin_signed_in?
@@ -88,7 +88,7 @@ module Admin
       temples = available_admin_temples.to_a
       if temples.empty?
         destroy_admin_session!
-        redirect_to admin_login_path, alert: "Your account is not assigned to any temples yet."
+        redirect_to admin_login_path, alert: t("admin.base.alerts.no_temples")
         return
       end
 
