@@ -1695,19 +1695,18 @@ body.admin-body--internal .admin-layout--public .admin-main {
 }
 
 .patron-actions-menu {
-  position: absolute;
-  bottom: calc(100% + 0.35rem);
-  right: 0;
+  position: fixed;
   display: none;
   flex-direction: column;
   gap: var(--spacing-xs);
-  min-width: 180px;
+  min-width: 220px;
+  max-width: min(280px, 100vw - 1.5rem);
   background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--spacing-sm);
   box-shadow: var(--shadow-soft);
-  z-index: 50;
+  z-index: 200;
 }
 
 .patron-actions.is-open .patron-actions-menu {

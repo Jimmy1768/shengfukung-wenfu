@@ -54,10 +54,43 @@
       const menus = Array.from(document.querySelectorAll('[data-profile-menu]'));
       if (!menus.length) return;
 
+      const positionPatronMenu = (menu) => {
+        if (!menu.classList.contains('patron-actions')) return;
+
+        const trigger = menu.querySelector('[data-profile-menu-trigger]');
+        const panel = menu.querySelector('[data-profile-menu-panel]');
+        if (!trigger || !panel) return;
+
+        const spacing = 8;
+        const triggerRect = trigger.getBoundingClientRect();
+        panel.style.top = '0px';
+        panel.style.left = '0px';
+
+        const panelRect = panel.getBoundingClientRect();
+        const availableBelow = window.innerHeight - triggerRect.bottom - spacing;
+        const shouldOpenBelow = availableBelow >= panelRect.height || triggerRect.top < panelRect.height + spacing;
+
+        let top = shouldOpenBelow
+          ? triggerRect.bottom + spacing
+          : triggerRect.top - panelRect.height - spacing;
+        let left = triggerRect.right - panelRect.width;
+
+        top = Math.max(spacing, Math.min(top, window.innerHeight - panelRect.height - spacing));
+        left = Math.max(spacing, Math.min(left, window.innerWidth - panelRect.width - spacing));
+
+        panel.style.top = `${top}px`;
+        panel.style.left = `${left}px`;
+      };
+
       const closeMenu = (menu) => {
         menu.classList.remove('is-open');
         const trigger = menu.querySelector('[data-profile-menu-trigger]');
         if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        const panel = menu.querySelector('[data-profile-menu-panel]');
+        if (panel && menu.classList.contains('patron-actions')) {
+          panel.style.top = '';
+          panel.style.left = '';
+        }
       };
 
       const openMenu = (menu) => {
@@ -67,6 +100,7 @@
         menu.classList.add('is-open');
         const trigger = menu.querySelector('[data-profile-menu-trigger]');
         if (trigger) trigger.setAttribute('aria-expanded', 'true');
+        window.requestAnimationFrame(() => positionPatronMenu(menu));
       };
 
       document.addEventListener('click', (event) => {
@@ -95,6 +129,15 @@
           menus.forEach(closeMenu);
         }
       });
+
+      const repositionOpenMenus = () => {
+        menus.forEach((menu) => {
+          if (menu.classList.contains('is-open')) positionPatronMenu(menu);
+        });
+      };
+
+      window.addEventListener('resize', repositionOpenMenus);
+      window.addEventListener('scroll', repositionOpenMenus, true);
     });
 
     ready(() => {
