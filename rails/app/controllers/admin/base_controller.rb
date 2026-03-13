@@ -181,7 +181,7 @@ module Admin
     def filter_params
       @filter_params ||= params
         .fetch(:filter, {})
-        .permit(:query, :offering_id, :offering_reference, :offering_kind, :payment_method, :start_date, :end_date, :status)
+        .permit(:query, :offering_id, :offering_reference, :offering_kind, :payment_method, :start_date, :end_date, :status, :month_preset)
         .to_h
         .symbolize_keys
     end

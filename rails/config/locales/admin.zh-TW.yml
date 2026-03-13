@@ -913,11 +913,19 @@ zh-TW:
         body_html: "目前僅能檢視年度快照。若需查看完整明細，請向擁有者或具財務權限的管理員申請。"
       payments:
         title: "搜尋付款封存"
-        subtitle: "輸入日期區間，即可檢視歷史帳冊的付款紀錄與付款方式。"
+        subtitle: "輸入日期區間，或直接使用月份捷徑，即可檢視歷史帳冊的付款紀錄與付款方式。"
         awaiting_range: "請先選擇日期區間以檢視封存紀錄。"
         range_heading: "%{start} 至 %{end} 的付款紀錄"
         range_hint: "封存區塊不套用視窗限制，會回傳所選區間的所有資料。"
         empty_range: "此日期區間沒有封存的付款紀錄。"
+        presets:
+          this_month: "本月"
+          last_month: "上月"
+        summary:
+          total_amount: "總收款"
+          payments_logged: "付款筆數"
+          completed: "已完成"
+          refunded: "已退款"
     permissions:
       index:
         eyebrow: "權限"

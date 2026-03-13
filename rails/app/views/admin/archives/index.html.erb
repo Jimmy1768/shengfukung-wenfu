@@ -7,6 +7,15 @@
           <p class="muted"><%= t("admin.archives.payments.subtitle") %></p>
         </header>
 
+        <div class="filter-chip-row">
+          <% archive_month_presets.each do |preset| %>
+            <% classes = ["filter-chip"] %>
+            <% active = @filters[:start_date].to_s == preset[:filters][:start_date].to_s && @filters[:end_date].to_s == preset[:filters][:end_date].to_s %>
+            <% classes << "is-active" if active %>
+            <%= link_to preset[:label], admin_archives_path(filter: preset[:filters]), class: classes.join(" ") %>
+          <% end %>
+        </div>
+
         <%= render "admin/shared/filters",
           filters: @filters,
           filter_path: admin_archives_path,
@@ -34,11 +43,34 @@
       </div>
     <% else %>
       <div class="admin-stack__row">
+        <section class="card stack-item">
+          <div class="metric-row">
+            <article class="metric">
+              <span><%= t("admin.archives.payments.summary.total_amount") %></span>
+              <strong><%= Currency::Symbols.format_amount(@archive_summary[:total_amount_cents], @archived_payments.first&.currency || "TWD") %></strong>
+            </article>
+            <article class="metric">
+              <span><%= t("admin.archives.payments.summary.payments_logged") %></span>
+              <strong><%= @archive_summary[:payment_count] %></strong>
+            </article>
+            <article class="metric">
+              <span><%= t("admin.archives.payments.summary.completed") %></span>
+              <strong><%= @archive_summary[:completed_count] %></strong>
+            </article>
+            <article class="metric">
+              <span><%= t("admin.archives.payments.summary.refunded") %></span>
+              <strong><%= @archive_summary[:refunded_count] %></strong>
+            </article>
+          </div>
+        </section>
+      </div>
+
+      <div class="admin-stack__row">
         <section class="card stack-item stack-item--fluid admin-table-card">
           <header class="admin-section-header">
             <div>
-              <h2><%= t("admin.archives.payments.range_heading", start: @filters[:start_date], end: @filters[:end_date]) %></h2>
-              <p class="muted"><%= t("admin.archives.payments.range_hint") %></p>
+              <h2><%= archive_heading_title %></h2>
+              <p class="muted"><%= archive_heading_hint %></p>
             </div>
           </header>
 
