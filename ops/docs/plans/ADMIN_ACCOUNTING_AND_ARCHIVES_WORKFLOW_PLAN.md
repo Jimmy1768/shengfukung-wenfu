@@ -198,32 +198,32 @@ This prevents accidental broad unbounded archive queries while matching staff wo
 
 ### Phase 2 — Monthly Report UX
 
-- [ ] Add month presets (`this month`, `last month`, `custom`).
-- [ ] Add month-first filtering without manual date typing.
-- [ ] Show summary totals above the report table.
+- [x] Add month presets (`this month`, `last month`, `custom`).
+- [x] Add month-first filtering without manual date typing.
+- [x] Show summary totals above the report table.
 - [ ] Keep offering/payment/status filters compatible with this flow.
 
 ### Phase 3 — Export Refinement
 
-- [ ] Normalize exported column order/labels for bookkeeping.
-- [ ] Use month-aware filenames.
-- [ ] Ensure exports match visible filters exactly.
+- [x] Normalize exported column order/labels for bookkeeping.
+- [x] Use month-aware filenames.
+- [x] Ensure exports match visible filters exactly.
 - [ ] Decide whether `.xlsx` is needed after v1 staff validation.
 
 ### Phase 4 — Archives Name-First Search
 
-- [ ] Add patron lookup input(s) to `/admin/archives`.
-- [ ] Implement exact-one-patron resolution rule for date-less search.
-- [ ] Show resolve/refine UI when multiple patrons match.
-- [ ] Load full cross-date archive history only for the resolved patron.
+- [x] Add patron lookup input(s) to `/admin/archives`.
+- [x] Implement exact-one-patron resolution rule for date-less search.
+- [x] Show resolve/refine UI when multiple patrons match.
+- [x] Load full cross-date archive history only for the resolved patron.
 
 ### Phase 5 — Regression Coverage
 
-- [ ] Monthly preset returns correct date window.
-- [ ] Export respects active month/filter state.
+- [x] Monthly preset returns correct date window.
+- [x] Export respects active month/filter state.
 - [ ] No-date archive search with zero patron matches returns empty state.
-- [ ] No-date archive search with multiple patron matches requires refinement.
-- [ ] No-date archive search with one patron match returns that patron’s full archive history.
+- [x] No-date archive search with multiple patron matches requires refinement.
+- [x] No-date archive search with one patron match returns that patron’s full archive history.
 - [ ] Temple scope and export permissions remain enforced.
 
 ## Open Decisions
@@ -243,3 +243,32 @@ This prevents accidental broad unbounded archive queries while matching staff wo
 2. Add monthly date presets + summary row to the existing reporting screen.
 3. Refine CSV output shape.
 4. Defer true `.xlsx` unless staff explicitly reject CSV.
+
+## Completed In Repo
+
+- `/admin/archives` now supports patron-name-first lookup with no date range when the query resolves to exactly one temple patron.
+- `/admin/archives` now supports month presets, a summary row, and filter-scoped exports for payments, registrations, and certificates.
+- `/admin/payments` export now respects active filters and uses accounting-friendly CSV columns:
+  - processed time
+  - payment reference
+  - patron
+  - patron phone
+  - offering type
+  - offering
+  - registration period key
+  - payment method
+  - status
+  - amount
+  - currency
+  - recorded by
+
+## Regression Coverage Implemented
+
+- `bin/rails test test/integration/admin/archives_access_test.rb`
+  - month preset path
+  - one-patron no-date archive lookup
+  - ambiguous patron no-date archive lookup
+  - patron-scoped archive payments export
+- `bin/rails test test/services/reporting/payments_csv_exporter_test.rb test/integration/admin/orders_and_payments_access_test.rb`
+  - accounting CSV column shape
+  - payments export filter scoping

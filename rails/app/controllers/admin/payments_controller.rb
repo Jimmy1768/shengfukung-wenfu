@@ -5,10 +5,10 @@ module Admin
     before_action :require_view_financials!, only: :index
     before_action :require_cash_permissions!, only: %i[new create fake_checkout]
     before_action :require_export_permissions!, only: :export
+    before_action :prepare_payment_filters, only: %i[index export]
     before_action :set_registration, only: %i[new create fake_checkout]
 
     def index
-      @filters = normalized_filter_params
       apply_default_payment_range!
       scoped = filtered_payments_scope
       @payments = scoped
@@ -27,10 +27,10 @@ module Admin
 
     def export
       exporter = Reporting::PaymentsCsvExporter.new(
-        payments: base_payment_scope.includes(:temple_registration, :user, admin_account: :user)
+        payments: filtered_payments_scope.includes(:temple_registration, :user, admin_account: :user)
       )
       send_data exporter.to_csv,
-        filename: "payments-#{Time.current.strftime('%Y%m%d')}.csv",
+        filename: export_filename,
         type: "text/csv"
     end
 
@@ -85,6 +85,10 @@ module Admin
 
     private
 
+    def prepare_payment_filters
+      @filters = normalized_filter_params
+    end
+
     def require_cash_permissions!
       require_capability!(:record_cash_payments)
     end
@@ -118,6 +122,19 @@ module Admin
 
     def filtered_payments_scope
       base_payment_scope.merge(TemplePayment.admin_filtered(@filters))
+    end
+
+    def export_filename
+      scope =
+        if @filters[:start_date].present? && @filters[:end_date].present?
+          "#{@filters[:start_date]}-to-#{@filters[:end_date]}"
+        elsif @filters[:query].present?
+          @filters[:query].parameterize(separator: "-").presence || "filtered"
+        else
+          Time.current.strftime("%Y%m%d")
+        end
+
+      "payments-#{scope}-#{Time.current.strftime('%Y%m%d')}.csv"
     end
 
     def offering_order_path(offering, registration)

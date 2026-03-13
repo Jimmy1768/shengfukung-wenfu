@@ -75,7 +75,7 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
     get admin_payments_path
 
     assert_response :success
-    assert_includes response.body, "Payment reporting"
+    assert_includes response.body, "付款報表"
   end
 
   test "admin without view_financials is redirected from payments index" do
@@ -101,6 +101,50 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.content_type, "text/csv"
     assert_includes response.body, "Reference"
+  end
+
+  test "payments export respects active date filters" do
+    admin = create_admin_user(temple: @temple)
+    permission = AdminPermission.find_by(admin_account: admin.admin_account, temple: @temple)
+    permission.update!(view_financials: true, export_financials: true)
+
+    older_registration = TempleEventRegistration.create!(
+      temple: @temple,
+      registrable: @offering,
+      user: @user,
+      quantity: 1,
+      contact_payload: {},
+      logistics_payload: {},
+      metadata: {},
+      created_at: 6.months.ago
+    )
+    TemplePayment.create!(
+      temple: @temple,
+      temple_event_registration: older_registration,
+      provider: "demo",
+      provider_account: "temple",
+      payment_method: TemplePayment::PAYMENT_METHODS[:cash],
+      status: TemplePayment::STATUSES[:completed],
+      amount_cents: 700,
+      currency: "TWD",
+      processed_at: 6.months.ago,
+      metadata: {},
+      payment_payload: {}
+    )
+
+    sign_in_admin(admin)
+
+    get export_admin_payments_path(format: :csv), params: {
+      filter: {
+        start_date: 30.days.ago.to_date.to_s,
+        end_date: Date.current.to_s
+      }
+    }
+
+    assert_response :success
+    assert_includes response.headers["Content-Disposition"], 30.days.ago.to_date.to_s
+    assert_includes response.body, @registration.reference_code
+    refute_includes response.body, older_registration.reference_code
   end
 
   test "admin without export_financials cannot download csv" do

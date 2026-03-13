@@ -42,6 +42,13 @@ This document captures what exists in the admin portal today so future work can 
 - The temple switcher lets owners jump between slugs locally while remaining disabled in production.
 - Shared visual/preference policy details (Rails display modes, mobile sync contract, token boundaries) live in `ops/docs/reference/visual_preference_systems.md`.
 
+## Accounting & Archives Workflow
+
+- `/admin/archives` supports patron-name-first lookup without a date range when the query resolves to exactly one temple patron. Ambiguous patron searches stay empty and require refinement instead of loading broad results.
+- `/admin/archives` includes quick month presets plus a summary row so staff can review monthly totals without manually typing date windows.
+- Archive exports for payments, registrations, and certificates now follow the active archive filters and resolved patron scope instead of falling back to a broader year-wide export.
+- `/admin/payments` CSV export now follows the active filter state and uses accounting-oriented columns, including patron phone, offering type, and registration period key.
+
 ## Permission Model (Current Policy)
 
 - Baseline policy direction: admins should have read access to core console surfaces, while permissions gate mutation actions (create/edit/delete/export/record cash).

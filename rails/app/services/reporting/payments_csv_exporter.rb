@@ -5,15 +5,17 @@ require "csv"
 module Reporting
   class PaymentsCsvExporter
     HEADER = [
+      "Processed At",
       "Reference",
+      "Patron",
+      "Patron Phone",
+      "Offering Type",
       "Offering",
       "Registration Period Key",
-      "Patron",
       "Method",
       "Status",
       "Amount",
       "Currency",
-      "Processed At",
       "Recorded By"
     ].freeze
 
@@ -41,15 +43,17 @@ module Reporting
       recorded_by = payment.admin_account&.user&.english_name || payment.admin_account&.user&.email || "System"
 
       [
+        (payment.processed_at || payment.created_at)&.iso8601,
         payment.external_reference.presence || registration&.reference_code || payment.id,
+        patron_label || "Guest",
+        patron_phone_for(payment, registration),
+        offering_type_for(registration),
         offering_title || "—",
         registration_period_key_for(registration),
-        patron_label || "Guest",
         payment.payment_method,
         payment.status,
         format_amount(payment.amount_cents),
         payment.currency,
-        (payment.processed_at || payment.created_at)&.iso8601,
         recorded_by
       ]
     end
@@ -66,6 +70,27 @@ module Reporting
       return unless offering.respond_to?(:registration_period_key)
 
       offering.registration_period_key
+    end
+
+    def patron_phone_for(payment, registration)
+      registration&.user&.metadata.to_h["phone"].presence ||
+        registration&.contact_payload.to_h["phone"].presence ||
+        payment.user&.metadata.to_h["phone"].presence ||
+        "—"
+    end
+
+    def offering_type_for(registration)
+      offering = registration&.offering
+      case offering
+      when TempleService
+        "Service"
+      when TempleGathering
+        "Gathering"
+      when TempleEvent
+        "Event"
+      else
+        "—"
+      end
     end
   end
 end

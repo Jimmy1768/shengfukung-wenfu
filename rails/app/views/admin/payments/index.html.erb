@@ -8,7 +8,7 @@
         <h1><%= t("admin.payments.index.title") %></h1>
         <p class="muted"><%= t("admin.payments.index.body") %></p>
         <% if @show_export %>
-          <%= link_to t("admin.payments.index.export"), export_admin_payments_path(format: :csv), class: "pill-link" %>
+          <%= link_to t("admin.payments.index.export"), export_admin_payments_path({ format: :csv, filter: @filters.compact_blank }), class: "pill-link" %>
         <% end %>
       </header>
 

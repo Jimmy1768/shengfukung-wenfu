@@ -17,7 +17,8 @@ module Reporting
       user = User.create!(
         email: "guest@example.com",
         english_name: "Guest",
-        encrypted_password: User.password_hash("Password123!")
+        encrypted_password: User.password_hash("Password123!"),
+        metadata: { "phone" => "0912-345-678" }
       )
       registration = TempleEventRegistration.create!(
         temple:,
@@ -46,8 +47,13 @@ module Reporting
       exporter = PaymentsCsvExporter.new(payments: temple.temple_payments)
       csv = exporter.to_csv
 
+      assert_includes csv, "Processed At"
       assert_includes csv, "Reference"
       assert_includes csv, payment.temple_event_registration.reference_code
+      assert_includes csv, "Patron Phone"
+      assert_includes csv, "0912-345-678"
+      assert_includes csv, "Offering Type"
+      assert_includes csv, "Event"
       assert_includes csv, "Ancestor Rites"
       assert_includes csv, "Registration Period Key"
       assert_includes csv, "2026-ghost-month"
