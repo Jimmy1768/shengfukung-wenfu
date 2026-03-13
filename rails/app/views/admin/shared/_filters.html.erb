@@ -1,6 +1,8 @@
 <% filters ||= {} %>
 <% offerings ||= [] %>
 <% payment_methods ||= [] %>
+<% status_options ||= [] %>
+<% status_translation_scope ||= nil %>
 <% hidden_params ||= {} %>
 
 <%= form_with url: filter_path, method: :get, scope: :filter, local: true, class: "admin-filter-bar" do |form| %>
@@ -64,6 +66,15 @@
         { include_blank: t("admin.filters.payment_method.all") },
         class: "filter-input" %>
     </div>
+    <% if status_options.present? %>
+      <div class="filter-field">
+        <%= form.label :status, t("admin.filters.status.label"), class: "filter-label" %>
+        <%= form.select :status,
+          options_for_select(status_options.map { |status| [admin_filter_status_label(status, scope: status_translation_scope), status] }, filters[:status]),
+          { include_blank: t("admin.filters.status.all", default: "All statuses") },
+          class: "filter-input" %>
+      </div>
+    <% end %>
     <div class="filter-field">
       <%= form.label :start_date, t("admin.filters.date.start"), class: "filter-label" %>
       <%= form.date_field :start_date,

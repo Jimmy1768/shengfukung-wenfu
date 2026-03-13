@@ -12,6 +12,7 @@ module Admin
       @filter_hidden_fields = filter_hidden_params
       @filter_offerings = current_temple.temple_events.order(:title).to_a + current_temple.temple_services.order(:title).to_a
       @filter_payment_methods = TemplePayment::PAYMENT_METHODS.values
+      @filter_statuses = TemplePayment::STATUSES.values
       @filter_errors = []
       @awaiting_range = @filters[:start_date].blank? && @filters[:end_date].blank? && @resolved_patron.blank?
       if allow_archive_details?

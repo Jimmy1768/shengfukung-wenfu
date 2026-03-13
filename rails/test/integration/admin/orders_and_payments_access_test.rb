@@ -192,6 +192,43 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "payments month preset preserves status filter context" do
+    travel_to Time.zone.local(2026, 3, 12, 12, 0, 0) do
+      admin = create_admin_user(temple: @temple)
+      permission = AdminPermission.find_by(admin_account: admin.admin_account, temple: @temple)
+      permission.update!(view_financials: true)
+
+      @payment.update!(status: TemplePayment::STATUSES[:refunded], amount_cents: 900)
+      TemplePayment.create!(
+        temple: @temple,
+        temple_event_registration: @registration,
+        provider: "demo",
+        provider_account: "temple",
+        payment_method: TemplePayment::PAYMENT_METHODS[:cash],
+        status: TemplePayment::STATUSES[:completed],
+        amount_cents: 500,
+        currency: "TWD",
+        processed_at: Time.zone.now,
+        metadata: {},
+        payment_payload: {}
+      )
+
+      sign_in_admin(admin)
+
+      get admin_payments_path, params: {
+        filter: {
+          month_preset: "this_month",
+          status: TemplePayment::STATUSES[:refunded]
+        }
+      }
+
+      assert_response :success
+      assert_includes response.body, "已退款"
+      assert_includes response.body, "NT$9"
+      refute_includes response.body, "NT$5"
+    end
+  end
+
   test "admin without export_financials cannot download csv" do
     admin = create_admin_user(temple: @temple)
     permission = AdminPermission.find_by(admin_account: admin.admin_account, temple: @temple)

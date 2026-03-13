@@ -48,6 +48,7 @@ class TemplePayment < ApplicationRecord
     filters ||= {}
     scope = includes(:user, { admin_account: :user }, :temple_registration)
     scope = scope.where(payment_method: filters[:payment_method]) if filters[:payment_method].present?
+    scope = scope.where(status: filters[:status]) if filters[:status].present?
     if filters[:offering_type].present?
       table = TempleRegistration.table_name
       type_values = TempleRegistration.offering_type_filter_values(filters[:offering_type])

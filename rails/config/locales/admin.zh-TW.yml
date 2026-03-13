@@ -46,6 +46,7 @@ zh-TW:
         end: "結束日期"
       status:
         label: "付款狀態"
+        all: "全部狀態"
         paid: "已付款"
         unpaid: "未付款"
       apply: "套用條件"
@@ -808,6 +809,11 @@ zh-TW:
         errors: "%{count} 項問題需要修正"
       empty: "尚未建立任何聚會。"
     payments:
+      statuses:
+        pending: "待付款"
+        completed: "已完成"
+        failed: "失敗"
+        refunded: "已退款"
       index:
         eyebrow: "收款"
         title: "付款報表"

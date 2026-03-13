@@ -176,6 +176,17 @@ class Admin::ArchivesAccessTest < ActionDispatch::IntegrationTest
     assert_select ".filter-error-list li", text: /Multiple patrons matched/
   end
 
+  test "owner sees empty state when no archive patron matches without date range" do
+    owner = create_admin_user(temple: @temple)
+    sign_in_admin(owner)
+
+    get admin_archives_path, params: { filter: { query: "不存在的信眾" } }
+
+    assert_response :success
+    assert_select ".empty-state-card", text: /請先選擇日期區間以檢視封存紀錄。/
+    assert_select ".filter-error-list li", text: /No matching patron was found/
+  end
+
   test "staff without archive permissions is redirected" do
     staff = create_admin_user(
       temple: @temple,

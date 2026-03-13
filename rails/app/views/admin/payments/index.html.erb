@@ -111,6 +111,8 @@
         clear_path: admin_payments_path,
         offerings: @filter_offerings,
         payment_methods: @filter_payment_methods,
+        status_options: @filter_statuses,
+        status_translation_scope: "admin.payments.statuses",
         show_status_chips: false,
         hidden_params: @filter_hidden_fields %>
 

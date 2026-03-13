@@ -25,6 +25,7 @@ module Admin
         current_temple.temple_gatherings.order(:title)
       ].flat_map(&:to_a)
       @filter_payment_methods = TemplePayment::PAYMENT_METHODS.values
+      @filter_statuses = TemplePayment::STATUSES.values
       @filter_hidden_fields = filter_hidden_params
     end
 

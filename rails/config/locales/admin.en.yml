@@ -46,6 +46,7 @@ en:
         end: "End date"
       status:
         label: "Payment status"
+        all: "All statuses"
         paid: "Paid"
         unpaid: "Unpaid"
       apply: "Apply filters"
@@ -810,6 +811,11 @@ en:
           view: "View"
           edit: "Edit"
     payments:
+      statuses:
+        pending: "Pending"
+        completed: "Completed"
+        failed: "Failed"
+        refunded: "Refunded"
       index:
         eyebrow: "Payments"
         title: "Payment reporting"
