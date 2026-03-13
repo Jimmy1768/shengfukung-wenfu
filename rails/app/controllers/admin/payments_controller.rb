@@ -2,6 +2,8 @@
 
 module Admin
   class PaymentsController < BaseController
+    helper_method :payment_month_presets
+
     before_action :require_view_financials!, only: :index
     before_action :require_cash_permissions!, only: %i[new create fake_checkout]
     before_action :require_export_permissions!, only: :export
@@ -9,6 +11,7 @@ module Admin
     before_action :set_registration, only: %i[new create fake_checkout]
 
     def index
+      apply_month_preset!
       apply_default_payment_range!
       scoped = filtered_payments_scope
       @payments = scoped
@@ -120,6 +123,31 @@ module Admin
       @default_payment_window = true
     end
 
+    def apply_month_preset!
+      return if @filters[:start_date].present? || @filters[:end_date].present?
+
+      preset = payment_month_presets.find { |entry| entry[:key] == @filters[:month_preset].to_s }
+      return unless preset
+
+      @filters[:start_date] = preset[:filters][:start_date]
+      @filters[:end_date] = preset[:filters][:end_date]
+    end
+
+    def payment_month_presets
+      [
+        {
+          key: "this_month",
+          label: I18n.t("admin.payments.index.presets.this_month"),
+          filters: preset_filters_for(Time.zone.today.beginning_of_month.to_date, Time.zone.today.end_of_month.to_date)
+        },
+        {
+          key: "last_month",
+          label: I18n.t("admin.payments.index.presets.last_month"),
+          filters: preset_filters_for(1.month.ago.beginning_of_month.to_date, 1.month.ago.end_of_month.to_date)
+        }
+      ]
+    end
+
     def filtered_payments_scope
       base_payment_scope.merge(TemplePayment.admin_filtered(@filters))
     end
@@ -147,6 +175,13 @@ module Admin
 
     def fake_idempotency_key
       params[:idempotency_key].presence || "admin-reg-#{@registration.id}-#{SecureRandom.hex(4)}"
+    end
+
+    def preset_filters_for(start_date, end_date)
+      filter_params.except(:start_date, :end_date, :month_preset).merge(
+        start_date: start_date.iso8601,
+        end_date: end_date.iso8601
+      )
     end
   end
 end

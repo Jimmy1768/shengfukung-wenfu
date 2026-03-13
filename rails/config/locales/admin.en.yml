@@ -815,6 +815,9 @@ en:
         title: "Payment reporting"
         body: "Totals update in real time as payments are recorded. Export CSVs for finance teams from here."
         export: "Download CSV export"
+        presets:
+          this_month: "This month"
+          last_month: "Last month"
         empty: "No payments recorded yet."
         system_fallback: "System"
         metrics:

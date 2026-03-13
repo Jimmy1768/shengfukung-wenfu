@@ -813,6 +813,9 @@ zh-TW:
         title: "付款報表"
         body: "收款資料會即時更新，可在此下載 CSV 給財務彙整。"
         export: "下載 CSV 匯出"
+        presets:
+          this_month: "本月"
+          last_month: "上月"
         empty: "尚未有任何付款紀錄。"
         system_fallback: "系統"
         metrics:
