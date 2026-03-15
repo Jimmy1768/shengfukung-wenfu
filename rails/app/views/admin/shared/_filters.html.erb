@@ -66,15 +66,6 @@
         { include_blank: t("admin.filters.payment_method.all") },
         class: "filter-input" %>
     </div>
-    <% if status_options.present? %>
-      <div class="filter-field">
-        <%= form.label :status, t("admin.filters.status.label"), class: "filter-label" %>
-        <%= form.select :status,
-          options_for_select(status_options.map { |status| [admin_filter_status_label(status, scope: status_translation_scope), status] }, filters[:status]),
-          { include_blank: t("admin.filters.status.all", default: "All statuses") },
-          class: "filter-input" %>
-      </div>
-    <% end %>
     <div class="filter-field">
       <%= form.label :start_date, t("admin.filters.date.start"), class: "filter-label" %>
       <%= form.date_field :start_date,
@@ -109,10 +100,22 @@
     </div>
   <% end %>
 
-  <div class="filter-actions">
-    <%= form.submit t("admin.filters.apply"), class: "btn btn-secondary" %>
-    <% clear_classes = ["filter-clear"] %>
-    <% clear_classes << "is-disabled" unless admin_filters_active?(filters) %>
-    <%= link_to t("admin.filters.clear"), clear_path, class: clear_classes.join(" "), data: { turbo: false } %>
+  <div class="filter-footer-row">
+    <% if status_options.present? %>
+      <div class="filter-field filter-field--footer">
+        <%= form.label :status, t("admin.filters.status.label"), class: "filter-label" %>
+        <%= form.select :status,
+          options_for_select(status_options.map { |status| [admin_filter_status_label(status, scope: status_translation_scope), status] }, filters[:status]),
+          { include_blank: t("admin.filters.status.all", default: "All statuses") },
+          class: "filter-input" %>
+      </div>
+    <% end %>
+
+    <div class="filter-actions">
+      <%= form.submit t("admin.filters.apply"), class: "btn btn-secondary" %>
+      <% clear_classes = ["filter-clear"] %>
+      <% clear_classes << "is-disabled" unless admin_filters_active?(filters) %>
+      <%= link_to t("admin.filters.clear"), clear_path, class: clear_classes.join(" "), data: { turbo: false } %>
+    </div>
   </div>
 <% end %>
