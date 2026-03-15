@@ -8,14 +8,15 @@
   </header>
 
   <%= form_with model: @form, url: account_profile_path, method: :put, class: "profile-form" do |f| %>
+    <%= render "shared/form_errors", form: @form %>
     <div class="single-row-grid">
-      <div class="field">
-        <%= f.label :english_name, t("account.profile.summary.english_name") %>
-        <%= f.text_field :english_name, required: true %>
-      </div>
       <div class="field">
         <%= f.label :native_name, t("account.profile.summary.native_name") %>
         <%= f.text_field :native_name %>
+      </div>
+      <div class="field">
+        <%= f.label :english_name, t("account.profile.summary.english_name") %>
+        <%= f.text_field :english_name %>
       </div>
       <div class="field">
         <%= f.label :phone, t("account.profile.summary.phone") %>

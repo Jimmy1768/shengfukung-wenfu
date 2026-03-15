@@ -109,9 +109,11 @@ en:
         subtitle: "This information is only shared with temple staff and will not be public."
         save: "Save"
         cancel: "Cancel"
+        errors:
+          name_required: "Enter either your name or your English name."
       summary:
-        english_name: "Name"
-        native_name: "Chinese name"
+        native_name: "Name"
+        english_name: "English name"
         phone: "Phone"
         city: "City/Region"
         notes: "Notes"

@@ -2,7 +2,7 @@
   <header class="section-header">
     <div>
       <p class="eyebrow"><%= t("account.dashboard.intro.eyebrow") %></p>
-      <h2><%= t("account.dashboard.intro.greeting", name: current_user.english_name.presence || current_user.email) %></h2>
+      <h2><%= t("account.dashboard.intro.greeting", name: current_user.native_name.presence || current_user.english_name.presence || current_user.email) %></h2>
       <p><%= t("account.dashboard.intro.body") %></p>
     </div>
   </header>

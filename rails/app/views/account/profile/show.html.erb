@@ -10,12 +10,12 @@
 
   <div class="profile-summary">
     <div>
-      <span class="label"><%= t("account.profile.summary.english_name") %></span>
-      <p><%= current_user.english_name.presence || t("account.profile.summary.not_provided") %></p>
-    </div>
-    <div>
       <span class="label"><%= t("account.profile.summary.native_name") %></span>
       <p><%= current_user.native_name.presence || t("account.profile.summary.not_provided") %></p>
+    </div>
+    <div>
+      <span class="label"><%= t("account.profile.summary.english_name") %></span>
+      <p><%= current_user.english_name.presence || t("account.profile.summary.not_provided") %></p>
     </div>
     <div>
       <span class="label"><%= t("account.profile.summary.phone") %></span>
@@ -90,13 +90,13 @@
 
   <% if @dependents.any? %>
     <div class="dependent-grid">
-      <% @dependents.each do |link| %>
+        <% @dependents.each do |link| %>
         <% dependent = link.dependent %>
         <article class="dependent-card">
           <div>
-            <h3><%= dependent.english_name %></h3>
-            <% if dependent.native_name.present? %>
-              <p class="muted"><%= dependent.native_name %></p>
+            <h3><%= dependent.native_name.presence || dependent.english_name %></h3>
+            <% if dependent.native_name.present? && dependent.english_name.present? %>
+              <p class="muted"><%= dependent.english_name %></p>
             <% end %>
             <p class="muted"><%= t("account.profile.dependents.relationship") %>：<%= link.relationship_label.presence || dependent.relationship_label || "—" %></p>
             <p class="muted"><%= t("account.profile.dependents.birthdate") %>：<%= dependent.birthdate&.strftime("%Y/%m/%d") || "—" %></p>

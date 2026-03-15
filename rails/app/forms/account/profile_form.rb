@@ -11,7 +11,7 @@ module Account
     attribute :city, :string
     attribute :notes, :string
 
-    validates :english_name, presence: true
+    validate :at_least_one_name_present
 
     attr_reader :user
 
@@ -54,6 +54,12 @@ module Account
         "city" => city,
         "notes" => notes
       }.compact
+    end
+
+    def at_least_one_name_present
+      return if english_name.to_s.strip.present? || native_name.to_s.strip.present?
+
+      errors.add(:base, :blank, message: I18n.t("account.profile.edit.errors.name_required"))
     end
   end
 end

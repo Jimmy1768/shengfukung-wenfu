@@ -15,7 +15,7 @@ class User < ApplicationRecord
   has_many :temple_payments, dependent: :nullify
 
   validates :email, presence: true, uniqueness: true
-  validates :english_name, presence: true
+  validate :at_least_one_name_present
 
   before_validation :normalize_email
 
@@ -43,5 +43,11 @@ class User < ApplicationRecord
 
   def admin?
     admin_account&.active?
+  end
+
+  def at_least_one_name_present
+    return if english_name.to_s.strip.present? || native_name.to_s.strip.present?
+
+    errors.add(:base, I18n.t("account.profile.edit.errors.name_required"))
   end
 end

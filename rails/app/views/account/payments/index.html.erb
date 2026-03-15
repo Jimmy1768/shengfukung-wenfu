@@ -35,7 +35,7 @@
                   <span class="line-pay-placeholder" title="<%= t("account.dashboard.payments.line_pay_title") %>"><%= t("account.dashboard.payments.line_pay_label") %></span>
                 <% end %>
               </td>
-              <td><%= payment.temple_event_registration&.registrant_name || current_user.english_name %></td>
+              <td><%= payment.temple_event_registration&.registrant_name || current_user.native_name.presence || current_user.english_name.presence || current_user.email %></td>
             </tr>
           <% end %>
         </tbody>

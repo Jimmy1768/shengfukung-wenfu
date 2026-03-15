@@ -96,6 +96,58 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, I18n.t("account.profile.password.enabled")
   end
 
+  test "profile update accepts native name without english name" do
+    temple = create_temple
+    user = User.create!(
+      email: "native-only@example.com",
+      english_name: "Temporary Name",
+      encrypted_password: User.password_hash("Password123!")
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+
+    patch account_profile_path, params: {
+      account_profile_form: {
+        native_name: "朱玲",
+        english_name: "",
+        phone: "0912-333-333",
+        city: "苗栗",
+        notes: "Native name only"
+      }
+    }
+
+    assert_redirected_to account_profile_path
+    user.reload
+    assert_equal "朱玲", user.native_name
+    assert_equal "", user.english_name
+
+    get account_dashboard_path
+    assert_response :success
+    assert_includes response.body, "朱玲"
+  end
+
+  test "profile update requires at least one name field" do
+    temple = create_temple
+    user = User.create!(
+      email: "name-required@example.com",
+      english_name: "Existing Name",
+      encrypted_password: User.password_hash("Password123!")
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+
+    patch account_profile_path, params: {
+      account_profile_form: {
+        native_name: "",
+        english_name: "",
+        phone: "0912-444-444"
+      }
+    }
+
+    assert_response :unprocessable_content
+    assert_includes response.body, I18n.t("account.profile.edit.errors.name_required")
+  end
+
   test "account pending registration allows core field edits" do
     temple = create_temple
     offering = create_offering(temple:, slug: "pending-edit", title: "待付款編輯測試")

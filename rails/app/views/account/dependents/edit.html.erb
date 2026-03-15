@@ -2,7 +2,7 @@
   <header class="section-header">
     <div>
       <p class="eyebrow"><%= t("account.dependents.edit_header.eyebrow") %></p>
-      <h2><%= @form.english_name %></h2>
+      <h2><%= @form.native_name.presence || @form.english_name %></h2>
       <p><%= t("account.dependents.edit_header.subtitle") %></p>
     </div>
   </header>

@@ -116,9 +116,11 @@ zh-TW:
         subtitle: "這些資訊僅提供寺廟工作人員聯繫之用，不會對外公開。"
         save: "儲存"
         cancel: "取消"
+        errors:
+          name_required: "姓名或英文姓名至少需填寫一項。"
       summary:
-        english_name: "姓名"
-        native_name: "中文姓名"
+        native_name: "姓名"
+        english_name: "英文姓名"
         phone: "電話"
         city: "居住區"
         notes: "備註"
