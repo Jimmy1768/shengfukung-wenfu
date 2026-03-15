@@ -146,6 +146,7 @@ en:
         disabled: "Account linking is not enabled for this account yet."
         unavailable: "OAuth provider linking is unavailable right now."
         unlinked: "%{provider} has been unlinked from your account."
+        complete_profile: "Please complete your profile before continuing."
       index:
         eyebrow: "Sign-in methods"
         title: "Manage connected providers"

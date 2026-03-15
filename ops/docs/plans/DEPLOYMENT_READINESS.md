@@ -41,13 +41,12 @@ Current interpretation after production Google OAuth validation and shared-DB cl
   - both temple rows remain present with only slug/name retained
   - blank unpublished temple profile is the correct pre-onboarding state
 - `Blocked externally`
-  - Apple OAuth final callback path, due to SourceGrid central auth `OpenSSL::PKey::ECError: invalid curve name`
 - `Untested`
   - email/password account flows
   - admin-driven temple profile/content entry from blank state
   - publish flow after admin content entry
   - one real registration flow after temple content is prepared
-  - account linking manual validation after Apple fix
+  - account linking manual validation with Apple as secondary provider
   - payments beyond fake provider mode
   - S3/media uploads
   - rollback drill timing
@@ -163,7 +162,7 @@ Current interpretation after production Google OAuth validation and shared-DB cl
   - publish flow for temple profile
   - one registration flow can be created in staging after onboarding content exists
   - email/password account flow
-  - Apple OAuth callback after SourceGrid fix
+  - Apple OAuth on `www.shengfukung.com.tw`
 - [x] Payments gate for this phase:
   - keep `PAYMENTS_PROVIDER=fake` unless provider sandbox credentials are ready and validated
 - [ ] Pass criteria: smoke tests pass and remaining manual critical path checks pass.
@@ -188,8 +187,11 @@ Current interpretation after production Google OAuth validation and shared-DB cl
 ## Post-Staging Follow-Ups
 
 - Use admin onboarding flow to populate temple profile/content, then publish when client is ready.
-- Follow up with SourceGrid central auth team on Apple OAuth fix, then rerun manual provider tests.
-- Run account-linking manual validation after Apple is fixed.
+- Apple OAuth is working on `shengfukung.com.tw` after fixing the central auth Team ID; keep the SourceGrid env value at `APPLE_TEAM_ID=99GH38T5WW`.
+- Run remaining manual provider tests:
+  - Apple on `www.shengfukung.com.tw`
+  - account linking with Apple as secondary provider
+  - first-login vs repeat-login name capture behavior
 - Wire production `.org.tw` once client purchases domain.
 - Repeat DNS/TLS/deploy/smoke flow for production hostnames.
 - Enable live Stripe/LINE Pay only after provider credential validation and callback verification.

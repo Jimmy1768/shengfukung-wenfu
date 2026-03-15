@@ -14,7 +14,7 @@ This plan is intentionally split into phases.
 - [x] Tenant registered in central auth DB for `shengfukung`.
 - [x] Temple-side runtime wiring is active and verified for Google end-to-end.
 - [x] Apple provider is configured in Apple Developer + central auth `/oauth/start` returns `authorize_url`.
-- [ ] Apple full callback sign-in success is blocked in central auth (`auth.sourcegridlabs.com`) pending SourceGrid fix for `OpenSSL::PKey::ECError: invalid curve name` during `/auth/apple/callback`.
+- [x] Apple full callback sign-in success is working in production after correcting SourceGrid central auth `APPLE_TEAM_ID` to `99GH38T5WW` and restarting the platform services.
 
 ## Current State
 
@@ -24,7 +24,7 @@ Use this interpretation when reading the checklist below:
   - temple runtime is using centralized auth correctly
   - Google OAuth is working end-to-end in production
   - Apple start path, tenant resolution, and return URL wiring are correct
-- `Blocked upstream`
+- `Done in platform`
   - Apple final callback completion inside SourceGrid central auth
 - `Not required for this repo`
   - temple-side provider secret management for Google/Apple/Facebook production clients
@@ -55,7 +55,7 @@ Use this interpretation when reading the checklist below:
 
 - [x] Central auth service deployed and reachable.
 - [x] Central auth tenant created for shengfukung.
-- [ ] Central auth Apple callback path fixed in platform/sourcegrid production (`/auth/apple/callback` currently fails before `/oauth/token/exchange`).
+- [x] Central auth Apple callback path fixed in platform/sourcegrid production (`/auth/apple/callback` now reaches `/oauth/token/exchange` successfully).
 - [x] Signed state/nonce replay controls are present in the platform handoff design.
 - [ ] Final production monitoring/audit checks validated.
 
@@ -106,7 +106,9 @@ Do not use unregistered callback URLs.
 - [x] Apple `/oauth/start` returns valid `authorize_url` from central auth.
 - [x] Apple central auth request uses the correct tenant (`shengfukung`) and return URL (`https://shengfukung.com.tw/auth/callback`).
 - [x] Apple posts back to central auth first (`POST /auth/apple/callback`) as designed.
-- [ ] Apple callback and final sign-in success remain blocked by central auth production error handling; current observed failure is `OpenSSL::PKey::ECError: invalid curve name` on SourceGrid infrastructure before temple `/auth/callback` or `/oauth/token/exchange`.
+- [x] Apple callback reaches temple `/auth/callback` and temple `/oauth/token/exchange` successfully in production.
+- [x] Apple sign-in establishes a temple session end-to-end in production.
+- [x] If the provider does not return a usable name, the temple app now redirects the user to profile edit instead of leaving the account at `OAuth User`.
 
 ## Acceptance Criteria
 
@@ -115,17 +117,15 @@ All must be true before marking OAuth done for this temple:
 - [x] Temple runtime contains only `AUTH_*` client credentials (no provider secrets).
 - [ ] Central auth flow works for both `shengfukung.com.tw` and `www.shengfukung.com.tw`.
 - [x] Token exchange and session establishment are stable for Google.
-- [ ] Error/denial paths are user-safe and logged for all enabled providers.
+- [x] Error/denial paths are user-safe and logged for all enabled providers.
 
-## Current Blocker
+## Remaining Follow-Up
 
-- Temple-side config has been verified for Apple start: tenant slug, allowlisted return URLs, and central auth handoff are correct for `shengfukung`.
-- The remaining failure is outside this repo. SourceGrid central auth currently raises `OpenSSL::PKey::ECError: invalid curve name` inside `/auth/apple/callback`, then falls back to `/account/login?error=provider_error`.
-- Resume Apple callback remediation in the platform/sourcegrid project.
-- After the SourceGrid fix is deployed, re-test this temple for:
-  - Apple sign-in success on `shengfukung.com.tw`
+- Apple callback remediation is complete for `shengfukung.com.tw`.
+- Still validate:
   - Apple sign-in success on `www.shengfukung.com.tw`
   - account-linking manual flows that depend on Apple as the second provider
+  - first-time Apple authorization behavior vs later logins with no returned name
 
 ## Security Notes
 

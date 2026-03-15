@@ -153,6 +153,7 @@ zh-TW:
         disabled: "此帳號尚未開啟帳號連結功能。"
         unavailable: "目前無法使用 OAuth 帳號連結功能。"
         unlinked: "已解除 %{provider} 與此帳號的綁定。"
+        complete_profile: "請先完成個人資料，再繼續使用帳號功能。"
       index:
         eyebrow: "登入方式"
         title: "管理已連結的登入方式"

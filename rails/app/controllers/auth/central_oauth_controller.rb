@@ -338,15 +338,25 @@ module Auth
 
     def success_redirect_path(pending)
       return fallback_redirect_path(pending) if link_intent?(pending)
+      return edit_account_profile_path if require_profile_completion?(current_account_user)
 
       resolve_post_login_path(pending)
     end
 
     def success_notice(pending, link_result, identity)
+      return I18n.t("account.oauth.flash.complete_profile") if !link_intent?(pending) && require_profile_completion?(current_account_user)
       return "Signed in successfully." unless link_intent?(pending)
       return "Your #{identity.provider.titleize} account is already linked." if link_result&.respond_to?(:already_linked) && link_result.already_linked
 
       "Linked #{identity.provider.titleize} to your account."
+    end
+
+    def require_profile_completion?(user)
+      return false if user.blank?
+
+      english_name = user.english_name.to_s.strip
+      native_name = user.native_name.to_s.strip
+      (english_name.blank? || english_name == "OAuth User") && native_name.blank?
     end
 
     def log_oauth_event(action, user:, pending:, provider:, **metadata)

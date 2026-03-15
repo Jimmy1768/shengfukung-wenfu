@@ -118,6 +118,43 @@ module Account
       assert SystemAuditLog.exists?(action: "account.oauth.link_conflict", target: current_user)
     end
 
+    test "oauth sign in without usable name redirects to profile edit" do
+      temple = create_temple(slug: "oauth-profile-temple")
+
+      Auth::CentralOAuthClient.stub(:new, FakeCentralOAuthClient.new({ "redirect_url" => "https://auth.example.test/oauth" }, nil)) do
+        get central_oauth_start_path(
+          provider: "apple",
+          surface: "account",
+          temple: temple.slug,
+          origin: account_login_path(temple: temple.slug)
+        )
+      end
+
+      assert_redirected_to "https://auth.example.test/oauth"
+
+      exchange_response = {
+        "provider" => "apple",
+        "uid" => "apple-missing-name-uid",
+        "email" => "apple-missing-name@example.com",
+        "email_verified" => true,
+        "credentials" => { "token" => "apple-token" }
+      }
+
+      Auth::CentralOAuthClient.stub(:new, FakeCentralOAuthClient.new(nil, exchange_response)) do
+        get central_oauth_callback_path(code: "oauth-code", state: "oauth-state")
+      end
+
+      assert_redirected_to edit_account_profile_path
+      follow_redirect!
+
+      assert_response :success
+      assert_includes response.body, I18n.t("account.oauth.flash.complete_profile")
+
+      user = User.find_by!(email: "apple-missing-name@example.com")
+      assert_equal user.id, session[AppConstants::Sessions.key(:account)]
+      assert_equal "OAuth User", user.english_name
+    end
+
     test "user can unlink provider when another login path remains" do
       temple = create_temple(slug: "oauth-unlink-temple")
       user = User.create!(
