@@ -235,12 +235,14 @@ Status:
 
 Status:
 
-- In progress.
+- Built.
 - `/internal/temples/access/:temple_id` now exists as a per-temple detail page.
-- The detail page currently lists only temple accounts that already have admin access.
-- Non-owner temple admins can now be promoted to `owner` from the internal screen.
-- Owner promotion updates the selected temple membership, enables `manage_permissions`, and writes a `SystemAuditLog`.
-- Eligible patron promotion, admin promotion, and revoke/demotion controls are still pending.
+- The detail page lists temple admins and eligible patrons for promotion.
+- Internal ops can promote a patron into temple `admin`.
+- Internal ops can promote a patron or existing admin into temple `owner`.
+- Internal ops can revoke/demote temple admin access as needed.
+- Role changes update only the selected temple membership/permission rows.
+- Promotion/revoke actions write `SystemAuditLog` entries.
 
 ### Phase 4
 
@@ -248,6 +250,25 @@ Status:
 - Add confirmation modal
 - Add “open temple admin” shortcut if useful
 - Add clearer role/status badges
+
+Status:
+
+- Built.
+- Internal access screens include the confirmation modal flow used for sensitive actions.
+- The temple detail page includes the temple-admin management shortcut/navigation path needed for ops workflow.
+- Role/status presentation has been polished enough for production use.
+
+## Validation status
+
+- Validated on production.
+- Confirmed working in production:
+  - operator self-access grant/revoke
+  - temple detail page access
+  - eligible patron visibility
+  - patron -> admin promotion
+  - admin/patron -> owner promotion
+  - revoke/demotion flow
+  - audit-backed temple bootstrap workflow without Rails console
 
 ## Suggested defaults
 
@@ -284,3 +305,7 @@ That is enough to remove the current console dependency for operator self-access
 - No global super-admin role is introduced
 - Every change is auditable
 - Revocation is equally easy
+
+Status:
+
+- Met.
