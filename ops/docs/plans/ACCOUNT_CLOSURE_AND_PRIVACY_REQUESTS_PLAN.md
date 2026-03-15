@@ -11,12 +11,14 @@ Define a compliant, operationally safe account-closure flow that:
 
 ## Current State
 
-- There is no account deletion or account closure feature.
-- `User` rows are still first-class active accounts unless manually altered in the database.
-- Hard delete would currently damage operational continuity:
-  - `admin_account`, `user_preference`, `user_dependents`, and `oauth_identities` would be destroyed
-  - `temple_event_registrations` and `temple_payments` would be nullified
-- This is not acceptable for temple operations, finance history, or auditability.
+- Account closure exists and is implemented as soft closure, not hard delete.
+- Users can reach `/account/privacy` and submit:
+  - `Close account`
+  - `Request deletion of personal data`
+  - `Request data export`
+- Internal operators can review requests in `/internal/privacy_requests`.
+- Data export requests can now be fulfilled into a downloadable JSON export.
+- Full anonymization/deletion execution is still not built.
 
 ## Product Decision
 
@@ -108,7 +110,7 @@ Recommended actions on that page:
 
 3. `Request data export`
    - optional but useful
-   - can start as a simple support-backed request rather than full automated export
+   - now fulfilled through an internal review + generated JSON export flow
 
 ## Important Wording
 
@@ -180,7 +182,12 @@ Admins/operators should still be able to:
 - [x] Add `Request deletion of personal data` flow
 - [x] Add `Request data export` flow
 - [x] Record request rows / audit metadata
-- [ ] Add operator/admin visibility for privacy requests
+- [x] Add operator/admin visibility for privacy requests
+- [x] Add operator review transitions:
+  - `approve`
+  - `reject`
+  - `complete`
+- [x] Fulfill completed data export requests into downloadable JSON
 - [ ] Define what gets anonymized immediately vs retained
 
 ### Phase 3: Retention/anonymization policy
@@ -230,3 +237,44 @@ Current web status:
 This satisfies the important discoverability part of Apple/Google reviewer expectations on web.
 
 For Expo/mobile, the equivalent entry points must be visible in-app, not hidden behind support-only instructions.
+
+## Built And Tested
+
+Built now:
+
+- lifecycle fields on `users` for account closure state
+- `privacy_requests` workflow model
+- closed-account auth guards across account/admin/OAuth sign-in paths
+- `/account/privacy` self-service page
+- self-service `Close account`
+- self-service `Request deletion of personal data`
+- self-service `Request data export`
+- internal privacy request review queue at `/internal/privacy_requests`
+- operator transitions:
+  - `approved`
+  - `rejected`
+  - `completed`
+- export fulfillment for `data_export` requests
+- downloadable JSON export for completed export requests
+
+Focused tests verified during build:
+
+```bash
+cd rails && bin/rails test test/integration/account/privacy_flow_test.rb test/integration/internal/privacy_requests_test.rb
+```
+
+Result:
+
+- `8 runs, 49 assertions, 0 failures, 0 errors`
+
+Also previously verified in focused suites:
+
+- account closure runtime/model behavior
+- closed-account auth blocking
+- admin closed-account guard
+
+Not built yet:
+
+- actual anonymization execution for approved/completed deletion requests
+- export artifact delivery beyond internal operator download
+- request detail page with operator notes
