@@ -102,6 +102,49 @@ class InternalPrivacyRequestsTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "completing a data deletion request anonymizes the account" do
+    operator = create_operator!
+    user = User.create!(
+      email: "privacy-delete-fulfill@example.com",
+      native_name: "王小明",
+      english_name: "Wang",
+      encrypted_password: User.password_hash("Password123!")
+    )
+    user.oauth_identities.create!(
+      provider: "google_oauth2",
+      provider_uid: "google-delete-uid",
+      email: user.email,
+      email_verified: true,
+      linked_at: Time.current
+    )
+    request_record = PrivacyRequest.create!(
+      user: user,
+      request_type: "data_deletion",
+      status: "approved",
+      submitted_via: "web",
+      requested_at: Time.current
+    )
+
+    with_env("INTERNAL_PLATFORM_OPERATOR_EMAIL" => "operator@example.com") do
+      sign_in_admin(operator)
+
+      post transition_internal_privacy_request_path(request_record, next_status: "completed")
+
+      assert_redirected_to internal_privacy_requests_path
+
+      user.reload
+      request_record.reload
+      assert_equal "completed", request_record.status
+      assert_equal "closed", user.account_status
+      assert_equal "deleted-user-#{user.id}@redacted.local", user.email
+      assert_equal "已刪除使用者", user.native_name
+      assert_equal "Deleted User", user.english_name
+      assert_not_nil user.anonymized_at
+      assert_equal 0, user.oauth_identities.count
+      assert AccountLifecycleEvent.exists?(user: user, event_type: "account_anonymized")
+    end
+  end
+
   test "non-operator admin is redirected away from privacy requests" do
     temple = create_temple(slug: "privacy-no-access")
     user = create_admin_user(temple: temple, role: "owner")

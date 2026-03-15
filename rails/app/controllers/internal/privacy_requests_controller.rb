@@ -29,8 +29,8 @@ module Internal
       end
 
       @privacy_request.transaction do
-        if @privacy_request.request_type == "data_export" && next_status == "completed"
-          Privacy::UserDataExportFulfillment.fulfill!(privacy_request: @privacy_request, operator: current_admin)
+        if next_status == "completed"
+          fulfill_request_completion!(@privacy_request)
         end
 
         @privacy_request.update!(status: next_status, resolved_at: resolved_at_for(next_status), operator_user: current_admin)
@@ -100,6 +100,15 @@ module Internal
       return nil if payload_id.blank?
 
       DataExportPayload.find_by(id: payload_id)&.metadata&.dig("payload")
+    end
+
+    def fulfill_request_completion!(privacy_request)
+      case privacy_request.request_type
+      when "data_export"
+        Privacy::UserDataExportFulfillment.fulfill!(privacy_request:, operator: current_admin)
+      when "data_deletion"
+        Privacy::UserDataDeletionFulfillment.fulfill!(privacy_request:, operator: current_admin)
+      end
     end
   end
 end

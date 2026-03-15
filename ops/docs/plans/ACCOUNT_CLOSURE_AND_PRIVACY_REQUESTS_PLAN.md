@@ -149,6 +149,25 @@ Recommended Expo placement:
 
 This is important for Apple/Google review even if the backend implementation remains retention-aware and non-destructive.
 
+## Reviewer Scope For V1
+
+Minimal compliant interpretation for this product:
+
+- Apple: the app must provide an in-app path to initiate account deletion.
+- Google: deactivation alone is not enough; the deletion path must lead to actual removal or anonymization of personal account data.
+
+So v1 should not stop at:
+
+- `Close account`
+- or a pending deletion request with no fulfillment
+
+V1 should include:
+
+- visible in-app privacy actions
+- internal operator handling for deletion requests
+- real anonymization of the account identity when a deletion request is completed
+- explicit disclosure that registrations, payments, receipts, and audit records may be retained for operational or legal reasons
+
 ## Backend Enforcement Rules
 
 Closed accounts should:
@@ -188,13 +207,17 @@ Admins/operators should still be able to:
   - `reject`
   - `complete`
 - [x] Fulfill completed data export requests into downloadable JSON
-- [ ] Define what gets anonymized immediately vs retained
+- [x] Define v1 anonymization scope for completed deletion requests:
+  - anonymize core account identity
+  - revoke/remove login methods
+  - preserve registrations/payments/audit history
 
 ### Phase 3: Retention/anonymization policy
 
 - [ ] Decide retention windows for profile/contact data
-- [ ] Implement anonymization job/process where appropriate
+- [x] Implement minimal v1 anonymization on deletion completion
 - [ ] Preserve registration/payment/audit integrity while minimizing stored PII
+- [ ] Expand anonymization review to historical registration/contact payloads if required
 
 ### Phase 4: Expo/mobile parity
 
@@ -256,6 +279,11 @@ Built now:
   - `completed`
 - export fulfillment for `data_export` requests
 - downloadable JSON export for completed export requests
+- deletion fulfillment for `data_deletion` requests:
+  - close account if still active
+  - anonymize core account identity
+  - remove linked OAuth identities
+  - scrub basic preference/privacy metadata
 
 Focused tests verified during build:
 
