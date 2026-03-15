@@ -4,6 +4,7 @@ module Account
   class ProfileController < BaseController
     def show
       @form = Account::ProfileForm.new(user: current_user)
+      @password_form = Account::PasswordSettingsForm.new(user: current_user)
       @contact_temple_form = Account::ContactTempleRequestForm.new
       @dependents = current_user.user_dependents.includes(:dependent)
       @oauth_identities = current_user.oauth_identities.recently_active

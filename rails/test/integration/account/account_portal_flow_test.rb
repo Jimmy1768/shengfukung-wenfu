@@ -79,6 +79,23 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, gallery_entry.title
   end
 
+  test "profile page renders password login status" do
+    temple = create_temple
+    user = User.create!(
+      email: "profile-password@example.com",
+      english_name: "Profile Password",
+      encrypted_password: User.password_hash("Password123!")
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+
+    get account_profile_path
+
+    assert_response :success
+    assert_includes response.body, I18n.t("account.profile.password.title")
+    assert_includes response.body, I18n.t("account.profile.password.enabled")
+  end
+
   test "account pending registration allows core field edits" do
     temple = create_temple
     offering = create_offering(temple:, slug: "pending-edit", title: "待付款編輯測試")
