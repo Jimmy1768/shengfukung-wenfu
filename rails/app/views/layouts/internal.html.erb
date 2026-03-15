@@ -23,6 +23,7 @@
           <% end %>
         </div>
         <div class="nav-links">
+          <%= link_to t("admin.internal.layout.privacy_requests"), internal_privacy_requests_path, class: "pill-link secondary" %>
           <%= link_to t("admin.internal.layout.back_to_admin"), admin_dashboard_path, class: "pill-link secondary" %>
         </div>
       </header>

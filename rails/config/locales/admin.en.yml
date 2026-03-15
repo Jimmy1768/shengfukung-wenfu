@@ -254,6 +254,7 @@ en:
     internal:
       layout:
         brand: "Internal Tools"
+        privacy_requests: "Privacy requests"
         back_to_admin: "Temple admin"
       shared:
         "yes": "Yes"
@@ -316,6 +317,48 @@ en:
             make_owner: "Make owner"
             make_owner_confirm: "Make %{email} an owner for %{temple}?"
           empty: "No temple admin accounts found."
+      privacy_requests:
+        flash:
+          updated: "Privacy request updated."
+          invalid_transition: "That privacy request transition is not allowed."
+        shared:
+          request_types:
+            account_closure: "Account closure"
+            data_deletion: "Data deletion"
+            data_export: "Data export"
+          statuses:
+            pending: "Pending"
+            approved: "Approved"
+            completed: "Completed"
+            rejected: "Rejected"
+            cancelled: "Cancelled"
+          account_statuses:
+            active: "Active"
+            closed: "Closed"
+        index:
+          eyebrow: "Internal privacy"
+          title: "Privacy requests"
+          subtitle: "Review account closure, data deletion, and data export requests."
+          filters_eyebrow: "Filters"
+          filters_title: "Request status"
+          empty: "No privacy requests match this filter."
+          filters:
+            all: "All"
+          table:
+            requested_at: "Requested"
+            user: "User"
+            email: "Email"
+            type: "Request type"
+            status: "Status"
+            account_status: "Account status"
+            operator: "Operator"
+            actions: "Actions"
+          actions:
+            approve: "Approve"
+            reject: "Reject"
+            complete: "Complete"
+            reject_confirm: "Reject this privacy request?"
+            no_actions: "No actions"
     patrons:
       index:
         title: "Member directory"

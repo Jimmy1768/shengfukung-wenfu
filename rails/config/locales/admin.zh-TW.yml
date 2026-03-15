@@ -254,6 +254,7 @@ zh-TW:
     internal:
       layout:
         brand: "內部工具"
+        privacy_requests: "隱私請求"
         back_to_admin: "返回宮廟管理"
       shared:
         "yes": "是"
@@ -316,6 +317,48 @@ zh-TW:
             make_owner: "設為擁有者"
             make_owner_confirm: "確定要將 %{email} 設為 %{temple} 的擁有者嗎？"
           empty: "找不到任何宮廟管理員帳號。"
+      privacy_requests:
+        flash:
+          updated: "隱私請求已更新。"
+          invalid_transition: "此隱私請求不可進行該狀態變更。"
+        shared:
+          request_types:
+            account_closure: "帳號關閉"
+            data_deletion: "資料刪除"
+            data_export: "資料匯出"
+          statuses:
+            pending: "待處理"
+            approved: "已核准"
+            completed: "已完成"
+            rejected: "已拒絕"
+            cancelled: "已取消"
+          account_statuses:
+            active: "啟用中"
+            closed: "已關閉"
+        index:
+          eyebrow: "內部隱私"
+          title: "隱私請求"
+          subtitle: "檢視帳號關閉、資料刪除與資料匯出請求。"
+          filters_eyebrow: "篩選"
+          filters_title: "請求狀態"
+          empty: "目前沒有符合條件的隱私請求。"
+          filters:
+            all: "全部"
+          table:
+            requested_at: "提出時間"
+            user: "使用者"
+            email: "Email"
+            type: "請求類型"
+            status: "狀態"
+            account_status: "帳號狀態"
+            operator: "處理人"
+            actions: "操作"
+          actions:
+            approve: "核准"
+            reject: "拒絕"
+            complete: "完成"
+            reject_confirm: "確定拒絕這筆隱私請求嗎？"
+            no_actions: "無可用操作"
     patrons:
       index:
         title: "信眾名單"

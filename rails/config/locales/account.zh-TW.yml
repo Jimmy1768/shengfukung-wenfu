@@ -410,7 +410,15 @@ zh-TW:
         eyebrow: "隱私請求"
         title: "請求紀錄"
         subtitle: "已完成或待處理的隱私／帳號請求會列在這裡。"
+        actions_eyebrow: "送出請求"
+        actions_title: "建立請求"
+        actions_subtitle: "可在此提出個人資料刪除或資料匯出請求。"
         empty: "目前尚無隱私請求。"
+        request_deletion: "申請資料刪除"
+        request_export: "申請資料匯出"
+        deletion_confirm: "確定送出個人資料刪除請求嗎？"
+        export_confirm: "確定送出資料匯出請求嗎？"
+        open_request_hint: "其中一項隱私請求已在處理中。"
         request_type_labels:
           account_closure: "帳號關閉"
           data_deletion: "資料刪除"
@@ -423,6 +431,9 @@ zh-TW:
           cancelled: "已取消"
       flash:
         account_closed: "您的帳號已關閉，並已自動登出。"
+        deletion_requested: "已送出您的資料刪除請求。"
+        export_requested: "已送出您的資料匯出請求。"
+        request_already_open: "此類型的隱私請求已在處理中。"
     signups:
       modal:
         title: "建立帳號"

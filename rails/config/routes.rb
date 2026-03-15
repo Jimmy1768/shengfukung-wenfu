@@ -117,6 +117,11 @@ Rails.application.routes.draw do
       to: "temple_access#promote_owner",
       as: :promote_temple_access_owner
     delete "/temples/access/:temple_id/revoke", to: "temple_access#revoke", as: :revoke_temple_access
+    resources :privacy_requests, only: :index do
+      member do
+        post :transition
+      end
+    end
   end
 
   # --- User account console --------------------------------------------------
@@ -134,6 +139,8 @@ Rails.application.routes.draw do
     resource :settings, only: %i[show update], controller: "settings"
     resource :privacy, only: :show, controller: "privacy" do
       post :close
+      post :request_data_deletion
+      post :request_data_export
     end
     get "/oauth/identities", to: "oauth_identities#index", as: :oauth_identities
     post "/oauth/:provider/link", to: "oauth_identities#create", as: :oauth_link

@@ -12,4 +12,6 @@ class PrivacyRequest < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
   validates :submitted_via, inclusion: { in: SUBMITTED_VIA }
   validates :requested_at, presence: true
+
+  scope :open_requests, -> { where(status: %w[pending approved]) }
 end

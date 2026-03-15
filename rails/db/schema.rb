@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_06_000015) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_15_000016) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -506,6 +506,24 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_06_000015) do
     t.index ["temple_id"], name: "index_payment_webhook_logs_on_temple_id"
   end
 
+  create_table "privacy_requests", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "operator_user_id"
+    t.string "request_type", null: false
+    t.string "status", default: "pending", null: false
+    t.string "submitted_via", default: "web", null: false
+    t.datetime "requested_at", null: false
+    t.datetime "resolved_at"
+    t.text "notes"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["operator_user_id"], name: "index_privacy_requests_on_operator_user_id"
+    t.index ["requested_at"], name: "index_privacy_requests_on_requested_at"
+    t.index ["user_id", "request_type", "status"], name: "index_privacy_requests_on_user_type_status"
+    t.index ["user_id"], name: "index_privacy_requests_on_user_id"
+  end
+
   create_table "privacy_settings", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.boolean "share_data_with_partners", default: false, null: false
@@ -843,6 +861,14 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_06_000015) do
     t.jsonb "metadata", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "account_status", default: "active", null: false
+    t.datetime "closed_at"
+    t.string "closure_reason"
+    t.datetime "anonymized_at"
+    t.bigint "closed_by_user_id"
+    t.index ["account_status"], name: "index_users_on_account_status"
+    t.index ["closed_at"], name: "index_users_on_closed_at"
+    t.index ["closed_by_user_id"], name: "index_users_on_closed_by_user_id"
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
@@ -875,6 +901,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_06_000015) do
   add_foreign_key "notifications", "users"
   add_foreign_key "oauth_identities", "users"
   add_foreign_key "payment_webhook_logs", "temples"
+  add_foreign_key "privacy_requests", "users"
+  add_foreign_key "privacy_requests", "users", column: "operator_user_id"
   add_foreign_key "privacy_settings", "users"
   add_foreign_key "push_tokens", "users"
   add_foreign_key "refresh_tokens", "users"
@@ -898,4 +926,5 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_06_000015) do
   add_foreign_key "user_dependents", "dependents"
   add_foreign_key "user_dependents", "users"
   add_foreign_key "user_preferences", "users"
+  add_foreign_key "users", "users", column: "closed_by_user_id"
 end

@@ -403,7 +403,15 @@ en:
         eyebrow: "Privacy requests"
         title: "Request history"
         subtitle: "Completed and pending privacy/account requests appear here."
+        actions_eyebrow: "Request actions"
+        actions_title: "Submit a request"
+        actions_subtitle: "Ask for data deletion or data export from this account."
         empty: "No privacy requests yet."
+        request_deletion: "Request data deletion"
+        request_export: "Request data export"
+        deletion_confirm: "Submit a personal data deletion request?"
+        export_confirm: "Submit a data export request?"
+        open_request_hint: "An open privacy request already exists for one or more actions."
         request_type_labels:
           account_closure: "Account closure"
           data_deletion: "Data deletion"
@@ -416,6 +424,9 @@ en:
           cancelled: "Cancelled"
       flash:
         account_closed: "Your account has been closed. You have been signed out."
+        deletion_requested: "Your data deletion request has been submitted."
+        export_requested: "Your data export request has been submitted."
+        request_already_open: "A privacy request of this type is already open."
     signups:
       modal:
         title: "Create your account"

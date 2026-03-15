@@ -166,19 +166,20 @@ Admins/operators should still be able to:
 
 ### Phase 1: Runtime model + web controls
 
-- [ ] Add lifecycle fields to `users`
-- [ ] Add model helpers:
+- [x] Add lifecycle fields to `users`
+- [x] Add model helpers:
   - `active_account?`
   - `closed_account?`
-- [ ] Block sign-in for closed accounts
-- [ ] Add `/account/privacy`
-- [ ] Add self-service `Close account`
-- [ ] Add audit logging for closure
+- [x] Block sign-in for closed accounts
+- [x] Add `/account/privacy`
+- [x] Add self-service `Close account`
+- [x] Add audit logging for closure
 
 ### Phase 2: Privacy request workflow
 
-- [ ] Add `Request deletion of personal data` flow
-- [ ] Record request rows / audit metadata
+- [x] Add `Request deletion of personal data` flow
+- [x] Add `Request data export` flow
+- [x] Record request rows / audit metadata
 - [ ] Add operator/admin visibility for privacy requests
 - [ ] Define what gets anonymized immediately vs retained
 
@@ -215,3 +216,17 @@ That gives:
 - clear privacy posture,
 - app-store-compliant UX,
 - minimal damage to temple reporting and financial history.
+
+## Reviewer Compliance Note
+
+Current web status:
+
+- users can clearly find `Privacy & account` from the account surface,
+- users can clearly find:
+  - `Close account`
+  - `Request deletion of personal data`
+  - `Request data export`
+
+This satisfies the important discoverability part of Apple/Google reviewer expectations on web.
+
+For Expo/mobile, the equivalent entry points must be visible in-app, not hidden behind support-only instructions.

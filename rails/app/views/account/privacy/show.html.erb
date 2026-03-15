@@ -43,6 +43,39 @@
 <section class="account-section">
   <header class="section-header">
     <div>
+      <p class="eyebrow"><%= t("account.privacy.requests.actions_eyebrow") %></p>
+      <h2><%= t("account.privacy.requests.actions_title") %></h2>
+      <p><%= t("account.privacy.requests.actions_subtitle") %></p>
+    </div>
+  </header>
+
+  <div class="form-actions">
+    <% deletion_open = @pending_request_types.include?("data_deletion") %>
+    <% export_open = @pending_request_types.include?("data_export") %>
+
+    <%= button_to t("account.privacy.requests.request_deletion"),
+                  request_data_deletion_account_privacy_path,
+                  method: :post,
+                  class: "btn btn-secondary",
+                  disabled: deletion_open,
+                  data: { turbo_confirm: t("account.privacy.requests.deletion_confirm") } %>
+
+    <%= button_to t("account.privacy.requests.request_export"),
+                  request_data_export_account_privacy_path,
+                  method: :post,
+                  class: "btn btn-secondary",
+                  disabled: export_open,
+                  data: { turbo_confirm: t("account.privacy.requests.export_confirm") } %>
+  </div>
+
+  <% if deletion_open || export_open %>
+    <p class="muted"><%= t("account.privacy.requests.open_request_hint") %></p>
+  <% end %>
+</section>
+
+<section class="account-section">
+  <header class="section-header">
+    <div>
       <p class="eyebrow"><%= t("account.privacy.requests.eyebrow") %></p>
       <h2><%= t("account.privacy.requests.title") %></h2>
       <p><%= t("account.privacy.requests.subtitle") %></p>
