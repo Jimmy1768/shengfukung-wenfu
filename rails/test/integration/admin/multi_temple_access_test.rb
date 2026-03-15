@@ -3,13 +3,13 @@
 require "test_helper"
 
 class Admin::MultiTempleAccessTest < ActionDispatch::IntegrationTest
-  test "staff remains scoped to their assigned temple" do
+  test "admin remains scoped to their assigned temple" do
     alpha = create_temple(name: "Alpha Temple", slug: "alpha-temple")
     beta = create_temple(name: "Beta Temple", slug: "beta-temple")
     staff_user = create_admin_user(
       temple: alpha,
-      role: "staff",
-      membership_role: "staff",
+      role: "admin",
+      membership_role: "admin",
       permission_overrides: { manage_offerings: true }
     )
 
@@ -22,7 +22,7 @@ class Admin::MultiTempleAccessTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
     assert_includes response.body, "Alpha Temple"
-    assert_match "owner accounts", response.body
+    assert_includes response.body, I18n.t("admin.temple_switches.flash.owner_only")
 
     get admin_dashboard_path, params: { temple_slug: beta.slug }
     assert_response :success
@@ -53,7 +53,7 @@ class Admin::MultiTempleAccessTest < ActionDispatch::IntegrationTest
     post admin_temple_switch_path, params: { temple_switch: { temple_slug: beta.slug } }
     follow_redirect!
     assert_response :success
-    assert_match "Now viewing Beta Temple.", response.body
+    assert_includes response.body, I18n.t("admin.temple_switches.flash.switched", temple: "Beta Temple")
     assert_select ".temple-switcher-select option[selected=selected]", text: "Beta Temple"
 
     get admin_dashboard_path

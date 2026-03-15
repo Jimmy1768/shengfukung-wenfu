@@ -5,7 +5,7 @@ require "test_helper"
 class Account::Api::PreferencesTest < ActionDispatch::IntegrationTest
   test "shows persisted preference payload for signed-in user" do
     temple = create_temple
-    user = create_admin_user(temple:, role: "staff")
+    user = create_admin_user(temple:, role: "admin")
     preference = UserPreference.for_user(user)
     preference.set_display_mode(:account, "dark")
     preference.set_display_mode(:admin, "standard")
@@ -52,7 +52,7 @@ class Account::Api::PreferencesTest < ActionDispatch::IntegrationTest
 
   test "rejects invalid preference values" do
     temple = create_temple
-    user = create_admin_user(temple:, role: "staff")
+    user = create_admin_user(temple:, role: "admin")
 
     sign_in_account(user, temple_slug: temple.slug)
 

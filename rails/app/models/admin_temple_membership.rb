@@ -5,9 +5,8 @@ class AdminTempleMembership < ApplicationRecord
   belongs_to :temple
 
   enum role: {
-    staff: "staff",
+    admin: "admin",
     owner: "owner",
-    support: "support"
   }, _suffix: true
 
   validates :admin_account_id, uniqueness: { scope: :temple_id }

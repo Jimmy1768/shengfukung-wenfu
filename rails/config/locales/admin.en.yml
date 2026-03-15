@@ -263,7 +263,6 @@ en:
         roles:
           owner: "Owner"
           admin: "Admin"
-          support: "Support"
       base:
         alerts:
           sign_in_required: "Please sign in to access internal tools."
@@ -1145,7 +1144,7 @@ en:
         title: "Admin capabilities"
         body: "Only temple owners can change these flags. Use them to align access between offerings, onsite staff, and finance reviewers."
         save: "Save"
-        empty: "No staff admins yet. Invite a user from the Users screen to grant access."
+        empty: "No admins yet. Invite a user from the Users screen to grant access."
       capabilities:
         manage_offerings:
           label: "Manage offerings"
@@ -1167,7 +1166,7 @@ en:
           hint: "View attendee rosters for onsite events."
         manage_permissions:
           label: "Manage permissions"
-          hint: "Grant or revoke staff access levels."
+          hint: "Grant or revoke admin access levels."
         manage_profile:
           label: "Manage profile"
           hint: "Edit the temple profile, hero copy, and contact details."
@@ -1201,4 +1200,3 @@ en:
       roles:
         owner: "Owner"
         admin: "Admin"
-        support: "Support"

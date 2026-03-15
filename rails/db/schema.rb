@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_16_000017) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_16_000018) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -52,7 +52,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_16_000017) do
   create_table "admin_temple_memberships", force: :cascade do |t|
     t.bigint "admin_account_id", null: false
     t.bigint "temple_id", null: false
-    t.string "role", default: "staff", null: false
+    t.string "role", default: "admin", null: false
     t.jsonb "metadata", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -63,7 +63,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_16_000017) do
 
   create_table "admins", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.string "role", default: "staff", null: false
+    t.string "role", default: "admin", null: false
     t.integer "access_level", default: 1, null: false
     t.boolean "active", default: true, null: false
     t.datetime "last_signed_in_at"

@@ -190,8 +190,8 @@ class Admin::ArchivesAccessTest < ActionDispatch::IntegrationTest
   test "staff without archive permissions is redirected" do
     staff = create_admin_user(
       temple: @temple,
-      role: "staff",
-      membership_role: "staff",
+      role: "admin",
+      membership_role: "admin",
       permission_overrides: { view_financials: false, export_financials: false }
     )
 
@@ -203,8 +203,8 @@ class Admin::ArchivesAccessTest < ActionDispatch::IntegrationTest
   test "export route is blocked without capability" do
     staff = create_admin_user(
       temple: @temple,
-      role: "staff",
-      membership_role: "staff",
+      role: "admin",
+      membership_role: "admin",
       permission_overrides: { view_financials: false, export_financials: false }
     )
     sign_in_admin(staff)

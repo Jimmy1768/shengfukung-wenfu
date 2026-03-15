@@ -6,7 +6,7 @@ class Account::Api::RegistrationsTest < ActionDispatch::IntegrationTest
   test "returns the signed-in user's registrations" do
     temple = create_temple
     offering = create_offering(temple:)
-    user = create_admin_user(temple:, role: "staff")
+    user = create_admin_user(temple:, role: "admin")
     registration = create_registration(user:, offering:)
 
     sign_in_account(user)

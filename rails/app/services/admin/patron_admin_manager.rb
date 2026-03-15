@@ -32,9 +32,9 @@ module Admin
     private
 
     def ensure_admin_account(user)
-      admin = user.admin_account || user.build_admin_account(role: :staff, active: true)
+      admin = user.admin_account || user.build_admin_account(role: :admin, active: true)
       admin.active = true
-      admin.role ||= :staff
+      admin.role ||= :admin
       admin.save! if admin.changed?
       admin
     end

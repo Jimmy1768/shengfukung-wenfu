@@ -38,9 +38,8 @@
               <td><%= membership.present? ? t("admin.internal.temple_access.index.access.has_access") : t("admin.internal.temple_access.index.access.no_access") %></td>
               <td>
                 <% role_label = case membership&.role
-                   when "staff" then t("admin.internal.shared.roles.admin")
+                   when "admin" then t("admin.internal.shared.roles.admin")
                    when "owner" then t("admin.internal.shared.roles.owner")
-                   when "support" then t("admin.internal.shared.roles.support")
                    else t("admin.internal.shared.none")
                    end %>
                 <%= role_label %>
@@ -54,7 +53,7 @@
                         method: :post,
                         class: "btn btn-primary btn-small" %>
                     <% end %>
-                    <% unless membership&.role == "staff" %>
+                    <% unless membership&.role == "admin" %>
                       <%= button_to t("admin.internal.temple_access.index.actions.grant_admin"),
                         internal_grant_temple_access_path(temple_id: temple.id, role: "admin"),
                         method: :post,

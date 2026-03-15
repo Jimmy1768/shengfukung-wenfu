@@ -36,7 +36,7 @@ module Admin
 
     def admin_accounts_scope
       current_temple.admin_accounts
-        .staff_role
+        .admin_role
         .joins(:user)
         .includes(:user)
         .order("users.english_name asc")

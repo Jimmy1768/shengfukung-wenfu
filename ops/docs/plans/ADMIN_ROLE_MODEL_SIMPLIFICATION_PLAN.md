@@ -117,6 +117,12 @@ Apply this to:
 
 Then update schema defaults from `staff` to `admin`.
 
+Decision note:
+
+- do **not** map `support` to `owner`
+- that would silently expand privilege for a legacy role we have already decided to remove
+- owner remains the only elevated tier
+
 ## Application updates
 
 ### Models
@@ -133,11 +139,20 @@ Then update schema defaults from `staff` to `admin`.
   - `owner`
   - `admin`
 - ensure only `owner` gets `manage_permissions`
+- remove any remaining default-permission branches that special-case `support`
 
 ### Controllers / queries
 
 - replace all role checks that explicitly reference `staff` or `support`
 - preserve current behavior but with `admin` as the non-owner role
+
+Confirmed hotspots from current code:
+
+- `AdminAccount` enum + default permission helper
+- `AdminTempleMembership` enum
+- admin dashboard checks using `.staff_role`
+- permissions management filters using `.staff_role`
+- test helper defaults and integration fixtures that still create `role: "staff"`
 
 ### Internal tools
 
@@ -189,31 +204,64 @@ Mitigation:
 - ship migration + enum changes together
 - run focused tests before deploy
 
+### Risk: stale tests and fixtures
+
+Many tests still instantiate admin users with `role: "staff"` or `membership_role: "staff"`.
+
+Mitigation:
+
+- update test helper defaults first
+- then update direct fixture/setup calls in focused suites
+- avoid leaving mixed-role strings in the tree after the refactor
+
 ## Implementation phases
 
 ### Phase 1
 
-- audit all `staff` / `support` references
-- identify which are product-facing vs internal/runtime
-- centralize role-default logic
+- [x] Audit all `staff` / `support` references
+- [x] Identify which are product-facing vs internal/runtime
+- [x] Decide migration mapping:
+  - `staff -> admin`
+  - `support -> admin`
+- [x] Centralize role-default logic
 
 ### Phase 2
 
-- add migration to remap legacy data
-- change schema defaults to `admin`
-- update enums in models
+- [x] Add migration to remap legacy data
+- [x] Change schema defaults to `admin`
+- [x] Update enums in models
 
 ### Phase 3
 
-- update controllers, queries, and internal dashboard
-- update temple admin-management flow
-- update UI labels/copy
+- [x] Update controllers, queries, and internal dashboard
+- [x] Update temple admin-management flow
+- [x] Update UI labels/copy
 
 ### Phase 4
 
-- update tests
-- update docs
-- run production migration and verify existing admins still work
+- [x] Update focused tests
+- [x] Update docs
+- [ ] Run production migration and verify existing admins still work
+
+## Built and tested
+
+- Added migration [`20260316000018_simplify_admin_roles.rb`](/Users/jimmy1768/Projects/shengfukung-wenfu/rails/db/migrate/20260316000018_simplify_admin_roles.rb)
+- Persisted defaults now use `admin` in [`schema.rb`](/Users/jimmy1768/Projects/shengfukung-wenfu/rails/db/schema.rb)
+- Runtime enums now only expose `owner` and `admin`
+- Internal temple access grants `owner` or `admin` directly
+- Legacy `support` special-casing was removed from permission defaults
+- Admin login/internal UI copy no longer refers to `staff` access
+
+Focused verification:
+
+```bash
+cd rails && bin/rails db:migrate
+cd rails && bin/rails test test/integration/internal/temple_access_test.rb test/integration/admin/permissions_management_test.rb test/integration/admin/method_override_test.rb test/integration/admin/multi_temple_access_test.rb test/integration/admin/archives_access_test.rb
+```
+
+Result:
+
+- `22 runs, 121 assertions, 0 failures, 0 errors`
 
 ## Success criteria
 

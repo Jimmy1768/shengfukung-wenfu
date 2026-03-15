@@ -5,7 +5,7 @@ class AdminPermissionsManagementTest < ActionDispatch::IntegrationTest
     temple = create_temple
     owner = create_admin_user(temple:)
     staff = create_admin_user(temple:)
-    staff.admin_account.update!(role: "staff")
+    staff.admin_account.update!(role: "admin")
 
     staff_permission = AdminPermission.find_or_create_by!(admin_account: staff.admin_account, temple:)
     staff_permission.update!(AdminPermission::CAPABILITIES.index_with { false })

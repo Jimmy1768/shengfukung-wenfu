@@ -20,13 +20,12 @@ module Internal
 
     def grant
       role = normalized_role
-      stored_role = stored_membership_role(role)
       admin_account = current_admin.admin_account
       membership = admin_account.admin_temple_memberships.find_or_initialize_by(temple: @temple)
       previous_role = membership.role
 
       AdminTempleMembership.transaction do
-        membership.role = stored_role
+        membership.role = role
         membership.save!
 
         permission = AdminPermission.find_or_initialize_by(admin_account:, temple: @temple)
@@ -41,7 +40,7 @@ module Internal
         temple: @temple,
         metadata: {
           previous_role: previous_role,
-          resulting_role: stored_role,
+          resulting_role: role,
           requested_role: role,
           admin_account_id: admin_account.id
         }
@@ -132,10 +131,6 @@ module Internal
       AdminPermission::CAPABILITIES.each do |capability|
         permission[capability] = permission_enabled_for_role?(capability, role)
       end
-    end
-
-    def stored_membership_role(role)
-      role == "admin" ? "staff" : role
     end
 
     def permission_enabled_for_role?(capability, role)

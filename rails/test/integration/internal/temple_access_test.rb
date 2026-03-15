@@ -57,7 +57,7 @@ class InternalTempleAccessTest < ActionDispatch::IntegrationTest
 
       assert_redirected_to internal_temple_access_path
       membership = operator.admin_account.admin_temple_memberships.find_by!(temple:)
-      assert_equal "staff", membership.role
+      assert_equal "admin", membership.role
 
       permission = AdminPermission.find_by!(admin_account: operator.admin_account, temple:)
       assert_equal false, permission.manage_permissions
@@ -87,8 +87,8 @@ class InternalTempleAccessTest < ActionDispatch::IntegrationTest
     operator = create_operator!
     admin_user = create_admin_user(
       temple: temple,
-      role: "staff",
-      membership_role: "staff",
+      role: "admin",
+      membership_role: "admin",
       permission_overrides: { manage_permissions: false }
     )
     outsider = User.create!(
@@ -130,8 +130,8 @@ class InternalTempleAccessTest < ActionDispatch::IntegrationTest
     operator = create_operator!
     admin_user = create_admin_user(
       temple: temple,
-      role: "staff",
-      membership_role: "staff",
+      role: "admin",
+      membership_role: "admin",
       permission_overrides: { manage_permissions: false }
     )
 

@@ -23,8 +23,8 @@ class Account::Api::GuestListsTest < ActionDispatch::IntegrationTest
     offering = create_offering(temple:)
     staff = create_admin_user(
       temple:,
-      role: "staff",
-      membership_role: "staff",
+      role: "admin",
+      membership_role: "admin",
       permission_overrides: { view_guest_lists: false }
     )
 

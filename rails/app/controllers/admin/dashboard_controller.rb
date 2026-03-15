@@ -76,17 +76,17 @@ module Admin
     end
 
     def needs_admin_promotion?
-      current_temple.present? && !staff_admins_present?
+      current_temple.present? && !admin_accounts_present?
     end
 
     def should_review_permissions?
-      current_temple.present? && staff_admins_present? && !permissions_reviewed?
+      current_temple.present? && admin_accounts_present? && !permissions_reviewed?
     end
 
-    def staff_admins_present?
+    def admin_accounts_present?
       return false unless current_temple.present?
 
-      @staff_admins_present ||= current_temple.admin_accounts.staff_role.exists?
+      @admin_accounts_present ||= current_temple.admin_accounts.admin_role.exists?
     end
 
     def permissions_reviewed?

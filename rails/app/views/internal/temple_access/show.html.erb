@@ -40,9 +40,8 @@
               <td><%= user.email %></td>
               <td>
                 <% role_label = case membership.role
-                   when "staff" then t("admin.internal.shared.roles.admin")
+                   when "admin" then t("admin.internal.shared.roles.admin")
                    when "owner" then t("admin.internal.shared.roles.owner")
-                   when "support" then t("admin.internal.shared.roles.support")
                    else membership.role.to_s.humanize
                    end %>
                 <%= role_label %>

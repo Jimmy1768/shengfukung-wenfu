@@ -6,7 +6,7 @@ class Account::Api::PaymentStatusesTest < ActionDispatch::IntegrationTest
   test "returns payment status for the user's registration" do
     temple = create_temple
     offering = create_offering(temple:)
-    user = create_admin_user(temple:, role: "staff")
+    user = create_admin_user(temple:, role: "admin")
     registration = create_registration(user:, offering:, payment_status: "paid")
     create_payment(registration:, amount_cents: registration.total_price_cents)
 
@@ -23,8 +23,8 @@ class Account::Api::PaymentStatusesTest < ActionDispatch::IntegrationTest
   test "returns 404 when registration is not accessible" do
     temple = create_temple
     offering = create_offering(temple:)
-    user = create_admin_user(temple:, role: "staff")
-    other_user = create_admin_user(temple:, role: "staff")
+    user = create_admin_user(temple:, role: "admin")
+    other_user = create_admin_user(temple:, role: "admin")
     other_registration = create_registration(user: other_user, offering:)
     create_registration(user:, offering:)
 
