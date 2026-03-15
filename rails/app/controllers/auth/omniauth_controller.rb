@@ -6,6 +6,7 @@ module Auth
     def callback
       auth_hash = request.env["omniauth.auth"]
       identity = find_or_create_identity(auth_hash)
+      raise "Closed account cannot sign in" if identity.user.closed_account?
 
       establish_account_session!(identity.user)
 
@@ -16,10 +17,11 @@ module Auth
       end
     rescue StandardError => e
       Rails.logger.error("[OmniauthController] #{e.class}: #{e.message}")
+      message = e.message == "Closed account cannot sign in" ? I18n.t("account.sessions.flash.account_closed") : "OAuth login failed. Please try again."
       if respond_with_json?
-        render json: { error: "OAuth login failed" }, status: :unprocessable_entity
+        render json: { error: message }, status: :unprocessable_content
       else
-        redirect_to account_login_path, alert: "OAuth login failed. Please try again."
+        redirect_to account_login_path, alert: message
       end
     end
 

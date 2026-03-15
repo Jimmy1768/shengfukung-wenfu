@@ -93,6 +93,10 @@ module Auth
       identity, user, link_result = resolve_identity_from_exchange!(response, pending, account_user)
 
       unless link_intent?(pending)
+        if user.closed_account?
+          raise "Closed account cannot sign in"
+        end
+
         establish_session_for(user, pending)
       end
 
@@ -118,7 +122,13 @@ module Auth
       redirect_to fallback_redirect_path(pending), alert: e.message
     rescue StandardError => e
       Rails.logger.error("[CentralOAuthController#callback] #{e.class}: #{e.message}")
-      redirect_to fallback_redirect_path(pending), alert: "OAuth callback failed. Please try again."
+      alert =
+        if e.message == "Closed account cannot sign in"
+          I18n.t("account.sessions.flash.account_closed")
+        else
+          "OAuth callback failed. Please try again."
+        end
+      redirect_to fallback_redirect_path(pending), alert: alert
     end
 
     private

@@ -27,6 +27,7 @@ module Admin
 
     def can_sign_in?(user, password)
       return false unless user&.admin_account&.active?
+      return false if user.closed_account?
 
       secure_compare(user.encrypted_password, User.password_hash(password.to_s))
     end
@@ -34,6 +35,8 @@ module Admin
     def login_failure_message(user)
       if user.nil?
         t("admin.sessions.flash.invalid_credentials")
+      elsif user.closed_account?
+        t("admin.sessions.flash.account_closed")
       elsif user.admin_account.nil?
         t("admin.sessions.flash.not_admin")
       elsif !user.admin_account.active?

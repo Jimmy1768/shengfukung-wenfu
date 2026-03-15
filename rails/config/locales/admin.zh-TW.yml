@@ -242,6 +242,7 @@ zh-TW:
       flash:
         signed_in: "已登入管理後台。"
         signed_out: "已登出。"
+        account_closed: "此帳號已關閉，無法再登入。"
         invalid_credentials: "帳號或密碼不正確，請使用有效的管理員帳號。"
         not_admin: "此帳號尚未取得宮廟管理權限，請聯絡擁有者管理員。"
         inactive: "此管理權限目前為停用狀態，請聯絡擁有者管理員。"

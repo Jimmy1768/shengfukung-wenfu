@@ -29,6 +29,7 @@ zh-TW:
       nav:
         dashboard: "儀表板"
         profile: "個人資料"
+        privacy: "隱私"
         events: "活動資訊"
         gallery: "活動回顧"
         services: "祈福服務"
@@ -110,6 +111,8 @@ zh-TW:
         subtitle: "查看目前綁定在帳號上的社群登入方式。"
         manage: "管理登入方式"
         empty: "目前尚未綁定任何 OAuth 登入方式。"
+      privacy:
+        manage: "管理隱私"
       edit:
         eyebrow: "會員資料"
         title: "編輯個人資料"
@@ -380,10 +383,46 @@ zh-TW:
         register_prompt: "想透過電子郵件註冊？"
         register_button: "建立帳號"
       flash:
+        account_closed: "此帳號已關閉，無法再登入。"
         invalid_credentials: "帳號或密碼不正確。"
         signed_in: "已成功登入。"
         sign_in_required: "請先登入以繼續。"
         signed_out: "已成功登出。"
+    privacy:
+      header:
+        eyebrow: "隱私"
+        title: "隱私與帳號"
+        subtitle: "管理帳號關閉與隱私相關請求。"
+        back: "回到個人資料"
+      summary:
+        account_status: "帳號狀態"
+        active: "啟用中"
+        closed: "已關閉"
+        email: "Email"
+      close_account:
+        eyebrow: "帳號存取"
+        title: "關閉帳號"
+        subtitle: "關閉後，這個帳號將無法再登入。"
+        retention_notice: "部分報名、付款、收據與稽核紀錄仍可能因營運或法規需求而保留。"
+        submit: "關閉帳號"
+        confirm: "確定現在關閉這個帳號嗎？系統會立即將您登出。"
+      requests:
+        eyebrow: "隱私請求"
+        title: "請求紀錄"
+        subtitle: "已完成或待處理的隱私／帳號請求會列在這裡。"
+        empty: "目前尚無隱私請求。"
+        request_type_labels:
+          account_closure: "帳號關閉"
+          data_deletion: "資料刪除"
+          data_export: "資料匯出"
+        status_labels:
+          pending: "待處理"
+          approved: "已核准"
+          completed: "已完成"
+          rejected: "已拒絕"
+          cancelled: "已取消"
+      flash:
+        account_closed: "您的帳號已關閉，並已自動登出。"
     signups:
       modal:
         title: "建立帳號"

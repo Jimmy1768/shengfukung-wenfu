@@ -13,6 +13,12 @@ module Account
     def create
       if valid_credentials?
         user = User.find_by(email: session_params[:email].to_s.downcase.strip)
+        if user.closed_account?
+          flash.now[:alert] = I18n.t("account.sessions.flash.account_closed")
+          @registration_form ||= Account::RegistrationForm.new
+          return render :new, status: :unprocessable_content
+        end
+
         establish_user_session!(user)
         redirect_to resolve_post_login_path, notice: I18n.t("account.sessions.flash.signed_in")
       else

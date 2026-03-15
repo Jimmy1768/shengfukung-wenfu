@@ -242,6 +242,7 @@ en:
       flash:
         signed_in: "Signed in to the admin console."
         signed_out: "Signed out."
+        account_closed: "This account has been closed and can no longer sign in."
         invalid_credentials: "Those credentials did not match. Use an active admin account."
         not_admin: "That account hasn't been granted temple admin access yet. Ask your owner admin to invite you."
         inactive: "Your temple admin access is inactive. Contact your owner admin for help."

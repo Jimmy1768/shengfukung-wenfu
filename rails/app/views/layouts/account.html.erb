@@ -69,6 +69,7 @@
           <nav class="account-hero-actions">
               <%= link_to t("account.layout.nav.dashboard"), account_dashboard_path, class: "pill-link #{active_nav?(account_dashboard_path) ? "active" : ""}" %>
               <%= link_to t("account.layout.nav.profile"), account_profile_path, class: "pill-link #{active_nav?(account_profile_path) ? "active" : ""}" %>
+              <%= link_to t("account.layout.nav.privacy"), account_privacy_path, class: "pill-link #{active_nav?(account_privacy_path) ? "active" : ""}" %>
               <%= link_to t("account.layout.nav.services"), account_services_path, class: "pill-link #{active_nav?(account_services_path) ? "active" : ""}" %>
               <%= link_to t("account.layout.nav.events"), account_events_path, class: "pill-link #{active_nav?(account_events_path) ? "active" : ""}" %>
               <%= link_to t("account.layout.nav.registrations"), account_registrations_path, class: "pill-link #{active_nav?(account_registrations_path) ? "active" : ""}" %>

@@ -51,6 +51,17 @@
   </div>
 </section>
 
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow"><%= t("account.privacy.header.eyebrow") %></p>
+      <h2><%= t("account.privacy.header.title") %></h2>
+      <p><%= t("account.privacy.header.subtitle") %></p>
+    </div>
+    <%= link_to t("account.profile.privacy.manage"), account_privacy_path, class: "pill-link secondary" %>
+  </header>
+</section>
+
 <% if oauth_account_linking_enabled? %>
   <section class="account-section">
     <header class="section-header">

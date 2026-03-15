@@ -22,6 +22,7 @@ en:
       nav:
         dashboard: "Dashboard"
         profile: "Profile"
+        privacy: "Privacy"
         events: "Events"
         gallery: "Gallery"
         services: "Services"
@@ -103,6 +104,8 @@ en:
         subtitle: "Review which social providers are linked to your account."
         manage: "Manage sign-in methods"
         empty: "No OAuth providers are linked yet."
+      privacy:
+        manage: "Manage privacy"
       edit:
         eyebrow: "Profile"
         title: "Edit personal details"
@@ -373,10 +376,46 @@ en:
         register_prompt: "Prefer email onboarding?"
         register_button: "Create account"
       flash:
+        account_closed: "This account has been closed and can no longer sign in."
         invalid_credentials: "Those credentials did not match."
         signed_in: "Signed in."
         sign_in_required: "Please sign in to continue."
         signed_out: "Signed out."
+    privacy:
+      header:
+        eyebrow: "Privacy"
+        title: "Privacy & account"
+        subtitle: "Close your account or review privacy-related requests."
+        back: "Back to profile"
+      summary:
+        account_status: "Account status"
+        active: "Active"
+        closed: "Closed"
+        email: "Email"
+      close_account:
+        eyebrow: "Account access"
+        title: "Close account"
+        subtitle: "This removes future sign-in access from this account."
+        retention_notice: "Registrations, payments, receipts, and audit history may still be retained for operational or legal reasons."
+        submit: "Close account"
+        confirm: "Close this account now? You will be signed out immediately."
+      requests:
+        eyebrow: "Privacy requests"
+        title: "Request history"
+        subtitle: "Completed and pending privacy/account requests appear here."
+        empty: "No privacy requests yet."
+        request_type_labels:
+          account_closure: "Account closure"
+          data_deletion: "Data deletion"
+          data_export: "Data export"
+        status_labels:
+          pending: "Pending"
+          approved: "Approved"
+          completed: "Completed"
+          rejected: "Rejected"
+          cancelled: "Cancelled"
+      flash:
+        account_closed: "Your account has been closed. You have been signed out."
     signups:
       modal:
         title: "Create your account"

@@ -33,13 +33,18 @@ module Admin
     private
 
     def authenticate_admin!
+      if current_admin&.closed_account?
+        destroy_admin_session!
+        return redirect_to admin_login_path, alert: t("admin.sessions.flash.account_closed")
+      end
+
       return if admin_signed_in?
 
       redirect_to admin_login_path, alert: t("admin.base.alerts.sign_in_required")
     end
 
     def admin_signed_in?
-      current_admin&.admin_account&.active?
+      current_admin&.admin_account&.active? && !current_admin&.closed_account?
     end
 
     def current_admin

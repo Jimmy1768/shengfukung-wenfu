@@ -66,6 +66,11 @@ module Account
     end
 
     def authenticate_user!
+      if current_user&.closed_account?
+        destroy_user_session!
+        return redirect_to account_login_path, alert: I18n.t("account.sessions.flash.account_closed")
+      end
+
       return if user_signed_in?
 
       redirect_to account_login_path, alert: I18n.t("account.sessions.flash.sign_in_required")
