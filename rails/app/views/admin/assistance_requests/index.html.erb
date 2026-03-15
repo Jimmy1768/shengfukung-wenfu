@@ -1,0 +1,65 @@
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item">
+      <header class="section-header">
+        <div>
+          <p class="eyebrow"><%= t("admin.assistance_requests.index.eyebrow") %></p>
+          <h2><%= t("admin.assistance_requests.index.title") %></h2>
+          <p><%= t("admin.assistance_requests.index.subtitle") %></p>
+        </div>
+      </header>
+
+      <div class="admin-filter-bar">
+        <%= link_to t("admin.assistance_requests.index.filters.all"), admin_assistance_requests_path, class: "pill-link #{@status_filter.blank? ? 'active' : ''}" %>
+        <% TempleAssistanceRequest::STATUSES.each do |status| %>
+          <%= link_to t("admin.assistance_requests.statuses.#{status}"), admin_assistance_requests_path(status: status), class: "pill-link #{@status_filter == status ? 'active' : ''}" %>
+        <% end %>
+      </div>
+
+      <div class="table-shell">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><%= t("admin.assistance_requests.table.requested_at") %></th>
+              <th><%= t("admin.assistance_requests.table.patron") %></th>
+              <th><%= t("admin.assistance_requests.table.channel") %></th>
+              <th><%= t("admin.assistance_requests.table.context") %></th>
+              <th><%= t("admin.assistance_requests.table.message") %></th>
+              <th><%= t("admin.assistance_requests.table.status") %></th>
+              <th><%= t("admin.assistance_requests.table.actions") %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @assistance_requests.each do |request| %>
+              <tr>
+                <td><%= l(request.requested_at, format: :short) rescue request.requested_at.strftime("%Y/%m/%d") %></td>
+                <td>
+                  <strong><%= request.user.native_name.presence || request.user.english_name.presence || request.user.email %></strong>
+                  <div class="muted"><%= request.user.email %></div>
+                </td>
+                <td><%= t("admin.assistance_requests.channels.#{request.channel}") %></td>
+                <td><%= request.temple_registration&.reference_code.presence || t("admin.assistance_requests.context.profile") %></td>
+                <td><%= request.display_message.presence || t("admin.internal.shared.none") %></td>
+                <td><%= t("admin.assistance_requests.statuses.#{request.status}") %></td>
+                <td>
+                  <% if request.closed? %>
+                    <span class="muted"><%= request.closed_by_admin&.user&.email || t("admin.internal.shared.none") %></span>
+                  <% else %>
+                    <%= button_to t("admin.assistance_requests.actions.close"),
+                      close_admin_assistance_request_path(request, status: @status_filter),
+                      method: :post,
+                      class: "btn btn-ghost btn-small" %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <% if @assistance_requests.empty? %>
+        <p class="muted"><%= t("admin.assistance_requests.index.empty") %></p>
+      <% end %>
+    </section>
+  </div>
+</div>

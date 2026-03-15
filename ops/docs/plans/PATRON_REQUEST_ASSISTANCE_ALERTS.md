@@ -123,32 +123,32 @@ Keep V1 narrow:
 
 ### Phase A: Domain + Endpoints
 
-- [ ] Add assistance request model + migration.
-- [ ] Add create endpoint for account portal.
-- [ ] Add close endpoint for admin portal.
-- [ ] Add dedupe guard for repeated quick taps.
+- [x] Add assistance request model + migration.
+- [x] Add create endpoint for account portal.
+- [x] Add close endpoint for admin portal.
+- [x] Add dedupe guard for repeated quick taps.
 
 ### Phase B: Account UX
 
-- [ ] Add button on registrations list/detail.
-- [ ] Add fallback button on profile.
-- [ ] Allow optional short message only.
-- [ ] Add clear confirmation state after submit.
+- [x] Add button on registrations list/detail.
+- [x] Add fallback button on profile.
+- [x] Allow optional short message only.
+- [x] Add clear confirmation state after submit.
 
 ### Phase C: Admin UX
 
-- [ ] Add open queue widget to dashboard.
-- [ ] Add dedicated admin list page if dashboard card alone becomes too cramped.
-- [ ] Add links to patron + registrations context.
-- [ ] Add close action with optimistic update.
+- [x] Add open queue widget to dashboard.
+- [x] Add dedicated admin list page if dashboard card alone becomes too cramped.
+- [x] Add links to patron + registrations context.
+- [x] Add close action with optimistic update.
 
 ### Phase D: Test Coverage
 
-- [ ] Account create succeeds and is temple-scoped.
-- [ ] Duplicate rapid taps do not create alert storms.
-- [ ] Admin close updates status and audit fields.
-- [ ] Dashboard shows only open requests for current temple.
-- [ ] Authorization blocks cross-temple access.
+- [x] Account create succeeds and is temple-scoped.
+- [x] Duplicate rapid taps do not create alert storms.
+- [x] Admin close updates status and audit fields.
+- [x] Dashboard shows only open requests for current temple.
+- [x] Authorization blocks cross-temple access.
 
 ## Open Decisions
 
@@ -162,3 +162,37 @@ Keep V1 narrow:
 - [ ] Full ticket lifecycle (assigned/in-progress/escalated).
 - [ ] Patron-visible status timeline.
 - [ ] Analytics dashboard for response time SLA.
+
+## Built And Tested
+
+Built now:
+
+- `temple_assistance_requests` table + model
+- account create endpoint with temple-scoped dedupe
+- registration list/detail request actions
+- profile fallback request form with optional short message
+- admin dashboard open-request queue
+- dedicated `/admin/assistance_requests` list
+- admin close action with audit logging
+
+Focused tests verified during build:
+
+```bash
+cd rails && bin/rails db:migrate
+cd rails && bin/rails test test/integration/account/assistance_requests_test.rb test/integration/admin/assistance_requests_test.rb
+```
+
+Result:
+
+- `3 runs, 18 assertions, 0 failures, 0 errors`
+
+Broader smoke:
+
+```bash
+cd rails && bin/rails test test/integration/account/account_portal_flow_test.rb test/integration/admin/registrations_access_test.rb
+```
+
+Result:
+
+- account portal flow stayed green
+- one unrelated existing failure remains in `admin/registrations_access_test` because it still expects old English copy (`Create New Registration`) while the registrations page now renders Chinese copy (`建立新報名`)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_15_000016) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_16_000017) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -586,6 +586,26 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_15_000016) do
     t.index ["user_id"], name: "index_system_audit_logs_on_user_id"
   end
 
+  create_table "temple_assistance_requests", force: :cascade do |t|
+    t.bigint "temple_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "temple_registration_id"
+    t.string "status", default: "open", null: false
+    t.datetime "requested_at", null: false
+    t.datetime "closed_at"
+    t.bigint "closed_by_admin_id"
+    t.string "channel", null: false
+    t.string "message"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["temple_id", "status", "requested_at"], name: "idx_temple_assistance_requests_queue"
+    t.index ["temple_id", "user_id", "temple_registration_id", "status"], name: "idx_temple_assistance_requests_dedupe"
+    t.index ["temple_id"], name: "index_temple_assistance_requests_on_temple_id"
+    t.index ["temple_registration_id"], name: "index_temple_assistance_requests_on_temple_registration_id"
+    t.index ["user_id"], name: "index_temple_assistance_requests_on_user_id"
+  end
+
   create_table "temple_events", force: :cascade do |t|
     t.bigint "temple_id", null: false
     t.string "slug", null: false
@@ -909,6 +929,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_15_000016) do
   add_foreign_key "system_audit_logs", "admins"
   add_foreign_key "system_audit_logs", "temples"
   add_foreign_key "system_audit_logs", "users"
+  add_foreign_key "temple_assistance_requests", "admins", column: "closed_by_admin_id"
+  add_foreign_key "temple_assistance_requests", "temple_registrations"
+  add_foreign_key "temple_assistance_requests", "temples"
+  add_foreign_key "temple_assistance_requests", "users"
   add_foreign_key "temple_events", "temples"
   add_foreign_key "temple_gallery_entries", "temples"
   add_foreign_key "temple_gatherings", "temples"

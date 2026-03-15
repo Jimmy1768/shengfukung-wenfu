@@ -25,6 +25,11 @@ module Admin
         .where.not(expires_at: nil)
         .where("temple_registrations.expires_at > ? AND temple_registrations.expires_at <= ?", now, hold_warning_window_end)
         .count
+      open_assistance_requests = current_temple.temple_assistance_requests
+        .open_requests
+        .includes(:user, :temple_registration)
+        .recent_first
+      open_assistance_requests_count = open_assistance_requests.count
       month_revenue_cents = current_temple.temple_payments
         .completed
         .where("temple_payments.created_at >= ?", month_start)
@@ -37,8 +42,10 @@ module Admin
         { label: I18n.t("admin.dashboard.metrics.entries.revenue_mtd"), value: Currency::Symbols.format_amount(month_revenue_cents, "TWD") }
       ]
       @queue_metrics = [
-        { label: I18n.t("admin.dashboard.metrics.entries.expiring_unpaid_holds_24h"), value: expiring_unpaid_holds_count }
+        { label: I18n.t("admin.dashboard.metrics.entries.expiring_unpaid_holds_24h"), value: expiring_unpaid_holds_count },
+        { label: I18n.t("admin.dashboard.metrics.entries.open_assistance_requests"), value: open_assistance_requests_count }
       ].select { |metric| metric[:value].to_i.positive? }
+      @open_assistance_requests = open_assistance_requests.limit(5)
       @next_steps = build_next_steps
     end
 

@@ -207,6 +207,20 @@ zh-TW:
       email_label: "回覆 Email"
       phone_label: "電話"
       response_expectation: "寺方會在可回覆時以 Email 聯繫您，回覆時間可能依工作情況有所不同。"
+    assistance_requests:
+      header:
+        eyebrow: "支援請求"
+        title: "需要宮廟協助嗎？"
+        subtitle: "送出簡短支援請求給目前宮廟，管理員可從後台佇列查看。"
+      actions:
+        request: "建立支援請求"
+      fields:
+        message: "補充說明（選填）"
+      flash:
+        created: "已送出支援請求，宮廟管理員會在後台看到。"
+        already_open: "此項目目前已有尚未處理的支援請求。"
+      status:
+        open: "已建立支援請求"
     events:
       offerings:
         eyebrow: "活動與法會"

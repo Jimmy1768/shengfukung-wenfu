@@ -83,6 +83,11 @@ Rails.application.routes.draw do
         post :fake_checkout
       end
     end
+    resources :assistance_requests, only: :index do
+      member do
+        post :close
+      end
+    end
     resources :news_posts
     resources :gallery_entries
     resources :media_uploads, only: :create
@@ -157,6 +162,7 @@ Rails.application.routes.draw do
     resources :services, only: :index
     resources :galleries, only: %i[index show]
     resources :payments, only: :index
+    resources :assistance_requests, only: :create
     resource :locale, only: :create, controller: "locales"
     resource :theme, only: :create, controller: "themes"
     resources :contact_temple_requests, only: :create

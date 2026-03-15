@@ -16,6 +16,8 @@ class Temple < ApplicationRecord
     dependent: :nullify
   has_many :temple_events,
     dependent: :destroy
+  has_many :temple_assistance_requests,
+    dependent: :destroy
   has_many :temple_services,
     dependent: :destroy
   has_many :temple_gatherings,

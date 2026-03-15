@@ -10,12 +10,16 @@ module Account
 
     helper_method :existing_registration_for
     helper_method :registration_lifecycle_policy
+    helper_method :open_assistance_request_for
 
     def index
       @registrations = registration_scope.order(created_at: :desc)
+      preload_open_assistance_requests
     end
 
-    def show; end
+    def show
+      preload_open_assistance_requests
+    end
 
     def new
       @form = build_form_from_selected_registrant
@@ -215,6 +219,23 @@ module Account
 
     def fake_idempotency_key
       params[:idempotency_key].presence || "acct-reg-#{@registration.id}-#{SecureRandom.hex(4)}"
+    end
+
+    def preload_open_assistance_requests
+      @open_assistance_requests_by_registration_id = current_temple.temple_assistance_requests
+        .open_requests
+        .where(user: current_user)
+        .pluck(:temple_registration_id, :id)
+        .each_with_object({}) do |(registration_id, request_id), buffer|
+          buffer[registration_id] = request_id
+        end
+    end
+
+    def open_assistance_request_for(registration)
+      return nil if registration.blank?
+
+      request_id = (@open_assistance_requests_by_registration_id || {})[registration.id]
+      request_id.present? ? request_id : nil
     end
   end
 end

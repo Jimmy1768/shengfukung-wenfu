@@ -19,6 +19,7 @@ class User < ApplicationRecord
   has_many :push_tokens, dependent: :destroy
   has_many :privacy_requests, dependent: :destroy
   has_many :account_lifecycle_events, dependent: :destroy
+  has_many :temple_assistance_requests, dependent: :destroy
   has_many :temple_event_registrations, dependent: :nullify
   has_many :temple_payments, dependent: :nullify
   belongs_to :closed_by_user, class_name: "User", optional: true

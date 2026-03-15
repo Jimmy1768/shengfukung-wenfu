@@ -32,6 +32,20 @@
               <td>
                 <%= link_to t("account.registrations.index.actions.view"), account_registration_path(registration), class: "pill-link" %>
                 <%= link_to t("account.registrations.index.actions.edit"), edit_account_registration_path(registration), class: "pill-link secondary" %>
+                <% if open_assistance_request_for(registration) %>
+                  <span class="pill-link secondary"><%= t("account.assistance_requests.status.open") %></span>
+                <% else %>
+                  <%= button_to t("account.assistance_requests.actions.request"),
+                    account_assistance_requests_path,
+                    method: :post,
+                    params: {
+                      account_assistance_request: {
+                        registration_id: registration.id,
+                        channel: "registration_list"
+                      }
+                    },
+                    class: "pill-link danger" %>
+                <% end %>
               </td>
             </tr>
           <% end %>

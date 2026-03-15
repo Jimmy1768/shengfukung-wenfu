@@ -442,6 +442,7 @@ en:
           pending_registrations: "Pending registrations"
           unpaid_registrations: "Unpaid registrations"
           expiring_unpaid_holds_24h: "Unpaid holds expiring (24h)"
+          open_assistance_requests: "Open assistance requests"
           revenue_mtd: "Revenue (this month)"
       next_steps:
         title: "Next steps"
@@ -452,6 +453,39 @@ en:
         manage_permissions: "Review and adjust admin permissions"
         complete_heading: "Congratulations!"
         complete: "All onboarding tasks are done. Use the navigation to continue."
+    assistance_requests:
+      flash:
+        closed: "Assistance request closed."
+      dashboard:
+        title: "Patron assistance requests"
+        subtitle: "Recent open help requests from patrons in this temple."
+        view_all: "View all"
+      index:
+        eyebrow: "Support queue"
+        title: "Assistance requests"
+        subtitle: "Track and close lightweight help signals from patrons."
+        empty: "No assistance requests match the current filter."
+        filters:
+          all: "All"
+      table:
+        requested_at: "Requested at"
+        patron: "Patron"
+        channel: "Source"
+        context: "Registration"
+        message: "Message"
+        status: "Status"
+        actions: "Actions"
+      actions:
+        close: "Close"
+      statuses:
+        open: "Open"
+        closed: "Closed"
+      channels:
+        profile: "Profile"
+        registration_list: "Registrations list"
+        registration_detail: "Registration detail"
+      context:
+        profile: "General profile request"
     temple_profile:
       flash:
         updated: "Temple profile updated."

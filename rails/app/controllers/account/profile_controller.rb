@@ -6,6 +6,7 @@ module Account
       @form = Account::ProfileForm.new(user: current_user)
       @password_form = Account::PasswordSettingsForm.new(user: current_user)
       @contact_temple_form = Account::ContactTempleRequestForm.new
+      @assistance_request = current_temple.temple_assistance_requests.open_requests.find_by(user: current_user, temple_registration_id: nil)
       @dependents = current_user.user_dependents.includes(:dependent)
       @oauth_identities = current_user.oauth_identities.recently_active
     end

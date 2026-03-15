@@ -442,6 +442,7 @@ zh-TW:
           pending_registrations: "待處理報名"
           unpaid_registrations: "未付款報名"
           expiring_unpaid_holds_24h: "24 小時內到期保留單"
+          open_assistance_requests: "待處理支援請求"
           revenue_mtd: "本月營收"
       next_steps:
         title: "下一步"
@@ -452,6 +453,39 @@ zh-TW:
         manage_permissions: "檢視並調整管理員權限"
         complete_heading: "恭喜！"
         complete: "已完成主要任務，接著可透過左側選單繼續操作。"
+    assistance_requests:
+      flash:
+        closed: "已關閉支援請求。"
+      dashboard:
+        title: "信眾支援請求"
+        subtitle: "查看目前宮廟尚未處理的簡易協助請求。"
+        view_all: "查看全部"
+      index:
+        eyebrow: "支援佇列"
+        title: "支援請求"
+        subtitle: "追蹤並關閉信眾送出的輕量協助請求。"
+        empty: "目前沒有符合篩選條件的支援請求。"
+        filters:
+          all: "全部"
+      table:
+        requested_at: "提出時間"
+        patron: "信眾"
+        channel: "來源"
+        context: "報名內容"
+        message: "訊息"
+        status: "狀態"
+        actions: "操作"
+      actions:
+        close: "關閉"
+      statuses:
+        open: "開啟"
+        closed: "已關閉"
+      channels:
+        profile: "個人資料"
+        registration_list: "報名列表"
+        registration_detail: "報名明細"
+      context:
+        profile: "一般個人資料請求"
     temple_profile:
       flash:
         updated: "宮廟資料已更新。"

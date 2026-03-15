@@ -62,6 +62,31 @@
   </header>
 </section>
 
+<section class="account-section">
+  <header class="section-header">
+    <div>
+      <p class="eyebrow"><%= t("account.assistance_requests.header.eyebrow") %></p>
+      <h2><%= t("account.assistance_requests.header.title") %></h2>
+      <p><%= t("account.assistance_requests.header.subtitle") %></p>
+    </div>
+  </header>
+
+  <% if @assistance_request.present? %>
+    <p class="muted"><%= t("account.assistance_requests.flash.already_open") %></p>
+  <% else %>
+    <%= form_with url: account_assistance_requests_path, scope: :account_assistance_request, class: "profile-form" do |f| %>
+      <%= f.hidden_field :channel, value: "profile" %>
+      <div>
+        <%= f.label :message, t("account.assistance_requests.fields.message") %>
+        <%= f.text_area :message, rows: 4, maxlength: 280 %>
+      </div>
+      <div class="form-actions">
+        <%= f.submit t("account.assistance_requests.actions.request"), class: "btn btn-secondary" %>
+      </div>
+    <% end %>
+  <% end %>
+</section>
+
 <% if oauth_account_linking_enabled? %>
   <section class="account-section">
     <header class="section-header">

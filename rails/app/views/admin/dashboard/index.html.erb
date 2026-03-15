@@ -48,6 +48,53 @@
     </div>
   <% end %>
 
+  <% if @open_assistance_requests.present? %>
+    <div class="admin-stack__row">
+      <section class="card stack-item">
+        <header class="section-header">
+          <div>
+            <h2><%= t("admin.assistance_requests.dashboard.title") %></h2>
+            <p class="muted"><%= t("admin.assistance_requests.dashboard.subtitle") %></p>
+          </div>
+          <%= link_to t("admin.assistance_requests.dashboard.view_all"), admin_assistance_requests_path, class: "pill-link secondary" %>
+        </header>
+
+        <div class="table-shell">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th><%= t("admin.assistance_requests.table.requested_at") %></th>
+                <th><%= t("admin.assistance_requests.table.patron") %></th>
+                <th><%= t("admin.assistance_requests.table.context") %></th>
+                <th><%= t("admin.assistance_requests.table.message") %></th>
+                <th><%= t("admin.assistance_requests.table.actions") %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @open_assistance_requests.each do |request| %>
+                <tr>
+                  <td><%= l(request.requested_at, format: :short) rescue request.requested_at.strftime("%Y/%m/%d") %></td>
+                  <td>
+                    <strong><%= request.user.native_name.presence || request.user.english_name.presence || request.user.email %></strong>
+                    <div class="muted"><%= request.user.email %></div>
+                  </td>
+                  <td><%= request.temple_registration&.reference_code.presence || t("admin.assistance_requests.context.profile") %></td>
+                  <td><%= request.display_message.presence || t("admin.internal.shared.none") %></td>
+                  <td>
+                    <%= button_to t("admin.assistance_requests.actions.close"),
+                      close_admin_assistance_request_path(request),
+                      method: :post,
+                      class: "btn btn-ghost btn-small" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  <% end %>
+
   <div class="admin-stack__row">
     <section class="card stack-item">
       <% if @next_steps.any? %>

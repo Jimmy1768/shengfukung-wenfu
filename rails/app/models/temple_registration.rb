@@ -23,6 +23,9 @@ class TempleRegistration < ApplicationRecord
   has_many :temple_payments,
     foreign_key: :temple_registration_id,
     dependent: :destroy
+  has_many :temple_assistance_requests,
+    foreign_key: :temple_registration_id,
+    dependent: :nullify
 
   validates :reference_code, presence: true, uniqueness: { scope: :temple_id }
   validates :payment_status, inclusion: { in: PAYMENT_STATUSES.values }

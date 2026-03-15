@@ -14,6 +14,10 @@ class AdminAccount < ApplicationRecord
     through: :admin_temple_memberships
   has_many :admin_permissions,
     dependent: :destroy
+  has_many :closed_temple_assistance_requests,
+    class_name: "TempleAssistanceRequest",
+    foreign_key: :closed_by_admin_id,
+    dependent: :nullify
   has_many :temple_payments,
     dependent: :nullify
 
