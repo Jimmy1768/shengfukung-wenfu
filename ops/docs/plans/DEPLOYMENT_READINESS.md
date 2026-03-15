@@ -47,6 +47,7 @@ Current interpretation after production Google OAuth validation and shared-DB cl
   - publish flow after admin content entry
   - one real registration flow after temple content is prepared
   - account linking manual validation with Apple as secondary provider
+  - Facebook OAuth production validation
   - payments beyond fake provider mode
   - S3/media uploads
   - rollback drill timing
@@ -163,6 +164,7 @@ Current interpretation after production Google OAuth validation and shared-DB cl
   - one registration flow can be created in staging after onboarding content exists
   - email/password account flow
   - Apple OAuth on `www.shengfukung.com.tw`
+  - Facebook OAuth end-to-end on `shengfukung.com.tw`
 - [x] Payments gate for this phase:
   - keep `PAYMENTS_PROVIDER=fake` unless provider sandbox credentials are ready and validated
 - [ ] Pass criteria: smoke tests pass and remaining manual critical path checks pass.
@@ -192,6 +194,7 @@ Current interpretation after production Google OAuth validation and shared-DB cl
   - Apple on `www.shengfukung.com.tw`
   - account linking with Apple as secondary provider
   - first-login vs repeat-login name capture behavior
+  - Facebook provider start/callback/session validation in production
 - Wire production `.org.tw` once client purchases domain.
 - Repeat DNS/TLS/deploy/smoke flow for production hostnames.
 - Enable live Stripe/LINE Pay only after provider credential validation and callback verification.

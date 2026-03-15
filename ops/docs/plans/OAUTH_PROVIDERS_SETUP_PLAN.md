@@ -15,6 +15,7 @@ This plan is intentionally split into phases.
 - [x] Temple-side runtime wiring is active and verified for Google end-to-end.
 - [x] Apple provider is configured in Apple Developer + central auth `/oauth/start` returns `authorize_url`.
 - [x] Apple full callback sign-in success is working in production after correcting SourceGrid central auth `APPLE_TEAM_ID` to `99GH38T5WW` and restarting the platform services.
+- [ ] Facebook provider still needs final centralized-auth setup and production verification.
 
 ## Current State
 
@@ -26,6 +27,8 @@ Use this interpretation when reading the checklist below:
   - Apple start path, tenant resolution, and return URL wiring are correct
 - `Done in platform`
   - Apple final callback completion inside SourceGrid central auth
+- `Next provider to finish`
+  - Facebook
 - `Not required for this repo`
   - temple-side provider secret management for Google/Apple/Facebook production clients
 
@@ -109,6 +112,9 @@ Do not use unregistered callback URLs.
 - [x] Apple callback reaches temple `/auth/callback` and temple `/oauth/token/exchange` successfully in production.
 - [x] Apple sign-in establishes a temple session end-to-end in production.
 - [x] If the provider does not return a usable name, the temple app now redirects the user to profile edit instead of leaving the account at `OAuth User`.
+- [ ] Facebook `/oauth/start` returns valid `authorize_url` from central auth.
+- [ ] Facebook callback reaches temple `/auth/callback` and temple `/oauth/token/exchange` successfully in production.
+- [ ] Facebook sign-in establishes a temple session end-to-end in production.
 
 ## Acceptance Criteria
 
@@ -117,15 +123,21 @@ All must be true before marking OAuth done for this temple:
 - [x] Temple runtime contains only `AUTH_*` client credentials (no provider secrets).
 - [ ] Central auth flow works for both `shengfukung.com.tw` and `www.shengfukung.com.tw`.
 - [x] Token exchange and session establishment are stable for Google.
+- [ ] Token exchange and session establishment are stable for Facebook.
 - [x] Error/denial paths are user-safe and logged for all enabled providers.
 
 ## Remaining Follow-Up
 
 - Apple callback remediation is complete for `shengfukung.com.tw`.
-- Still validate:
+- Apple remaining follow-up:
   - Apple sign-in success on `www.shengfukung.com.tw`
   - account-linking manual flows that depend on Apple as the second provider
   - first-time Apple authorization behavior vs later logins with no returned name
+- Facebook is the next provider to finish:
+  - central auth provider configuration
+  - production `/oauth/start` verification
+  - callback and token exchange validation
+  - temple session establishment verification
 
 ## Security Notes
 
