@@ -21,6 +21,10 @@
 - App shows a mode switch when the authenticated user has admin capability.
 - Default mode after login should be `Patron` (safer, simpler).
 - Admin mode is conditional and server-authorized.
+- Expo must also expose overt account/privacy actions for app-store compliance:
+  - `Close account`
+  - `Request deletion of personal data`
+  - `Request data export` (can start as operator-assisted)
 
 ## Core Concepts
 
