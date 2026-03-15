@@ -240,4 +240,62 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to admin_dashboard_path
   end
+
+  test "payments export stays scoped to the selected temple for multi-temple owners" do
+    alpha = create_temple(name: "Alpha Temple", slug: "alpha-temple")
+    beta = create_temple(name: "Beta Temple", slug: "beta-temple")
+    owner = create_admin_user(temple: alpha)
+    AdminPermission.find_by(admin_account: owner.admin_account, temple: alpha)&.update!(
+      view_financials: true,
+      export_financials: true,
+      manage_permissions: true
+    )
+
+    AdminTempleMembership.create!(
+      admin_account: owner.admin_account,
+      temple: beta,
+      role: "owner"
+    )
+    AdminPermission.create!(
+      admin_account: owner.admin_account,
+      temple: beta,
+      view_financials: true,
+      export_financials: true,
+      manage_permissions: true
+    )
+
+    alpha_offering = create_offering(temple: alpha, slug: "alpha-offering", title: "Alpha Offering")
+    beta_offering = create_offering(temple: beta, slug: "beta-offering", title: "Beta Offering")
+    alpha_user = User.create!(
+      email: "alpha-patron@example.com",
+      english_name: "Alpha Patron",
+      encrypted_password: User.password_hash("Password123!")
+    )
+    beta_user = User.create!(
+      email: "beta-patron@example.com",
+      english_name: "Beta Patron",
+      encrypted_password: User.password_hash("Password123!")
+    )
+    alpha_registration = create_registration(user: alpha_user, offering: alpha_offering, reference_code: "REG-ALPHA")
+    beta_registration = create_registration(user: beta_user, offering: beta_offering, reference_code: "REG-BETA")
+    create_payment(registration: alpha_registration, amount_cents: 111)
+    create_payment(registration: beta_registration, amount_cents: 222)
+
+    sign_in_admin(owner)
+
+    get export_admin_payments_path(format: :csv)
+
+    assert_response :success
+    assert_includes response.body, "REG-ALPHA"
+    refute_includes response.body, "REG-BETA"
+
+    post admin_temple_switch_path, params: { temple_switch: { temple_slug: beta.slug } }
+    follow_redirect!
+
+    get export_admin_payments_path(format: :csv)
+
+    assert_response :success
+    assert_includes response.body, "REG-BETA"
+    refute_includes response.body, "REG-ALPHA"
+  end
 end

@@ -205,7 +205,7 @@ This prevents accidental broad unbounded archive queries while matching staff wo
 - [x] Add month presets (`this month`, `last month`, `custom`).
 - [x] Add month-first filtering without manual date typing.
 - [x] Show summary totals above the report table.
-- [ ] Keep offering/payment/status filters compatible with this flow.
+- [x] Keep offering/payment/status filters compatible with this flow.
 
 ### Phase 3 — Export Refinement
 
@@ -225,10 +225,10 @@ This prevents accidental broad unbounded archive queries while matching staff wo
 
 - [x] Monthly preset returns correct date window.
 - [x] Export respects active month/filter state.
-- [ ] No-date archive search with zero patron matches returns empty state.
+- [x] No-date archive search with zero patron matches returns empty state.
 - [x] No-date archive search with multiple patron matches requires refinement.
 - [x] No-date archive search with one patron match returns that patron’s full archive history.
-- [ ] Temple scope and export permissions remain enforced.
+- [x] Temple scope and export permissions remain enforced.
 
 ## Open Decisions
 
@@ -258,6 +258,14 @@ This prevents accidental broad unbounded archive queries while matching staff wo
   - patron
   - patron phone
   - offering type
+  - registration period key
+  - payment method/status
+  - recorded by
+- `/admin/payments` now treats payments as the monthly reporting surface, with month presets, summary badges, and compatible offering/payment/status filters.
+- Regression coverage now explicitly proves:
+  - no-date archive zero-match behavior
+  - export permission denial
+  - multi-temple export scoping for both payments and archives
   - offering
   - registration period key
   - payment method
