@@ -1,8 +1,7 @@
 module OAuthHelper
   PROVIDER_SPECS = {
     google: { label: "Continue with Google", icon_path: "/backend/assets/icons/google.png" },
-    apple: { label: "Continue with Apple", icon_path: "/backend/assets/icons/apple.png" },
-    facebook: { label: "Continue with Facebook", icon_path: "/backend/assets/icons/facebook.png" }
+    apple: { label: "Continue with Apple", icon_path: "/backend/assets/icons/apple.png" }
   }.freeze
 
   def oauth_provider_links
