@@ -357,6 +357,7 @@ zh-TW:
             approve: "核准"
             reject: "拒絕"
             complete: "完成"
+            download_export: "下載匯出檔"
             reject_confirm: "確定拒絕這筆隱私請求嗎？"
             no_actions: "無可用操作"
     patrons:

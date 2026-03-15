@@ -74,7 +74,13 @@
                       class: "btn btn-ghost btn-small",
                       form: { data: { confirm: t("admin.internal.privacy_requests.index.actions.reject_confirm") } } %>
                   <% else %>
-                    <span class="muted"><%= t("admin.internal.privacy_requests.index.actions.no_actions") %></span>
+                    <% if request.request_type == "data_export" && request.metadata.to_h["data_export_payload_id"].present? %>
+                      <%= link_to t("admin.internal.privacy_requests.index.actions.download_export"),
+                        export_internal_privacy_request_path(request),
+                        class: "btn btn-secondary btn-small" %>
+                    <% else %>
+                      <span class="muted"><%= t("admin.internal.privacy_requests.index.actions.no_actions") %></span>
+                    <% end %>
                   <% end %>
                 </div>
               </td>

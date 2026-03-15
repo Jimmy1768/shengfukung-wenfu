@@ -2,12 +2,24 @@
 
 module Internal
   class PrivacyRequestsController < BaseController
-    before_action :set_privacy_request, only: :transition
+    before_action :set_privacy_request, only: %i[export transition]
 
     def index
       @status_filter = normalized_status_filter
       @privacy_requests = PrivacyRequest.includes(:user, :operator_user).order(requested_at: :desc, created_at: :desc)
       @privacy_requests = @privacy_requests.where(status: @status_filter) if @status_filter.present?
+    end
+
+    def export
+      payload = export_payload_for(@privacy_request)
+      raise ActiveRecord::RecordNotFound if payload.blank?
+
+      send_data(
+        JSON.pretty_generate(payload),
+        filename: "privacy-export-request-#{@privacy_request.id}.json",
+        type: "application/json",
+        disposition: "attachment"
+      )
     end
 
     def transition
@@ -16,18 +28,24 @@ module Internal
         return redirect_to internal_privacy_requests_path(status: params[:status]), alert: t("admin.internal.privacy_requests.flash.invalid_transition")
       end
 
-      @privacy_request.update!(status: next_status, resolved_at: resolved_at_for(next_status), operator_user: current_admin)
-      @privacy_request.user.account_lifecycle_events.create!(
-        event_type: "privacy_request_status_changed",
-        occurred_at: Time.current,
-        user_name_snapshot: @privacy_request.user.native_name.presence || @privacy_request.user.english_name.presence || @privacy_request.user.email,
-        metadata: {
-          "privacy_request_id" => @privacy_request.id,
-          "request_type" => @privacy_request.request_type,
-          "status" => next_status,
-          "operator_user_id" => current_admin.id
-        }
-      )
+      @privacy_request.transaction do
+        if @privacy_request.request_type == "data_export" && next_status == "completed"
+          Privacy::UserDataExportFulfillment.fulfill!(privacy_request: @privacy_request, operator: current_admin)
+        end
+
+        @privacy_request.update!(status: next_status, resolved_at: resolved_at_for(next_status), operator_user: current_admin)
+        @privacy_request.user.account_lifecycle_events.create!(
+          event_type: "privacy_request_status_changed",
+          occurred_at: Time.current,
+          user_name_snapshot: @privacy_request.user.native_name.presence || @privacy_request.user.english_name.presence || @privacy_request.user.email,
+          metadata: {
+            "privacy_request_id" => @privacy_request.id,
+            "request_type" => @privacy_request.request_type,
+            "status" => next_status,
+            "operator_user_id" => current_admin.id
+          }
+        )
+      end
 
       SystemAuditLogger.log!(
         action: "internal.privacy_requests.transition",
@@ -75,6 +93,13 @@ module Internal
 
     def resolved_at_for(status)
       %w[completed rejected].include?(status) ? Time.current : nil
+    end
+
+    def export_payload_for(privacy_request)
+      payload_id = privacy_request.metadata.to_h["data_export_payload_id"]
+      return nil if payload_id.blank?
+
+      DataExportPayload.find_by(id: payload_id)&.metadata&.dig("payload")
     end
   end
 end

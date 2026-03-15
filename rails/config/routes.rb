@@ -119,6 +119,7 @@ Rails.application.routes.draw do
     delete "/temples/access/:temple_id/revoke", to: "temple_access#revoke", as: :revoke_temple_access
     resources :privacy_requests, only: :index do
       member do
+        get :export
         post :transition
       end
     end

@@ -357,6 +357,7 @@ en:
             approve: "Approve"
             reject: "Reject"
             complete: "Complete"
+            download_export: "Download export"
             reject_confirm: "Reject this privacy request?"
             no_actions: "No actions"
     patrons:

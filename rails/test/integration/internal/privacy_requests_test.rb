@@ -62,6 +62,46 @@ class InternalPrivacyRequestsTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "completing a data export request generates downloadable export payload" do
+    operator = create_operator!
+    user = User.create!(
+      email: "privacy-export@example.com",
+      english_name: "Privacy Export",
+      encrypted_password: User.password_hash("Password123!")
+    )
+    request_record = PrivacyRequest.create!(
+      user: user,
+      request_type: "data_export",
+      status: "pending",
+      submitted_via: "web",
+      requested_at: Time.current
+    )
+
+    with_env("INTERNAL_PLATFORM_OPERATOR_EMAIL" => "operator@example.com") do
+      sign_in_admin(operator)
+
+      post transition_internal_privacy_request_path(request_record, next_status: "completed")
+
+      assert_redirected_to internal_privacy_requests_path
+
+      request_record.reload
+      assert_equal "completed", request_record.status
+      assert request_record.metadata["data_export_job_id"].present?
+      assert request_record.metadata["data_export_payload_id"].present?
+
+      payload = DataExportPayload.find(request_record.metadata["data_export_payload_id"])
+      assert_equal request_record.id, payload.metadata.dig("payload", "privacy_requests")&.first&.fetch("id", nil)
+
+      get export_internal_privacy_request_path(request_record)
+
+      assert_response :success
+      assert_equal "application/json", response.media_type
+      json = JSON.parse(response.body)
+      assert_equal user.email, json.dig("user", "email")
+      assert_equal "data_export", json.dig("privacy_requests", 0, "request_type")
+    end
+  end
+
   test "non-operator admin is redirected away from privacy requests" do
     temple = create_temple(slug: "privacy-no-access")
     user = create_admin_user(temple: temple, role: "owner")
