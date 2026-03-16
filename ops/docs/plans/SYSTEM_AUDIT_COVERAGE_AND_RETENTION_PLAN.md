@@ -29,6 +29,26 @@ Make audit logging intentional:
 - broad enough to support support, ops, and financial review
 - narrow enough to avoid noisy, low-value logs and unclear retention
 
+## Locked V1 Decisions
+
+- Use a conservative logging policy in v1 to avoid low-value noise.
+- Keep Tier 1 coverage mandatory for admin, access, privacy, and money-related actions.
+- Keep Tier 2 coverage selective and focused on meaningful account self-service actions.
+- Skip Tier 3 logging by default.
+- Audit payment creation, refund, cancel, reconcile, manual override, and provider/system-driven status changes.
+- Use canonical dotted action names such as:
+  - `account.profile.updated`
+  - `account.password.added`
+  - `account.oauth.unlinked`
+  - `admin.payments.refunded`
+  - `system.payments.reconciled`
+- Retention windows for v1:
+  - Tier 1: 2 years
+  - Tier 2: 180 days
+  - Tier 3: do not log unless explicitly justified
+- Do not add a cleanup job until coverage and retention are both locked in code.
+- When cleanup is added later, Tier 1 money/access/privacy logs must be excluded from broad deletion.
+
 ## Non-Goals
 
 - event sourcing
