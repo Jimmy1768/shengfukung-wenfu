@@ -4,9 +4,10 @@ module Payments
   class CheckoutReturnService
     Result = Struct.new(:payment, :adapter_payload, keyword_init: true)
 
-    def initialize(provider_resolver: ProviderResolver, payment_repository: Repositories::PaymentRepository.new)
+    def initialize(provider_resolver: ProviderResolver, payment_repository: Repositories::PaymentRepository.new, audit_logger: SystemAuditLogger)
       @provider_resolver = provider_resolver
       @payment_repository = payment_repository
+      @audit_logger = audit_logger
     end
 
     def call(registration:, provider:, params: {})
@@ -39,7 +40,7 @@ module Payments
         },
         provider_reference: adapter_payload[:provider_reference].presence || payload_params["transaction_id"].presence || payload_params["order_id"].presence
       )
-      Payments::RegistrationPaymentSync.call(payment)
+      Payments::RegistrationPaymentSync.call(payment, audit_logger: audit_logger)
       log_reconciliation_event!(
         registration: registration,
         payment: payment,
@@ -53,7 +54,7 @@ module Payments
 
     private
 
-    attr_reader :provider_resolver, :payment_repository
+    attr_reader :provider_resolver, :payment_repository, :audit_logger
 
     def adapter(provider)
       provider_resolver.resolve(provider: provider)
@@ -96,7 +97,7 @@ module Payments
     end
 
     def log_reconciliation_event!(registration:, payment:, provider:, previous_status:, return_params:)
-      SystemAuditLogger.log!(
+      audit_logger.log!(
         action: "system.payments.reconciled",
         target: payment,
         metadata: {
@@ -110,7 +111,7 @@ module Payments
           current_status: payment.status,
           checkout_return: return_params.except("canceled")
         },
-        temple: registration.temple
+        temple: registration.respond_to?(:temple) ? registration.temple : nil
       )
     end
   end

@@ -4,6 +4,12 @@ require "test_helper"
 
 module Payments
   class CheckoutReturnServiceTest < ActiveSupport::TestCase
+    FakeAuditLogger = Struct.new(:calls) do
+      def log!(**kwargs)
+        calls << kwargs
+      end
+    end
+
     FakeTemple = Struct.new(:id)
     FakeRegistration = Struct.new(:reference_code, :payment_status) do
       def paid?
@@ -107,8 +113,9 @@ module Payments
       )
       adapter = FakeAdapter.new(confirm_status: "completed")
       repository = FakeRepository.new(payment)
+      audit_logger = FakeAuditLogger.new([])
       registration.define_singleton_method(:temple_payments) { TemplePayment.none }
-      service = CheckoutReturnService.new(provider_resolver: FakeResolver.new(adapter), payment_repository: repository)
+      service = CheckoutReturnService.new(provider_resolver: FakeResolver.new(adapter), payment_repository: repository, audit_logger: audit_logger)
       service.stub(:latest_payment_for!, payment) do
         result = service.call(
           registration: registration,
@@ -121,6 +128,8 @@ module Payments
         assert_equal TempleRegistration::PAYMENT_STATUSES[:paid], registration.payment_status
         assert_equal 1, adapter.confirm_calls.length
         assert_equal 0, adapter.query_calls.length
+        assert_includes audit_logger.calls.map { |call| call[:action] }, "system.registrations.payment_status_updated"
+        assert_includes audit_logger.calls.map { |call| call[:action] }, "system.payments.reconciled"
       end
     end
 
@@ -138,8 +147,9 @@ module Payments
       )
       adapter = FakeAdapter.new(query_status: "pending")
       repository = FakeRepository.new(payment)
+      audit_logger = FakeAuditLogger.new([])
       registration.define_singleton_method(:temple_payments) { TemplePayment.none }
-      service = CheckoutReturnService.new(provider_resolver: FakeResolver.new(adapter), payment_repository: repository)
+      service = CheckoutReturnService.new(provider_resolver: FakeResolver.new(adapter), payment_repository: repository, audit_logger: audit_logger)
       service.stub(:latest_payment_for!, payment) do
         result = service.call(
           registration: registration,
@@ -150,6 +160,7 @@ module Payments
         assert_equal TemplePayment::STATUSES[:pending], result.payment.status
         assert_equal 0, adapter.confirm_calls.length
         assert_equal 1, adapter.query_calls.length
+        assert_includes audit_logger.calls.map { |call| call[:action] }, "system.payments.reconciled"
       end
     end
   end

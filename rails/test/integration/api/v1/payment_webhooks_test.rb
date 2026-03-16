@@ -36,6 +36,8 @@ module Api
         assert_response :success
         assert_equal TemplePayment::STATUSES[:completed], payment.reload.status
         assert_equal TempleRegistration::PAYMENT_STATUSES[:paid], registration.reload.payment_status
+        assert SystemAuditLog.exists?(action: "system.payments.webhook_applied", target: payment)
+        assert SystemAuditLog.exists?(action: "system.registrations.payment_status_updated", target: registration)
       end
 
       test "duplicate webhook event is ignored" do

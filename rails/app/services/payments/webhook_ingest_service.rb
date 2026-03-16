@@ -8,11 +8,13 @@ module Payments
     def initialize(
       provider_resolver: ProviderResolver,
       payment_repository: Repositories::PaymentRepository.new,
-      event_log_repository: Repositories::PaymentEventLogRepository.new
+      event_log_repository: Repositories::PaymentEventLogRepository.new,
+      audit_logger: SystemAuditLogger
     )
       @provider_resolver = provider_resolver
       @payment_repository = payment_repository
       @event_log_repository = event_log_repository
+      @audit_logger = audit_logger
     end
 
     def call(temple:, provider:, payload:, headers: {})
@@ -51,6 +53,12 @@ module Payments
           provider_reference: adapter_payload[:provider_reference]
         )
         Payments::RegistrationPaymentSync.call(payment)
+        log_webhook_event!(
+          temple: temple,
+          payment: payment,
+          provider: provider,
+          adapter_payload: adapter_payload
+        )
       end
 
       event_log_repository.mark_processed!(event_log)
@@ -64,7 +72,7 @@ module Payments
 
     private
 
-    attr_reader :provider_resolver, :payment_repository, :event_log_repository
+    attr_reader :provider_resolver, :payment_repository, :event_log_repository, :audit_logger
 
     def adapter(provider)
       provider_resolver.resolve(provider: provider)
@@ -92,6 +100,24 @@ module Payments
 
     def sensitive_key?(key)
       key.match?(/secret|token|authorization|signature|card|cvv|cvc|pan|password/i)
+    end
+
+    def log_webhook_event!(temple:, payment:, provider:, adapter_payload:)
+      audit_logger.log!(
+        action: "system.payments.webhook_applied",
+        target: payment,
+        temple: temple,
+        metadata: {
+          actor_type: "system",
+          payment_id: payment.id,
+          payment_reference: payment.provider_reference.presence || payment.id,
+          registration_reference: payment.temple_registration&.reference_code,
+          provider: provider.to_s,
+          provider_event_id: adapter_payload[:provider_event_id],
+          event_type: adapter_payload[:event_type],
+          status: adapter_payload[:status]
+        }.compact
+      )
     end
 
   end
