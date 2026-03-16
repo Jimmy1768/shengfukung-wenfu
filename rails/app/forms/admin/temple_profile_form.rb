@@ -28,6 +28,7 @@ module Admin
     def save(current_admin:)
       return false unless valid?
 
+      previous_attributes = snapshot_for_record(temple)
       visit_data = compact_hash(visit_info)
       about_data = normalized_about_content
       metadata = merged_metadata(visit_data:, about_data:)
@@ -50,15 +51,12 @@ module Admin
       Temple.transaction do
         temple.save!
         SystemAuditLogger.log!(
-          action: "admin.temple.profile.update",
+          action: "admin.temple_profile.updated",
           admin: current_admin,
           target: temple,
           metadata: {
-            contact: contact_payload,
-            service_times:,
-            hero_images: normalized_hero_images,
-            visit_info: visit_data,
-            about: about_data
+            changed_fields: changed_fields(previous_attributes, profile_snapshot),
+            map_link_refreshed: resolved_contact.present?
           },
           temple:
         )
@@ -129,6 +127,70 @@ module Admin
         about: record.about_content,
         map_link: record.contact_details["mapUrl"]
       }
+    end
+
+    def profile_snapshot
+      {
+        name: name,
+        tagline: tagline,
+        hero_copy: hero_copy,
+        contact: compact_hash(contact),
+        service_times: compact_hash(service_times),
+        hero_images: normalized_hero_images,
+        visit_info: compact_hash(visit_info),
+        about: normalized_about_content,
+        map_link: normalized_map_link.presence
+      }
+    end
+
+    def snapshot_for_record(record)
+      extracted_attributes(record).then do |attrs|
+        {
+          name: attrs[:name],
+          tagline: attrs[:tagline],
+          hero_copy: attrs[:hero_copy],
+          contact: compact_hash(attrs[:contact]),
+          service_times: compact_hash(attrs[:service_times]),
+          hero_images: attrs[:hero_images].is_a?(Hash) ? attrs[:hero_images].slice(*Temple::HERO_TABS) : {},
+          visit_info: compact_hash(attrs[:visit_info]),
+          about: normalize_about_snapshot(attrs[:about]),
+          map_link: attrs[:map_link].to_s.strip.presence
+        }
+      end
+    end
+
+    def changed_fields(before_snapshot, after_snapshot)
+      before_snapshot.each_with_object([]) do |(key, value), changed|
+        changed << key.to_s if value != after_snapshot[key]
+      end
+    end
+
+    def normalize_about_snapshot(value)
+      return {} if value.blank?
+
+      data =
+        case value
+        when ActionController::Parameters
+          value.to_unsafe_h
+        when Hash
+          value
+        else
+          {}
+        end.deep_stringify_keys
+
+      normalized = {}
+      subtitle = normalized_string(data["hero_subtitle"])
+      normalized["hero_subtitle"] = subtitle if subtitle.present?
+
+      cards = Array(data["cards"]).filter_map do |card|
+        title = normalized_string(card["title"])
+        body = normalized_string(card["body"])
+        next if title.blank? || body.blank?
+
+        { "title" => title, "body" => body }
+      end
+      normalized["cards"] = cards if cards.present?
+      normalized
     end
 
     def compact_hash(value)

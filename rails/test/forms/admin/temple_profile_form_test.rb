@@ -66,7 +66,9 @@ class Admin::TempleProfileFormTest < ActiveSupport::TestCase
       }
     )
 
-    assert form.save(current_admin: admin)
+    assert_difference -> { SystemAuditLog.where(action: "admin.temple_profile.updated").count }, 1 do
+      assert form.save(current_admin: admin)
+    end
 
     temple.reload
     reloaded_form = Admin::TempleProfileForm.new(temple: temple)
@@ -87,5 +89,9 @@ class Admin::TempleProfileFormTest < ActiveSupport::TestCase
     assert_equal "test 2", cards.fetch("history")[:body]
     assert_equal "test 3", cards.fetch("deities")[:body]
     assert_equal "test 4", cards.fetch("etiquette")[:body]
+    log = SystemAuditLog.order(created_at: :desc).find_by(action: "admin.temple_profile.updated")
+    assert_equal admin.admin_account, log.admin_account
+    assert_equal temple, log.target
+    assert_includes log.metadata["changed_fields"], "name"
   end
 end

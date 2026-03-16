@@ -12,19 +12,25 @@ class AdminPermissionsManagementTest < ActionDispatch::IntegrationTest
 
     sign_in_admin(owner)
 
-    patch admin_permission_path(staff.admin_account), params: {
-      admin_permission: {
-        manage_offerings: "1",
-        manage_registrations: "1",
-        view_financials: "1"
+    assert_difference -> { SystemAuditLog.where(action: "admin.permissions.updated").count }, 1 do
+      patch admin_permission_path(staff.admin_account), params: {
+        admin_permission: {
+          manage_offerings: "1",
+          manage_registrations: "1",
+          view_financials: "1"
+        }
       }
-    }
+    end
 
     assert_redirected_to admin_permissions_path
     staff_permission.reload
     assert staff_permission.manage_offerings
     assert staff_permission.manage_registrations
     assert staff_permission.view_financials
+    log = SystemAuditLog.order(created_at: :desc).find_by(action: "admin.permissions.updated")
+    assert_equal owner.admin_account, log.admin_account
+    assert_equal temple, log.temple
+    assert_includes log.metadata["changed_capabilities"], "manage_offerings"
   end
 
   test "admin without manage permissions is redirected" do
