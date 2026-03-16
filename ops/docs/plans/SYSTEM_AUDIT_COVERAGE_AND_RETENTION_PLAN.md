@@ -76,6 +76,59 @@ Clearly not comprehensive yet:
 - admin payment checkout/refund/reconciliation actions
 - admin session/login-sensitive actions, if desired
 
+### Phase 1 Inventory Findings
+
+Current `SystemAuditLogger.log!` call sites observed:
+
+- account:
+  - `account.oauth.link_started`
+  - `account.oauth.unlinked`
+  - `preferences.theme_updated`
+- admin:
+  - offerings create/update
+  - services create/update
+  - events create/update
+  - patrons create
+  - assistance request close
+  - archive export
+- internal/high-trust:
+  - privacy request transitions
+  - temple access grant/promote/revoke
+- money/supporting flows:
+  - cash payment recorder
+  - registration builder
+- media/supporting flows:
+  - managed uploader
+  - hero image uploader
+- auth/system:
+  - central OAuth flow writes at least one audit event already
+
+High-value actions currently missing or not clearly covered:
+
+- Tier 1 gaps:
+  - admin payment hosted checkout start/return/result
+  - admin refund/cancel/reconcile/manual payment actions
+  - provider/system-driven payment reconciliation events
+  - registration status changes tied to payment outcomes
+  - admin permission updates are not yet confirmed here
+  - temple profile/content edits outside existing audited forms are not yet confirmed here
+- Tier 2 gaps:
+  - account profile update
+  - account settings password add/change
+  - account dependent create/update/destroy
+  - account registration create/update
+  - account checkout start/return/result
+  - account privacy request submission/closure request
+  - account contact temple request create
+  - account assistance request create
+
+Current skip candidates unless later justified:
+
+- account/admin locale changes
+- theme/display preference changes beyond the current targeted preference audit
+- session login/logout events
+- ordinary reads and page visits
+
 ## Audit Tiers
 
 ### Tier 1 — Mandatory Retention
@@ -123,6 +176,84 @@ For money-related actions, metadata should also include:
   - system reconciliation
 - before/after status where relevant
 
+## Phase 2 Contract Decisions
+
+### Canonical Action Naming
+
+Use dotted names with actor surface first, then domain, then verb:
+
+- account:
+  - `account.profile.updated`
+  - `account.password.added`
+  - `account.password.changed`
+  - `account.registration.created`
+  - `account.registration.updated`
+  - `account.payment.checkout_started`
+- admin:
+  - `admin.payments.created`
+  - `admin.payments.refunded`
+  - `admin.payments.reconciled`
+  - `admin.permissions.updated`
+  - `admin.temple_profile.updated`
+- system:
+  - `system.payments.reconciled`
+  - `system.payments.webhook_applied`
+  - `system.payments.status_corrected`
+- internal:
+  - `internal.privacy_requests.transitioned`
+  - `internal.temple_access.revoked`
+
+Rules:
+- prefer past-tense result names for completed actions
+- use `started` only for intentionally logged start events such as checkout initiation
+- avoid inconsistent mixes like `create`, `created`, `update`, `updated` in the same action family
+
+### Minimum Metadata By Action Family
+
+Profile/account self-service:
+- changed field list only
+- avoid storing raw sensitive values
+
+Password actions:
+- action source
+- whether this was add vs change vs reset completion
+- never store password material
+
+OAuth identity actions:
+- provider
+- identity id when available
+
+Registration actions:
+- registration reference/id
+- offering/service/event reference if applicable
+- before/after status when status changed
+
+Payment actions:
+- payment id/reference
+- registration/order reference
+- provider
+- action source
+- before/after status
+- idempotency or provider reference only when useful for reconciliation
+- never store secrets, tokens, or raw sensitive provider payloads in `SystemAuditLog`
+
+Privacy/access/admin permission actions:
+- target actor or target resource
+- before/after role or status when changed
+- reason/note when manually triggered
+
+Export actions:
+- export type
+- scope summary
+- actor
+
+### User Actor Handling (V1)
+
+- Keep using `SystemAuditLogger` in v1.
+- Continue passing `current_user` where account-side actions need an actor recorded.
+- Do not redesign the schema/logger yet.
+- If account-side coverage becomes awkward or ambiguous during implementation, add a small logger API refinement in a later focused pass instead of blocking Phase 3.
+
 ## Retention Proposal
 
 ### Tier 1
@@ -148,15 +279,15 @@ For money-related actions, metadata should also include:
 
 ### Phase 1 — Coverage Inventory
 
-- [ ] Inventory all current `SystemAuditLogger.log!` call sites.
-- [ ] Inventory high-value account and admin actions with no audit logging yet.
-- [ ] Group actions into Tier 1, Tier 2, or skip.
+- [x] Inventory all current `SystemAuditLogger.log!` call sites.
+- [x] Inventory high-value account and admin actions with no audit logging yet.
+- [x] Group actions into Tier 1, Tier 2, or skip.
 
 ### Phase 2 — Contract Tightening
 
-- [ ] Define canonical audit action naming conventions.
-- [ ] Define minimum metadata requirements per action family.
-- [ ] Decide whether `SystemAuditLogger` should support explicit non-admin user actors more cleanly.
+- [x] Define canonical audit action naming conventions.
+- [x] Define minimum metadata requirements per action family.
+- [x] Decide whether `SystemAuditLogger` should support explicit non-admin user actors more cleanly.
 
 ### Phase 3 — Coverage Expansion
 
