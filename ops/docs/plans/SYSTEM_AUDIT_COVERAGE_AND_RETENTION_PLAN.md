@@ -65,15 +65,21 @@ Already audited in code:
 - OAuth link/unlink actions
 - some preference/theme updates
 - cash payment recorder and registration builder flows
+- account profile update
+- account password add from settings
+- account dependent create/update/delete
+- account registration create/update
+- account checkout start/return
+- admin payment create and hosted checkout start/return
+- system payment reconciliation during checkout return
 
 Clearly not comprehensive yet:
-- account profile updates
-- password added/changed flows
-- dependent create/update/destroy
-- account registration edits and checkout actions
-- contact temple request creation
+- password changed/reset completion beyond the current add-password path
+- account contact temple request creation
 - account privacy actions
-- admin payment checkout/refund/reconciliation actions
+- account assistance request create
+- admin refund/cancel/reconciliation/manual payment actions beyond checkout start/return
+- registration status changes tied to payment outcomes outside the current checkout-return reconciliation path
 - admin session/login-sensitive actions, if desired
 
 ### Phase 1 Inventory Findings
@@ -106,18 +112,12 @@ Current `SystemAuditLogger.log!` call sites observed:
 High-value actions currently missing or not clearly covered:
 
 - Tier 1 gaps:
-  - admin payment hosted checkout start/return/result
   - admin refund/cancel/reconcile/manual payment actions
-  - provider/system-driven payment reconciliation events
-  - registration status changes tied to payment outcomes
+  - registration status changes tied to payment outcomes outside checkout-return reconciliation
   - admin permission updates are not yet confirmed here
   - temple profile/content edits outside existing audited forms are not yet confirmed here
 - Tier 2 gaps:
-  - account profile update
-  - account settings password add/change
-  - account dependent create/update/destroy
-  - account registration create/update
-  - account checkout start/return/result
+  - account password change/reset completion outside the add-password path
   - account privacy request submission/closure request
   - account contact temple request create
   - account assistance request create
@@ -291,9 +291,28 @@ Export actions:
 
 ### Phase 3 — Coverage Expansion
 
-- [ ] Add missing account audit logs for selected Tier 1 and Tier 2 actions.
-- [ ] Add missing admin money-flow audit logs.
-- [ ] Add tests for high-value audit events.
+- [~] Add missing account audit logs for selected Tier 1 and Tier 2 actions.
+- [~] Add missing admin money-flow audit logs.
+- [~] Add tests for high-value audit events.
+
+Phase 3 progress:
+- added account audit logs for:
+  - profile update
+  - password add from settings
+  - dependent create/update/delete
+  - registration create/update
+  - payment checkout start/return
+- added admin payment audit logs for:
+  - cash payment create
+  - hosted checkout start
+  - hosted checkout return
+- added system payment reconciliation audit log for checkout return processing
+- added integration coverage for the new account/admin audit-producing flows
+
+Remaining in Phase 3:
+- account privacy/contact/support submission flows
+- admin refund/cancel/reconcile/manual override flows
+- broader payment lifecycle audit coverage beyond checkout return
 
 ### Phase 4 — Retention + Access Policy
 

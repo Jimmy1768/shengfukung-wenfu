@@ -54,16 +54,18 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
     get edit_account_registration_path(registration)
     assert_response :success
 
-    patch account_registration_path(registration), params: {
-      account_registration_metadata_form: {
-        contact_name: "Member",
-        contact_phone: "0912-000-000",
-        contact_email: "member@example.com",
-        household_notes: "2 位家人",
-        arrival_window: "08:30",
-        ceremony_notes: "Need seating"
+    assert_difference -> { SystemAuditLog.where(action: "account.registrations.updated").count }, 1 do
+      patch account_registration_path(registration), params: {
+        account_registration_metadata_form: {
+          contact_name: "Member",
+          contact_phone: "0912-000-000",
+          contact_email: "member@example.com",
+          household_notes: "2 位家人",
+          arrival_window: "08:30",
+          ceremony_notes: "Need seating"
+        }
       }
-    }
+    end
     assert_redirected_to account_registration_path(registration)
 
     registration.reload
@@ -106,20 +108,25 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
 
     sign_in_account(user, temple_slug: temple.slug)
 
-    patch account_profile_path, params: {
-      account_profile_form: {
-        native_name: "朱玲",
-        english_name: "",
-        phone: "0912-333-333",
-        city: "苗栗",
-        notes: "Native name only"
+    assert_difference -> { SystemAuditLog.where(action: "account.profile.updated").count }, 1 do
+      patch account_profile_path, params: {
+        account_profile_form: {
+          native_name: "朱玲",
+          english_name: "",
+          phone: "0912-333-333",
+          city: "苗栗",
+          notes: "Native name only"
+        }
       }
-    }
+    end
 
     assert_redirected_to account_profile_path
     user.reload
     assert_equal "朱玲", user.native_name
     assert_equal "", user.english_name
+    log = SystemAuditLog.order(created_at: :desc).find_by(action: "account.profile.updated")
+    assert_equal user, log.user
+    assert_includes log.metadata["changed_fields"], "native_name"
 
     get account_dashboard_path
     assert_response :success
@@ -186,6 +193,45 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
     assert_equal "dependent", registration.metadata["registrant_scope"]
     assert_equal dependent.id.to_s, registration.metadata["dependent_id"]
     assert_equal "Dependent Member", registration.metadata["registrant_name"]
+  end
+
+  test "dependent lifecycle writes audit events" do
+    temple = create_temple
+    user = User.create!(
+      email: "dependent-audit@example.com",
+      english_name: "Dependent Audit",
+      encrypted_password: User.password_hash("Password123!")
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+
+    assert_difference -> { SystemAuditLog.where(action: "account.dependents.created").count }, 1 do
+      post account_dependents_path, params: {
+        account_dependent_form: {
+          english_name: "Family Member",
+          relationship_label: "Sibling",
+          phone: "0911-222-333",
+          email: "family@example.com"
+        }
+      }
+    end
+
+    link = user.reload.user_dependents.includes(:dependent).last
+
+    assert_difference -> { SystemAuditLog.where(action: "account.dependents.updated").count }, 1 do
+      patch account_dependent_path(link), params: {
+        account_dependent_form: {
+          english_name: "Family Member Updated",
+          relationship_label: "Sibling",
+          phone: "0911-222-333",
+          email: "family@example.com"
+        }
+      }
+    end
+
+    assert_difference -> { SystemAuditLog.where(action: "account.dependents.deleted").count }, 1 do
+      delete account_dependent_path(link)
+    end
   end
 
   test "account paid registration blocks core field edits" do

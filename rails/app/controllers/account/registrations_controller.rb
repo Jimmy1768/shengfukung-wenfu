@@ -37,6 +37,7 @@ module Account
       @metadata_form = Account::RegistrationMetadataForm.new(registration: @existing_registration, user: current_user) if @existing_registration
 
       if @form.save
+        log_registration_event!("account.registrations.created", target: @form.registration, changed_fields: registration_intake_params.keys)
         redirect_to payment_account_registration_path(@form.registration),
           notice: "Registration submitted."
       else
@@ -57,6 +58,7 @@ module Account
       )
 
       if @form.save
+        log_registration_event!("account.registrations.updated", target: @registration, changed_fields: metadata_params.keys)
         redirect_to account_registration_path(@registration), notice: "Registration updated."
       else
         flash.now[:alert] = "Please review the errors below."
@@ -87,6 +89,8 @@ module Account
         )
       )
 
+      log_payment_checkout_started!(provider: provider, payment: result.payment, reused: result.reused)
+
       redirect_url = Payments::CheckoutFlow.redirect_url_for(result)
       return redirect_to redirect_url, allow_other_host: true if redirect_url.present?
 
@@ -112,6 +116,8 @@ module Account
         provider: provider,
         params: checkout_return_params
       )
+
+      log_payment_checkout_returned!(provider: provider, payment: result.payment)
 
       notice =
         if result.payment.completed?
@@ -286,6 +292,54 @@ module Account
 
       request_id = (@open_assistance_requests_by_registration_id || {})[registration.id]
       request_id.present? ? request_id : nil
+    end
+
+    def log_registration_event!(action, target:, changed_fields:)
+      SystemAuditLogger.log!(
+        action: action,
+        admin: current_user,
+        target: target,
+        temple: current_temple,
+        metadata: {
+          actor_type: "user",
+          registration_reference: target.reference_code,
+          changed_fields: Array(changed_fields).map(&:to_s)
+        }
+      )
+    end
+
+    def log_payment_checkout_started!(provider:, payment:, reused:)
+      SystemAuditLogger.log!(
+        action: "account.payments.checkout_started",
+        admin: current_user,
+        target: payment,
+        temple: current_temple,
+        metadata: {
+          actor_type: "user",
+          registration_reference: @registration.reference_code,
+          payment_reference: payment.provider_reference.presence || payment.id,
+          provider: provider.to_s,
+          source: "account_portal",
+          reused: reused
+        }
+      )
+    end
+
+    def log_payment_checkout_returned!(provider:, payment:)
+      SystemAuditLogger.log!(
+        action: "account.payments.checkout_returned",
+        admin: current_user,
+        target: payment,
+        temple: current_temple,
+        metadata: {
+          actor_type: "user",
+          registration_reference: @registration.reference_code,
+          payment_reference: payment.provider_reference.presence || payment.id,
+          provider: provider.to_s,
+          source: "checkout_return",
+          status: payment.status
+        }
+      )
     end
   end
 end

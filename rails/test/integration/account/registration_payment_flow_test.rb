@@ -129,7 +129,9 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
     sign_in_account(user, temple_slug: temple.slug)
     registration = create_registration(user:, offering:)
 
-    post start_checkout_account_registration_path(registration)
+    assert_difference -> { SystemAuditLog.where(action: "account.payments.checkout_started").count }, 1 do
+      post start_checkout_account_registration_path(registration)
+    end
 
     assert_redirected_to payment_account_registration_path(registration)
     payment = registration.temple_payments.order(:created_at).last
@@ -153,7 +155,9 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
 
     Payments::ProviderResolver.stub(:current_provider, "line_pay") do
       PaymentGateway::LinePayAdapter.stub(:new, FakeRedirectAdapter.new("https://pay.example.test/checkout")) do
-        post start_checkout_account_registration_path(registration)
+        assert_difference -> { SystemAuditLog.where(action: "account.payments.checkout_started").count }, 1 do
+          post start_checkout_account_registration_path(registration)
+        end
       end
     end
 
@@ -181,8 +185,12 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
       processed_at: nil
     )
 
-    PaymentGateway::LinePayAdapter.stub(:new, FakeReturnAdapter.new("completed")) do
-      get checkout_return_account_registration_path(registration, provider: "line_pay", transactionId: "tx_123", orderId: "order_123")
+    assert_difference -> { SystemAuditLog.where(action: "account.payments.checkout_returned").count }, 1 do
+      assert_difference -> { SystemAuditLog.where(action: "system.payments.reconciled").count }, 1 do
+        PaymentGateway::LinePayAdapter.stub(:new, FakeReturnAdapter.new("completed")) do
+          get checkout_return_account_registration_path(registration, provider: "line_pay", transactionId: "tx_123", orderId: "order_123")
+        end
+      end
     end
 
     assert_redirected_to payment_account_registration_path(registration)

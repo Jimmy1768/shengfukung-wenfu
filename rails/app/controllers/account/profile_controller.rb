@@ -18,6 +18,7 @@ module Account
     def update
       @form = Account::ProfileForm.new(user: current_user, params: profile_params)
       if @form.save
+        log_profile_update!
         redirect_to account_profile_path, notice: "Profile updated."
       else
         flash.now[:alert] = "Please fix the errors below."
@@ -29,6 +30,19 @@ module Account
 
     def profile_params
       params.require(:account_profile_form).permit(:english_name, :native_name, :phone, :city, :notes)
+    end
+
+    def log_profile_update!
+      SystemAuditLogger.log!(
+        action: "account.profile.updated",
+        admin: current_user,
+        target: current_user,
+        temple: current_temple,
+        metadata: {
+          actor_type: "user",
+          changed_fields: profile_params.keys.map(&:to_s)
+        }
+      )
     end
   end
 end

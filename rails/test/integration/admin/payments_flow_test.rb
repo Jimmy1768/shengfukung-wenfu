@@ -39,8 +39,10 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
 
     sign_in_admin(admin_user)
 
-    post admin_payments_path(registration_id: registration.id),
-      params: { temple_payment: { amount_cents: 700, currency: "TWD" } }
+    assert_difference -> { SystemAuditLog.where(action: "admin.payments.created").count }, 1 do
+      post admin_payments_path(registration_id: registration.id),
+        params: { temple_payment: { amount_cents: 700, currency: "TWD" } }
+    end
 
     assert_redirected_to admin_event_offering_order_path(offering, registration)
     assert_equal "paid", registration.reload.payment_status
@@ -62,7 +64,9 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
 
     sign_in_admin(admin_user)
 
-    post start_checkout_admin_payments_path(registration_id: registration.id)
+    assert_difference -> { SystemAuditLog.where(action: "admin.payments.checkout_started").count }, 1 do
+      post start_checkout_admin_payments_path(registration_id: registration.id)
+    end
 
     assert_redirected_to admin_event_offering_order_path(offering, registration)
     payment = registration.temple_payments.order(:created_at).last
@@ -88,7 +92,9 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
 
     Payments::ProviderResolver.stub(:current_provider, "line_pay") do
       PaymentGateway::LinePayAdapter.stub(:new, FakeRedirectAdapter.new("https://pay.example.test/admin")) do
-        post start_checkout_admin_payments_path(registration_id: registration.id)
+        assert_difference -> { SystemAuditLog.where(action: "admin.payments.checkout_started").count }, 1 do
+          post start_checkout_admin_payments_path(registration_id: registration.id)
+        end
       end
     end
 
@@ -119,8 +125,12 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
 
     sign_in_admin(admin_user)
 
-    PaymentGateway::LinePayAdapter.stub(:new, FakeReturnAdapter.new("completed")) do
-      get checkout_return_admin_payments_path(registration_id: registration.id, provider: "line_pay", transactionId: "tx_admin_1", orderId: "order_admin_1")
+    assert_difference -> { SystemAuditLog.where(action: "admin.payments.checkout_returned").count }, 1 do
+      assert_difference -> { SystemAuditLog.where(action: "system.payments.reconciled").count }, 1 do
+        PaymentGateway::LinePayAdapter.stub(:new, FakeReturnAdapter.new("completed")) do
+          get checkout_return_admin_payments_path(registration_id: registration.id, provider: "line_pay", transactionId: "tx_admin_1", orderId: "order_admin_1")
+        end
+      end
     end
 
     assert_redirected_to admin_event_offering_order_path(offering, registration)

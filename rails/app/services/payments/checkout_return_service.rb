@@ -11,6 +11,7 @@ module Payments
 
     def call(registration:, provider:, params: {})
       payment = latest_payment_for!(registration: registration, provider: provider)
+      previous_status = payment.status
       payload_params = normalize_params(params)
 
       adapter_payload =
@@ -39,6 +40,13 @@ module Payments
         provider_reference: adapter_payload[:provider_reference].presence || payload_params["transaction_id"].presence || payload_params["order_id"].presence
       )
       Payments::RegistrationPaymentSync.call(payment)
+      log_reconciliation_event!(
+        registration: registration,
+        payment: payment,
+        provider: provider,
+        previous_status: previous_status,
+        return_params: payload_params
+      )
 
       Result.new(payment: payment, adapter_payload: adapter_payload)
     end
@@ -87,5 +95,23 @@ module Payments
       }.compact
     end
 
+    def log_reconciliation_event!(registration:, payment:, provider:, previous_status:, return_params:)
+      SystemAuditLogger.log!(
+        action: "system.payments.reconciled",
+        target: payment,
+        metadata: {
+          actor_type: "system",
+          registration_reference: registration.reference_code,
+          payment_id: payment.id,
+          payment_reference: payment.provider_reference.presence || payment.id,
+          provider: provider.to_s,
+          source: "checkout_return",
+          previous_status: previous_status,
+          current_status: payment.status,
+          checkout_return: return_params.except("canceled")
+        },
+        temple: registration.temple
+      )
+    end
   end
 end

@@ -11,6 +11,7 @@ module Account
     def create
       @form = Account::DependentForm.new(user: current_user, params: dependent_params)
       if @form.save
+        log_dependent_event!("account.dependents.created", target: @form.link&.dependent, changed_fields: dependent_params.keys)
         redirect_to account_profile_path, notice: "已新增家屬。"
       else
         flash.now[:alert] = "請確認欄位填寫正確。"
@@ -25,6 +26,7 @@ module Account
     def update
       @form = Account::DependentForm.new(user: current_user, link: @link, params: dependent_params)
       if @form.save
+        log_dependent_event!("account.dependents.updated", target: @form.link&.dependent, changed_fields: dependent_params.keys)
         redirect_to account_profile_path, notice: "家屬資料已更新。"
       else
         flash.now[:alert] = "請確認欄位填寫正確。"
@@ -33,7 +35,9 @@ module Account
     end
 
     def destroy
+      dependent = @link.dependent
       @link.destroy
+      log_dependent_event!("account.dependents.deleted", target: dependent, changed_fields: [])
       redirect_to account_profile_path, notice: "家屬已刪除。"
     end
 
@@ -52,6 +56,19 @@ module Account
         :phone,
         :email,
         :notes
+      )
+    end
+
+    def log_dependent_event!(action, target:, changed_fields:)
+      SystemAuditLogger.log!(
+        action: action,
+        admin: current_user,
+        target: target,
+        temple: current_temple,
+        metadata: {
+          actor_type: "user",
+          changed_fields: Array(changed_fields).map(&:to_s)
+        }
       )
     end
   end

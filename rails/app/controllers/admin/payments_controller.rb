@@ -55,6 +55,7 @@ module Admin
         notes: payment_params[:notes]
       )
       @payment = recorder.record!
+      log_payment_event!("admin.payments.created", payment: @payment, source: "cash_entry")
 
       redirect_to offering_order_path(@registration.offering, @registration),
         notice: t("admin.payments.flash.recorded")
@@ -81,6 +82,16 @@ module Admin
         )
       )
 
+      log_payment_event!(
+        "admin.payments.checkout_started",
+        payment: result.payment,
+        source: "admin_checkout",
+        extra_metadata: {
+          provider: provider.to_s,
+          reused: result.reused
+        }
+      )
+
       redirect_url = Payments::CheckoutFlow.redirect_url_for(result)
       return redirect_to redirect_url, allow_other_host: true if redirect_url.present?
 
@@ -104,6 +115,16 @@ module Admin
         registration: @registration,
         provider: provider,
         params: checkout_return_params
+      )
+
+      log_payment_event!(
+        "admin.payments.checkout_returned",
+        payment: result.payment,
+        source: "checkout_return",
+        extra_metadata: {
+          provider: provider.to_s,
+          status: result.payment.status
+        }
       )
 
       notice =
@@ -231,6 +252,23 @@ module Admin
       filter_params.except(:start_date, :end_date, :month_preset).merge(
         start_date: start_date.iso8601,
         end_date: end_date.iso8601
+      )
+    end
+
+    def log_payment_event!(action, payment:, source:, extra_metadata: {})
+      SystemAuditLogger.log!(
+        action: action,
+        admin: current_admin,
+        target: payment,
+        temple: current_temple,
+        metadata: {
+          actor_type: "admin",
+          payment_id: payment.id,
+          payment_reference: payment.provider_reference.presence || payment.id,
+          registration_reference: @registration.reference_code,
+          provider: payment.provider,
+          source: source
+        }.merge(extra_metadata)
       )
     end
   end

@@ -48,17 +48,23 @@ class AccountPasswordSettingsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, I18n.t("account.settings.password.title")
 
-    patch account_settings_path, params: {
-      account_password_settings_form: {
-        password: "Password123!",
-        password_confirmation: "Password123!"
+    assert_difference -> { SystemAuditLog.where(action: "account.password.added").count }, 1 do
+      patch account_settings_path, params: {
+        account_password_settings_form: {
+          password: "Password123!",
+          password_confirmation: "Password123!"
+        }
       }
-    }
+    end
 
     assert_redirected_to account_settings_path
     user.reload
     assert_equal User.password_hash("Password123!"), user.encrypted_password
     assert_equal false, user.metadata["oauth_seeded"]
+    log = SystemAuditLog.order(created_at: :desc).find_by(action: "account.password.added")
+    assert_equal user, log.user
+    assert_equal temple, log.temple
+    assert_equal "account_settings", log.metadata["source"]
 
     sign_in_account(user, password: "Password123!", temple_slug: temple.slug)
     assert_response :success
