@@ -204,7 +204,8 @@ This means the repo can reach feature-complete internal payment architecture bef
   - `Payments::CashPaymentRecorder` (`rails/app/services/payments/cash_payment_recorder.rb`)
   - `Admin::PaymentsController#create` records cash payment and marks registration paid.
 - Account payment UX is currently placeholder for online provider:
-  - `account/registrations/payment` page shows LINE Pay CTA text but no real checkout flow wiring.
+  - historical note: this was previously a placeholder with LINE Pay-only CTA copy.
+  - current state: account/admin now use provider-agnostic checkout actions that redirect to hosted payment URLs when the adapter returns one.
 - Existing LINE Pay-specific code is stub-only:
   - `Payments::LinePayGatewayStub` exists (`create_order`, `confirm_order` stubbed responses).
 - Route/API audit:
@@ -347,19 +348,31 @@ Phase 4 test execution log:
 
 Phase 6A implementation notes (fake end-to-end):
 - Added account checkout action:
-  - `POST /account/registrations/:id/start_fake_checkout`
-  - uses `Payments::CheckoutService` with provider `fake`.
+  - `POST /account/registrations/:id/start_checkout`
+  - resolves provider from `PAYMENTS_PROVIDER`
+  - redirects to provider `redirect_url` when present, otherwise stays on the payment page
 - Added admin checkout action:
-  - `POST /admin/payments/fake_checkout?registration_id=:id`
-  - uses `Payments::CheckoutService` with provider `fake`.
+  - `POST /admin/payments/start_checkout?registration_id=:id`
+  - resolves provider from `PAYMENTS_PROVIDER`
+  - redirects to provider `redirect_url` when present, otherwise returns to the admin order screen
+- Added hosted-checkout return actions:
+  - `GET /account/registrations/:id/checkout_return`
+  - `GET /admin/payments/checkout_return?registration_id=:id`
+  - these call `Payments::CheckoutReturnService` to confirm/query provider state after user return
 - Added webhook ingest endpoint:
   - `POST /api/v1/payments/webhooks/:provider`
   - resolves temple via payload (`temple_slug`) and executes `Payments::WebhookIngestService`.
 - Payment status synchronization:
-  - `CheckoutService`, `WebhookIngestService`, and `RefundService` now sync registration payment status (`pending/paid/failed/refunded`) based on payment outcome.
+  - `CheckoutService`, `WebhookIngestService`, `RefundService`, and `CheckoutReturnService` now share status mapping + registration sync via `Payments::StatusMapper` and `Payments::RegistrationPaymentSync`.
+- Shared checkout flow contract:
+  - `Payments::CheckoutFlow` now centralizes hosted checkout metadata (`return_url`, `confirm_url`, `cancel_url`, `registration_reference`)
+  - controller redirect handling now reuses the same helper for provider `redirect_url` extraction
 - Cash flow compatibility fixes:
   - `CashPaymentRecorder` now writes `provider`/`provider_account`.
   - `CashPaymentRecorder` no longer assumes legacy offering columns/foreign keys that are absent in current schema.
+- Account payment UX hardening:
+  - payment page now polls `GET /api/v1/account/payment_statuses/:reference` while payment remains pending
+  - hosted checkout completion can surface on-page without a full manual refresh
 
 Phase 6A test execution log:
 - Command:
@@ -389,6 +402,10 @@ Phase 6C progress notes (in progress):
 - Env + signing gates:
   - requires `LINE_PAY_CHANNEL_ID`, `LINE_PAY_CHANNEL_SECRET`, `LINE_PAY_API_BASE`
   - webhook signature verification now checks `x-line-signature` against raw request body HMAC
+- Return/query hardening now covered in tests:
+  - `query_status` falls back across `transactionId`, `orderId`, metadata `transaction_id`, and original query reference
+  - webhook normalization falls back to `payStatus` / `transactionStatus` when `returnCode` is absent
+  - hosted checkout return flows are covered in account/admin integration tests via `CheckoutReturnService`
 - Remaining to mark 6C complete:
   - test with real merchant sandbox credentials and callback URLs
   - verify webhook/callback signature behavior against actual provider payloads

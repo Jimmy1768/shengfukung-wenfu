@@ -13,6 +13,7 @@ Controller / job / webhook endpoint
         v
 Payments::* service entrypoints
   - CheckoutService
+  - CheckoutReturnService
   - WebhookIngestService
   - RefundService
         |
@@ -28,6 +29,11 @@ Payments::* service entrypoints
                  - PaymentRepository
                  - PaymentEventLogRepository
                  (project-specific persistence seam)
+        |
+        +--> Shared payment state helpers
+                 - CheckoutFlow
+                 - StatusMapper
+                 - RegistrationPaymentSync
 ```
 
 ## Core Service Responsibilities
@@ -37,6 +43,11 @@ Payments::* service entrypoints
   - creates pending payment via repository
   - executes provider checkout through adapter
   - maps provider status to internal status
+- `Payments::CheckoutReturnService`
+  - handles hosted-checkout user return paths
+  - confirms LINE Pay transactions when `transactionId` is present
+  - falls back to provider `query_status` for reconciliation
+  - applies normalized payment + registration state updates
 - `Payments::WebhookIngestService`
   - ingests provider webhook payloads through adapter
   - writes provider event log with dedupe guard
@@ -110,6 +121,29 @@ LINE Pay adapter capabilities:
 - `refund` via `/v3/payments/{transactionId}/refund`
 - `cancel` currently mapped to refund behavior for parity
 - webhook/callback signature check uses `x-line-signature` against raw request body HMAC
+- return/query fallback handling:
+  - `query_status` now falls back across `transactionId`, `orderId`, metadata `transaction_id`, and original query reference
+  - callback normalization uses `payStatus` / `transactionStatus` when `returnCode` is absent
+
+## Hosted Checkout Web Flow
+- Account start path:
+  - `POST /account/registrations/:id/start_checkout`
+- Admin start path:
+  - `POST /admin/payments/start_checkout?registration_id=:id`
+- Account return path:
+  - `GET /account/registrations/:id/checkout_return`
+- Admin return path:
+  - `GET /admin/payments/checkout_return?registration_id=:id`
+
+Behavior:
+- checkout start passes normalized metadata through `Payments::CheckoutFlow`
+  - `registration_reference`
+  - `return_url`
+  - `confirm_url`
+  - `cancel_url`
+- if adapter returns `redirect_url`, the controller redirects the browser to the hosted provider page
+- when the provider returns the user, `CheckoutReturnService` confirms or queries payment state and redirects back into the account/admin surface
+- account payment page also polls `GET /api/v1/account/payment_statuses/:reference` while status remains pending so webhook-driven completion can surface without a full manual refresh
 
 ## Internal Status Lifecycle
 Current canonical statuses:
@@ -173,10 +207,19 @@ Policy:
 2. Run focused payment-core tests:
 ```bash
 cd rails && bin/rails test \
+  test/services/payments/checkout_flow_test.rb \
+  test/services/payments/checkout_return_service_test.rb \
+  test/services/payments/status_mapper_test.rb \
+  test/services/payments/registration_payment_sync_test.rb \
   test/services/payments/status_transition_policy_test.rb \
   test/services/payments/checkout_service_test.rb \
   test/services/payments/webhook_ingest_service_test.rb \
-  test/services/payments/refund_service_test.rb
+  test/services/payments/refund_service_test.rb \
+  test/services/payment_gateway/line_pay_adapter_test.rb \
+  test/integration/account/registration_payment_flow_test.rb \
+  test/integration/admin/payments_flow_test.rb \
+  test/integration/api/v1/payment_webhooks_test.rb \
+  test/integration/account/api/payment_statuses_test.rb
 ```
 3. Validate no uncommitted files after edits:
 ```bash
@@ -206,6 +249,10 @@ Canonical file manifest for copy/adapt scope:
 1. Copy core files:
    - `rails/app/services/payment_gateway/*`
    - `rails/app/services/payments/checkout_service.rb`
+   - `rails/app/services/payments/checkout_return_service.rb`
+   - `rails/app/services/payments/checkout_flow.rb`
+   - `rails/app/services/payments/status_mapper.rb`
+   - `rails/app/services/payments/registration_payment_sync.rb`
    - `rails/app/services/payments/webhook_ingest_service.rb`
    - `rails/app/services/payments/refund_service.rb`
    - `rails/app/services/payments/status_transition_policy.rb`
