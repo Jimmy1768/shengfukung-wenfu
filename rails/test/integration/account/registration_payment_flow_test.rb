@@ -59,6 +59,7 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "前往付款"
     assert_includes response.body, offering.title
+    assert_includes response.body, api_v1_account_payment_status_path(reference: registration.reference_code)
   end
 
   test "free registration payment page shows confirmation" do

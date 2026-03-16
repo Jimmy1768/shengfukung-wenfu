@@ -6,7 +6,7 @@ module Api
       class PaymentStatusesController < BaseController
         def show
           registration = find_registration
-          render json: Account::Api::PaymentStatusSerializer.new(registration).as_json
+          render json: ::Account::Api::PaymentStatusSerializer.new(registration).as_json
         end
 
         private

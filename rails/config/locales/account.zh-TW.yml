@@ -364,6 +364,8 @@ zh-TW:
         free_notice: "此報名不需付費，已完成。"
         paid_notice: "已完成付款。"
         pending_notice: "完成線上付款即可保留名額。"
+        failed_notice: "付款失敗，請重試或洽廟方服務台。"
+        refunded_notice: "此筆付款已退款。"
         checkout_cta: "前往付款"
         checkout_hint: "%{provider} 可能會於新視窗開啟，如需協助可洽寺廟服務台。"
         pay_later: "稍後再付"

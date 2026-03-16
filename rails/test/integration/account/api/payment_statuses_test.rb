@@ -10,8 +10,8 @@ class Account::Api::PaymentStatusesTest < ActionDispatch::IntegrationTest
     registration = create_registration(user:, offering:, payment_status: "paid")
     create_payment(registration:, amount_cents: registration.total_price_cents)
 
-    sign_in_account(user)
-    get account_api_payment_status_path(reference: registration.reference_code)
+    sign_in_account(user, temple_slug: temple.slug)
+    get api_v1_account_payment_status_path(reference: registration.reference_code)
 
     assert_response :success
     payload = JSON.parse(response.body)
@@ -28,8 +28,8 @@ class Account::Api::PaymentStatusesTest < ActionDispatch::IntegrationTest
     other_registration = create_registration(user: other_user, offering:)
     create_registration(user:, offering:)
 
-    sign_in_account(user)
-    get account_api_payment_status_path(reference: other_registration.reference_code)
+    sign_in_account(user, temple_slug: temple.slug)
+    get api_v1_account_payment_status_path(reference: other_registration.reference_code)
 
     assert_response :not_found
   end

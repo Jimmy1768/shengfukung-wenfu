@@ -2,8 +2,19 @@
 <% amount_label = Currency::Symbols.format_amount(@registration.total_price_cents, @registration.currency) %>
 <% amount_zero = @registration.total_price_cents.to_i.zero? %>
 <% status_key = @registration.payment_status_for_display %>
+<% payment_status_url = api_v1_account_payment_status_path(reference: @registration.reference_code) %>
 
-<section class="account-section">
+<section class="account-section"
+  data-payment-status-url="<%= payment_status_url %>"
+  data-payment-status-current="<%= status_key %>"
+  data-payment-status-paid-label="<%= t("account.dashboard.payment_statuses.paid") %>"
+  data-payment-status-pending-label="<%= t("account.dashboard.payment_statuses.pending") %>"
+  data-payment-status-failed-label="<%= t("account.dashboard.payment_statuses.failed") %>"
+  data-payment-status-refunded-label="<%= t("account.dashboard.payment_statuses.refunded") %>"
+  data-payment-status-paid-notice="<%= t("account.registrations.payment.paid_notice") %>"
+  data-payment-status-pending-notice="<%= t("account.registrations.payment.pending_notice") %>"
+  data-payment-status-failed-notice="<%= t("account.registrations.payment.failed_notice") %>"
+  data-payment-status-refunded-notice="<%= t("account.registrations.payment.refunded_notice") %>">
   <header class="section-header">
     <div>
       <p class="eyebrow"><%= t("account.registrations.payment.eyebrow") %></p>
@@ -44,7 +55,7 @@
       <div>
         <dt><%= t("account.registrations.payment.summary.status") %></dt>
         <dd>
-          <span class="status-pill status-<%= status_key %>">
+          <span class="status-pill status-<%= status_key %>" data-payment-status-pill>
             <%= t("account.dashboard.payment_statuses.#{status_key}", default: status_key.to_s.humanize) %>
           </span>
         </dd>
@@ -59,27 +70,121 @@
       <%= link_to t("account.registrations.payment.back_to_registration"), account_registration_path(@registration), class: "pill-link secondary" %>
     </article>
   <% elsif @registration.paid? %>
-    <article class="card payment-callout is-paid">
+    <article class="card payment-callout is-paid" data-payment-callout>
       <div class="payment-amount">
         <p class="eyebrow"><%= t("account.registrations.payment.amount_label") %></p>
         <strong><%= amount_label %></strong>
       </div>
-      <p><%= t("account.registrations.payment.paid_notice") %></p>
+      <p data-payment-message><%= t("account.registrations.payment.paid_notice") %></p>
       <%= link_to t("account.registrations.payment.back_to_registration"), account_registration_path(@registration), class: "pill-link secondary" %>
     </article>
   <% else %>
-    <article class="card payment-callout is-pending">
+    <article class="card payment-callout is-pending" data-payment-callout>
       <div class="payment-amount">
         <p class="eyebrow"><%= t("account.registrations.payment.amount_label") %></p>
         <strong><%= amount_label %></strong>
       </div>
-      <p class="payment-message"><%= t("account.registrations.payment.pending_notice") %></p>
+      <p class="payment-message" data-payment-message><%= t("account.registrations.payment.pending_notice") %></p>
       <%= button_to t("account.registrations.payment.checkout_cta"),
           start_checkout_account_registration_path(@registration),
           method: :post,
-          class: "btn btn-primary payment-cta" %>
+          class: "btn btn-primary payment-cta",
+          data: { payment_checkout_cta: true } %>
       <p class="muted"><%= t("account.registrations.payment.checkout_hint", provider: @payment_provider_label) %></p>
       <%= link_to t("account.registrations.payment.pay_later"), account_registration_path(@registration), class: "pill-link secondary" %>
     </article>
   <% end %>
 </section>
+
+<script>
+  (() => {
+    const bindPaymentStatusPolling = () => {
+      const section = document.querySelector("[data-payment-status-url]");
+      if (!section) return;
+
+      const currentStatus = () => section.dataset.paymentStatusCurrent || "";
+      if (currentStatus() !== "pending") return;
+
+      const url = section.dataset.paymentStatusUrl;
+      if (!url) return;
+
+      const statusPill = section.querySelector("[data-payment-status-pill]");
+      const messageNode = section.querySelector("[data-payment-message]");
+      const callout = section.querySelector("[data-payment-callout]");
+      const checkoutButton = section.querySelector("[data-payment-checkout-cta]");
+
+      const labels = {
+        paid: section.dataset.paymentStatusPaidLabel || "Paid",
+        pending: section.dataset.paymentStatusPendingLabel || "Pending",
+        failed: section.dataset.paymentStatusFailedLabel || "Failed",
+        refunded: section.dataset.paymentStatusRefundedLabel || "Refunded"
+      };
+
+      const notices = {
+        paid: section.dataset.paymentStatusPaidNotice || "",
+        pending: section.dataset.paymentStatusPendingNotice || "",
+        failed: section.dataset.paymentStatusFailedNotice || "",
+        refunded: section.dataset.paymentStatusRefundedNotice || ""
+      };
+
+      const applyStatus = (nextStatus) => {
+        section.dataset.paymentStatusCurrent = nextStatus;
+
+        if (statusPill) {
+          statusPill.className = `status-pill status-${nextStatus}`;
+          statusPill.textContent = labels[nextStatus] || nextStatus;
+        }
+
+        if (messageNode && notices[nextStatus]) {
+          messageNode.textContent = notices[nextStatus];
+        }
+
+        if (callout) {
+          callout.classList.remove("is-pending", "is-paid", "is-failed", "is-refunded");
+          if (nextStatus === "paid") {
+            callout.classList.add("is-paid");
+          } else if (nextStatus === "failed") {
+            callout.classList.add("is-failed");
+          } else if (nextStatus === "refunded") {
+            callout.classList.add("is-refunded");
+          } else {
+            callout.classList.add("is-pending");
+          }
+        }
+
+        if (checkoutButton && nextStatus !== "pending") {
+          checkoutButton.remove();
+        }
+      };
+
+      const poll = () => {
+        fetch(url, { headers: { Accept: "application/json" }, credentials: "same-origin" })
+          .then((response) => {
+            if (!response.ok) throw new Error(`Payment status request failed: ${response.status}`);
+            return response.json();
+          })
+          .then((payload) => {
+            const nextStatus = payload.payment_status;
+            if (!nextStatus || nextStatus === currentStatus()) return;
+
+            applyStatus(nextStatus);
+            if (nextStatus !== "pending") {
+              window.clearInterval(intervalId);
+            }
+          })
+          .catch(() => {});
+      };
+
+      const intervalId = window.setInterval(poll, 5000);
+      poll();
+      window.addEventListener("beforeunload", () => window.clearInterval(intervalId), { once: true });
+    };
+
+    document.addEventListener("turbo:load", bindPaymentStatusPolling);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bindPaymentStatusPolling, { once: true });
+    } else {
+      bindPaymentStatusPolling();
+    }
+  })();
+</script>
