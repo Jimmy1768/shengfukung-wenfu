@@ -44,6 +44,11 @@ module Payments
         }.compact
       )
       Payments::RegistrationPaymentSync.call(payment)
+      log_refund_event!(
+        payment: payment,
+        operation: operation,
+        reason: reason
+      )
 
       Result.new(payment: payment, adapter_payload: adapter_payload)
     end
@@ -54,6 +59,32 @@ module Payments
 
     def adapter(provider)
       provider_resolver.resolve(provider: provider)
+    end
+
+    def log_refund_event!(payment:, operation:, reason:)
+      action =
+        if operation.to_sym == :cancel
+          "system.payments.cancelled"
+        else
+          "system.payments.refunded"
+        end
+
+      SystemAuditLogger.log!(
+        action: action,
+        target: payment,
+        temple: payment.temple,
+        metadata: {
+          actor_type: "system",
+          payment_id: payment.id,
+          payment_reference: payment.provider_reference.presence || payment.id,
+          registration_reference: payment.temple_registration&.reference_code,
+          provider: payment.provider,
+          source: "refund_service",
+          operation: operation.to_sym,
+          reason: reason,
+          current_status: payment.status
+        }.compact
+      )
     end
   end
 end

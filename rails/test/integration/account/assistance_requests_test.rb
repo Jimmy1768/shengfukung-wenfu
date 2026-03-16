@@ -32,17 +32,22 @@ module Account
 
       sign_in_account(user, temple_slug: temple.slug)
 
-      post account_assistance_requests_path, params: {
-        account_assistance_request: {
-          registration_id: registration.id,
-          channel: "registration_detail"
+      assert_difference -> { SystemAuditLog.where(action: "account.assistance_requests.created").count }, 1 do
+        post account_assistance_requests_path, params: {
+          account_assistance_request: {
+            registration_id: registration.id,
+            channel: "registration_detail"
+          }
         }
-      }
+      end
 
       assert_redirected_to account_registration_path(registration)
       request_record = TempleAssistanceRequest.find_by!(temple: temple, user: user, temple_registration: registration)
       assert_equal "open", request_record.status
       assert_equal "registration_detail", request_record.channel
+      log = SystemAuditLog.order(created_at: :desc).find_by(action: "account.assistance_requests.created")
+      assert_equal "registration_detail", log.metadata["source"]
+      assert_equal registration.reference_code, log.metadata["registration_reference"]
     end
 
     test "duplicate open assistance request is reused" do

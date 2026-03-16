@@ -15,7 +15,7 @@ module Account
         return
       end
 
-      current_temple.temple_assistance_requests.create!(
+      request_record = current_temple.temple_assistance_requests.create!(
         user: current_user,
         temple_registration: registration,
         status: "open",
@@ -23,6 +23,8 @@ module Account
         channel: normalized_channel,
         message: assistance_request_params[:message].presence
       )
+
+      log_assistance_request_event!(request_record)
 
       redirect_back fallback_location: fallback_location(registration), notice: t("account.assistance_requests.flash.created")
     end
@@ -49,6 +51,21 @@ module Account
 
     def fallback_location(registration)
       registration.present? ? account_registration_path(registration) : account_profile_path
+    end
+
+    def log_assistance_request_event!(request_record)
+      SystemAuditLogger.log!(
+        action: "account.assistance_requests.created",
+        admin: current_user,
+        target: request_record,
+        temple: current_temple,
+        metadata: {
+          actor_type: "user",
+          source: request_record.channel,
+          registration_reference: request_record.temple_registration&.reference_code,
+          message_present: request_record.message.present?
+        }.compact
+      )
     end
   end
 end

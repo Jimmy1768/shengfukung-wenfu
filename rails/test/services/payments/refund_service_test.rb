@@ -51,38 +51,49 @@ module Payments
     end
 
     test "refund path maps to refunded" do
-      payment = TemplePayment.new(provider: "fake", status: TemplePayment::STATUSES[:completed], provider_reference: "pay_123")
+      temple = create_temple
+      registration = create_registration(user: User.create!(email: "refund@example.com", english_name: "Refund User", encrypted_password: User.password_hash("Password123!")), offering: create_offering(temple: temple))
+      payment = TemplePayment.new(id: 101, temple: temple, temple_event_registration: registration, provider: "fake", status: TemplePayment::STATUSES[:completed], provider_reference: "pay_123")
       repository = FakeRepository.new
       service = RefundService.new(provider_resolver: FakeResolver.new(FakeAdapter.new), payment_repository: repository)
 
-      result = service.call(
-        payment: payment,
-        amount_cents: 500,
-        reason: "duplicate",
-        idempotency_key: "refund-1",
-        operation: :refund
-      )
+      assert_difference -> { SystemAuditLog.where(action: "system.payments.refunded").count }, 1 do
+        result = service.call(
+          payment: payment,
+          amount_cents: 500,
+          reason: "duplicate",
+          idempotency_key: "refund-1",
+          operation: :refund
+        )
 
-      assert_equal TemplePayment::STATUSES[:refunded], repository.updated_status
-      assert_equal :refund, repository.updated_metadata[:operation]
-      assert_equal TemplePayment::STATUSES[:refunded], result.payment.status
+        assert_equal TemplePayment::STATUSES[:refunded], repository.updated_status
+        assert_equal :refund, repository.updated_metadata[:operation]
+        assert_equal TemplePayment::STATUSES[:refunded], result.payment.status
+      end
+
+      log = SystemAuditLog.order(created_at: :desc).find_by(action: "system.payments.refunded")
+      assert_equal "refund_service", log.metadata["source"]
     end
 
     test "cancel path maps to failed status with operation metadata" do
-      payment = TemplePayment.new(provider: "fake", status: TemplePayment::STATUSES[:pending], provider_reference: "pay_456")
+      temple = create_temple
+      registration = create_registration(user: User.create!(email: "cancel@example.com", english_name: "Cancel User", encrypted_password: User.password_hash("Password123!")), offering: create_offering(temple: temple))
+      payment = TemplePayment.new(id: 102, temple: temple, temple_event_registration: registration, provider: "fake", status: TemplePayment::STATUSES[:pending], provider_reference: "pay_456")
       repository = FakeRepository.new
       service = RefundService.new(provider_resolver: FakeResolver.new(FakeAdapter.new), payment_repository: repository)
 
-      result = service.call(
-        payment: payment,
-        reason: "user_cancelled",
-        idempotency_key: "cancel-1",
-        operation: :cancel
-      )
+      assert_difference -> { SystemAuditLog.where(action: "system.payments.cancelled").count }, 1 do
+        result = service.call(
+          payment: payment,
+          reason: "user_cancelled",
+          idempotency_key: "cancel-1",
+          operation: :cancel
+        )
 
-      assert_equal TemplePayment::STATUSES[:failed], repository.updated_status
-      assert_equal :cancel, repository.updated_metadata[:operation]
-      assert_equal TemplePayment::STATUSES[:failed], result.payment.status
+        assert_equal TemplePayment::STATUSES[:failed], repository.updated_status
+        assert_equal :cancel, repository.updated_metadata[:operation]
+        assert_equal TemplePayment::STATUSES[:failed], result.payment.status
+      end
     end
   end
 end

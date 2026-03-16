@@ -10,9 +10,11 @@ module Account
         encrypted_password: User.password_hash("Password123!")
       )
 
-      sign_in_account(user, temple_slug: temple.slug)
+    sign_in_account(user, temple_slug: temple.slug)
 
-      post request_data_deletion_account_privacy_path
+      assert_difference -> { SystemAuditLog.where(action: "account.privacy.requested").count }, 1 do
+        post request_data_deletion_account_privacy_path
+      end
 
       assert_redirected_to account_privacy_path
       request_record = PrivacyRequest.find_by!(user: user, request_type: "data_deletion")
@@ -28,9 +30,11 @@ module Account
         encrypted_password: User.password_hash("Password123!")
       )
 
-      sign_in_account(user, temple_slug: temple.slug)
+    sign_in_account(user, temple_slug: temple.slug)
 
-      post request_data_export_account_privacy_path
+      assert_difference -> { SystemAuditLog.where(action: "account.privacy.requested").count }, 1 do
+        post request_data_export_account_privacy_path
+      end
 
       assert_redirected_to account_privacy_path
       request_record = PrivacyRequest.find_by!(user: user, request_type: "data_export")
@@ -76,7 +80,9 @@ module Account
       assert_response :success
       assert_includes response.body, I18n.t("account.privacy.close_account.title")
 
-      post close_account_privacy_path
+      assert_difference -> { SystemAuditLog.where(action: "account.privacy.account_closed").count }, 1 do
+        post close_account_privacy_path
+      end
 
       assert_redirected_to account_login_path
       user.reload
@@ -84,6 +90,8 @@ module Account
 
       request_record = PrivacyRequest.find_by!(user: user, request_type: "account_closure")
       assert_equal "completed", request_record.status
+      log = SystemAuditLog.order(created_at: :desc).find_by(action: "account.privacy.account_closed")
+      assert_equal "account_closure", log.metadata["request_type"]
 
       get account_dashboard_path
       assert_redirected_to account_temples_path

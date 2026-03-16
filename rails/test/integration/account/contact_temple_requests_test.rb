@@ -18,15 +18,17 @@ class Account::ContactTempleRequestsTest < ActionDispatch::IntegrationTest
     sign_in_account(user, temple_slug: temple.slug)
 
     Notifications::BrevoClient.stub(:new, fake_client) do
-      post account_contact_temple_requests_path,
-        params: {
-          return_to: account_events_path,
-          account_contact_temple_request_form: {
-            subject: "Question about registration",
-            message: "Hello temple, I need help with tomorrow's registration.",
-            website: ""
+      assert_difference -> { SystemAuditLog.where(action: "account.contact_temple_requests.created").count }, 1 do
+        post account_contact_temple_requests_path,
+          params: {
+            return_to: account_events_path,
+            account_contact_temple_request_form: {
+              subject: "Question about registration",
+              message: "Hello temple, I need help with tomorrow's registration.",
+              website: ""
+            }
           }
-        }
+      end
     end
 
     assert_redirected_to account_events_path
@@ -38,6 +40,9 @@ class Account::ContactTempleRequestsTest < ActionDispatch::IntegrationTest
     patron_email = fake_client.calls.second.dig(:to, :email)
     assert_equal AppConstants::Emails.support_email, temple_email
     assert_equal user.email, patron_email
+    log = SystemAuditLog.order(created_at: :desc).find_by(action: "account.contact_temple_requests.created")
+    assert_equal temple, log.temple
+    assert_equal true, log.metadata["subject_present"]
   end
 
   test "invalid payload does not send emails" do
@@ -58,9 +63,9 @@ class Account::ContactTempleRequestsTest < ActionDispatch::IntegrationTest
         }
     end
 
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
     assert_equal 0, fake_client.calls.size
-    assert_includes response.body, "Please fix"
+    assert_includes response.body, "Please check the form and try again."
   end
 
   test "development email override routes both recipients to dev email" do

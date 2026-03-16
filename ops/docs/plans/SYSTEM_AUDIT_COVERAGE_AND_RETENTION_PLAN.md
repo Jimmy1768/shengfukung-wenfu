@@ -70,14 +70,15 @@ Already audited in code:
 - account dependent create/update/delete
 - account registration create/update
 - account checkout start/return
+- account privacy request create and account closure
+- account contact temple request create
+- account assistance request create
 - admin payment create and hosted checkout start/return
 - system payment reconciliation during checkout return
+- system refund/cancel lifecycle events
 
 Clearly not comprehensive yet:
 - password changed/reset completion beyond the current add-password path
-- account contact temple request creation
-- account privacy actions
-- account assistance request create
 - admin refund/cancel/reconciliation/manual payment actions beyond checkout start/return
 - registration status changes tied to payment outcomes outside the current checkout-return reconciliation path
 - admin session/login-sensitive actions, if desired
@@ -118,9 +119,6 @@ High-value actions currently missing or not clearly covered:
   - temple profile/content edits outside existing audited forms are not yet confirmed here
 - Tier 2 gaps:
   - account password change/reset completion outside the add-password path
-  - account privacy request submission/closure request
-  - account contact temple request create
-  - account assistance request create
 
 Current skip candidates unless later justified:
 
@@ -307,10 +305,17 @@ Phase 3 progress:
   - hosted checkout start
   - hosted checkout return
 - added system payment reconciliation audit log for checkout return processing
+- added account audit logs for:
+  - privacy request create
+  - account closure
+  - contact temple request create
+  - assistance request create
+- added system payment audit logs for:
+  - refund
+  - cancel
 - added integration coverage for the new account/admin audit-producing flows
 
 Remaining in Phase 3:
-- account privacy/contact/support submission flows
 - admin refund/cancel/reconcile/manual override flows
 - broader payment lifecycle audit coverage beyond checkout return
 

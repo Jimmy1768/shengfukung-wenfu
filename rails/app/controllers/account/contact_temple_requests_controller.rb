@@ -20,6 +20,7 @@ module Account
       ).call
 
       if result.success?
+        log_contact_request_event!
         redirect_to success_redirect_path, notice: "Your message has been sent to the temple."
       else
         render_profile_with_errors(
@@ -37,6 +38,7 @@ module Account
 
     def render_profile_with_errors(status:, alert:)
       @form = Account::ProfileForm.new(user: current_user)
+      @password_form = Account::PasswordSettingsForm.new(user: current_user)
       @contact_temple_form ||= Account::ContactTempleRequestForm.new
       @dependents = current_user.user_dependents.includes(:dependent)
       flash.now[:alert] = alert
@@ -63,6 +65,21 @@ module Account
       else
         "We could not send your message right now. Please try again later."
       end
+    end
+
+    def log_contact_request_event!
+      SystemAuditLogger.log!(
+        action: "account.contact_temple_requests.created",
+        admin: current_user,
+        target: current_user,
+        temple: current_temple,
+        metadata: {
+          actor_type: "user",
+          source: "account_profile",
+          subject_present: @contact_temple_form.subject.present?,
+          message_length: @contact_temple_form.message.to_s.length
+        }
+      )
     end
   end
 end
