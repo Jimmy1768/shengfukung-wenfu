@@ -78,6 +78,28 @@ module PaymentGateway
       end
     end
 
+    test "query_status falls back to order id when transaction id missing" do
+      response_body = { returnCode: "0000", info: { orderId: "order_abc", payStatus: "PENDING" } }.to_json
+      adapter = LinePayAdapter.new(http_client: FakeHttpClient.new([FakeResponse.new("200", response_body)]))
+
+      with_env(line_env) do
+        result = adapter.query_status(provider_payment_ref: "order_abc", metadata: {})
+        assert_equal "pending", result[:status]
+        assert_equal "order_abc", result[:provider_reference]
+      end
+    end
+
+    test "query_status carries metadata transaction id when provider response omits ids" do
+      response_body = { returnCode: "0000", info: { payStatus: "PAID" } }.to_json
+      adapter = LinePayAdapter.new(http_client: FakeHttpClient.new([FakeResponse.new("200", response_body)]))
+
+      with_env(line_env) do
+        result = adapter.query_status(provider_payment_ref: "order_abc", metadata: { transaction_id: "tx_meta_1" })
+        assert_equal "completed", result[:status]
+        assert_equal "tx_meta_1", result[:provider_reference]
+      end
+    end
+
     test "refund and cancel return normalized statuses" do
       success = { returnCode: "0000", info: { refundTransactionId: "rf_1" } }.to_json
       adapter = LinePayAdapter.new(http_client: FakeHttpClient.new([FakeResponse.new("200", success), FakeResponse.new("200", success)]))
@@ -112,6 +134,46 @@ module PaymentGateway
           headers: { "x-line-signature" => signature }
         )
         assert_equal true, result[:valid]
+      end
+    end
+
+    test "ingest_webhook maps transaction status fallback when return code missing" do
+      payload_body = {
+        event_type: "line_pay.callback",
+        transactionId: "tx_pending_1",
+        orderId: "order_pending_1",
+        transactionStatus: "AUTHORIZED"
+      }.to_json
+      secret = "line_secret"
+      signature = Base64.strict_encode64(OpenSSL::HMAC.digest("SHA256", secret, payload_body))
+      adapter = LinePayAdapter.new
+
+      with_env(line_env.merge("LINE_PAY_CHANNEL_SECRET" => secret)) do
+        result = adapter.ingest_webhook(
+          payload: JSON.parse(payload_body).deep_symbolize_keys.merge(_raw_body: payload_body),
+          headers: { "x-line-signature" => signature }
+        )
+
+        assert_equal "completed", result[:status]
+        assert_equal "tx_pending_1", result[:provider_reference]
+        assert_equal true, result[:signature_valid]
+      end
+    end
+
+    test "confirm maps non-success return code to failed" do
+      response_body = { returnCode: "1172", returnMessage: "Transaction not found" }.to_json
+      adapter = LinePayAdapter.new(http_client: FakeHttpClient.new([FakeResponse.new("200", response_body)]))
+
+      with_env(line_env) do
+        result = adapter.confirm(
+          provider_payment_ref: "tx_missing",
+          amount_cents: 900,
+          currency: "TWD",
+          metadata: {},
+          idempotency_key: "idem_line_confirm_fail"
+        )
+        assert_equal "failed", result[:status]
+        assert_equal "tx_missing", result[:provider_reference]
       end
     end
 

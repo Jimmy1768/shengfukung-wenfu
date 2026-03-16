@@ -136,9 +136,15 @@ module PaymentGateway
 
       response = request_line_pay(method: :get, path: path)
       info = response["info"] || {}
+      provider_reference =
+        info["transactionId"]&.to_s ||
+        info["orderId"]&.to_s ||
+        transaction_id.presence ||
+        order_id
+
       {
         status: map_check_status(info["payStatus"] || info["transactionStatus"]),
-        provider_reference: info["transactionId"]&.to_s || order_id,
+        provider_reference: provider_reference,
         raw: {
           line_pay_response: response
         }
@@ -235,6 +241,8 @@ module PaymentGateway
       return_code = payload[:returnCode].presence || payload["returnCode"].presence
       transaction_id = payload[:transactionId].presence || payload["transactionId"].presence
       order_id = payload[:orderId].presence || payload["orderId"].presence
+      transaction_status = payload[:transactionStatus].presence || payload["transactionStatus"].presence
+      pay_status = payload[:payStatus].presence || payload["payStatus"].presence
       event_type = payload[:event_type].presence || payload["event_type"].presence || "line_pay.callback"
 
       status =
@@ -242,6 +250,8 @@ module PaymentGateway
           "completed"
         elsif return_code.present?
           "failed"
+        elsif pay_status.present? || transaction_status.present?
+          map_check_status(pay_status || transaction_status)
         else
           "pending"
         end
