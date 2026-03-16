@@ -114,6 +114,11 @@ Last updated: 2026-03-01
 5. Port optional UI/reporting files if target project needs those surfaces.
 6. Add provider credentials later and run Stripe/LINE validation.
 
+## Current Rollout Decision
+- Approved build strategy: finish the shared payments-core architecture first with `PAYMENTS_PROVIDER=fake`.
+- Do not block subsystem implementation on owning a real or sandbox LINE Pay account.
+- Treat LINE Pay credential-based verification as the final provider rollout gate after the app is already wired end-to-end with the fake adapter.
+
 ## Acceptance Gates Before Marking Port Complete
 - `Payments::*` services are the only orchestration path used by controllers/jobs.
 - No direct provider SDK calls outside `PaymentGateway::*Adapter`.

@@ -65,6 +65,55 @@ module Account
       assert_includes response.body, "Google"
     end
 
+    test "signed in user can link apple through central oauth callback" do
+      temple = create_temple(slug: "oauth-apple-linking-temple")
+      user = User.create!(
+        email: "apple-link-owner@example.com",
+        english_name: "Apple Link Owner",
+        encrypted_password: User.password_hash("Password123!"),
+        metadata: {}
+      )
+
+      sign_in_account(user, temple_slug: temple.slug)
+
+      AppConstants::OAuth.stub(:central_auth_enabled?, true) do
+        post account_oauth_link_path(provider: "apple")
+        assert_redirected_to central_oauth_start_path(
+          provider: "apple",
+          surface: "account",
+          temple: temple.slug,
+          origin: account_oauth_identities_path,
+          intent: "link"
+        )
+
+        Auth::CentralOAuthClient.stub(:new, FakeCentralOAuthClient.new({ "redirect_url" => "https://auth.example.test/apple" }, nil)) do
+          follow_redirect!
+        end
+
+        assert_redirected_to "https://auth.example.test/apple"
+        assert SystemAuditLog.exists?(action: "account.oauth.link_started", target: user)
+      end
+
+      exchange_response = {
+        "provider" => "apple",
+        "uid" => "apple-linked-uid",
+        "email" => "apple-private-relay@example.com",
+        "email_verified" => true,
+        "credentials" => { "token" => "apple-linked-token" }
+      }
+
+      Auth::CentralOAuthClient.stub(:new, FakeCentralOAuthClient.new(nil, exchange_response)) do
+        get central_oauth_callback_path(code: "apple-oauth-code", state: "apple-oauth-state")
+      end
+
+      assert_redirected_to account_oauth_identities_path
+      follow_redirect!
+
+      identity = OAuthIdentity.find_by!(provider: "apple", provider_uid: "apple-linked-uid")
+      assert_equal user.id, identity.user_id
+      assert_includes response.body, "Apple"
+    end
+
     test "cannot link provider identity already attached to another user" do
       temple = create_temple(slug: "oauth-conflict-temple")
       current_user = User.create!(

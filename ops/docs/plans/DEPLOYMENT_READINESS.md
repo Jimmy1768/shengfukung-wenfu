@@ -36,18 +36,13 @@ Current interpretation after production Google OAuth validation and shared-DB cl
   - account namespace is wired and reachable
   - central-auth Google OAuth works end-to-end
   - admin sign-in works after promoting a real OAuth-backed user
+  - two real admin accounts exist, including one owner
   - admin console pages/actions are reachable and responsive
-  - shared production DB has been cleaned back to the intended baseline state
-  - both temple rows remain present with only slug/name retained
-  - blank unpublished temple profile is the correct pre-onboarding state
+  - admin-driven temple profile/content entry has been completed
+  - temple profile has been published successfully
 - `Blocked externally`
 - `Untested`
   - email/password account flows
-  - admin-driven temple profile/content entry from blank state
-  - publish flow after admin content entry
-  - one real registration flow after temple content is prepared
-  - account linking manual validation with Apple as secondary provider
-  - Facebook OAuth production validation
   - payments beyond fake provider mode
   - S3/media uploads
   - rollback drill timing
@@ -156,15 +151,13 @@ Current interpretation after production Google OAuth validation and shared-DB cl
   - `/api/v1/temples/shengfukung-wenfu` returns `200`
   - account sign-in flow is reachable and Google OAuth succeeds end-to-end
   - admin sign-in works with promoted account
+  - owner/admin role setup is in place with two admin accounts
   - admin console pages/buttons respond correctly
-  - shared DB cleanup completed and temples are now intentionally blank/unpublished until onboarding
+  - admin-driven temple profile/content entry completed from the initial blank baseline
+  - temple profile publish flow completed successfully
+  - one real registration flow completed after onboarding content was published
 - [ ] Manual checks still pending:
-  - admin-driven temple profile/content entry from blank baseline
-  - publish flow for temple profile
-  - one registration flow can be created in staging after onboarding content exists
   - email/password account flow
-  - Apple OAuth on `www.shengfukung.com.tw`
-  - Facebook OAuth end-to-end on `shengfukung.com.tw`
 - [x] Payments gate for this phase:
   - keep `PAYMENTS_PROVIDER=fake` unless provider sandbox credentials are ready and validated
 - [ ] Pass criteria: smoke tests pass and remaining manual critical path checks pass.
@@ -188,13 +181,11 @@ Current interpretation after production Google OAuth validation and shared-DB cl
 
 ## Post-Staging Follow-Ups
 
-- Use admin onboarding flow to populate temple profile/content, then publish when client is ready.
+- Temple profile/content onboarding and publish flow are complete; keep subsequent content changes in the normal admin workflow.
+- At least one real registration flow has been exercised successfully after publish.
 - Apple OAuth is working on `shengfukung.com.tw` after fixing the central auth Team ID; keep the SourceGrid env value at `APPLE_TEAM_ID=99GH38T5WW`.
 - Run remaining manual provider tests:
-  - Apple on `www.shengfukung.com.tw`
-  - account linking with Apple as secondary provider
   - first-login vs repeat-login name capture behavior
-  - Facebook provider start/callback/session validation in production
 - Wire production `.org.tw` once client purchases domain.
 - Repeat DNS/TLS/deploy/smoke flow for production hostnames.
 - Enable live Stripe/LINE Pay only after provider credential validation and callback verification.

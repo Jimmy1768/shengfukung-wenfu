@@ -10,8 +10,8 @@
 
 - Google OAuth can create or link a `User` by exact email match when the provider has already authenticated the user.
 - Email registration is create-only.
-- If email registration hits an existing `users.email`, the form returns a generic `email is already taken` error.
-- There is no current `/account/settings` flow for an authenticated user to add a password to an OAuth-seeded account.
+- Existing-email signup now shows guided messaging instead of a raw uniqueness error.
+- Authenticated users can add a password from `/account/settings` for an OAuth-seeded account.
 
 ## Security Rule
 
@@ -71,27 +71,26 @@
 
 ## Phase 3: Login / Recovery Integration
 
-- [ ] Confirm existing email/password sign-in works after password is added.
+- [x] Confirm existing email/password sign-in works after password is added.
 - [ ] Confirm password reset works for OAuth-seeded accounts once a real email exists on the user record.
 - [ ] Decide whether password reset should also be allowed for OAuth-seeded accounts before manual password creation.
 
 ## QA Checklist
 
-- [ ] Create account with Google OAuth, then attempt email registration with the same email and confirm the improved message appears.
-- [ ] Sign in with Google, go to `/account/settings`, add a password, sign out, and sign in again with email/password.
-- [ ] Verify no duplicate `users` row is created.
-- [ ] Verify existing OAuth login still works after password addition.
+- [x] Create account with Google OAuth, then attempt email registration with the same email and confirm the improved message appears.
+- [x] Sign in with Google, go to `/account/settings`, add a password, sign out, and sign in again with email/password.
+- [x] Verify no duplicate `users` row is created.
+- [x] Verify existing OAuth login still works after password addition.
 - [ ] Verify password reset behavior for the same account.
 
 ## Open Decisions
 
 - [ ] Final wording for the existing-email signup message.
-- [ ] Whether `/account/settings` should be a new page or an expansion of the current account profile/settings surface.
 - [ ] Whether password reset should be enabled before a manual password is ever set.
 
 ## Acceptance Criteria
 
-- [ ] Existing-email signup gives clear guidance instead of a raw uniqueness error.
-- [ ] Users can safely add a password only after proving ownership via an authenticated session.
-- [ ] Same user can sign in with either social OAuth or email/password after password addition.
-- [ ] No automatic merge or hijack path exists from public email signup.
+- [x] Existing-email signup gives clear guidance instead of a raw uniqueness error.
+- [x] Users can safely add a password only after proving ownership via an authenticated session.
+- [x] Same user can sign in with either social OAuth or email/password after password addition.
+- [x] No automatic merge or hijack path exists from public email signup.

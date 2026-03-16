@@ -10,10 +10,12 @@
 
 - Reuse existing TempleMate payment tables/models where practical (for this repo).
 - Keep core payment domain logic schema-agnostic via a persistence/repository seam.
+- Build the provider-agnostic subsystem now with `PaymentGateway::FakeAdapter` as the active development/staging gateway.
+- Treat final LINE Pay verification as a last-mile provider rollout step that requires real merchant/sandbox credentials.
 - Migration changes require explicit user approval before any migration file edits.
   - Pre-deploy projects: rollback/edit is allowed if approved.
   - Deployed projects: additive migrations only.
-- Do not start implementation until this plan is reviewed/approved.
+- Plan is approved for implementation through fake-adapter end-to-end flows and provider-gated adapter scaffolds.
 
 ## Scope
 
@@ -62,7 +64,7 @@ Define a shared adapter interface (`PaymentGateway::Adapter`) with normalized re
 
 - `PaymentGateway::FakeAdapter` (fully functional in dev/test/staging)
 - `PaymentGateway::StripeAdapter` (scaffold + gated implementation; can remain partial until provider cutover)
-- `PaymentGateway::LinePayAdapter` (scaffold in this plan; implementation phase after credential confirmation)
+- `PaymentGateway::LinePayAdapter` (build the adapter seam now, but treat live verification as blocked on credential access)
 
 ## Provider Capability Matrix (v1 Target)
 
@@ -80,6 +82,7 @@ Define a shared adapter interface (`PaymentGateway::Adapter`) with normalized re
 Notes:
 - `payments-core` must not assume webhook-first lifecycle. Some providers (including LINE Pay patterns) require confirm/query-centric orchestration.
 - Normalized internal statuses remain authoritative; provider-specific statuses are mapped in adapters.
+- The fake adapter is the approved stand-in for end-to-end app wiring until a real provider account is available.
 
 ## Payment State Machine (Target)
 
@@ -135,7 +138,7 @@ Rules:
 ## Environment Strategy
 
 - Default provider in `development` and `test`: fake adapter.
-- Staging may use fake by default unless explicitly switched.
+- Staging should use fake by default until a real provider rollout is explicitly approved.
 - Stripe activation must be explicit via env configuration.
 - LINE Pay activation must be explicit via env configuration and enabled only after merchant credentials are validated.
 - Provider selection should be centralized (resolver/factory), not conditionals scattered across services.
@@ -163,7 +166,17 @@ LINE Pay:
 Policy:
 
 - Dev/test default to `fake` unless explicitly overridden.
+- Staging default remains `fake` for the current buildout plan.
 - Missing provider credentials must fail closed (clear startup/runtime error), not silently downgrade in production.
+
+## Approved Delivery Sequence
+
+1. Build the provider-agnostic `payments-core` subsystem end-to-end.
+2. Use `PaymentGateway::FakeAdapter` as the only active gateway for local/staging/runtime integration.
+3. Keep Stripe and LINE Pay behind strict env gating so they cannot activate accidentally without credentials.
+4. Treat live LINE Pay API validation, callback verification, and reconciliation behavior as the final provider-specific rollout step.
+
+This means the repo can reach feature-complete internal payment architecture before any real LINE Pay account exists. The remaining blocked work is provider-truth validation, not subsystem design or app wiring.
 
 ## Persistence Strategy (TempleMate + Portability)
 
@@ -329,7 +342,7 @@ Phase 4 test execution log:
 
 - [x] Phase A provider: Fake adapter complete and default in dev/test.
 - [ ] Phase B provider: Stripe adapter integrated end-to-end using test account.
-- [ ] Phase C provider: LINE Pay adapter integrated after merchant credential validation.
+- [ ] Phase C provider: LINE Pay adapter verified against real/sandbox merchant credentials after core rollout is complete.
 - [ ] Phase D provider(s): optional additional gateways (e.g., Alipay) via same adapter contract.
 
 Phase 6A implementation notes (fake end-to-end):
@@ -412,4 +425,5 @@ Provider-specific completion:
 
 ## Implementation Hold
 
-- Build is intentionally paused at planning stage pending user review.
+- Planning hold is lifted for provider-agnostic core work and fake-adapter end-to-end integration.
+- Remaining external blocker: real/sandbox LINE Pay credentials for final provider verification.
