@@ -78,6 +78,30 @@
       <p data-payment-message><%= t("account.registrations.payment.paid_notice") %></p>
       <%= link_to t("account.registrations.payment.back_to_registration"), account_registration_path(@registration), class: "pill-link secondary" %>
     </article>
+  <% elsif status_key == TempleRegistration::PAYMENT_STATUSES[:failed] %>
+    <article class="card payment-callout is-failed" data-payment-callout>
+      <div class="payment-amount">
+        <p class="eyebrow"><%= t("account.registrations.payment.amount_label") %></p>
+        <strong><%= amount_label %></strong>
+      </div>
+      <p class="payment-message" data-payment-message><%= t("account.registrations.payment.failed_notice") %></p>
+      <%= button_to t("account.registrations.payment.retry_cta"),
+          start_checkout_account_registration_path(@registration),
+          method: :post,
+          class: "btn btn-primary payment-cta",
+          data: { payment_checkout_cta: true } %>
+      <p class="muted"><%= t("account.registrations.payment.checkout_hint", provider: @payment_provider_label) %></p>
+      <%= link_to t("account.registrations.payment.back_to_registration"), account_registration_path(@registration), class: "pill-link secondary" %>
+    </article>
+  <% elsif status_key == TempleRegistration::PAYMENT_STATUSES[:refunded] %>
+    <article class="card payment-callout is-refunded" data-payment-callout>
+      <div class="payment-amount">
+        <p class="eyebrow"><%= t("account.registrations.payment.amount_label") %></p>
+        <strong><%= amount_label %></strong>
+      </div>
+      <p data-payment-message><%= t("account.registrations.payment.refunded_notice") %></p>
+      <%= link_to t("account.registrations.payment.back_to_registration"), account_registration_path(@registration), class: "pill-link secondary" %>
+    </article>
   <% else %>
     <article class="card payment-callout is-pending" data-payment-callout>
       <div class="payment-amount">

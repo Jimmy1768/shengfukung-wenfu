@@ -21,7 +21,7 @@ module Account
         redirect_to account_profile_path, notice: "Profile updated."
       else
         flash.now[:alert] = "Please fix the errors below."
-        render :edit, status: :unprocessable_entity
+        render :edit, status: :unprocessable_content
       end
     end
 

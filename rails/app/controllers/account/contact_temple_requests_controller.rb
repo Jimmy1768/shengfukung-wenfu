@@ -6,7 +6,7 @@ module Account
       @contact_temple_form = Account::ContactTempleRequestForm.new(params: contact_temple_params)
 
       unless @contact_temple_form.valid?
-        render_profile_with_errors(status: :unprocessable_entity, alert: "Please check the form and try again.")
+        render_profile_with_errors(status: :unprocessable_content, alert: "Please check the form and try again.")
         return
       end
 
@@ -23,7 +23,7 @@ module Account
         redirect_to success_redirect_path, notice: "Your message has been sent to the temple."
       else
         render_profile_with_errors(
-          status: :unprocessable_entity,
+          status: :unprocessable_content,
           alert: delivery_failure_alert_for(result)
         )
       end

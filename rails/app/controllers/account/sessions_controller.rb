@@ -24,7 +24,7 @@ module Account
       else
         flash.now[:alert] = I18n.t("account.sessions.flash.invalid_credentials")
         @registration_form ||= Account::RegistrationForm.new
-        render :new, status: :unprocessable_entity
+        render :new, status: :unprocessable_content
       end
     end
 

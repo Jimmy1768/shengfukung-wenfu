@@ -98,6 +98,25 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "此報名不需付費，已完成。"
   end
 
+  test "failed payment page shows retry action" do
+    temple = create_temple
+    offering = create_offering(temple:, slug: "failed-payment", title: "Failed Payment Offering", price_cents: 700)
+    user = User.create!(
+      email: "failedpayment@example.com",
+      english_name: "Failed Payment",
+      encrypted_password: User.password_hash("Password123!")
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+    registration = create_registration(user:, offering:, payment_status: TempleRegistration::PAYMENT_STATUSES[:failed])
+
+    get payment_account_registration_path(registration)
+
+    assert_response :success
+    assert_includes response.body, "付款失敗"
+    assert_includes response.body, "重新付款"
+  end
+
   test "start checkout creates pending payment and stays on payment page" do
     temple = create_temple
     offering = create_offering(temple:, slug: "fake-checkout", title: "Fake Checkout Offering", price_cents: 800)

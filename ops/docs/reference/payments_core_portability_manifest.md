@@ -1,127 +1,74 @@
 # Payments Core Portability Manifest
-Last updated: 2026-03-01
 
 ## Purpose
-- Provide a concrete copy/adapt manifest for porting the payments-core subsystem into sibling Rails projects.
-- Keep schema portability explicit: migrations and model/table names are project-specific.
 
-## Source Baseline
-- Source repo: `shenfukung-wenfu`
-- Recommended process:
-  1. Freeze a source SHA before export.
-  2. Copy files in this manifest from that SHA only.
-  3. Adapt target persistence/model wiring after copy.
+- Define the smallest useful copy/adapt package for moving `payments-core` into another Rails app.
+- Keep schema and model names explicitly project-specific.
 
-## Migration + Schema Policy (Confirmed)
-- Migration/schema portability is intentional.
-- See [deployment_notes.md](/Users/jimmy1768/Projects/shenfukung-wenfu/ops/docs/reference/deployment_notes.md:149):
-  - Use generic resource names in docs/contracts (`payments_transactions`, `payments_provider_events`).
-  - Map to project-domain models/tables in each target repo.
-  - Keep payment-core schema optional and onboarding-phase driven.
+## Copy First
 
-## Docs Package (Copy First)
-- [platform_payments.md](/Users/jimmy1768/Projects/shenfukung-wenfu/ops/docs/reference/platform_payments.md)
-- [PAYMENTS_CORE_SUBSYSTEM_PLAN.md](/Users/jimmy1768/Projects/shenfukung-wenfu/ops/docs/plans/PAYMENTS_CORE_SUBSYSTEM_PLAN.md)
-- [deployment_notes.md](/Users/jimmy1768/Projects/shenfukung-wenfu/ops/docs/reference/deployment_notes.md)
+Docs:
+- `ops/docs/reference/platform_payments.md`
+- `ops/docs/plans/PAYMENTS_CORE_SUBSYSTEM_PLAN.md`
 
-## Code Manifest
-
-### Copy As-Is (Core Infra)
+Core provider boundary:
 - `rails/app/services/payment_gateway/adapter.rb`
 - `rails/app/services/payment_gateway/fake_adapter.rb`
 - `rails/app/services/payment_gateway/stripe_adapter.rb`
 - `rails/app/services/payment_gateway/line_pay_adapter.rb`
+
+Core orchestration:
 - `rails/app/services/payments/provider_resolver.rb`
 - `rails/app/services/payments/checkout_service.rb`
+- `rails/app/services/payments/checkout_return_service.rb`
 - `rails/app/services/payments/webhook_ingest_service.rb`
 - `rails/app/services/payments/refund_service.rb`
+- `rails/app/services/payments/checkout_flow.rb`
+- `rails/app/services/payments/status_mapper.rb`
+- `rails/app/services/payments/registration_payment_sync.rb`
 - `rails/app/services/payments/status_transition_policy.rb`
 
-### Adapt Required (Project Persistence + Domain Mapping)
+## Adapt In The Target App
+
+Persistence:
 - `rails/app/services/payments/repositories/payment_repository.rb`
-  - Replace `TemplePayment` persistence assumptions with target transaction model/table.
 - `rails/app/services/payments/repositories/payment_event_log_repository.rb`
-  - Replace `PaymentWebhookLog` persistence assumptions with target provider-event model/table.
-- `rails/app/models/temple_payment.rb`
-  - Either port as compatibility model or map service/repository logic to target model.
-- `rails/app/models/payment_webhook_log.rb`
-  - Either port as compatibility model or map to target event-log model.
-- `rails/app/services/payments/checkout_service.rb`
-- `rails/app/services/payments/webhook_ingest_service.rb`
-- `rails/app/services/payments/refund_service.rb`
-- `rails/app/services/payments/status_transition_policy.rb`
-  - These service files are mostly identical infra plumbing, but they reference:
-  - `TemplePayment::STATUSES`
-  - `TemplePayment::PAYMENT_METHODS`
-  - `TempleRegistration::PAYMENT_STATUSES`
-  - If target constants differ, add a compatibility shim or update these references.
 
-### Required HTTP Entry Points
+Project models/constants:
+- `rails/app/models/temple_payment.rb`
+- `rails/app/models/payment_webhook_log.rb`
+- any registration/order model references used by `RegistrationPaymentSync`
+
+HTTP entry points:
 - `rails/app/controllers/api/v1/payment_webhooks_controller.rb`
 - `rails/config/routes.rb`
-  - Ensure route exists: `POST /api/v1/payments/webhooks/:provider`
 
-### Optional but Commonly Ported (UI/Reporting Integration)
-- `rails/app/controllers/admin/payments_controller.rb`
-- `rails/app/controllers/account/payments_controller.rb`
-- `rails/app/controllers/api/v1/account/payment_statuses_controller.rb`
-- `rails/app/views/admin/payments/index.html.erb`
-- `rails/app/views/admin/payments/new.html.erb`
-- `rails/app/views/admin/payments/_ledger_table.html.erb`
-- `rails/app/views/account/payments/index.html.erb`
-- `rails/app/views/account/registrations/payment.html.erb`
-- `rails/app/serializers/account/api/payment_status_serializer.rb`
-- `rails/app/services/payments/cash_payment_recorder.rb`
-- `rails/app/services/payments/temple_registration_builder.rb`
-- `rails/app/services/reporting/payment_summary.rb`
-- `rails/app/services/reporting/payments_csv_exporter.rb`
+Optional UI surfaces:
+- account/admin payment controllers and views
+- payment status serializer/API
+- reporting/export code
 
-## Test Manifest
+## Required Contract In The Target App
 
-### Must Port (Core Contract Safety)
-- `rails/test/services/payments/checkout_service_test.rb`
-- `rails/test/services/payments/webhook_ingest_service_test.rb`
-- `rails/test/services/payments/refund_service_test.rb`
-- `rails/test/services/payments/status_transition_policy_test.rb`
-- `rails/test/services/payment_gateway/stripe_adapter_test.rb`
-- `rails/test/services/payment_gateway/line_pay_adapter_test.rb`
+- controllers and jobs call `Payments::*` services only
+- provider SDK/API calls stay inside `PaymentGateway::*Adapter`
+- target persistence supports payment lookup, status updates, and webhook event dedupe
+- target app preserves the canonical internal statuses:
+  - `pending`
+  - `completed`
+  - `failed`
+  - `refunded`
 
-### Port If Feature Surfaces Are Included
-- `rails/test/integration/api/v1/payment_webhooks_test.rb`
-- `rails/test/integration/admin/payments_flow_test.rb`
-- `rails/test/integration/account/registration_payment_flow_test.rb`
-- `rails/test/models/temple_payment_test.rb`
-- `rails/test/services/payments/cash_payment_recorder_test.rb`
-- `rails/test/services/reporting/payment_summary_test.rb`
-- `rails/test/services/reporting/payments_csv_exporter_test.rb`
+## Porting Sequence
 
-## Environment Contract (Target Repo)
-- `PAYMENTS_PROVIDER=fake|stripe|line_pay`
-- `PAYMENTS_IDEMPOTENCY_WINDOW_SECONDS` (optional)
-- `STRIPE_SECRET_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-- `STRIPE_PUBLISHABLE_KEY`
-- `LINE_PAY_CHANNEL_ID`
-- `LINE_PAY_CHANNEL_SECRET`
-- `LINE_PAY_API_BASE`
-- `LINE_PAY_CONFIRM_BASE_URL`
-
-## Porting Sequence (Recommended)
-1. Copy docs package and core infra files.
-2. Implement/adjust persistence repositories for target schema.
-3. Wire webhook controller + route.
-4. Set `PAYMENTS_PROVIDER=fake` and run core service tests.
-5. Port optional UI/reporting files if target project needs those surfaces.
-6. Add provider credentials later and run Stripe/LINE validation.
+1. Copy the docs and core service/adapter files.
+2. Rewire the repository layer to the target schema.
+3. Add the webhook endpoint and hosted checkout routes needed by the target app.
+4. Run the target repo with `PAYMENTS_PROVIDER=fake` first.
+5. Only after fake flows pass, add real provider credentials.
 
 ## Current Rollout Decision
-- Approved build strategy: finish the shared payments-core architecture first with `PAYMENTS_PROVIDER=fake`.
-- Do not block subsystem implementation on owning a real or sandbox LINE Pay account.
-- Treat LINE Pay credential-based verification as the final provider rollout gate after the app is already wired end-to-end with the fake adapter.
 
-## Acceptance Gates Before Marking Port Complete
-- `Payments::*` services are the only orchestration path used by controllers/jobs.
-- No direct provider SDK calls outside `PaymentGateway::*Adapter`.
-- Webhook replay dedupe works in target event-log persistence.
-- Invalid transition enforcement works with target status constants.
-- Fake-provider test suite passes in target repo before real provider rollout.
+- The approved path is still: build and port the subsystem with `PAYMENTS_PROVIDER=fake` first.
+- Real LINE Pay access is not required for the architecture or app wiring phase.
+- Real provider validation remains the final rollout gate.

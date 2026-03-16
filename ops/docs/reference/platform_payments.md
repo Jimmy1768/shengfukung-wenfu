@@ -1,217 +1,100 @@
 # Platform Payments Reference
-Last updated: 2026-03-01
 
 ## Purpose
-- Define the reusable `payments-core` architecture implemented in this repo.
-- Keep provider logic isolated so future adapters (Stripe, LINE Pay, Alipay, etc.) can be added without rewriting domain flows.
-- Provide a copy/port checklist for sibling Rails projects that use different table/model names.
 
-## Architecture (Text Diagram)
-```text
-Controller / job / webhook endpoint
-        |
-        v
-Payments::* service entrypoints
-  - CheckoutService
-  - CheckoutReturnService
-  - WebhookIngestService
-  - RefundService
-        |
-        +--> Payments::ProviderResolver
-        |        |
-        |        v
-        |    PaymentGateway::*Adapter
-        |      - FakeAdapter
-        |      - StripeAdapter (scaffold)
-        |      - LinePayAdapter (scaffold)
-        |
-        +--> Payments::Repositories::*
-                 - PaymentRepository
-                 - PaymentEventLogRepository
-                 (project-specific persistence seam)
-        |
-        +--> Shared payment state helpers
-                 - CheckoutFlow
-                 - StatusMapper
-                 - RegistrationPaymentSync
-```
+- Describe the payment architecture that now exists in this repo.
+- Keep future provider work constrained to adapter-level changes.
 
-## Core Service Responsibilities
+## Current Build
+
+The app now has a provider-agnostic payments core.
+
+Main service entrypoints:
 - `Payments::CheckoutService`
-  - validates required keys (`idempotency_key`, `intent_key`)
-  - enforces idempotency + duplicate-intent guard
-  - creates pending payment via repository
-  - executes provider checkout through adapter
-  - maps provider status to internal status
 - `Payments::CheckoutReturnService`
-  - handles hosted-checkout user return paths
-  - confirms LINE Pay transactions when `transactionId` is present
-  - falls back to provider `query_status` for reconciliation
-  - applies normalized payment + registration state updates
 - `Payments::WebhookIngestService`
-  - ingests provider webhook payloads through adapter
-  - writes provider event log with dedupe guard
-  - enforces signature validity (fail-closed for non-fake providers)
-  - applies payment status update when payment reference is found
 - `Payments::RefundService`
-  - supports `operation: :refund` and `operation: :cancel`
-  - requires idempotency key
-  - updates canonical payment status through repository
 
-## Adapter Contract
-All adapters implement `PaymentGateway::Adapter`.
+Shared helpers:
+- `Payments::CheckoutFlow`
+- `Payments::StatusMapper`
+- `Payments::RegistrationPaymentSync`
 
-Required methods:
-- `verify_webhook_signature(payload:, headers:)`
-- `checkout(intent:, amount_cents:, currency:, metadata:, idempotency_key:)`
-- `ingest_webhook(payload:, headers:)`
-- `confirm(provider_payment_ref:, amount_cents: nil, currency: nil, metadata: {}, idempotency_key:)`
-- `query_status(provider_payment_ref:, metadata: {})`
-- `refund(payment_reference:, amount_cents: nil, reason: nil, idempotency_key:)`
-- `cancel(payment_reference:, reason: nil, idempotency_key:)`
+Provider boundary:
+- `PaymentGateway::FakeAdapter`
+- `PaymentGateway::StripeAdapter`
+- `PaymentGateway::LinePayAdapter`
 
-### Normalized payload examples
-Checkout response:
-```ruby
-{
-  status: "pending",
-  provider_checkout_id: "chk_123",
-  provider_payment_id: "pay_123",
-  provider_reference: "pay_123",
-  redirect_url: nil,
-  raw: { ... }
-}
-```
+Persistence boundary:
+- `Payments::Repositories::PaymentRepository`
+- `Payments::Repositories::PaymentEventLogRepository`
 
-Webhook ingest response:
-```ruby
-{
-  event_type: "payment.updated",
-  provider_event_id: "evt_123",
-  provider_reference: "pay_123",
-  status: "completed",
-  signature_valid: true,
-  signature_reason: "header_and_secret_present",
-  raw: { payload: ..., headers: ... }
-}
-```
+## Important Runtime Behavior
 
-Refund/cancel response:
-```ruby
-{
-  status: "refunded", # or "canceled"
-  provider_reference: "pay_123",
-  raw: { ... }
-}
-```
+- Controllers call `Payments::*` services instead of writing provider logic inline.
+- Hosted checkout can start from both account and admin surfaces.
+- Hosted providers can return into the app through dedicated return endpoints.
+- Payment webhooks are ingested through a shared provider endpoint.
+- Pending account payments can refresh on-page through the payment status API.
+- Failed account payments now expose a retry path.
 
-Stripe checkout modes supported by adapter:
-- `payment_intent`:
-  - intended for Expo/native in-app payment sheets
-  - returns `client_secret`
-- `checkout_session`:
-  - intended for web/account redirect flow
-  - returns `redirect_url`
-  - requires `success_url` + `cancel_url` in metadata
+## Active Routes
 
-LINE Pay adapter capabilities:
-- `checkout` via `/v3/payments/request`
-- `confirm` via `/v3/payments/{transactionId}/confirm`
-- `query_status` via `/v3/payments/requests/{orderId}/check`
-- `refund` via `/v3/payments/{transactionId}/refund`
-- `cancel` currently mapped to refund behavior for parity
-- webhook/callback signature check uses `x-line-signature` against raw request body HMAC
-- return/query fallback handling:
-  - `query_status` now falls back across `transactionId`, `orderId`, metadata `transaction_id`, and original query reference
-  - callback normalization uses `payStatus` / `transactionStatus` when `returnCode` is absent
+Account:
+- `POST /account/registrations/:id/start_checkout`
+- `GET /account/registrations/:id/checkout_return`
+- `GET /api/v1/account/payment_statuses/:reference`
 
-## Hosted Checkout Web Flow
-- Account start path:
-  - `POST /account/registrations/:id/start_checkout`
-- Admin start path:
-  - `POST /admin/payments/start_checkout?registration_id=:id`
-- Account return path:
-  - `GET /account/registrations/:id/checkout_return`
-- Admin return path:
-  - `GET /admin/payments/checkout_return?registration_id=:id`
+Admin:
+- `POST /admin/payments/start_checkout?registration_id=:id`
+- `GET /admin/payments/checkout_return?registration_id=:id`
 
-Behavior:
-- checkout start passes normalized metadata through `Payments::CheckoutFlow`
-  - `registration_reference`
-  - `return_url`
-  - `confirm_url`
-  - `cancel_url`
-- if adapter returns `redirect_url`, the controller redirects the browser to the hosted provider page
-- when the provider returns the user, `CheckoutReturnService` confirms or queries payment state and redirects back into the account/admin surface
-- account payment page also polls `GET /api/v1/account/payment_statuses/:reference` while status remains pending so webhook-driven completion can surface without a full manual refresh
+Webhook:
+- `POST /api/v1/payments/webhooks/:provider`
 
-## Internal Status Lifecycle
-Current canonical statuses:
+## Status Model
+
+Canonical internal statuses:
 - `pending`
 - `completed`
 - `failed`
 - `refunded`
 
-Transition policy (`Payments::StatusTransitionPolicy`):
+Transition policy:
 - `pending -> pending|completed|failed`
 - `completed -> completed|refunded`
 - `failed -> failed`
 - `refunded -> refunded`
 
-Invalid transitions raise `Payments::StatusTransitionPolicy::InvalidTransition`.
+## Provider Strategy
 
-## Idempotency + Replay Rules
-- Request idempotency:
-  - checkout/refund require `idempotency_key`
-  - repeated checkout with same idempotency key reuses existing payment
-- Business intent dedupe:
-  - checkout blocks duplicate successful charge intent via `intent_key`
-- Webhook replay dedupe:
-  - `PaymentEventLogRepository` rejects duplicate provider events by (`provider`, `provider_event_id`)
-  - duplicate webhook returns `duplicate: true` with no payment mutation
+- `PAYMENTS_PROVIDER=fake` is the approved default for development and staging buildout.
+- The fake adapter is the current end-to-end stand-in for hosted checkout, webhook, return, and refund flows.
+- Stripe and LINE Pay stay behind env gating until credentials exist.
+- Final LINE Pay validation is still a later rollout step, not a blocker for current app wiring.
 
-## Safety and Audit Rules
-- Webhook signature verification:
-  - fake: bypass allowed
-  - stripe/line: fail closed when required signature header/secret is missing
-- Audit payload sanitization:
-  - sensitive fields are redacted (`secret`, `token`, `authorization`, `card`, `cvv`, etc.)
-  - `_raw_body` is excluded from event payload storage
-- Processing errors:
-  - persisted and truncated to safe length (`500` chars)
-- Never persist raw PCI/card data in app records.
+## LINE Pay Notes
 
-## Environment Variables
-Shared:
-- `PAYMENTS_PROVIDER=fake|stripe|line_pay`
-- `PAYMENTS_IDEMPOTENCY_WINDOW_SECONDS` (optional policy window)
+The LINE Pay adapter now includes:
+- checkout request support
+- confirm support
+- query-status support
+- refund support
+- signature verification seam
+- fallback handling across `transactionId`, `orderId`, and callback/query metadata
 
-Stripe:
-- `STRIPE_SECRET_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-- `STRIPE_PUBLISHABLE_KEY`
+This is implementation-complete for local code integration, but not yet verified against a real LINE Pay merchant environment.
 
-LINE Pay:
-- `LINE_PAY_CHANNEL_ID`
-- `LINE_PAY_CHANNEL_SECRET`
-- `LINE_PAY_API_BASE`
-- `LINE_PAY_CONFIRM_BASE_URL`
+## Local Validation
 
-Policy:
-- default to `fake` in development/test
-- production must fail closed if required provider credentials are missing
+Typical focused payment test command:
 
-## Local Runbook
-1. Ensure provider:
-   - set `PAYMENTS_PROVIDER=fake` in local env for deterministic tests.
-2. Run focused payment-core tests:
 ```bash
 cd rails && bin/rails test \
   test/services/payments/checkout_flow_test.rb \
   test/services/payments/checkout_return_service_test.rb \
   test/services/payments/status_mapper_test.rb \
   test/services/payments/registration_payment_sync_test.rb \
-  test/services/payments/status_transition_policy_test.rb \
   test/services/payments/checkout_service_test.rb \
   test/services/payments/webhook_ingest_service_test.rb \
   test/services/payments/refund_service_test.rb \
@@ -221,53 +104,9 @@ cd rails && bin/rails test \
   test/integration/api/v1/payment_webhooks_test.rb \
   test/integration/account/api/payment_statuses_test.rb
 ```
-3. Validate no uncommitted files after edits:
-```bash
-git status --short
-```
 
-## Common Failures + Recovery
-- Invalid webhook signature:
-  - Symptom: `InvalidWebhookSignature` and event log `processed=false`.
-  - Action: fix provider secret/header configuration, then replay webhook from provider dashboard.
-- Duplicate webhook:
-  - Symptom: service returns `duplicate: true`.
-  - Action: no mutation needed unless provider and app states diverge.
-- Transition blocked:
-  - Symptom: `InvalidTransition` error.
-  - Action: inspect payment current state + provider truth; reconcile via controlled update script/admin operation.
-- Missing provider credentials:
-  - Symptom: adapter verification fails (invalid signature reason includes missing secret).
-  - Action: populate env vars and restart app worker/web processes.
+## Remaining External Work
 
-## Portability Checklist (Siblings / Combatives)
-Use this checklist when porting to another Rails app with different schema names.
-
-Canonical file manifest for copy/adapt scope:
-- `ops/docs/reference/payments_core_portability_manifest.md`
-
-1. Copy core files:
-   - `rails/app/services/payment_gateway/*`
-   - `rails/app/services/payments/checkout_service.rb`
-   - `rails/app/services/payments/checkout_return_service.rb`
-   - `rails/app/services/payments/checkout_flow.rb`
-   - `rails/app/services/payments/status_mapper.rb`
-   - `rails/app/services/payments/registration_payment_sync.rb`
-   - `rails/app/services/payments/webhook_ingest_service.rb`
-   - `rails/app/services/payments/refund_service.rb`
-   - `rails/app/services/payments/status_transition_policy.rb`
-2. Replace repository adapters only:
-   - implement project-specific `PaymentRepository`
-   - implement project-specific `PaymentEventLogRepository`
-3. Map model/table fields:
-   - canonical transaction table (generic: `payments_transactions`)
-   - provider event table (generic: `payments_provider_events`)
-4. Add provider env vars in target project config.
-5. Add/update tests in target repo for:
-   - checkout success/failure
-   - webhook duplicate replay
-   - transition block
-   - refund/cancel
-6. Keep controller boundary:
-   - controllers/jobs/webhooks call `Payments::*` services only
-   - no direct provider SDK calls outside adapters
+- real Stripe test-mode validation, if Stripe rollout is pursued
+- real or sandbox LINE Pay validation
+- manual ops testing of the fake hosted checkout flow in production-like environments

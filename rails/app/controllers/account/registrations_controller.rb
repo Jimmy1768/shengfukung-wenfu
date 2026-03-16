@@ -41,7 +41,7 @@ module Account
           notice: "Registration submitted."
       else
         flash.now[:alert] = "Please review the errors below."
-        render :new, status: :unprocessable_entity
+        render :new, status: :unprocessable_content
       end
     end
 

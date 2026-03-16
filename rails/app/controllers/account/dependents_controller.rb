@@ -14,7 +14,7 @@ module Account
         redirect_to account_profile_path, notice: "已新增家屬。"
       else
         flash.now[:alert] = "請確認欄位填寫正確。"
-        render :new, status: :unprocessable_entity
+        render :new, status: :unprocessable_content
       end
     end
 
@@ -28,7 +28,7 @@ module Account
         redirect_to account_profile_path, notice: "家屬資料已更新。"
       else
         flash.now[:alert] = "請確認欄位填寫正確。"
-        render :edit, status: :unprocessable_entity
+        render :edit, status: :unprocessable_content
       end
     end
 

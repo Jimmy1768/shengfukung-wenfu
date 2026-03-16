@@ -21,7 +21,7 @@ module Account
         @show_registration_modal = true
         @existing_sign_in_providers = @registration_form.existing_oauth_providers
         @existing_sign_in_email = registration_params[:email].to_s.downcase.strip.presence
-        render "account/sessions/new", status: :unprocessable_entity
+        render "account/sessions/new", status: :unprocessable_content
       end
     end
 

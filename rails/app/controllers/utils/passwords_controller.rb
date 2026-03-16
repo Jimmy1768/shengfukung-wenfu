@@ -17,7 +17,7 @@ module Utils
       if @request_form.submit { |user, token| send_reset_email(user, token) }
         redirect_to new_password_path, notice: I18n.t("account.passwords.flash.sent")
       else
-        render :new, status: :unprocessable_entity
+        render :new, status: :unprocessable_content
       end
     end
 
@@ -35,7 +35,7 @@ module Utils
       if @reset_form.submit
         redirect_to account_login_path, notice: I18n.t("account.passwords.flash.updated")
       else
-        render :edit, status: :unprocessable_entity
+        render :edit, status: :unprocessable_content
       end
     end
 
