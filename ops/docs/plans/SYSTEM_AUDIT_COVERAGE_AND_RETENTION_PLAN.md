@@ -74,13 +74,16 @@ Already audited in code:
 - account contact temple request create
 - account assistance request create
 - admin payment create and hosted checkout start/return
+- admin permissions update
+- admin temple profile update
 - system payment reconciliation during checkout return
 - system refund/cancel lifecycle events
+- system webhook-applied payment events
+- system registration payment-status sync events
 
 Clearly not comprehensive yet:
 - password changed/reset completion beyond the current add-password path
 - admin refund/cancel/reconciliation/manual payment actions beyond checkout start/return
-- registration status changes tied to payment outcomes outside the current checkout-return reconciliation path
 - admin session/login-sensitive actions, if desired
 
 ### Phase 1 Inventory Findings
@@ -114,9 +117,6 @@ High-value actions currently missing or not clearly covered:
 
 - Tier 1 gaps:
   - admin refund/cancel/reconcile/manual payment actions
-  - registration status changes tied to payment outcomes outside checkout-return reconciliation
-  - admin permission updates are not yet confirmed here
-  - temple profile/content edits outside existing audited forms are not yet confirmed here
 - Tier 2 gaps:
   - account password change/reset completion outside the add-password path
 
@@ -304,6 +304,9 @@ Phase 3 progress:
   - cash payment create
   - hosted checkout start
   - hosted checkout return
+- normalized admin audit logs for:
+  - permissions update
+  - temple profile update
 - added system payment reconciliation audit log for checkout return processing
 - added account audit logs for:
   - privacy request create
@@ -313,11 +316,14 @@ Phase 3 progress:
 - added system payment audit logs for:
   - refund
   - cancel
+- added system lifecycle audit logs for:
+  - webhook-applied payment events
+  - registration payment-status sync updates
 - added integration coverage for the new account/admin audit-producing flows
+- added form/integration coverage for normalized admin permission and temple profile audit events
 
 Remaining in Phase 3:
-- admin refund/cancel/reconcile/manual override flows
-- broader payment lifecycle audit coverage beyond checkout return
+- admin refund/cancel/reconcile/manual override flows, if and when those runtime paths exist
 
 ### Phase 4 — Retention + Access Policy
 
