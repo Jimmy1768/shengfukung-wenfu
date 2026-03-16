@@ -41,7 +41,7 @@ module Payments
       if payment
         payment_repository.update_status!(
           payment: payment,
-          status: map_status(adapter_payload[:status]),
+          status: Payments::StatusMapper.map(adapter_payload[:status]),
           payload: sanitize_for_audit(adapter_payload[:raw] || payload),
           metadata: {
             webhook_event_type: adapter_payload[:event_type],
@@ -50,7 +50,7 @@ module Payments
           },
           provider_reference: adapter_payload[:provider_reference]
         )
-        sync_registration_status!(payment)
+        Payments::RegistrationPaymentSync.call(payment)
       end
 
       event_log_repository.mark_processed!(event_log)
@@ -68,20 +68,6 @@ module Payments
 
     def adapter(provider)
       provider_resolver.resolve(provider: provider)
-    end
-
-    def map_status(value)
-      status = value.to_s
-      case status
-      when "succeeded", "success", "completed", "paid", TemplePayment::STATUSES[:completed]
-        TemplePayment::STATUSES[:completed]
-      when "failed", "error", "declined", "canceled", "cancelled", TemplePayment::STATUSES[:failed]
-        TemplePayment::STATUSES[:failed]
-      when "refunded", "partial_refunded", TemplePayment::STATUSES[:refunded]
-        TemplePayment::STATUSES[:refunded]
-      else
-        TemplePayment::STATUSES[:pending]
-      end
     end
 
     def sanitize_for_audit(value)
@@ -108,18 +94,5 @@ module Payments
       key.match?(/secret|token|authorization|signature|card|cvv|cvc|pan|password/i)
     end
 
-    def sync_registration_status!(payment)
-      registration = payment.temple_registration
-      return unless registration
-
-      case payment.status
-      when TemplePayment::STATUSES[:completed]
-        registration.mark_paid! unless registration.paid?
-      when TemplePayment::STATUSES[:refunded]
-        registration.update!(payment_status: TempleRegistration::PAYMENT_STATUSES[:refunded])
-      when TemplePayment::STATUSES[:failed]
-        registration.update!(payment_status: TempleRegistration::PAYMENT_STATUSES[:failed])
-      end
-    end
   end
 end

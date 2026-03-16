@@ -54,12 +54,12 @@ module Payments
 
       payment_repository.apply_checkout_result!(
         payment: payment,
-        status: map_status(adapter_payload[:status]),
-        provider_reference: adapter_payload[:provider_reference] || adapter_payload[:provider_payment_id] || adapter_payload[:provider_checkout_id],
+        status: Payments::StatusMapper.map(adapter_payload[:status]),
+        provider_reference: Payments::CheckoutFlow.provider_reference_for(adapter_payload),
         payload: adapter_payload,
         metadata: metadata
       )
-      sync_registration_status!(payment)
+      Payments::RegistrationPaymentSync.call(payment)
 
       Result.new(payment: payment, adapter_payload: adapter_payload, reused: false)
     end
@@ -77,32 +77,6 @@ module Payments
         provider.to_s
       else
         TemplePayment::PAYMENT_METHODS[:cash]
-      end
-    end
-
-    def map_status(value)
-      status = value.to_s
-      case status
-      when "succeeded", "success", "completed", "paid", TemplePayment::STATUSES[:completed]
-        TemplePayment::STATUSES[:completed]
-      when "failed", "error", "declined", "canceled", "cancelled", TemplePayment::STATUSES[:failed]
-        TemplePayment::STATUSES[:failed]
-      when "refunded", "partial_refunded", TemplePayment::STATUSES[:refunded]
-        TemplePayment::STATUSES[:refunded]
-      else
-        TemplePayment::STATUSES[:pending]
-      end
-    end
-
-    def sync_registration_status!(payment)
-      registration = payment.temple_registration
-      return unless registration
-
-      case payment.status
-      when TemplePayment::STATUSES[:completed]
-        registration.mark_paid! unless registration.paid?
-      when TemplePayment::STATUSES[:failed]
-        registration.update!(payment_status: TempleRegistration::PAYMENT_STATUSES[:failed])
       end
     end
   end

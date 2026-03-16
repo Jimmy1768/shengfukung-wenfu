@@ -29,14 +29,21 @@ module Payments
 
       payment_repository.update_status!(
         payment: payment,
-        status: map_status(adapter_payload[:status]),
+        status: Payments::StatusMapper.map(
+          adapter_payload[:status],
+          aliases: {
+            TemplePayment::STATUSES[:refunded] => %w[refunded partial_refunded],
+            TemplePayment::STATUSES[:failed] => %w[canceled cancelled failed error declined]
+          },
+          fallback: TemplePayment::STATUSES[:failed]
+        ),
         payload: adapter_payload,
         metadata: {
           refund_reason: reason,
           operation: operation.to_sym
         }.compact
       )
-      sync_registration_status!(payment)
+      Payments::RegistrationPaymentSync.call(payment)
 
       Result.new(payment: payment, adapter_payload: adapter_payload)
     end
@@ -47,28 +54,6 @@ module Payments
 
     def adapter(provider)
       provider_resolver.resolve(provider: provider)
-    end
-
-    def map_status(value)
-      status = value.to_s
-      return TemplePayment::STATUSES[:refunded] if %w[refunded partial_refunded].include?(status)
-      return TemplePayment::STATUSES[:failed] if %w[canceled cancelled].include?(status)
-
-      TemplePayment::STATUSES[:failed]
-    end
-
-    def sync_registration_status!(payment)
-      registration = payment.temple_registration
-      return unless registration
-
-      case payment.status
-      when TemplePayment::STATUSES[:refunded]
-        registration.update!(payment_status: TempleRegistration::PAYMENT_STATUSES[:refunded])
-      when TemplePayment::STATUSES[:failed]
-        registration.update!(payment_status: TempleRegistration::PAYMENT_STATUSES[:failed])
-      when TemplePayment::STATUSES[:completed]
-        registration.mark_paid! unless registration.paid?
-      end
     end
   end
 end

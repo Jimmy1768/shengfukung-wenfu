@@ -80,7 +80,8 @@ Rails.application.routes.draw do
     resources :payments, only: %i[index new create] do
       collection do
         get :export
-        post :fake_checkout
+        post :start_checkout
+        get :checkout_return
       end
     end
     resources :assistance_requests, only: :index do
@@ -155,7 +156,8 @@ Rails.application.routes.draw do
     resources :registrations, only: %i[index show edit update new create] do
       member do
         get :payment
-        post :start_fake_checkout
+        post :start_checkout
+        get :checkout_return
       end
     end
     resources :events, only: :index

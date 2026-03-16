@@ -5,10 +5,10 @@ module Admin
     helper_method :payment_month_presets
 
     before_action :require_view_financials!, only: :index
-    before_action :require_cash_permissions!, only: %i[new create fake_checkout]
+    before_action :require_cash_permissions!, only: %i[new create start_checkout checkout_return]
     before_action :require_export_permissions!, only: :export
     before_action :prepare_payment_filters, only: %i[index export]
-    before_action :set_registration, only: %i[new create fake_checkout]
+    before_action :set_registration, only: %i[new create start_checkout checkout_return]
 
     def index
       apply_month_preset!
@@ -63,28 +63,63 @@ module Admin
       render :new, status: :unprocessable_entity
     end
 
-    def fake_checkout
+    def start_checkout
+      provider = Payments::ProviderResolver.current_provider
       result = Payments::CheckoutService.new.call(
         registration: @registration,
         amount_cents: @registration.total_price_cents,
         currency: @registration.currency,
-        provider: "fake",
-        idempotency_key: fake_idempotency_key,
+        provider: provider,
+        idempotency_key: checkout_idempotency_key,
         intent_key: "registration:#{@registration.id}",
-        metadata: {
+        metadata: Payments::CheckoutFlow.metadata_for(
+          registration: @registration,
           source: "admin_console",
-          temple_slug: current_temple.slug
-        }
+          temple_slug: current_temple.slug,
+          return_url: checkout_return_admin_payments_url(registration_id: @registration.id, provider: provider),
+          cancel_url: checkout_return_admin_payments_url(registration_id: @registration.id, provider: provider, canceled: 1)
+        )
       )
 
+      redirect_url = Payments::CheckoutFlow.redirect_url_for(result)
+      return redirect_to redirect_url, allow_other_host: true if redirect_url.present?
+
       notice = if result.reused
-                 t("admin.payments.flash.fake_checkout_reused")
+                 t("admin.payments.flash.checkout_reused")
                else
-                 t("admin.payments.flash.fake_checkout_started")
+                 t("admin.payments.flash.checkout_started", provider: Payments::ProviderResolver.label_for(provider))
                end
       redirect_to offering_order_path(@registration.offering, @registration), notice: notice
     rescue StandardError => e
-      redirect_to offering_order_path(@registration.offering, @registration), alert: t("admin.payments.flash.fake_checkout_failed", error: e.message)
+      redirect_to offering_order_path(@registration.offering, @registration), alert: t("admin.payments.flash.checkout_failed", error: e.message)
+    end
+
+    def checkout_return
+      provider = checkout_return_provider
+      if ActiveModel::Type::Boolean.new.cast(params[:canceled])
+        return redirect_to offering_order_path(@registration.offering, @registration), alert: "Payment was canceled before completion."
+      end
+
+      result = Payments::CheckoutReturnService.new.call(
+        registration: @registration,
+        provider: provider,
+        params: checkout_return_params
+      )
+
+      notice =
+        if result.payment.completed?
+          "Payment confirmed successfully."
+        elsif result.payment.failed?
+          "Payment failed. Please review the registration before retrying."
+        else
+          "Payment is still pending confirmation."
+        end
+
+      redirect_to offering_order_path(@registration.offering, @registration), notice: notice
+    rescue ActiveRecord::RecordNotFound
+      redirect_to offering_order_path(@registration.offering, @registration), alert: "We could not find a matching payment attempt."
+    rescue StandardError => e
+      redirect_to offering_order_path(@registration.offering, @registration), alert: "Unable to verify payment status: #{e.message}"
     end
 
     private
@@ -174,8 +209,22 @@ module Admin
       admin_orders_path
     end
 
-    def fake_idempotency_key
+    def checkout_idempotency_key
       params[:idempotency_key].presence || "admin-reg-#{@registration.id}-#{SecureRandom.hex(4)}"
+    end
+
+    def checkout_return_provider
+      params[:provider].presence || @registration.temple_payments.order(created_at: :desc).limit(1).pick(:provider) || Payments::ProviderResolver.current_provider
+    end
+
+    def checkout_return_params
+      params.permit(:transactionId, :orderId, :canceled).to_h.transform_keys do |key|
+        case key
+        when "transactionId" then "transaction_id"
+        when "orderId" then "order_id"
+        else key
+        end
+      end
     end
 
     def preset_filters_for(start_date, end_date)

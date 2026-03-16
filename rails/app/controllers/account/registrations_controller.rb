@@ -2,7 +2,7 @@
 
 module Account
   class RegistrationsController < BaseController
-    before_action :set_registration, only: %i[show edit update payment start_fake_checkout]
+    before_action :set_registration, only: %i[show edit update payment start_checkout checkout_return]
     before_action :assign_offering_from_params, only: %i[new create]
     before_action :assign_eligible_registrants, only: %i[new create edit update]
     before_action :ensure_selected_registrant, only: %i[new create]
@@ -66,31 +66,67 @@ module Account
 
     def payment
       @registration_period_label = period_label_for(@registration)
+      @payment_provider_label = Payments::ProviderResolver.label_for(Payments::ProviderResolver.current_provider)
     end
 
-    def start_fake_checkout
+    def start_checkout
+      provider = Payments::ProviderResolver.current_provider
       result = Payments::CheckoutService.new.call(
         registration: @registration,
         amount_cents: @registration.total_price_cents,
         currency: @registration.currency,
-        provider: "fake",
-        idempotency_key: fake_idempotency_key,
+        provider: provider,
+        idempotency_key: checkout_idempotency_key,
         intent_key: "registration:#{@registration.id}",
-        metadata: {
+        metadata: Payments::CheckoutFlow.metadata_for(
+          registration: @registration,
           source: "account_portal",
-          temple_slug: current_temple.slug
-        }
+          temple_slug: current_temple.slug,
+          return_url: checkout_return_account_registration_url(@registration, provider: provider),
+          cancel_url: checkout_return_account_registration_url(@registration, provider: provider, canceled: 1)
+        )
       )
+
+      redirect_url = Payments::CheckoutFlow.redirect_url_for(result)
+      return redirect_to redirect_url, allow_other_host: true if redirect_url.present?
 
       message = if result.reused
                   "A payment attempt already exists. Waiting for confirmation."
                 else
-                  "Fake checkout started. Waiting for webhook confirmation."
+                  "#{Payments::ProviderResolver.label_for(provider)} checkout started. Waiting for confirmation."
                 end
 
       redirect_to payment_account_registration_path(@registration), notice: message
     rescue StandardError => e
       redirect_to payment_account_registration_path(@registration), alert: "Unable to start checkout: #{e.message}"
+    end
+
+    def checkout_return
+      provider = checkout_return_provider
+      if ActiveModel::Type::Boolean.new.cast(params[:canceled])
+        return redirect_to payment_account_registration_path(@registration), alert: "Payment was canceled before completion."
+      end
+
+      result = Payments::CheckoutReturnService.new.call(
+        registration: @registration,
+        provider: provider,
+        params: checkout_return_params
+      )
+
+      notice =
+        if result.payment.completed?
+          "Payment confirmed successfully."
+        elsif result.payment.failed?
+          "Payment failed. Please try again or contact the temple."
+        else
+          "Payment is still pending confirmation."
+        end
+
+      redirect_to payment_account_registration_path(@registration), notice: notice
+    rescue ActiveRecord::RecordNotFound
+      redirect_to payment_account_registration_path(@registration), alert: "We could not find a matching payment attempt."
+    rescue StandardError => e
+      redirect_to payment_account_registration_path(@registration), alert: "Unable to verify payment status: #{e.message}"
     end
 
     private
@@ -217,8 +253,22 @@ module Account
       @registration_lifecycle_policy ||= Registrations::LifecyclePolicy.new(@registration)
     end
 
-    def fake_idempotency_key
+    def checkout_idempotency_key
       params[:idempotency_key].presence || "acct-reg-#{@registration.id}-#{SecureRandom.hex(4)}"
+    end
+
+    def checkout_return_provider
+      params[:provider].presence || @registration.temple_payments.order(created_at: :desc).limit(1).pick(:provider) || Payments::ProviderResolver.current_provider
+    end
+
+    def checkout_return_params
+      params.permit(:transactionId, :orderId, :canceled).to_h.transform_keys do |key|
+        case key
+        when "transactionId" then "transaction_id"
+        when "orderId" then "order_id"
+        else key
+        end
+      end
     end
 
     def preload_open_assistance_requests

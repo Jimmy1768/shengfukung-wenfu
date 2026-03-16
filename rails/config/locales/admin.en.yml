@@ -991,9 +991,9 @@ en:
     payments:
       flash:
         recorded: "Payment recorded."
-        fake_checkout_reused: "Fake checkout already exists for this registration."
-        fake_checkout_started: "Fake checkout started. Awaiting webhook confirmation."
-        fake_checkout_failed: "Unable to start fake checkout: %{error}"
+        checkout_reused: "A checkout attempt already exists for this registration."
+        checkout_started: "%{provider} checkout started. Awaiting confirmation."
+        checkout_failed: "Unable to start checkout: %{error}"
       statuses:
         pending: "Pending"
         completed: "Completed"

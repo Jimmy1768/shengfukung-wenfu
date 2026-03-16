@@ -989,9 +989,9 @@ zh-TW:
     payments:
       flash:
         recorded: "已登記付款。"
-        fake_checkout_reused: "此報名已存在測試結帳。"
-        fake_checkout_started: "已啟動測試結帳，等待 webhook 確認。"
-        fake_checkout_failed: "無法啟動測試結帳：%{error}"
+        checkout_reused: "此報名已存在付款嘗試。"
+        checkout_started: "已啟動 %{provider} 付款流程，等待確認。"
+        checkout_failed: "無法啟動付款流程：%{error}"
       statuses:
         pending: "待付款"
         completed: "已完成"
