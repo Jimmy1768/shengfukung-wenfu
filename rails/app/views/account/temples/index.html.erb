@@ -10,7 +10,7 @@
     <% @temples.each do |temple| %>
       <%= link_to account_login_path(temple: temple["slug"]), class: "temple-card" do %>
         <% hero_url = temple["hero_image_url"].presence %>
-        <div class="temple-card__hero" style="background-image: url('<%= hero_url.presence || asset_path("temple-placeholder.png") %>');"></div>
+        <div class="temple-card__hero" style="background-image: url('<%= hero_url.presence || asset_path("admin/hero-placeholder.svg") %>');"></div>
         <div class="temple-card__body">
           <h3>
             <span><%= temple["display_name"] %></span>

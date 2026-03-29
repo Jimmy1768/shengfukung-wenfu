@@ -14,7 +14,7 @@
 #     RAILS_MAX_THREADS, RAILS_MIN_THREADS, WEB_CONCURRENCY, PUMA_PORT
 #
 # - Port convention:
-#     development: 3001 (local dev UI)
+#     development: 3002 (local dev UI)
 #     other envs:  3000 (prod/staging UI)
 #
 
@@ -24,10 +24,10 @@ threads min_threads_count, max_threads_count
 
 # Port:
 # - Use PUMA_PORT if set
-# - Otherwise: 3001 in development, 3000 elsewhere
+# - Otherwise: 3002 in development, 3000 elsewhere
 default_port =
   if ENV.fetch("RAILS_ENV", "development") == "development"
-    3001
+    3002
   else
     3000
   end

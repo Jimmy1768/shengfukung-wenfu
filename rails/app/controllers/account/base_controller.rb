@@ -56,7 +56,7 @@ module Account
     end
 
     def ensure_temple_context
-      return if @active_temple_slug.present?
+      return if @active_temple_slug.present? && current_temple.present?
 
       redirect_to account_temples_path
     end
@@ -97,7 +97,10 @@ module Account
     end
 
     def establish_user_session!(user)
-      preserved_temple_slug = @active_temple_slug.presence || session[ACCOUNT_TEMPLE_SESSION_KEY]
+      preserved_temple_slug =
+        @active_temple_slug.presence ||
+        session[ACCOUNT_TEMPLE_SESSION_KEY].presence ||
+        current_temple&.slug
       preserved_intent = session[ACCOUNT_ENTRY_INTENT_SESSION_KEY]
       preserved_locale = current_account_locale
       reset_session

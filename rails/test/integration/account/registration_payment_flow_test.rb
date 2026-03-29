@@ -62,6 +62,75 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, api_v1_account_payment_status_path(reference: registration.reference_code)
   end
 
+  test "paid gathering registration redirects to payment page" do
+    temple = create_temple
+    gathering = temple.temple_gatherings.create!(
+      slug: "community-workshop",
+      title: "Community Workshop",
+      currency: "TWD",
+      price_cents: 450,
+      status: "published",
+      starts_on: Date.current
+    )
+    user = User.create!(
+      email: "gatheringflow@example.com",
+      english_name: "Gathering Flow Member",
+      encrypted_password: User.password_hash("Password123!")
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+
+    assert_difference -> { TempleEventRegistration.count }, 1 do
+      post account_registrations_path, params: {
+        offering: gathering.slug,
+        account_action: "gathering",
+        account_registration_intake_form: {
+          contact_name: "Gathering Flow Member",
+          quantity: 1
+        }
+      }
+    end
+
+    registration = TempleEventRegistration.order(:created_at).last
+    assert_equal gathering, registration.registrable
+    assert_redirected_to payment_account_registration_path(registration)
+
+    follow_redirect!
+    assert_response :success
+    assert_includes response.body, "前往付款"
+    assert_includes response.body, gathering.title
+  end
+
+  test "new gathering registration honors temple param and active account temple context" do
+    create_temple(slug: "decoy-temple", name: "Decoy Temple")
+    temple = create_temple(slug: "selected-temple", name: "Selected Temple")
+    gathering = temple.temple_gatherings.create!(
+      slug: "selected-gathering",
+      title: "Selected Gathering",
+      currency: "TWD",
+      price_cents: 450,
+      status: "published",
+      starts_on: Date.current
+    )
+    user = User.create!(
+      email: "templecontext@example.com",
+      english_name: "Temple Context Member",
+      encrypted_password: User.password_hash("Password123!")
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+
+    get new_account_registration_path(
+      temple: temple.slug,
+      account_action: "gathering",
+      offering: gathering.slug
+    )
+
+    assert_response :success
+    assert_includes response.body, gathering.title
+    assert_select "input[name='account_registration_intake_form[contact_name]']"
+  end
+
   test "free registration payment page shows confirmation" do
     temple = create_temple
     offering = TempleOffering.create!(
@@ -98,6 +167,42 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "此報名不需付費，已完成。"
   end
 
+  test "free gathering registration payment page shows confirmation" do
+    temple = create_temple
+    gathering = temple.temple_gatherings.create!(
+      slug: "free-community-tea",
+      title: "Free Community Tea",
+      currency: "TWD",
+      price_cents: 0,
+      status: "published",
+      starts_on: Date.current
+    )
+    user = User.create!(
+      email: "freegathering@example.com",
+      english_name: "Free Gathering Member",
+      encrypted_password: User.password_hash("Password123!")
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+
+    post account_registrations_path, params: {
+      offering: gathering.slug,
+      account_action: "gathering",
+      account_registration_intake_form: {
+        contact_name: "Free Gathering Member",
+        quantity: 1
+      }
+    }
+
+    registration = TempleEventRegistration.order(:created_at).last
+    assert_equal gathering, registration.registrable
+    assert_redirected_to payment_account_registration_path(registration)
+
+    follow_redirect!
+    assert_response :success
+    assert_includes response.body, "此報名不需付費，已完成。"
+  end
+
   test "failed payment page shows retry action" do
     temple = create_temple
     offering = create_offering(temple:, slug: "failed-payment", title: "Failed Payment Offering", price_cents: 700)
@@ -117,7 +222,7 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "重新付款"
   end
 
-  test "start checkout creates pending payment and stays on payment page" do
+  test "start fake checkout redirects through return flow and marks payment paid" do
     temple = create_temple
     offering = create_offering(temple:, slug: "fake-checkout", title: "Fake Checkout Offering", price_cents: 800)
     user = User.create!(
@@ -133,12 +238,17 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
       post start_checkout_account_registration_path(registration)
     end
 
+    assert_redirected_to checkout_return_account_registration_url(registration, provider: "fake")
+    follow_redirect!
     assert_redirected_to payment_account_registration_path(registration)
+    follow_redirect!
+    assert_response :success
     payment = registration.temple_payments.order(:created_at).last
     assert_not_nil payment
     assert_equal "fake", payment.provider
-    assert_equal TemplePayment::STATUSES[:pending], payment.status
-    assert_equal TempleRegistration::PAYMENT_STATUSES[:pending], registration.reload.payment_status
+    assert_equal TemplePayment::STATUSES[:completed], payment.reload.status
+    assert_equal TempleRegistration::PAYMENT_STATUSES[:paid], registration.reload.payment_status
+    assert_includes response.body, "Payment confirmed successfully."
   end
 
   test "start checkout redirects to provider url when adapter returns one" do

@@ -69,11 +69,11 @@ class AdminAccountingReportingGatheringsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Free Gathering"
     assert_no_match(/orders-source__title\">Spring Event</, response.body)
-    assert_includes response.body, "No payment required"
+    assert_includes response.body, I18n.t("admin.orders.index.table.no_payment_required")
 
     get admin_gathering_offering_order_path(@gathering, free_registration)
     assert_response :success
-    assert_includes response.body, "No payment required"
+    assert_includes response.body, I18n.t("admin.orders.index.table.no_payment_required")
   end
 
   test "payments filter can isolate gathering payments" do
@@ -138,7 +138,9 @@ class AdminAccountingReportingGatheringsTest < ActionDispatch::IntegrationTest
     get admin_payments_path, params: { filter: { offering_kind: "gatherings" } }
 
     assert_response :success
-    assert_match(/<tbody>[\s\S]*Gathering · Free Gathering[\s\S]*<\/tbody>/, response.body)
-    assert_no_match(/<tbody>[\s\S]*Event · Spring Event[\s\S]*<\/tbody>/, response.body)
+    gathering_label = Regexp.escape("#{I18n.t('admin.filters.offering.gathering_prefix')} · Free Gathering")
+    event_label = Regexp.escape("#{I18n.t('admin.filters.offering.event_prefix')} · Spring Event")
+    assert_match(/<tbody>[\s\S]*#{gathering_label}[\s\S]*<\/tbody>/, response.body)
+    assert_no_match(/<tbody>[\s\S]*#{event_label}[\s\S]*<\/tbody>/, response.body)
   end
 end

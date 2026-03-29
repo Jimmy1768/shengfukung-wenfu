@@ -109,7 +109,7 @@
             <% if step[:url].present? %>
               <%= link_to step[:label], step[:url], class: "btn btn-secondary next-step-button" %>
             <% else %>
-              <div class="next-step-button next-step-button--static"><%= step[:label] %></div>
+              <div class="next-step-button next-step-button--static <%= "is-disabled" if step[:disabled] %>"><%= step[:label] %></div>
             <% end %>
           <% end %>
         </div>

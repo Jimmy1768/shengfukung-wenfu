@@ -98,6 +98,20 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, I18n.t("account.profile.password.enabled")
   end
 
+  test "account events redirects to temple picker when active temple slug no longer resolves" do
+    user = User.create!(
+      email: "missing-temple@example.com",
+      english_name: "Missing Temple",
+      encrypted_password: User.password_hash("Password123!")
+    )
+
+    sign_in_account(user, temple_slug: "missing-temple")
+
+    get account_events_path
+
+    assert_redirected_to account_temples_path
+  end
+
   test "profile update accepts native name without english name" do
     temple = create_temple
     user = User.create!(

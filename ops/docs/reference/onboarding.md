@@ -39,7 +39,7 @@ Use this when you need representative data locally or on staging:
 >
 > - Use `ops/env/template.temple.env` as your non-secret checklist template.
 > - Keep third-party credentials out of git: local goes in `.env.development`; production goes in `/etc/default/<slug>-env`.
-> - Load a specific temple’s secrets by prefixing any command with `bin/load_temple_env <slug> -- <command>`. Example: `bin/load_temple_env shengfukung-wenfu -- (cd rails && bundle exec rails server -p 3001)`.
+> - Load a specific temple’s secrets by prefixing any command with `bin/load_temple_env <slug> -- <command>`. Example: `bin/load_temple_env shengfukung-wenfu -- (cd rails && bundle exec rails server -p 3002)`.
 > - The loader sources `.env`, `.env.<env>`, then `/etc/default/<slug>-env` when readable (falling back to `.env.development`), so Vue/Expo builds and Rails share the same credential set for the active temple.
 
 ### Generate + Deploy Env Files

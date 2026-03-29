@@ -49,7 +49,7 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
     assert_equal 1, registration.temple_payments.count
   end
 
-  test "starts checkout through admin controller" do
+  test "starts fake checkout through admin controller and confirms payment" do
     temple = create_temple
     offering = create_offering(temple:, slug: "admin-fake", title: "Admin Fake", price_cents: 900)
     user = User.create!(
@@ -68,11 +68,14 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
       post start_checkout_admin_payments_path(registration_id: registration.id)
     end
 
+    assert_redirected_to checkout_return_admin_payments_url(registration_id: registration.id, provider: "fake")
+    follow_redirect!
     assert_redirected_to admin_event_offering_order_path(offering, registration)
     payment = registration.temple_payments.order(:created_at).last
     assert_not_nil payment
     assert_equal "fake", payment.provider
-    assert_equal TemplePayment::STATUSES[:pending], payment.status
+    assert_equal TemplePayment::STATUSES[:completed], payment.reload.status
+    assert_equal TempleRegistration::PAYMENT_STATUSES[:paid], registration.reload.payment_status
   end
 
   test "start checkout redirects to provider checkout url when present" do
@@ -134,6 +137,54 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to admin_event_offering_order_path(offering, registration)
+    assert_equal TempleRegistration::PAYMENT_STATUSES[:paid], registration.reload.payment_status
+    assert_equal TemplePayment::STATUSES[:completed], registration.temple_payments.order(:created_at).last.reload.status
+  end
+
+  test "checkout return for gathering redirects back to gathering order" do
+    temple = create_temple
+    gathering = temple.temple_gatherings.create!(
+      slug: "admin-gathering-line-return",
+      title: "Admin Gathering Return",
+      currency: "TWD",
+      price_cents: 550,
+      status: "published"
+    )
+    user = User.create!(
+      email: "admin-gathering-line-return@example.com",
+      english_name: "Admin Gathering Return",
+      encrypted_password: User.password_hash("Password123!")
+    )
+    registration = create_registration(user:, offering: gathering)
+    create_payment(
+      registration: registration,
+      amount_cents: registration.total_price_cents,
+      status: TemplePayment::STATUSES[:pending],
+      method: TemplePayment::PAYMENT_METHODS[:line_pay],
+      provider: "line_pay",
+      provider_reference: "order_admin_gathering_1",
+      processed_at: nil
+    )
+    admin_user = create_admin_user(temple:)
+    permission = AdminPermission.find_by(admin_account: admin_user.admin_account, temple:)
+    permission.update!(record_cash_payments: true)
+
+    sign_in_admin(admin_user)
+
+    assert_difference -> { SystemAuditLog.where(action: "admin.payments.checkout_returned").count }, 1 do
+      assert_difference -> { SystemAuditLog.where(action: "system.payments.reconciled").count }, 1 do
+        PaymentGateway::LinePayAdapter.stub(:new, FakeReturnAdapter.new("completed")) do
+          get checkout_return_admin_payments_path(
+            registration_id: registration.id,
+            provider: "line_pay",
+            transactionId: "tx_admin_gathering_1",
+            orderId: "order_admin_gathering_1"
+          )
+        end
+      end
+    end
+
+    assert_redirected_to admin_gathering_offering_order_path(gathering, registration)
     assert_equal TempleRegistration::PAYMENT_STATUSES[:paid], registration.reload.payment_status
     assert_equal TemplePayment::STATUSES[:completed], registration.temple_payments.order(:created_at).last.reload.status
   end

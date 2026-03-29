@@ -8,7 +8,13 @@
         </div>
         <div class="actions actions--inline">
           <% if current_admin_permissions&.allow?(:manage_offerings) %>
-            <%= link_to t("admin.offerings.index.new_button"), new_admin_offering_path, class: "btn btn-primary" %>
+            <% if offerings_v1_frozen? %>
+              <span class="btn btn-primary is-disabled" title="<%= t("admin.offerings.index.new_button_disabled_hint") %>">
+                <%= t("admin.offerings.index.new_button") %>
+              </span>
+            <% else %>
+              <%= link_to t("admin.offerings.index.new_button"), new_admin_offering_path, class: "btn btn-primary" %>
+            <% end %>
           <% end %>
           <% if archived_view? %>
             <%= link_to t("admin.offerings.index.view_active"), admin_offerings_path, class: "btn btn-secondary" %>
@@ -17,6 +23,9 @@
           <% end %>
         </div>
       </header>
+      <% if offerings_v1_frozen? %>
+        <p class="muted"><%= t("admin.offerings.index.freeze_notice") %></p>
+      <% end %>
     </section>
   </div>
 

@@ -44,6 +44,9 @@
         <p class="muted"><%= t("account.sessions.new.email.subtitle") %></p>
       </div>
       <%= form_with url: account_sessions_path, scope: :session, local: true, class: "login-form" do |f| %>
+        <% if active_temple_slug.present? || params[:temple].present? || current_temple&.slug.present? %>
+          <%= hidden_field_tag :temple, active_temple_slug.presence || params[:temple].presence || current_temple&.slug %>
+        <% end %>
         <% if @after_sign_in.present? || params[:after_sign_in].present? %>
           <%= hidden_field_tag :after_sign_in, @after_sign_in.presence || params[:after_sign_in].presence %>
         <% end %>

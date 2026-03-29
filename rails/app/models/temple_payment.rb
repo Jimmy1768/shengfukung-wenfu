@@ -36,6 +36,22 @@ class TemplePayment < ApplicationRecord
     payment_method == PAYMENT_METHODS[:cash]
   end
 
+  def pending?
+    status == STATUSES[:pending]
+  end
+
+  def completed?
+    status == STATUSES[:completed]
+  end
+
+  def failed?
+    status == STATUSES[:failed]
+  end
+
+  def refunded?
+    status == STATUSES[:refunded]
+  end
+
   def offering_registration
     temple_registration
   end

@@ -1094,6 +1094,10 @@ body.admin-body--internal .admin-layout--public .admin-main {
   box-sizing: border-box;
 }
 
+.next-step-button--static.is-disabled {
+  opacity: 0.6;
+}
+
 .idea-list {
   list-style: none;
   padding: 0;

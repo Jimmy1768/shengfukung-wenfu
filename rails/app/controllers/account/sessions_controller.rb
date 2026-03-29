@@ -1,6 +1,7 @@
 module Account
   class SessionsController < BaseController
     skip_before_action :authenticate_user!, only: %i[new create destroy]
+    skip_before_action :ensure_temple_context, only: %i[new create destroy]
     skip_before_action :verify_authenticity_token, only: %i[create destroy]
     before_action :capture_entry_intent_from_params!, only: :new
     before_action :redirect_authenticated_user_with_intent!, only: :new

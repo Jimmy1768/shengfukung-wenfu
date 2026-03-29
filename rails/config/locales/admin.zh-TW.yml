@@ -448,6 +448,7 @@ zh-TW:
         subtitle: "快速完成宮廟上線時會用到的幾個任務。"
         fill_profile: "前往填寫宮廟資料"
         setup_offerings: "發佈第一個活動或服務"
+        setup_offerings_frozen: "供品建立將於設定審查後恢復"
         promote_admin_from_patron: "從信眾名單挑選並建立管理員"
         manage_permissions: "檢視並調整管理員權限"
         complete_heading: "恭喜！"
@@ -614,6 +615,8 @@ zh-TW:
       index:
         title: "供品管理"
         new_button: "新增供品"
+        new_button_disabled_hint: "待寺方供品設定完成審查後，會再恢復新增供品。"
+        freeze_notice: "V1 期間暫停新增供品，待寺方供品設定完成審查後再開放。"
         view_archived: "查看封存供品"
         view_active: "返回現用供品"
         table:
@@ -822,6 +825,9 @@ zh-TW:
         pick_heading: "快速選擇"
         pick_body: "請選擇要建立報名的項目。"
         quick_pick_limit_hint: "先顯示最近使用的 %{count} 個項目；按「建立新報名」可查看全部。"
+        freeze_notice: "V1 期間暫停法會項目與祈福服務報名，待寺方供品設定完成審查後再開放；社群活動報名維持可用。"
+        target_disabled_hint: "此報名流程將於寺方供品設定完成審查後恢復。"
+        target_disabled_badge: "V1 暫停"
         recent_heading: "最新報名"
         recent_body: "跨法會項目、祈福服務與社群活動的最新報名紀錄。"
         actions:
@@ -843,6 +849,8 @@ zh-TW:
         body: "集中管理現場報名、面談紀錄與繳費狀態。"
         view_offering: "檢視詳情"
         new_registration: "新增報名"
+        new_registration_disabled_hint: "待寺方供品設定完成審查後，這裡會再恢復新增報名。"
+        freeze_notice: "V1 期間暫停此供品的新報名，待寺方供品設定完成審查後再恢復。"
         gathering:
           title: "%{offering} 的出席名單"
           body: "集中查看這場聚會的出席者與付款狀態。"

@@ -268,7 +268,7 @@ module Account
     end
 
     def checkout_return_params
-      params.permit(:transactionId, :orderId, :canceled).to_h.transform_keys do |key|
+      params.permit(:transactionId, :orderId, :canceled, :provider, :id, :format).to_h.except("provider", "id", "format").transform_keys do |key|
         case key
         when "transactionId" then "transaction_id"
         when "orderId" then "order_id"

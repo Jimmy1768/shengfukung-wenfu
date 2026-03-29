@@ -1,6 +1,7 @@
 module Account
   class SignupsController < BaseController
     skip_before_action :authenticate_user!, only: %i[new create]
+    skip_before_action :ensure_temple_context, only: %i[new create]
     skip_before_action :verify_authenticity_token, only: :create
 
     before_action :redirect_if_signed_in, only: :new

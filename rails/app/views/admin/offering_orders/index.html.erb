@@ -28,13 +28,22 @@
                 admin_offering_path_for(@offering),
                 class: "btn btn-secondary"
               ) %>
-          <%= link_to(
-                gathering_mode ? t("admin.offering_orders.index.gathering.new_registration") : t("admin.offering_orders.index.new_registration"),
-                new_admin_offering_order_path_for(@offering),
-                class: "btn btn-primary"
-              ) %>
+          <% if admin_registration_entry_enabled_for?(@offering) %>
+            <%= link_to(
+                  gathering_mode ? t("admin.offering_orders.index.gathering.new_registration") : t("admin.offering_orders.index.new_registration"),
+                  new_admin_offering_order_path_for(@offering),
+                  class: "btn btn-primary"
+                ) %>
+          <% else %>
+            <span class="btn btn-primary is-disabled" title="<%= t("admin.offering_orders.index.new_registration_disabled_hint") %>">
+              <%= gathering_mode ? t("admin.offering_orders.index.gathering.new_registration") : t("admin.offering_orders.index.new_registration") %>
+            </span>
+          <% end %>
         </div>
       </div>
+      <% unless admin_registration_entry_enabled_for?(@offering) %>
+        <p class="muted"><%= t("admin.offering_orders.index.freeze_notice") %></p>
+      <% end %>
     </section>
   </div>
 

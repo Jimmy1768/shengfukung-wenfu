@@ -10,24 +10,48 @@ module TempleContext
   def current_temple
     @current_temple ||= begin
       slug = resolved_temple_slug
-      base_scope = Temple.includes(temple_pages: :temple_sections)
       if admin_temple_context?
-        scoped = base_scope.merge(Temple.for_admin(current_admin.admin_account))
-        scoped.find_by(slug:) || scoped.first
+        scoped = Temple.for_admin(current_admin.admin_account)
+        resolve_temple_from_scope(scoped, slug)
       else
-        base_scope.find_by(slug:) || base_scope.find_by(slug: AppConstants::Project.slug) || base_scope.first
+        resolve_temple_from_scope(Temple.all, slug)
       end
     end
   end
 
   private
 
+  def resolve_temple_from_scope(scope, slug)
+    temple =
+      find_temple(scope, slug) ||
+      find_temple(scope, AppConstants::Project.slug) ||
+      scope.first
+
+    return unless temple
+
+    Temple.includes(temple_pages: :temple_sections).find_by(id: temple.id) || temple
+  end
+
+  def find_temple(scope, slug)
+    return if slug.blank?
+
+    scope.find_by(slug: slug)
+  end
+
   def resolved_temple_slug
-    slug = params[:temple_slug].presence || params[:slug].presence
+    slug =
+      params[:temple_slug].presence ||
+      params[:slug].presence ||
+      params[:temple].presence
     return slug if slug.present?
 
     if respond_to?(:admin_selected_temple_slug, true)
       selected = admin_selected_temple_slug
+      return selected if selected.present?
+    end
+
+    if respond_to?(:active_temple_slug, true)
+      selected = active_temple_slug
       return selected if selected.present?
     end
 

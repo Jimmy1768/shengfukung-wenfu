@@ -54,7 +54,13 @@ module Admin
     def build_next_steps
       steps = []
       steps << { label: t("admin.dashboard.next_steps.fill_profile"), url: admin_temple_profile_path } if profile_incomplete?
-      steps << { label: t("admin.dashboard.next_steps.setup_offerings"), url: new_admin_event_path } if missing_offering_templates?
+      if missing_offering_templates?
+        steps << if offerings_v1_frozen?
+          { label: t("admin.dashboard.next_steps.setup_offerings_frozen"), disabled: true }
+        else
+          { label: t("admin.dashboard.next_steps.setup_offerings"), url: new_admin_event_path }
+        end
+      end
       if owner_account?
         steps << { label: t("admin.dashboard.next_steps.promote_admin_from_patron"), url: admin_patrons_path } if needs_admin_promotion?
         steps << { label: t("admin.dashboard.next_steps.manage_permissions"), url: admin_permissions_path } if should_review_permissions?

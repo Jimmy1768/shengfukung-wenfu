@@ -13,6 +13,8 @@ module Admin
                   :oauth_account_linking_enabled?,
                   :available_admin_temples,
                   :allow_temple_switch?,
+                  :offerings_v1_frozen?,
+                  :admin_registration_entry_enabled_for?,
                   :admin_theme_options,
                   :current_admin_theme_label,
                   :current_admin_display_mode_id,
@@ -181,6 +183,14 @@ module Admin
       return nil unless admin_signed_in?
 
       AppConstants::Project.slug
+    end
+
+    def offerings_v1_frozen?
+      true
+    end
+
+    def admin_registration_entry_enabled_for?(offering)
+      offering.is_a?(TempleGathering)
     end
 
     def filter_params

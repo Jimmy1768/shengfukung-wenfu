@@ -21,10 +21,14 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
 
     # Development and production ports differ:
     # - Production: 3000
-    # - Development: 3001
+    # - Development: 3002
 
     if Rails.env.development?
       # Rails UI (dev mode)
+      allowed_origins << "http://localhost:3002"
+      allowed_origins << "http://127.0.0.1:3002"
+
+      # Legacy local Rails port kept for compatibility during the transition.
       allowed_origins << "http://localhost:3001"
       allowed_origins << "http://127.0.0.1:3001"
 

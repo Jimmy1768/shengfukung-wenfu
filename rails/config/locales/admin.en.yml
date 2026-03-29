@@ -448,6 +448,7 @@ en:
         subtitle: "Quick links to finish onboarding tasks."
         fill_profile: "Complete the temple profile →"
         setup_offerings: "Publish your first event or service"
+        setup_offerings_frozen: "Offering setup will reopen after config review"
         promote_admin_from_patron: "Promote a patron into the admin roster"
         manage_permissions: "Review and adjust admin permissions"
         complete_heading: "Congratulations!"
@@ -727,6 +728,8 @@ en:
       index:
         title: "Temple Offerings"
         new_button: "New Offering"
+        new_button_disabled_hint: "Offering creation will reopen after the temple offering config is reviewed."
+        freeze_notice: "Offering creation is paused for V1 while the temple offering config is being reviewed."
         view_archived: "View archived offerings"
         view_active: "Back to current"
         table:
@@ -935,6 +938,9 @@ en:
         pick_heading: "Quick pick"
         pick_body: "Choose where you want to create a new registration."
         quick_pick_limit_hint: "Showing your %{count} most recent targets first. Use Create New Registration to see all."
+        freeze_notice: "Event and service registrations are paused for V1 while the temple offering config is being reviewed. Gatherings remain available."
+        target_disabled_hint: "This registration path will reopen after the temple offering config is reviewed."
+        target_disabled_badge: "Paused for V1"
         recent_heading: "Recent registrations"
         recent_body: "Latest registration activity across events, services, and gatherings."
         actions:
@@ -956,6 +962,8 @@ en:
         body: "Track onsite registrations, reference interview notes, and keep finance synced."
         view_offering: "View details"
         new_registration: "New Registration"
+        new_registration_disabled_hint: "New registrations here will reopen after the temple offering config is reviewed."
+        freeze_notice: "New registrations for this offering are paused for V1 while the temple offering config is being reviewed."
         gathering:
           title: "Attendance for %{offering}"
           body: "Track attendee list and payment state for this gathering."

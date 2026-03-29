@@ -9,7 +9,7 @@ if [ ! -f "$MANIFEST_FILE" ]; then
   exit 1
 fi
 
-DEFAULT_FALLBACK_URL="${SMOKE_DEFAULT_BASE_URL:-http://localhost:3001}"
+DEFAULT_FALLBACK_URL="${SMOKE_DEFAULT_BASE_URL:-http://localhost:3002}"
 EXPECTED_STATUS="${SMOKE_EXPECTED_STATUS:-200}"
 
 mapfile -t TEMPLES < <(ruby - "$MANIFEST_FILE" <<'RUBY'

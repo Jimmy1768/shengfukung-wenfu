@@ -12,7 +12,7 @@ module PaymentGateway
         provider_checkout_id: "fake_chk_#{SecureRandom.hex(8)}",
         provider_payment_id: "fake_pay_#{SecureRandom.hex(8)}",
         provider_reference: "fake_ref_#{SecureRandom.hex(8)}",
-        redirect_url: nil,
+        redirect_url: metadata[:return_url].presence || metadata["return_url"].presence,
         raw: {
           intent: intent,
           amount_cents: amount_cents,
@@ -54,7 +54,7 @@ module PaymentGateway
 
     def query_status(provider_payment_ref:, metadata: {})
       {
-        status: "pending",
+        status: "completed",
         provider_reference: provider_payment_ref,
         raw: {
           metadata: metadata
