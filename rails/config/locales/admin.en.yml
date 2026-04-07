@@ -266,33 +266,39 @@ en:
         payment_method: "Payment Method"
       sections:
         ecpay:
+          eyebrow: "Taiwan custom onboarding"
           title: "Connect this temple to ECPay"
-          subtitle: "Open ECPay in a new tab, sign in or register, then copy the credentials back here."
+          subtitle: "Open ECPay in a new tab, finish the merchant setup there, then paste the temple credentials back here."
+          credentials_eyebrow: "Temple connection"
           credentials_title: "ECPay credentials"
           credentials_subtitle: "Save the values exactly as ECPay shows them."
           actions:
             open_portal: "Open ECPay"
+            save: "Save ECPay details"
           steps:
             open_portal:
+              kicker: "Step 1: Open ECPay"
               title: "Open ECPay"
               body: "Use this button to open the official ECPay login and registration screen in a new tab."
-            find_keys:
-              title: "Find the three ECPay values"
-              body: "After signing in, find the Merchant ID, HashKey, and HashIV for this temple account."
+            system_settings:
+              kicker: "Step 2: Go to System Settings"
+              title: "Open the ECPay setup area"
+              body: "After signing in, go to the merchant settings area where Merchant ID, HashKey, and HashIV are shown."
             paste_back:
+              kicker: "Step 3: Copy the temple credentials back here"
               title: "Paste the values back here"
               body: "Copy those values into the fields on this page, then save."
-          notes:
-            no_code_title: "Do we need to copy any TempleMate code into ECPay?"
-            no_code_body: "No TempleMate secret needs to be pasted into ECPay for this flow. In normal onboarding, you only copy ECPay values back into TempleMate. If ECPay later asks for callback URLs, we can provide those separately."
         payment_method:
+          eyebrow: "Platform billing"
           title: "Payment Method"
           subtitle: "The system charges %{amount} per month. Temples cannot change this price."
+          status_eyebrow: "Account status"
           status_title: "Billing status"
           status_subtitle: "Turn this on once a valid payment method has been added."
           missing_portal: "Set BILLING_PORTAL_URL before using the payment-method button in this environment."
           actions:
             open_billing: "Open payment method setup"
+            save: "Save payment status"
           notes:
             price_title: "Monthly platform fee: %{amount}"
             price_body: "This amount is controlled by the system. Temple admins do not enter or edit the price."
@@ -305,6 +311,8 @@ en:
         ecpay_environment: "ECPay environment"
         billing_payment_method_on_file: "A valid payment method is on file"
       status:
+        ecpay_setup: "ECPay setup"
+        ecpay_environment: "Environment"
         online_payments: "Online payments"
         active: "Active"
         frozen: "Frozen"

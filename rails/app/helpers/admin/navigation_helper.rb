@@ -31,13 +31,6 @@ module Admin
         capabilities: :view_financials
       },
       {
-        key: :payment_methods,
-        label: "Billing",
-        description: "設定 ECPay 與帳務狀態",
-        path: -> { admin_payment_methods_path },
-        owner_only: true
-      },
-      {
         key: :gatherings,
         label: "Gatherings",
         description: "社群活動與交流場次",
@@ -90,6 +83,13 @@ module Admin
         description: "管理管理員權限",
         path: -> { admin_permissions_path },
         capabilities: :manage_permissions
+      },
+      {
+        key: :payment_methods,
+        label: "Billing",
+        description: "設定 ECPay 與帳務狀態",
+        path: -> { admin_payment_methods_path },
+        owner_only: true
       }
     ].freeze
 

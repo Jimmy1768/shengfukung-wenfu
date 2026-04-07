@@ -266,33 +266,39 @@ zh-TW:
         payment_method: "Payment Method"
       sections:
         ecpay:
+          eyebrow: "台灣 ECPay onboarding"
           title: "連接這間宮廟的 ECPay"
-          subtitle: "開新分頁登入或註冊 ECPay，再把需要的資料複製回來。"
+          subtitle: "開新分頁登入或註冊 ECPay，在那邊完成商家設定後，再把資料複製回來。"
+          credentials_eyebrow: "宮廟收款連線"
           credentials_title: "ECPay 串接資料"
           credentials_subtitle: "請依照 ECPay 顯示的值原樣貼上。"
           actions:
             open_portal: "開啟 ECPay"
+            save: "儲存 ECPay 資料"
           steps:
             open_portal:
+              kicker: "Step 1: Open ECPay"
               title: "開啟 ECPay"
               body: "按這個按鈕，用新分頁開啟官方 ECPay 登入／註冊頁面。"
-            find_keys:
-              title: "找到三個 ECPay 值"
-              body: "登入後，找到這間宮廟帳號的 Merchant ID、HashKey、HashIV。"
+            system_settings:
+              kicker: "Step 2: Go to System Settings"
+              title: "進入 ECPay 設定區"
+              body: "登入後，到商家設定區找到 Merchant ID、HashKey、HashIV。"
             paste_back:
+              kicker: "Step 3: Copy the temple credentials back here"
               title: "把資料貼回這裡"
               body: "把剛剛找到的值貼到這一頁，然後按儲存。"
-          notes:
-            no_code_title: "需要把 TempleMate 的程式碼貼到 ECPay 嗎？"
-            no_code_body: "一般情況下不用。這個流程只需要把 ECPay 的資料複製回 TempleMate。如果 ECPay 之後要求設定 callback URL，我們再另外提供。"
         payment_method:
+          eyebrow: "平台帳務"
           title: "Payment Method"
           subtitle: "系統固定每月收取 %{amount}，宮廟不能自行修改價格。"
+          status_eyebrow: "帳務狀態"
           status_title: "帳務狀態"
           status_subtitle: "新增有效付款方式後，再把這個狀態打開。"
           missing_portal: "這個環境尚未設定 BILLING_PORTAL_URL，所以目前不能直接開啟付款方式頁面。"
           actions:
             open_billing: "開啟付款方式設定"
+            save: "儲存帳務狀態"
           notes:
             price_title: "平台月費：%{amount}"
             price_body: "這個金額由系統控制，宮廟不需要也不能自行調整。"
@@ -305,6 +311,8 @@ zh-TW:
         ecpay_environment: "ECPay 環境"
         billing_payment_method_on_file: "已經有有效付款方式"
       status:
+        ecpay_setup: "ECPay 狀態"
+        ecpay_environment: "環境"
         online_payments: "線上付款"
         active: "正常"
         frozen: "已凍結"

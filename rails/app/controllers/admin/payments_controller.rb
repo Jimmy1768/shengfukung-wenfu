@@ -83,10 +83,10 @@ module Admin
           registration: @registration,
           source: "admin_console",
           temple_slug: current_temple.slug,
-          return_url: checkout_return_admin_payments_url(registration_id: @registration.id, provider: provider),
+          browser_return_url: checkout_return_admin_payments_url(registration_id: @registration.id, provider: provider),
           cancel_url: checkout_return_admin_payments_url(registration_id: @registration.id, provider: provider, canceled: 1),
           extra: {
-            webhook_url: api_v1_payment_webhook_url(provider: provider, temple: current_temple.slug),
+            server_callback_url: api_v1_payment_webhook_url(provider: provider, temple: current_temple.slug),
             item_name: @registration.registrable&.try(:title) || @registration.reference_code
           }
         )

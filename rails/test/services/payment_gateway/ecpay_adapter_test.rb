@@ -16,9 +16,9 @@ module PaymentGateway
           amount_cents: 500,
           currency: "TWD",
           metadata: {
-            return_url: "https://example.test/return",
+            browser_return_url: "https://example.test/return",
             cancel_url: "https://example.test/cancel",
-            webhook_url: "https://example.test/webhooks/ecpay",
+            server_callback_url: "https://example.test/webhooks/ecpay",
             item_name: "Temple Registration",
             registration_reference: "REG-123",
             temple_slug: "shengfukung-wenfu"
@@ -91,9 +91,9 @@ module PaymentGateway
           amount_cents: 500,
           currency: "TWD",
           metadata: {
-            return_url: "https://example.test/return",
+            browser_return_url: "https://example.test/return",
             cancel_url: "https://example.test/cancel",
-            webhook_url: "https://example.test/webhooks/ecpay",
+            server_callback_url: "https://example.test/webhooks/ecpay",
             item_name: "Temple Registration"
           },
           idempotency_key: "idem-123"

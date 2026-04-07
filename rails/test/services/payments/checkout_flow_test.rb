@@ -13,13 +13,14 @@ module Payments
         registration: FakeRegistration.new("REG-123"),
         source: "account_portal",
         temple_slug: "shengfukung-wenfu",
-        return_url: "https://example.com/return",
+        browser_return_url: "https://example.com/return",
         cancel_url: "https://example.com/cancel"
       )
 
       assert_equal "account_portal", metadata[:source]
       assert_equal "shengfukung-wenfu", metadata[:temple_slug]
       assert_equal "REG-123", metadata[:registration_reference]
+      assert_equal "https://example.com/return", metadata[:browser_return_url]
       assert_equal "https://example.com/return", metadata[:return_url]
       assert_equal "https://example.com/return", metadata[:confirm_url]
       assert_equal "https://example.com/cancel", metadata[:cancel_url]

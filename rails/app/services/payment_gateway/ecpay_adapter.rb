@@ -41,8 +41,8 @@ module PaymentGateway
         "TotalAmount" => amount_cents.to_f.round.to_i.to_s,
         "TradeDesc" => truncate(metadata_value(metadata, "item_name").presence || "Temple registration payment", 200),
         "ItemName" => truncate(metadata_value(metadata, "item_name").presence || "Temple registration payment", 400),
-        "ReturnURL" => ecpay_return_url(metadata),
-        "OrderResultURL" => ecpay_order_result_url(metadata),
+        "ReturnURL" => ecpay_server_callback_url(metadata),
+        "OrderResultURL" => ecpay_browser_return_url(metadata),
         "ChoosePayment" => ENV.fetch("ECPAY_CHOOSE_PAYMENT", "ALL"),
         "NeedExtraPaidInfo" => "Y",
         "EncryptType" => "1"
@@ -118,12 +118,18 @@ module PaymentGateway
       raise ConfigurationError, "ECPAY_HASH_IV is missing" if credential_for(:hash_iv).blank?
     end
 
-    def ecpay_return_url(metadata)
-      metadata_value(metadata, "webhook_url").presence || raise(ConfigurationError, "ECPay checkout requires webhook_url")
+    # ECPay ReturnURL is the required server-to-server callback endpoint.
+    def ecpay_server_callback_url(metadata)
+      metadata_value(metadata, "server_callback_url").presence ||
+        metadata_value(metadata, "webhook_url").presence ||
+        raise(ConfigurationError, "ECPay checkout requires server_callback_url")
     end
 
-    def ecpay_order_result_url(metadata)
-      metadata_value(metadata, "return_url").presence || raise(ConfigurationError, "ECPay checkout requires return_url")
+    # ECPay OrderResultURL is the optional browser/client return page.
+    def ecpay_browser_return_url(metadata)
+      metadata_value(metadata, "browser_return_url").presence ||
+        metadata_value(metadata, "return_url").presence ||
+        raise(ConfigurationError, "ECPay checkout requires browser_return_url")
     end
 
     def checkout_endpoint

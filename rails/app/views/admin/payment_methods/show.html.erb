@@ -19,21 +19,21 @@
     <div class="admin-stack__row admin-stack__row--primary">
       <section class="card stack-item stack-item--xl stack-item--with-gutter billing-shell" data-billing-tabs>
         <header class="billing-shell__header">
-          <div>
-            <p class="eyebrow"><%= t("admin.payment_methods.hero.eyebrow") %></p>
+          <div class="billing-shell__intro">
+            <p class="billing-shell__eyebrow"><%= t("admin.payment_methods.hero.eyebrow") %></p>
             <h2><%= t("admin.payment_methods.hero.heading") %></h2>
             <p class="muted"><%= t("admin.payment_methods.hero.subheading") %></p>
           </div>
 
-          <div class="billing-status">
-            <span class="billing-status__label"><%= t("admin.payment_methods.status.online_payments") %></span>
-            <% if @form.online_payments_frozen? %>
-              <strong class="billing-status__value billing-status__value--danger"><%= t("admin.payment_methods.status.frozen") %></strong>
-            <% elsif @form.billing_payment_method_on_file? %>
-              <strong class="billing-status__value billing-status__value--success"><%= t("admin.payment_methods.status.active") %></strong>
-            <% else %>
-              <strong class="billing-status__value billing-status__value--warning"><%= t("admin.payment_methods.status.grace_period", days: @form.billing_grace_remaining_days || @form.billing_grace_days) %></strong>
-            <% end %>
+          <div class="billing-pills">
+            <span class="billing-pill billing-pill--<%= @form.ecpay_status_tone %>">
+              <span class="billing-pill__label"><%= t("admin.payment_methods.status.ecpay_setup") %></span>
+              <strong><%= @form.ecpay_status_label %></strong>
+            </span>
+            <span class="billing-pill billing-pill--<%= @form.online_payments_status_tone %>">
+              <span class="billing-pill__label"><%= t("admin.payment_methods.status.online_payments") %></span>
+              <strong><%= @form.online_payments_status_label %></strong>
+            </span>
           </div>
         </header>
 
@@ -53,150 +53,178 @@
         </div>
 
         <section class="billing-panel is-active" data-billing-tab-panel="ecpay" role="tabpanel">
-          <div class="card-grid two-column">
-            <section class="card form-card">
-              <header>
+          <div class="billing-layout">
+            <section class="billing-card billing-card--guide">
+              <div class="billing-card__header">
+                <p class="billing-card__eyebrow"><%= t("admin.payment_methods.sections.ecpay.eyebrow") %></p>
                 <h3><%= t("admin.payment_methods.sections.ecpay.title") %></h3>
                 <p><%= t("admin.payment_methods.sections.ecpay.subtitle") %></p>
-              </header>
+              </div>
 
-              <div class="billing-steps">
-                <article class="billing-step" data-billing-highlight="ecpay-portal">
-                  <span class="billing-step__number">1</span>
-                  <div>
-                    <strong><%= t("admin.payment_methods.sections.ecpay.steps.open_portal.title") %></strong>
-                    <p><%= t("admin.payment_methods.sections.ecpay.steps.open_portal.body") %></p>
-                    <%= link_to t("admin.payment_methods.sections.ecpay.actions.open_portal"),
-                          @form.ecpay_portal_url,
-                          class: "btn btn-secondary",
-                          target: "_blank",
-                          rel: "noopener" %>
-                  </div>
+              <div class="billing-step-list">
+                <article class="billing-step-card" data-billing-highlight="ecpay-portal">
+                  <span class="billing-step-card__label"><%= t("admin.payment_methods.sections.ecpay.steps.open_portal.kicker") %></span>
+                  <strong><%= t("admin.payment_methods.sections.ecpay.steps.open_portal.title") %></strong>
+                  <p><%= t("admin.payment_methods.sections.ecpay.steps.open_portal.body") %></p>
+                  <%= link_to t("admin.payment_methods.sections.ecpay.actions.open_portal"),
+                        @form.ecpay_portal_url,
+                        class: "billing-button billing-button--secondary",
+                        target: "_blank",
+                        rel: "noopener" %>
                 </article>
 
-                <article class="billing-step" data-billing-highlight="ecpay-fields">
-                  <span class="billing-step__number">2</span>
-                  <div>
-                    <strong><%= t("admin.payment_methods.sections.ecpay.steps.find_keys.title") %></strong>
-                    <p><%= t("admin.payment_methods.sections.ecpay.steps.find_keys.body") %></p>
-                  </div>
+                <article class="billing-step-card" data-billing-highlight="ecpay-portal">
+                  <span class="billing-step-card__label"><%= t("admin.payment_methods.sections.ecpay.steps.system_settings.kicker") %></span>
+                  <strong><%= t("admin.payment_methods.sections.ecpay.steps.system_settings.title") %></strong>
+                  <p><%= t("admin.payment_methods.sections.ecpay.steps.system_settings.body") %></p>
                 </article>
 
-                <article class="billing-step" data-billing-highlight="ecpay-fields">
-                  <span class="billing-step__number">3</span>
-                  <div>
-                    <strong><%= t("admin.payment_methods.sections.ecpay.steps.paste_back.title") %></strong>
-                    <p><%= t("admin.payment_methods.sections.ecpay.steps.paste_back.body") %></p>
-                  </div>
+                <article class="billing-step-card" data-billing-highlight="ecpay-fields">
+                  <span class="billing-step-card__label"><%= t("admin.payment_methods.sections.ecpay.steps.paste_back.kicker") %></span>
+                  <strong><%= t("admin.payment_methods.sections.ecpay.steps.paste_back.title") %></strong>
+                  <p><%= t("admin.payment_methods.sections.ecpay.steps.paste_back.body") %></p>
                 </article>
               </div>
 
-              <div class="billing-note" data-billing-highlight-key="ecpay-portal">
-                <strong><%= t("admin.payment_methods.sections.ecpay.notes.no_code_title") %></strong>
-                <p><%= t("admin.payment_methods.sections.ecpay.notes.no_code_body") %></p>
+              <div class="billing-mini-grid">
+                <% if Rails.env.development? %>
+                  <article class="billing-mini-card">
+                    <span class="billing-mini-card__label"><%= t("admin.payment_methods.status.ecpay_environment") %></span>
+                    <strong><%= @form.ecpay_environment.to_s.titleize.presence || "Stage" %></strong>
+                  </article>
+                <% end %>
               </div>
             </section>
 
-            <section class="card form-card" data-billing-highlight-key="ecpay-fields">
-              <header>
-                <h3><%= t("admin.payment_methods.sections.ecpay.credentials_title") %></h3>
-                <p><%= t("admin.payment_methods.sections.ecpay.credentials_subtitle") %></p>
-              </header>
+            <section class="billing-column">
+              <section class="billing-card billing-card--connection" data-billing-highlight-key="ecpay-fields">
+                <div class="billing-card__header">
+                  <p class="billing-card__eyebrow"><%= t("admin.payment_methods.sections.ecpay.credentials_eyebrow") %></p>
+                  <h3><%= t("admin.payment_methods.sections.ecpay.credentials_title") %></h3>
+                  <p><%= t("admin.payment_methods.sections.ecpay.credentials_subtitle") %></p>
+                </div>
 
-              <div class="field">
-                <%= form.label :ecpay_merchant_id, t("admin.payment_methods.fields.ecpay_merchant_id") %>
-                <%= form.text_field :ecpay_merchant_id, autocomplete: "off" %>
-              </div>
+                <div class="billing-field-grid">
+                  <div class="billing-form-field">
+                    <%= form.label :ecpay_merchant_id, t("admin.payment_methods.fields.ecpay_merchant_id"), class: "billing-form-label" %>
+                    <%= form.text_field :ecpay_merchant_id, autocomplete: "off", class: "billing-form-input" %>
+                  </div>
 
-              <div class="field">
-                <%= form.label :ecpay_hash_key, t("admin.payment_methods.fields.ecpay_hash_key") %>
-                <%= form.password_field :ecpay_hash_key, autocomplete: "new-password" %>
-              </div>
+                  <div class="billing-form-field">
+                    <%= form.label :ecpay_hash_key, t("admin.payment_methods.fields.ecpay_hash_key"), class: "billing-form-label" %>
+                    <%= form.password_field :ecpay_hash_key, autocomplete: "new-password", class: "billing-form-input" %>
+                  </div>
 
-              <div class="field">
-                <%= form.label :ecpay_hash_iv, t("admin.payment_methods.fields.ecpay_hash_iv") %>
-                <%= form.password_field :ecpay_hash_iv, autocomplete: "new-password" %>
-              </div>
+                  <div class="billing-form-field">
+                    <%= form.label :ecpay_hash_iv, t("admin.payment_methods.fields.ecpay_hash_iv"), class: "billing-form-label" %>
+                    <%= form.password_field :ecpay_hash_iv, autocomplete: "new-password", class: "billing-form-input" %>
+                  </div>
 
-              <div class="field">
-                <%= form.label :ecpay_environment, t("admin.payment_methods.fields.ecpay_environment") %>
-                <%= form.select :ecpay_environment, options_for_select(@form.ecpay_environment_options, @form.ecpay_environment) %>
+                  <% if Rails.env.development? %>
+                    <div class="billing-form-field">
+                      <%= form.label :ecpay_environment, t("admin.payment_methods.fields.ecpay_environment"), class: "billing-form-label" %>
+                      <%= form.select :ecpay_environment, options_for_select(@form.ecpay_environment_options, @form.ecpay_environment), {}, class: "billing-form-input billing-form-input--select" %>
+                    </div>
+                  <% end %>
+                </div>
+
+                <div class="billing-card__actions">
+                  <%= form.submit t("admin.payment_methods.sections.ecpay.actions.save"), class: "billing-button billing-button--primary" %>
+                </div>
+              </section>
+
+              <div class="billing-facts-grid">
+                <article class="billing-fact-card">
+                  <span class="billing-fact-card__label"><%= t("admin.payment_methods.status.ecpay_setup") %></span>
+                  <strong><%= @form.ecpay_status_label %></strong>
+                </article>
+                <% if Rails.env.development? %>
+                  <article class="billing-fact-card">
+                    <span class="billing-fact-card__label"><%= t("admin.payment_methods.status.ecpay_environment") %></span>
+                    <strong><%= @form.ecpay_environment.to_s.titleize.presence || "Stage" %></strong>
+                  </article>
+                <% end %>
+                <article class="billing-fact-card billing-fact-card--wide">
+                  <span class="billing-fact-card__label"><%= t("admin.payment_methods.sections.ecpay.credentials_title") %></span>
+                  <strong><%= @form.ecpay_merchant_id.presence || t("admin.internal.shared.none") %></strong>
+                  <p><%= t("admin.payment_methods.sections.ecpay.credentials_subtitle") %></p>
+                </article>
               </div>
             </section>
           </div>
         </section>
 
         <section class="billing-panel" data-billing-tab-panel="payment-method" role="tabpanel" hidden>
-          <div class="card-grid two-column">
-            <section class="card form-card">
-              <header>
+          <div class="billing-layout billing-layout--payment">
+            <section class="billing-card">
+              <div class="billing-card__header">
+                <p class="billing-card__eyebrow"><%= t("admin.payment_methods.sections.payment_method.eyebrow") %></p>
                 <h3><%= t("admin.payment_methods.sections.payment_method.title") %></h3>
                 <p><%= t("admin.payment_methods.sections.payment_method.subtitle", amount: @form.billing_monthly_fee_label) %></p>
-              </header>
-
-              <div class="billing-note">
-                <strong><%= t("admin.payment_methods.sections.payment_method.notes.price_title", amount: @form.billing_monthly_fee_label) %></strong>
-                <p><%= t("admin.payment_methods.sections.payment_method.notes.price_body") %></p>
               </div>
 
-              <div class="billing-note">
-                <strong><%= t("admin.payment_methods.sections.payment_method.notes.freeze_title") %></strong>
-                <p><%= t("admin.payment_methods.sections.payment_method.notes.freeze_body", days: @form.billing_grace_days) %></p>
+              <div class="billing-step-list">
+                <article class="billing-info-card">
+                  <span class="billing-info-card__label"><%= t("admin.payment_methods.sections.payment_method.notes.price_title", amount: @form.billing_monthly_fee_label) %></span>
+                  <p><%= t("admin.payment_methods.sections.payment_method.notes.price_body") %></p>
+                </article>
+                <article class="billing-info-card">
+                  <span class="billing-info-card__label"><%= t("admin.payment_methods.sections.payment_method.notes.freeze_title") %></span>
+                  <p><%= t("admin.payment_methods.sections.payment_method.notes.freeze_body", days: @form.billing_grace_days) %></p>
+                </article>
               </div>
 
-              <% if @form.billing_portal_url.present? %>
-                <%= link_to t("admin.payment_methods.sections.payment_method.actions.open_billing"),
-                      @form.billing_portal_url,
-                      class: "btn btn-secondary",
-                      target: "_blank",
-                      rel: "noopener" %>
-              <% else %>
-                <p class="muted"><%= t("admin.payment_methods.sections.payment_method.missing_portal") %></p>
-              <% end %>
+              <div class="billing-card__actions">
+                <% if @form.billing_portal_url.present? %>
+                  <%= link_to t("admin.payment_methods.sections.payment_method.actions.open_billing"),
+                        @form.billing_portal_url,
+                        class: "billing-button billing-button--secondary",
+                        target: "_blank",
+                        rel: "noopener" %>
+                <% else %>
+                  <p class="muted"><%= t("admin.payment_methods.sections.payment_method.missing_portal") %></p>
+                <% end %>
+              </div>
             </section>
 
-            <section class="card form-card">
-              <header>
-                <h3><%= t("admin.payment_methods.sections.payment_method.status_title") %></h3>
-                <p><%= t("admin.payment_methods.sections.payment_method.status_subtitle") %></p>
-              </header>
+            <section class="billing-column">
+              <section class="billing-card">
+                <div class="billing-card__header">
+                  <p class="billing-card__eyebrow"><%= t("admin.payment_methods.sections.payment_method.status_eyebrow") %></p>
+                  <h3><%= t("admin.payment_methods.sections.payment_method.status_title") %></h3>
+                  <p><%= t("admin.payment_methods.sections.payment_method.status_subtitle") %></p>
+                </div>
 
-              <div class="field checkbox-field">
-                <label>
-                  <%= form.check_box :billing_payment_method_on_file %>
-                  <span><%= t("admin.payment_methods.fields.billing_payment_method_on_file") %></span>
-                </label>
-              </div>
+                <div class="billing-form-field">
+                  <label class="billing-checkbox">
+                    <%= form.check_box :billing_payment_method_on_file %>
+                    <span><%= t("admin.payment_methods.fields.billing_payment_method_on_file") %></span>
+                  </label>
+                </div>
 
-              <div class="derived-contact">
-                <div class="derived-contact__item">
-                  <div class="label"><%= t("admin.payment_methods.status.monthly_fee") %></div>
-                  <div class="muted"><%= @form.billing_monthly_fee_label %></div>
+                <div class="billing-card__actions">
+                  <%= form.submit t("admin.payment_methods.sections.payment_method.actions.save"), class: "billing-button billing-button--primary" %>
                 </div>
-                <div class="derived-contact__item">
-                  <div class="label"><%= t("admin.payment_methods.status.grace_period_label") %></div>
-                  <div class="muted"><%= t("admin.payment_methods.status.grace_period_value", days: @form.billing_grace_days) %></div>
-                </div>
-                <div class="derived-contact__item">
-                  <div class="label"><%= t("admin.payment_methods.status.current_state") %></div>
-                  <div class="muted">
-                    <% if @form.online_payments_frozen? %>
-                      <%= t("admin.payment_methods.status.frozen") %>
-                    <% elsif @form.billing_payment_method_on_file? %>
-                      <%= t("admin.payment_methods.status.active") %>
-                    <% else %>
-                      <%= t("admin.payment_methods.status.grace_period", days: @form.billing_grace_remaining_days || @form.billing_grace_days) %>
-                    <% end %>
-                  </div>
-                </div>
+              </section>
+
+              <div class="billing-facts-grid">
+                <article class="billing-fact-card">
+                  <span class="billing-fact-card__label"><%= t("admin.payment_methods.status.monthly_fee") %></span>
+                  <strong><%= @form.billing_monthly_fee_label %></strong>
+                </article>
+                <article class="billing-fact-card">
+                  <span class="billing-fact-card__label"><%= t("admin.payment_methods.status.grace_period_label") %></span>
+                  <strong><%= t("admin.payment_methods.status.grace_period_value", days: @form.billing_grace_days) %></strong>
+                </article>
+                <article class="billing-fact-card billing-fact-card--wide">
+                  <span class="billing-fact-card__label"><%= t("admin.payment_methods.status.current_state") %></span>
+                  <strong><%= @form.online_payments_status_label %></strong>
+                  <p><%= t("admin.payment_methods.sections.payment_method.notes.freeze_body", days: @form.billing_grace_days) %></p>
+                </article>
               </div>
             </section>
           </div>
         </section>
-
-        <div class="form-actions form-actions--centered profile-form-actions">
-          <%= form.submit t("admin.payment_methods.actions.save"), class: "btn btn-primary" %>
-        </div>
       </section>
     </div>
   <% end %>

@@ -12,7 +12,8 @@ module PaymentGateway
         provider_checkout_id: "fake_chk_#{SecureRandom.hex(8)}",
         provider_payment_id: "fake_pay_#{SecureRandom.hex(8)}",
         provider_reference: "fake_ref_#{SecureRandom.hex(8)}",
-        redirect_url: metadata[:return_url].presence || metadata["return_url"].presence,
+        redirect_url: metadata[:browser_return_url].presence || metadata["browser_return_url"].presence ||
+          metadata[:return_url].presence || metadata["return_url"].presence,
         raw: {
           intent: intent,
           amount_cents: amount_cents,

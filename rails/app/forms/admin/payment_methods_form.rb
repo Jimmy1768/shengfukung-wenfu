@@ -91,6 +91,48 @@ module Admin
       temple.online_payments_frozen?
     end
 
+    def online_payments_state
+      return :setup_needed unless ecpay_configured?
+      return :active if billing_payment_method_on_file?
+      return :frozen if online_payments_frozen?
+
+      :grace_period
+    end
+
+    def online_payments_status_label
+      case online_payments_state
+      when :setup_needed
+        "Setup incomplete"
+      when :active
+        "Active"
+      when :frozen
+        "Billing overdue"
+      else
+        "#{billing_grace_remaining_days || billing_grace_days} days left in grace period"
+      end
+    end
+
+    def online_payments_status_tone
+      case online_payments_state
+      when :setup_needed
+        "neutral"
+      when :active
+        "success"
+      when :frozen
+        "danger"
+      else
+        "warning"
+      end
+    end
+
+    def ecpay_status_label
+      ecpay_configured? ? "Ready to test" : "Setup needed"
+    end
+
+    def ecpay_status_tone
+      ecpay_configured? ? "success" : "warning"
+    end
+
     def ecpay_portal_url
       ENV.fetch("ECPAY_PORTAL_URL", DEFAULT_ECPAY_PORTAL_URL).to_s
     end
@@ -132,6 +174,7 @@ module Admin
     end
 
     def billing_grace_started_at_value
+      return nil unless ecpay_configured?
       return nil if billing_payment_method_on_file?
 
       temple.billing_grace_started_at&.iso8601 || Time.current.iso8601

@@ -2,13 +2,15 @@
 
 module Payments
   class CheckoutFlow
-    def self.metadata_for(registration:, source:, temple_slug:, return_url:, cancel_url:, extra: {})
+    def self.metadata_for(registration:, source:, temple_slug:, browser_return_url:, cancel_url:, extra: {})
       {
         source: source,
         temple_slug: temple_slug,
         registration_reference: registration.reference_code,
-        return_url: return_url,
-        confirm_url: return_url,
+        browser_return_url: browser_return_url,
+        # Compatibility aliases for existing adapters and stored payloads.
+        return_url: browser_return_url,
+        confirm_url: browser_return_url,
         cancel_url: cancel_url
       }.merge((extra || {}).deep_symbolize_keys)
     end

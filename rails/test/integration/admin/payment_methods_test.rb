@@ -57,6 +57,28 @@ class AdminPaymentMethodsTest < ActionDispatch::IntegrationTest
     assert temple.billing_grace_started_at.present?
   end
 
+  test "setup incomplete does not start grace period" do
+    temple = create_temple
+    owner = create_admin_user(temple: temple, role: "owner")
+
+    sign_in_admin(owner)
+
+    patch admin_payment_methods_path, params: {
+      payment_methods: {
+        ecpay_merchant_id: "",
+        ecpay_hash_key: "",
+        ecpay_hash_iv: "",
+        ecpay_environment: "stage",
+        billing_payment_method_on_file: "0"
+      }
+    }
+
+    assert_redirected_to admin_payment_methods_path
+    temple.reload
+    assert_nil temple.billing_grace_started_at
+    refute temple.online_payments_frozen?
+  end
+
   test "non-owner is redirected away from payment methods" do
     temple = create_temple
     admin = create_admin_user(temple: temple, role: "admin")
