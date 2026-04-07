@@ -245,9 +245,17 @@ Production onboarding avoids creating real user passwords in seeds—only the te
    - After the first admin/staff person signs up as a normal patron account, use the internal console to promote them to temple `admin`.
    - Keep bootstrap role elevation centralized in `/internal/temples/access`.
 6. **Financial onboarding**
-   - Gather LINE Pay channel ID/secret but keep them out of Git; store in `.env.development` locally and `/etc/default/<slug>-env` on server until vaulting is ready.
+   - Treat `ECPay` as the only hosted online payment rail for Taiwan-facing temples.
+   - Collect the temple-specific ECPay values:
+     - `Merchant ID`
+     - `HashKey`
+     - `HashIV`
+     - environment (`stage` or `production`)
+   - Keep them out of Git. Store them either in the owner-only admin payment methods page or in secure env management during initial rollout.
+   - Open `/admin/payment_methods` as an owner admin and copy the ECPay values into the temple’s settings before testing hosted checkout.
+   - Run the first real payment verification using [ECPay Stage Smoke Checklist](../tickets/ECPAY_STAGE_SMOKE_CHECKLIST.md).
    - Decide which staff get financial permissions and run `bin/rails "temple_financial:grant_permissions[slug,email]"`.
-   - Cash entries live under `/admin/offerings/...` while we finish LINE Pay.
+   - Cash/manual payments remain supported alongside ECPay.
 7. **Mobile/API consumers**
    - Expo/mobile clients now call `/account/api/registrations`, `/account/api/payment_statuses/:reference`, `/account/api/certificates`, and `/account/api/guest_lists/:offering_id`.
    - Owner/staff roles determine what data comes back (guest lists additionally require `view_guest_lists`). When debugging, wrap Expo commands with `bin/load_temple_env <slug> -- ...` so the API and client agree on credentials.
@@ -268,7 +276,7 @@ Keep this matrix in sync with UI checks (`current_admin.admin_account.owner?` / 
 
 - [ ] YAML authored + committed.
 - [ ] `bin/rails temples:bootstrap[slug]` run (dev + prod).
-- [ ] Payment onboarding planned (LINE Pay credentials collected, offerings TBD).
+- [ ] ECPay onboarding completed (Merchant ID / HashKey / HashIV / environment stored).
 - [ ] Owner admin provisioned (internal console or manual promote).
 - [ ] Admin UI tested (profile edit, audit log, QR display).
 - [ ] Deployment notes updated only for template-level changes; keep temple-specific updates here.

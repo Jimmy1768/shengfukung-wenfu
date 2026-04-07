@@ -68,6 +68,42 @@ module PaymentGateway
       end
     end
 
+    test "checkout prefers temple-specific credentials over shared env defaults" do
+      temple = create_temple(
+        payment_provider_settings: {
+          "ecpay" => {
+            "merchant_id" => "3002607",
+            "hash_key" => "TempleHashKey",
+            "hash_iv" => "TempleHashIv",
+            "environment" => "production"
+          }
+        }
+      )
+
+      with_env(
+        "ECPAY_MERCHANT_ID" => "2000132",
+        "ECPAY_HASH_KEY" => "5294y06JbISpM5x9",
+        "ECPAY_HASH_IV" => "v77hoKGq4kWxNNIS",
+        "ECPAY_ENVIRONMENT" => "stage"
+      ) do
+        payload = EcpayAdapter.new(temple: temple).checkout(
+          intent: "registration:123",
+          amount_cents: 500,
+          currency: "TWD",
+          metadata: {
+            return_url: "https://example.test/return",
+            cancel_url: "https://example.test/cancel",
+            webhook_url: "https://example.test/webhooks/ecpay",
+            item_name: "Temple Registration"
+          },
+          idempotency_key: "idem-123"
+        )
+
+        assert_equal "https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5", payload.dig(:raw, :ecpay_checkout_url)
+        assert_equal "3002607", payload.dig(:raw, :ecpay_form_fields, "MerchantID")
+      end
+    end
+
     private
 
     def with_env(overrides)

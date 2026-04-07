@@ -8,9 +8,9 @@
 ## Locked Decisions
 
 - Build and use the shared payments core now.
-- Keep `PAYMENTS_PROVIDER=fake` as the active non-live gateway for development and staging.
-- Do not block app/payment flow work on owning a real or sandbox LINE Pay account.
-- Treat real provider verification as a later rollout gate.
+- Use `ECPay` as the main hosted online payment provider for this Taiwan-only repo.
+- Keep `PAYMENTS_PROVIDER=fake` available for tests and dummy local flows.
+- Do not depend on LINE Pay or Stripe Connect onboarding for launch.
 
 ## What Is Already Built
 
@@ -25,8 +25,7 @@
   - `Payments::RegistrationPaymentSync`
 - Adapter seam:
   - `PaymentGateway::FakeAdapter`
-  - `PaymentGateway::StripeAdapter`
-  - `PaymentGateway::LinePayAdapter`
+  - `PaymentGateway::EcpayAdapter`
 - Repository seam for payment rows and provider event logs.
 - Hosted checkout start/return flow for account and admin.
 - Shared webhook ingest endpoint.
@@ -46,8 +45,7 @@ Completed:
 - [x] Reference docs and portability manifest
 
 Not in scope right now:
-- [ ] Real Stripe rollout
-- [ ] Real LINE Pay rollout
+- [ ] Any hosted checkout provider besides ECPay
 - [ ] Advanced reconciliation/admin tooling
 
 ## Remaining Work
@@ -59,9 +57,8 @@ Only keep these as future rollout items:
    - Record expected behavior for account, admin, return, refund, and webhook paths.
 
 2. Real provider validation
-   - Validate Stripe in test mode if Stripe becomes an actual rollout target.
-   - Validate LINE Pay with real or sandbox merchant credentials.
-   - Confirm real callback/signature behavior against provider payloads.
+   - Validate ECPay with stage credentials.
+   - Confirm real callback/signature behavior against ECPay payloads.
 
 3. Optional operator tooling
    - Add admin-side reconcile/recheck actions if real provider edge cases start to matter.

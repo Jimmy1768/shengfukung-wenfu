@@ -22,8 +22,7 @@ Shared helpers:
 
 Provider boundary:
 - `PaymentGateway::FakeAdapter`
-- `PaymentGateway::StripeAdapter`
-- `PaymentGateway::LinePayAdapter`
+- `PaymentGateway::EcpayAdapter`
 
 Persistence boundary:
 - `Payments::Repositories::PaymentRepository`
@@ -68,22 +67,11 @@ Transition policy:
 
 ## Provider Strategy
 
-- `PAYMENTS_PROVIDER=fake` is the approved default for development and staging buildout.
-- The fake adapter is the current end-to-end stand-in for hosted checkout, webhook, return, and refund flows.
-- Stripe and LINE Pay stay behind env gating until credentials exist.
-- Final LINE Pay validation is still a later rollout step, not a blocker for current app wiring.
-
-## LINE Pay Notes
-
-The LINE Pay adapter now includes:
-- checkout request support
-- confirm support
-- query-status support
-- refund support
-- signature verification seam
-- fallback handling across `transactionId`, `orderId`, and callback/query metadata
-
-This is implementation-complete for local code integration, but not yet verified against a real LINE Pay merchant environment.
+- `PAYMENTS_PROVIDER=ecpay` is the intended hosted checkout default for deployed temple environments.
+- `PAYMENTS_PROVIDER=fake` remains useful in automated tests and local dummy-flow development.
+- ECPay is the only supported hosted online payment rail in this repo’s Taiwan deployment model.
+- Cash/manual payment rows remain supported.
+- Stripe is not used here for hosted checkout or Connect onboarding; any Stripe platform-fee notes live only in temple payment settings for internal operations.
 
 ## Local Validation
 
@@ -98,7 +86,7 @@ cd rails && bin/rails test \
   test/services/payments/checkout_service_test.rb \
   test/services/payments/webhook_ingest_service_test.rb \
   test/services/payments/refund_service_test.rb \
-  test/services/payment_gateway/line_pay_adapter_test.rb \
+  test/services/payment_gateway/ecpay_adapter_test.rb \
   test/integration/account/registration_payment_flow_test.rb \
   test/integration/admin/payments_flow_test.rb \
   test/integration/api/v1/payment_webhooks_test.rb \
@@ -107,6 +95,6 @@ cd rails && bin/rails test \
 
 ## Remaining External Work
 
-- real Stripe test-mode validation, if Stripe rollout is pursued
-- real or sandbox LINE Pay validation
-- manual ops testing of the fake hosted checkout flow in production-like environments
+- real ECPay stage validation with temple-specific credentials
+- production ECPay onboarding and callback verification
+- manual ops testing of hosted checkout and cash/manual fallbacks
