@@ -206,7 +206,6 @@ zh-TW:
       sign_out: "登出"
       temple_selector_label: "宮廟"
       no_temple: "尚未選擇宮廟"
-      settings: "設定"
       menu_toggle: "開啟管理選單"
       switch_temple: "切換宮廟"
       items:
@@ -313,9 +312,13 @@ zh-TW:
       status:
         ecpay_setup: "ECPay 狀態"
         ecpay_environment: "環境"
+        ready_to_test: "可開始測試"
+        setup_needed: "尚未完成設定"
         online_payments: "線上付款"
+        setup_incomplete: "ECPay 尚未設定完成"
         active: "正常"
         frozen: "已凍結"
+        billing_overdue: "帳務逾期"
         grace_period: "寬限期剩餘 %{days} 天"
         monthly_fee: "每月費用"
         grace_period_label: "寬限期"

@@ -204,7 +204,6 @@ en:
     nav:
       menu_heading: "Console menu"
       sign_out: "Sign out"
-      settings: "Settings"
       menu_toggle: "Open admin actions"
       switch_temple: "Switch temple"
       temple_selector_label: "Temple"
@@ -313,9 +312,13 @@ en:
       status:
         ecpay_setup: "ECPay setup"
         ecpay_environment: "Environment"
+        ready_to_test: "Ready to test"
+        setup_needed: "Setup needed"
         online_payments: "Online payments"
+        setup_incomplete: "Setup incomplete"
         active: "Active"
         frozen: "Frozen"
+        billing_overdue: "Billing overdue"
         grace_period: "%{days} days left in grace period"
         monthly_fee: "Monthly fee"
         grace_period_label: "Grace period"

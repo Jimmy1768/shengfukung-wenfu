@@ -28,11 +28,11 @@
           <div class="billing-pills">
             <span class="billing-pill billing-pill--<%= @form.ecpay_status_tone %>">
               <span class="billing-pill__label"><%= t("admin.payment_methods.status.ecpay_setup") %></span>
-              <strong><%= @form.ecpay_status_label %></strong>
+              <strong><%= t("admin.payment_methods.status.#{@form.ecpay_status_i18n_key}") %></strong>
             </span>
             <span class="billing-pill billing-pill--<%= @form.online_payments_status_tone %>">
               <span class="billing-pill__label"><%= t("admin.payment_methods.status.online_payments") %></span>
-              <strong><%= @form.online_payments_status_label %></strong>
+              <strong><%= t("admin.payment_methods.status.#{@form.online_payments_status_i18n_key}", **@form.online_payments_status_i18n_options) %></strong>
             </span>
           </div>
         </header>
@@ -136,7 +136,7 @@
               <div class="billing-facts-grid">
                 <article class="billing-fact-card">
                   <span class="billing-fact-card__label"><%= t("admin.payment_methods.status.ecpay_setup") %></span>
-                  <strong><%= @form.ecpay_status_label %></strong>
+                  <strong><%= t("admin.payment_methods.status.#{@form.ecpay_status_i18n_key}") %></strong>
                 </article>
                 <% if Rails.env.development? %>
                   <article class="billing-fact-card">
@@ -218,7 +218,7 @@
                 </article>
                 <article class="billing-fact-card billing-fact-card--wide">
                   <span class="billing-fact-card__label"><%= t("admin.payment_methods.status.current_state") %></span>
-                  <strong><%= @form.online_payments_status_label %></strong>
+                  <strong><%= t("admin.payment_methods.status.#{@form.online_payments_status_i18n_key}", **@form.online_payments_status_i18n_options) %></strong>
                   <p><%= t("admin.payment_methods.sections.payment_method.notes.freeze_body", days: @form.billing_grace_days) %></p>
                 </article>
               </div>

@@ -99,17 +99,23 @@ module Admin
       :grace_period
     end
 
-    def online_payments_status_label
+    def online_payments_status_i18n_key
       case online_payments_state
       when :setup_needed
-        "Setup incomplete"
+        "setup_incomplete"
       when :active
-        "Active"
+        "active"
       when :frozen
-        "Billing overdue"
+        "billing_overdue"
       else
-        "#{billing_grace_remaining_days || billing_grace_days} days left in grace period"
+        "grace_period"
       end
+    end
+
+    def online_payments_status_i18n_options
+      return {} unless online_payments_state == :grace_period
+
+      { days: billing_grace_remaining_days || billing_grace_days }
     end
 
     def online_payments_status_tone
@@ -125,8 +131,8 @@ module Admin
       end
     end
 
-    def ecpay_status_label
-      ecpay_configured? ? "Ready to test" : "Setup needed"
+    def ecpay_status_i18n_key
+      ecpay_configured? ? "ready_to_test" : "setup_needed"
     end
 
     def ecpay_status_tone

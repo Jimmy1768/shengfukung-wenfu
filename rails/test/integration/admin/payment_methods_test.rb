@@ -7,6 +7,11 @@ class AdminPaymentMethodsTest < ActionDispatch::IntegrationTest
 
     sign_in_admin(owner)
 
+    get admin_dashboard_path
+
+    assert_response :success
+    assert_includes response.body, "Billing"
+
     get admin_payment_methods_path
 
     assert_response :success
@@ -84,6 +89,11 @@ class AdminPaymentMethodsTest < ActionDispatch::IntegrationTest
     admin = create_admin_user(temple: temple, role: "admin")
 
     sign_in_admin(admin)
+
+    get admin_dashboard_path
+
+    assert_response :success
+    refute_includes response.body, "Billing"
 
     get admin_payment_methods_path
 
