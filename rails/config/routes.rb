@@ -28,6 +28,10 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :payments, defaults: { format: :html } do
+    get "ecpay_checkouts/:payment_reference", to: "ecpay_checkouts#show", as: :ecpay_checkout
+  end
+
   # --- Marketing admin showcase ----------------------------------------------
   namespace :marketing_admin, path: "/marketing/admin", module: "demo" do
     # Auth + sessions
@@ -81,9 +85,10 @@ Rails.application.routes.draw do
       collection do
         get :export
         post :start_checkout
-        get :checkout_return
+        match :checkout_return, via: %i[get post]
       end
     end
+    resource :payment_methods, only: %i[show update]
     resources :assistance_requests, only: :index do
       member do
         post :close
@@ -157,7 +162,7 @@ Rails.application.routes.draw do
       member do
         get :payment
         post :start_checkout
-        get :checkout_return
+        match :checkout_return, via: %i[get post]
       end
     end
     resources :events, only: :index

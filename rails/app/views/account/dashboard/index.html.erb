@@ -101,11 +101,7 @@
               <td><%= t("account.dashboard.payment_methods.#{payment.payment_method}", default: payment.payment_method.titleize) %></td>
               <td><span class="status-pill status-<%= payment.status %>"><%= t("account.dashboard.payment_statuses.#{payment.status}", default: payment.status) %></span></td>
               <td>
-                <% if payment.payment_method == "line_pay" %>
-                  <span class="line-pay-placeholder" title="<%= t("account.dashboard.payments.line_pay_title") %>"><%= t("account.dashboard.payments.line_pay_label") %></span>
-                <% else %>
-                  <span class="muted"><%= t("account.dashboard.payments.paper_hint") %></span>
-                <% end %>
+                <span class="muted"><%= t("account.dashboard.payments.paper_hint") %></span>
               </td>
             </tr>
           <% end %>

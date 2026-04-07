@@ -22,6 +22,14 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
         raw: {}
       }
     end
+
+    def query_status(provider_payment_ref:, **)
+      {
+        status: status,
+        provider_reference: provider_payment_ref,
+        raw: {}
+      }
+    end
   end
 
   test "records cash payment through admin controller" do
@@ -93,23 +101,23 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
 
     sign_in_admin(admin_user)
 
-    Payments::ProviderResolver.stub(:current_provider, "line_pay") do
-      PaymentGateway::LinePayAdapter.stub(:new, FakeRedirectAdapter.new("https://pay.example.test/admin")) do
+    Payments::ProviderResolver.stub(:current_provider, "ecpay") do
+      PaymentGateway::EcpayAdapter.stub(:new, FakeRedirectAdapter.new("/payments/ecpay_checkouts/admin")) do
         assert_difference -> { SystemAuditLog.where(action: "admin.payments.checkout_started").count }, 1 do
           post start_checkout_admin_payments_path(registration_id: registration.id)
         end
       end
     end
 
-    assert_redirected_to "https://pay.example.test/admin"
+    assert_redirected_to "/payments/ecpay_checkouts/admin"
   end
 
-  test "checkout return confirms payment and redirects back to admin order" do
+  test "checkout return confirms ecpay payment and redirects back to admin order" do
     temple = create_temple
-    offering = create_offering(temple:, slug: "admin-line-return", title: "Admin Line Return", price_cents: 1000)
+    offering = create_offering(temple:, slug: "admin-ecpay-return", title: "Admin ECPay Return", price_cents: 1000)
     user = User.create!(
-      email: "admin-line-return@example.com",
-      english_name: "Admin Line Return",
+      email: "admin-ecpay-return@example.com",
+      english_name: "Admin ECPay Return",
       encrypted_password: User.password_hash("Password123!")
     )
     registration = create_registration(user:, offering:)
@@ -117,9 +125,9 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
       registration: registration,
       amount_cents: registration.total_price_cents,
       status: TemplePayment::STATUSES[:pending],
-      method: TemplePayment::PAYMENT_METHODS[:line_pay],
-      provider: "line_pay",
-      provider_reference: "order_admin_1",
+      method: TemplePayment::PAYMENT_METHODS[:ecpay],
+      provider: "ecpay",
+      provider_reference: "trade_admin_1",
       processed_at: nil
     )
     admin_user = create_admin_user(temple:)
@@ -130,8 +138,16 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
 
     assert_difference -> { SystemAuditLog.where(action: "admin.payments.checkout_returned").count }, 1 do
       assert_difference -> { SystemAuditLog.where(action: "system.payments.reconciled").count }, 1 do
-        PaymentGateway::LinePayAdapter.stub(:new, FakeReturnAdapter.new("completed")) do
-          get checkout_return_admin_payments_path(registration_id: registration.id, provider: "line_pay", transactionId: "tx_admin_1", orderId: "order_admin_1")
+        PaymentGateway::EcpayAdapter.stub(:new, FakeReturnAdapter.new("completed")) do
+          post checkout_return_admin_payments_path(
+            registration_id: registration.id,
+            provider: "ecpay",
+            MerchantTradeNo: "trade_admin_1",
+            TradeNo: "ecpay_admin_trade_no_1",
+            RtnCode: "1",
+            TradeStatus: "1",
+            CheckMacValue: "mac_admin_1"
+          )
         end
       end
     end
@@ -141,10 +157,10 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
     assert_equal TemplePayment::STATUSES[:completed], registration.temple_payments.order(:created_at).last.reload.status
   end
 
-  test "checkout return for gathering redirects back to gathering order" do
+  test "ecpay checkout return for gathering redirects back to gathering order" do
     temple = create_temple
     gathering = temple.temple_gatherings.create!(
-      slug: "admin-gathering-line-return",
+      slug: "admin-gathering-ecpay-return",
       title: "Admin Gathering Return",
       currency: "TWD",
       price_cents: 550,
@@ -160,9 +176,9 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
       registration: registration,
       amount_cents: registration.total_price_cents,
       status: TemplePayment::STATUSES[:pending],
-      method: TemplePayment::PAYMENT_METHODS[:line_pay],
-      provider: "line_pay",
-      provider_reference: "order_admin_gathering_1",
+      method: TemplePayment::PAYMENT_METHODS[:ecpay],
+      provider: "ecpay",
+      provider_reference: "trade_admin_gathering_1",
       processed_at: nil
     )
     admin_user = create_admin_user(temple:)
@@ -173,12 +189,15 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
 
     assert_difference -> { SystemAuditLog.where(action: "admin.payments.checkout_returned").count }, 1 do
       assert_difference -> { SystemAuditLog.where(action: "system.payments.reconciled").count }, 1 do
-        PaymentGateway::LinePayAdapter.stub(:new, FakeReturnAdapter.new("completed")) do
-          get checkout_return_admin_payments_path(
+        PaymentGateway::EcpayAdapter.stub(:new, FakeReturnAdapter.new("completed")) do
+          post checkout_return_admin_payments_path(
             registration_id: registration.id,
-            provider: "line_pay",
-            transactionId: "tx_admin_gathering_1",
-            orderId: "order_admin_gathering_1"
+            provider: "ecpay",
+            MerchantTradeNo: "trade_admin_gathering_1",
+            TradeNo: "ecpay_admin_gathering_trade_no_1",
+            RtnCode: "1",
+            TradeStatus: "1",
+            CheckMacValue: "mac_admin_gathering_1"
           )
         end
       end

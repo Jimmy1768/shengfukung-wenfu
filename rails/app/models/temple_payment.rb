@@ -3,6 +3,7 @@
 class TemplePayment < ApplicationRecord
   PAYMENT_METHODS = {
     cash: "cash",
+    ecpay: "ecpay",
     line_pay: "line_pay",
     stripe: "stripe"
   }.freeze

@@ -218,6 +218,8 @@ zh-TW:
           label: "訂單"
         payments:
           label: "收款資料"
+        payment_methods:
+          label: "付款方式"
         gatherings:
           label: "社群活動"
         offerings:
@@ -251,6 +253,42 @@ zh-TW:
         owner_only: "只有擁有者帳號可以切換宮廟。"
         forbidden: "你沒有該宮廟的存取權限。"
         switched: "目前正在查看 %{temple}。"
+    payment_methods:
+      hero:
+        title: "付款方式"
+        body: "把 ECPay 當成唯一的線上代收流程，保留現金 / 人工收款，並在同一個擁有者頁面管理平台費設定。"
+      sections:
+        checkout:
+          title: "收款策略"
+          subtitle: "這間宮廟的線上代收流程現在只走 ECPay。"
+        ecpay:
+          title: "ECPay 串接資料"
+          subtitle: "儲存線上付款與回傳通知需要的商家資料。"
+          note: "這些值是宮廟獨立設定。新增宮廟時，擁有者管理員可以在這裡完成 onboarding。"
+        stripe_platform:
+          title: "Stripe 平台費"
+          subtitle: "Stripe 不再是這裡的 hosted checkout，但仍可記錄平台費的內部設定。"
+          note: "這一區只用於平台費規劃與營運紀錄，不會重新啟用 Stripe Checkout 或 Stripe Connect onboarding。"
+      fields:
+        payment_mode: "收款模式"
+        ecpay_merchant_id: "ECPay Merchant ID"
+        ecpay_hash_key: "ECPay HashKey"
+        ecpay_hash_iv: "ECPay HashIV"
+        ecpay_environment: "ECPay 環境"
+        stripe_platform_enabled: "記錄 Stripe 平台費代收"
+        stripe_platform_fee_bps: "平台費（basis points）"
+        stripe_platform_notes: "內部備註"
+      status:
+        online_provider: "線上 hosted checkout"
+        manual_provider: "線下 / 人工收款"
+        ecpay_only: "ECPay"
+        cash_manual: "現金 / 人工"
+      actions:
+        save: "儲存付款方式"
+      flash:
+        updated: "已更新付款方式設定。"
+        review_errors: "請檢查付款方式設定。"
+        owner_only: "只有擁有者管理員可以修改付款方式。"
     internal:
       layout:
         brand: "內部工具"
@@ -1051,6 +1089,7 @@ zh-TW:
         refunded: "已退款"
       methods:
         cash: "現金"
+        ecpay: "ECPay"
         bank_transfer: "匯款"
         credit_card: "信用卡"
         line_pay: "LINE Pay"

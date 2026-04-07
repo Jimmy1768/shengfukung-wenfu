@@ -49,7 +49,7 @@ module Reporting
         user:,
         provider: "demo",
         provider_account: "temple",
-        payment_method: TemplePayment::PAYMENT_METHODS[:line_pay],
+        payment_method: TemplePayment::PAYMENT_METHODS[:ecpay],
         status: TemplePayment::STATUSES[:completed],
         amount_cents: 400,
         currency: "TWD",
@@ -94,7 +94,7 @@ module Reporting
       assert_equal 2, summary.completed_count
       assert_equal 1, summary.pending_count
       assert_equal 1, summary.refunded_count
-      assert_equal %w[cash line_pay], summary.totals_by_method.map { |entry| entry[:label] }
+      assert_equal %w[cash ecpay], summary.totals_by_method.map { |entry| entry[:label] }
       assert_equal ["Event · Lantern"], summary.totals_by_offering.map { |entry| entry[:label] }.uniq
       assert_equal %w[2026-01-01 2026-01-02 2026-01-03 2026-01-04], summary.totals_by_date.map { |entry| entry[:label] }
   end

@@ -1,0 +1,107 @@
+<div class="admin-stack">
+  <div class="admin-stack__row admin-stack__row--hero-intro">
+    <section class="hero stack-item stack-item--hero">
+      <div class="hero-text">
+        <h1><%= t("admin.payment_methods.hero.title") %></h1>
+        <p><%= t("admin.payment_methods.hero.body") %></p>
+      </div>
+    </section>
+  </div>
+
+  <%= form_with model: @form,
+        scope: :payment_methods,
+        url: admin_payment_methods_path,
+        method: :patch,
+        class: "form-stack",
+        authenticity_token: true,
+        local: true,
+        data: { turbo: false } do |form| %>
+    <div class="admin-stack__row admin-stack__row--primary">
+      <section class="card stack-item stack-item--xl stack-item--with-gutter">
+        <div class="card-grid two-column">
+          <section class="card form-card">
+            <header>
+              <h2><%= t("admin.payment_methods.sections.checkout.title") %></h2>
+              <p><%= t("admin.payment_methods.sections.checkout.subtitle") %></p>
+            </header>
+
+            <div class="field">
+              <%= form.label :payment_mode, t("admin.payment_methods.fields.payment_mode") %>
+              <%= form.select :payment_mode, options_for_select(@form.payment_mode_options, @form.payment_mode) %>
+            </div>
+
+            <div class="derived-contact">
+              <div class="derived-contact__item">
+                <div class="label"><%= t("admin.payment_methods.status.online_provider") %></div>
+                <div class="muted"><%= t("admin.payment_methods.status.ecpay_only") %></div>
+              </div>
+              <div class="derived-contact__item">
+                <div class="label"><%= t("admin.payment_methods.status.manual_provider") %></div>
+                <div class="muted"><%= t("admin.payment_methods.status.cash_manual") %></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card form-card">
+            <header>
+              <h2><%= t("admin.payment_methods.sections.ecpay.title") %></h2>
+              <p><%= t("admin.payment_methods.sections.ecpay.subtitle") %></p>
+            </header>
+
+            <div class="field">
+              <%= form.label :ecpay_merchant_id, t("admin.payment_methods.fields.ecpay_merchant_id") %>
+              <%= form.text_field :ecpay_merchant_id, autocomplete: "off" %>
+            </div>
+
+            <div class="field">
+              <%= form.label :ecpay_hash_key, t("admin.payment_methods.fields.ecpay_hash_key") %>
+              <%= form.password_field :ecpay_hash_key, autocomplete: "new-password" %>
+            </div>
+
+            <div class="field">
+              <%= form.label :ecpay_hash_iv, t("admin.payment_methods.fields.ecpay_hash_iv") %>
+              <%= form.password_field :ecpay_hash_iv, autocomplete: "new-password" %>
+            </div>
+
+            <div class="field">
+              <%= form.label :ecpay_environment, t("admin.payment_methods.fields.ecpay_environment") %>
+              <%= form.select :ecpay_environment, options_for_select(@form.ecpay_environment_options, @form.ecpay_environment) %>
+            </div>
+
+            <p class="muted"><%= t("admin.payment_methods.sections.ecpay.note") %></p>
+          </section>
+
+          <section class="card form-card">
+            <header>
+              <h2><%= t("admin.payment_methods.sections.stripe_platform.title") %></h2>
+              <p><%= t("admin.payment_methods.sections.stripe_platform.subtitle") %></p>
+            </header>
+
+            <div class="field checkbox-field">
+              <label>
+                <%= form.check_box :stripe_platform_enabled %>
+                <span><%= t("admin.payment_methods.fields.stripe_platform_enabled") %></span>
+              </label>
+            </div>
+
+            <div class="field">
+              <%= form.label :stripe_platform_fee_bps, t("admin.payment_methods.fields.stripe_platform_fee_bps") %>
+              <%= form.number_field :stripe_platform_fee_bps, min: 0, max: 10_000, step: 1 %>
+            </div>
+
+            <div class="field">
+              <%= form.label :stripe_platform_notes, t("admin.payment_methods.fields.stripe_platform_notes") %>
+              <%= form.text_area :stripe_platform_notes, rows: 4 %>
+            </div>
+
+            <p class="muted"><%= t("admin.payment_methods.sections.stripe_platform.note") %></p>
+          </section>
+        </div>
+
+        <div class="form-actions form-actions--centered profile-form-actions">
+          <%= form.submit t("admin.payment_methods.actions.save"), class: "btn btn-primary" %>
+        </div>
+      </section>
+    </div>
+  <% end %>
+</div>

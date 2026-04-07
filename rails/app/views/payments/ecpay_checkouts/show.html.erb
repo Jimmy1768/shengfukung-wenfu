@@ -1,0 +1,22 @@
+<section style="max-width: 40rem; margin: 3rem auto; padding: 0 1rem; font-family: system-ui, sans-serif;">
+  <h1>Redirecting to ECPay</h1>
+  <p>We’re opening the secure ECPay payment page for this registration.</p>
+
+  <form id="ecpay-checkout-form" action="<%= @checkout_url %>" method="post">
+    <% @form_fields.each do |key, value| %>
+      <input type="hidden" name="<%= key %>" value="<%= value %>">
+    <% end %>
+
+    <noscript>
+      <p>JavaScript is required to continue automatically.</p>
+      <button type="submit">Continue to ECPay</button>
+    </noscript>
+  </form>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var form = document.getElementById("ecpay-checkout-form");
+    if (form) form.submit();
+  });
+</script>

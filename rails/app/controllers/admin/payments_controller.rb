@@ -3,6 +3,7 @@
 module Admin
   class PaymentsController < BaseController
     helper_method :payment_month_presets
+    skip_before_action :verify_authenticity_token, only: :checkout_return
 
     before_action :require_view_financials!, only: :index
     before_action :require_cash_permissions!, only: %i[new create start_checkout checkout_return]
@@ -78,7 +79,11 @@ module Admin
           source: "admin_console",
           temple_slug: current_temple.slug,
           return_url: checkout_return_admin_payments_url(registration_id: @registration.id, provider: provider),
-          cancel_url: checkout_return_admin_payments_url(registration_id: @registration.id, provider: provider, canceled: 1)
+          cancel_url: checkout_return_admin_payments_url(registration_id: @registration.id, provider: provider, canceled: 1),
+          extra: {
+            webhook_url: api_v1_payment_webhook_url(provider: provider, temple: current_temple.slug),
+            item_name: @registration.registrable&.try(:title) || @registration.reference_code
+          }
         )
       )
 
@@ -239,7 +244,33 @@ module Admin
     end
 
     def checkout_return_params
-      params.permit(:transactionId, :orderId, :canceled, :provider, :id, :format).to_h.except("provider", "id", "format").transform_keys do |key|
+      permitted = params.permit(
+        :transactionId,
+        :orderId,
+        :canceled,
+        :provider,
+        :id,
+        :format,
+        :MerchantID,
+        :MerchantTradeNo,
+        :StoreID,
+        :RtnCode,
+        :RtnMsg,
+        :TradeNo,
+        :TradeAmt,
+        :PaymentDate,
+        :PaymentType,
+        :PaymentTypeChargeFee,
+        :TradeDate,
+        :SimulatePaid,
+        :CustomField1,
+        :CustomField2,
+        :CustomField3,
+        :CustomField4,
+        :CheckMacValue
+      ).to_h.except("provider", "id", "format")
+
+      permitted.transform_keys do |key|
         case key
         when "transactionId" then "transaction_id"
         when "orderId" then "order_id"

@@ -6,7 +6,7 @@ module Api
       def create
         payload = webhook_payload
         temple = resolve_temple(payload)
-        return render json: { error: "temple_not_found" }, status: :unprocessable_entity unless temple
+        return render_webhook_error("temple_not_found", status: :unprocessable_entity) unless temple
 
         result = Payments::WebhookIngestService.new.call(
           temple: temple,
@@ -15,18 +15,13 @@ module Api
           headers: webhook_headers
         )
 
-        render json: {
-          ok: true,
-          duplicate: result.duplicate,
-          payment_id: result.payment&.id,
-          event_log_id: result.event_log&.id
-        }
+        render_webhook_success(result)
       rescue Payments::WebhookIngestService::InvalidWebhookSignature => e
-        render json: { error: "invalid_signature", detail: e.message }, status: :unauthorized
+        render_webhook_error("invalid_signature", detail: e.message, status: :unauthorized)
       rescue ArgumentError => e
-        render json: { error: "invalid_request", detail: e.message }, status: :unprocessable_entity
+        render_webhook_error("invalid_request", detail: e.message, status: :unprocessable_entity)
       rescue JSON::ParserError => e
-        render json: { error: "invalid_json", detail: e.message }, status: :bad_request
+        render_webhook_error("invalid_json", detail: e.message, status: :bad_request)
       end
 
       private
@@ -34,7 +29,7 @@ module Api
       def webhook_payload
         raw_body = request.raw_post
         parsed =
-          if raw_body.present?
+          if raw_body.present? && request.content_mime_type&.json?
             JSON.parse(raw_body)
           else
             request.request_parameters
@@ -58,6 +53,27 @@ module Api
           .to_h
           .select { |key, _| key.start_with?("HTTP_") || %w[CONTENT_TYPE CONTENT_LENGTH].include?(key) }
           .transform_values(&:to_s)
+      end
+
+      def ecpay_provider?
+        params[:provider].to_s == "ecpay"
+      end
+
+      def render_webhook_success(result)
+        return render plain: "1|OK" if ecpay_provider?
+
+        render json: {
+          ok: true,
+          duplicate: result.duplicate,
+          payment_id: result.payment&.id,
+          event_log_id: result.event_log&.id
+        }
+      end
+
+      def render_webhook_error(code, detail: nil, status:)
+        return render plain: "0|#{code}", status: status if ecpay_provider?
+
+        render json: { error: code, detail: detail }, status: status
       end
     end
   end

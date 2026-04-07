@@ -146,4 +146,14 @@ class Temple < ApplicationRecord
   def placeholder_hero?(value)
     value.to_s.match?(/placehold\.co/i)
   end
+
+  def payment_gateway_settings_for(provider)
+    settings = payment_provider_settings.is_a?(Hash) ? payment_provider_settings : {}
+    value = settings[provider.to_s]
+    value.is_a?(Hash) ? value.deep_stringify_keys : {}
+  end
+
+  def stripe_platform_settings
+    payment_gateway_settings_for(:stripe_platform)
+  end
 end

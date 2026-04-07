@@ -19,7 +19,7 @@ class ApiProtectionRequestClassifierTest < ActiveSupport::TestCase
   end
 
   test "classifies api webhook ingest with dedicated class" do
-    request = ActionDispatch::Request.new(Rack::MockRequest.env_for("/api/v1/payments/webhooks/stripe", method: "POST"))
+    request = ActionDispatch::Request.new(Rack::MockRequest.env_for("/api/v1/payments/webhooks/ecpay", method: "POST"))
     assert_equal "api.webhook.ingest", ApiProtection::RequestClassifier.classify(request)
   end
 

@@ -76,11 +76,10 @@ zh-TW:
           method: "方式"
           status: "狀態"
           download: "下載"
-        line_pay_label: "收據整理中"
-        line_pay_title: "LINE Pay 收據即將推出"
         paper_hint: "紙本收據"
         empty: "尚無付款。"
       payment_methods:
+        ecpay: "ECPay"
         line_pay: "LINE Pay"
         cash: "現金"
         bank: "匯款"

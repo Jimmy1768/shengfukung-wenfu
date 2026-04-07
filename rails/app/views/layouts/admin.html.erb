@@ -108,10 +108,12 @@
                 </button>
                 <div class="nav-user-dropdown" role="menu" data-profile-menu-panel>
                   <div class="nav-dropdown-group">
-                    <%= link_to "#",
-                          class: "nav-dropdown-item",
-                          role: "menuitem" do %>
-                      <span class="nav-dropdown-title"><%= t("admin.nav.settings") %></span>
+                    <% if current_admin&.admin_account&.owner_role? %>
+                      <%= link_to admin_payment_methods_path,
+                            class: "nav-dropdown-item",
+                            role: "menuitem" do %>
+                        <span class="nav-dropdown-title"><%= t("admin.nav.settings") %></span>
+                      <% end %>
                     <% end %>
                     <%= button_to t("admin.nav.sign_out"),
                           admin_logout_path,

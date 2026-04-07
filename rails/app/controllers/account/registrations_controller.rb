@@ -2,6 +2,7 @@
 
 module Account
   class RegistrationsController < BaseController
+    skip_before_action :verify_authenticity_token, only: :checkout_return
     before_action :set_registration, only: %i[show edit update payment start_checkout checkout_return]
     before_action :assign_offering_from_params, only: %i[new create]
     before_action :assign_eligible_registrants, only: %i[new create edit update]
@@ -85,7 +86,11 @@ module Account
           source: "account_portal",
           temple_slug: current_temple.slug,
           return_url: checkout_return_account_registration_url(@registration, provider: provider),
-          cancel_url: checkout_return_account_registration_url(@registration, provider: provider, canceled: 1)
+          cancel_url: checkout_return_account_registration_url(@registration, provider: provider, canceled: 1),
+          extra: {
+            webhook_url: api_v1_payment_webhook_url(provider: provider, temple: current_temple.slug),
+            item_name: @registration.registrable&.try(:title) || @registration.reference_code
+          }
         )
       )
 
@@ -268,7 +273,33 @@ module Account
     end
 
     def checkout_return_params
-      params.permit(:transactionId, :orderId, :canceled, :provider, :id, :format).to_h.except("provider", "id", "format").transform_keys do |key|
+      permitted = params.permit(
+        :transactionId,
+        :orderId,
+        :canceled,
+        :provider,
+        :id,
+        :format,
+        :MerchantID,
+        :MerchantTradeNo,
+        :StoreID,
+        :RtnCode,
+        :RtnMsg,
+        :TradeNo,
+        :TradeAmt,
+        :PaymentDate,
+        :PaymentType,
+        :PaymentTypeChargeFee,
+        :TradeDate,
+        :SimulatePaid,
+        :CustomField1,
+        :CustomField2,
+        :CustomField3,
+        :CustomField4,
+        :CheckMacValue
+      ).to_h.except("provider", "id", "format")
+
+      permitted.transform_keys do |key|
         case key
         when "transactionId" then "transaction_id"
         when "orderId" then "order_id"

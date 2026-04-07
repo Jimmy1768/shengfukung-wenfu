@@ -15,21 +15,10 @@ module Payments
       previous_status = payment.status
       payload_params = normalize_params(params)
 
-      adapter_payload =
-        if requires_confirm?(provider: provider, payment: payment, params: payload_params)
-          adapter(provider).confirm(
-            provider_payment_ref: payload_params["transaction_id"],
-            amount_cents: payment.amount_cents,
-            currency: payment.currency,
-            metadata: adapter_metadata(registration: registration, payment: payment, params: payload_params),
-            idempotency_key: confirm_idempotency_key(payment: payment, params: payload_params)
-          )
-        else
-          adapter(provider).query_status(
-            provider_payment_ref: provider_reference_for_query(payment: payment, params: payload_params),
-            metadata: adapter_metadata(registration: registration, payment: payment, params: payload_params)
-          )
-        end
+      adapter_payload = adapter(provider, temple: registration.temple).query_status(
+        provider_payment_ref: provider_reference_for_query(payment: payment, params: payload_params),
+        metadata: adapter_metadata(registration: registration, payment: payment, params: payload_params)
+      )
 
       payment_repository.update_status!(
         payment: payment,
@@ -56,8 +45,8 @@ module Payments
 
     attr_reader :provider_resolver, :payment_repository, :audit_logger
 
-    def adapter(provider)
-      provider_resolver.resolve(provider: provider)
+    def adapter(provider, temple:)
+      provider_resolver.resolve(provider: provider, temple: temple)
     end
 
     def latest_payment_for!(registration:, provider:)
@@ -67,17 +56,6 @@ module Payments
 
     def normalize_params(params)
       (params || {}).to_h.deep_stringify_keys
-    end
-
-    def requires_confirm?(provider:, payment:, params:)
-      provider.to_s == "line_pay" &&
-        payment.status == TemplePayment::STATUSES[:pending] &&
-        params["transaction_id"].present?
-    end
-
-    def confirm_idempotency_key(payment:, params:)
-      transaction_id = params["transaction_id"].presence || payment.provider_reference.presence || payment.id
-      "payment-confirm-#{payment.id}-#{transaction_id}"
     end
 
     def provider_reference_for_query(payment:, params:)

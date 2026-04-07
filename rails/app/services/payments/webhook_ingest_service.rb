@@ -18,7 +18,7 @@ module Payments
     end
 
     def call(temple:, provider:, payload:, headers: {})
-      adapter_payload = adapter(provider).ingest_webhook(payload: payload, headers: headers)
+      adapter_payload = adapter(provider, temple: temple).ingest_webhook(payload: payload, headers: headers)
 
       event_log = event_log_repository.record_once!(
         temple: temple,
@@ -74,8 +74,8 @@ module Payments
 
     attr_reader :provider_resolver, :payment_repository, :event_log_repository, :audit_logger
 
-    def adapter(provider)
-      provider_resolver.resolve(provider: provider)
+    def adapter(provider, temple:)
+      provider_resolver.resolve(provider: provider, temple: temple)
     end
 
     def sanitize_for_audit(value)

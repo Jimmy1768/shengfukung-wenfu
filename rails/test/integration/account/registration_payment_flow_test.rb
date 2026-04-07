@@ -22,6 +22,14 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
         raw: {}
       }
     end
+
+    def query_status(provider_payment_ref:, **)
+      {
+        status: status,
+        provider_reference: provider_payment_ref,
+        raw: {}
+      }
+    end
   end
 
   test "successful registration redirects to payment page" do
@@ -263,23 +271,23 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
     sign_in_account(user, temple_slug: temple.slug)
     registration = create_registration(user:, offering:)
 
-    Payments::ProviderResolver.stub(:current_provider, "line_pay") do
-      PaymentGateway::LinePayAdapter.stub(:new, FakeRedirectAdapter.new("https://pay.example.test/checkout")) do
+    Payments::ProviderResolver.stub(:current_provider, "ecpay") do
+      PaymentGateway::EcpayAdapter.stub(:new, FakeRedirectAdapter.new("/payments/ecpay_checkouts/test")) do
         assert_difference -> { SystemAuditLog.where(action: "account.payments.checkout_started").count }, 1 do
           post start_checkout_account_registration_path(registration)
         end
       end
     end
 
-    assert_redirected_to "https://pay.example.test/checkout"
+    assert_redirected_to "/payments/ecpay_checkouts/test"
   end
 
-  test "checkout return confirms a line pay payment and redirects back to payment page" do
+  test "checkout return confirms an ecpay payment and redirects back to payment page" do
     temple = create_temple
-    offering = create_offering(temple:, slug: "line-return", title: "Line Return", price_cents: 1500)
+    offering = create_offering(temple:, slug: "ecpay-return", title: "ECPay Return", price_cents: 1500)
     user = User.create!(
-      email: "linereturn@example.com",
-      english_name: "Line Return",
+      email: "ecpayreturn@example.com",
+      english_name: "ECPay Return",
       encrypted_password: User.password_hash("Password123!")
     )
 
@@ -289,16 +297,24 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
       registration: registration,
       amount_cents: registration.total_price_cents,
       status: TemplePayment::STATUSES[:pending],
-      method: TemplePayment::PAYMENT_METHODS[:line_pay],
-      provider: "line_pay",
-      provider_reference: "order_123",
+      method: TemplePayment::PAYMENT_METHODS[:ecpay],
+      provider: "ecpay",
+      provider_reference: "trade_123",
       processed_at: nil
     )
 
     assert_difference -> { SystemAuditLog.where(action: "account.payments.checkout_returned").count }, 1 do
       assert_difference -> { SystemAuditLog.where(action: "system.payments.reconciled").count }, 1 do
-        PaymentGateway::LinePayAdapter.stub(:new, FakeReturnAdapter.new("completed")) do
-          get checkout_return_account_registration_path(registration, provider: "line_pay", transactionId: "tx_123", orderId: "order_123")
+        PaymentGateway::EcpayAdapter.stub(:new, FakeReturnAdapter.new("completed")) do
+          post checkout_return_account_registration_path(
+            registration,
+            provider: "ecpay",
+            MerchantTradeNo: "trade_123",
+            TradeNo: "ecpay_trade_no_123",
+            RtnCode: "1",
+            TradeStatus: "1",
+            CheckMacValue: "mac_123"
+          )
         end
       end
     end

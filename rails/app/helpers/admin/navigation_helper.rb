@@ -31,6 +31,13 @@ module Admin
         capabilities: :view_financials
       },
       {
+        key: :payment_methods,
+        label: "Payment Methods",
+        description: "設定 ECPay 與平台費用",
+        path: -> { admin_payment_methods_path },
+        owner_only: true
+      },
+      {
         key: :gatherings,
         label: "Gatherings",
         description: "社群活動與交流場次",

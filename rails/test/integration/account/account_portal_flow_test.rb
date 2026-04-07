@@ -24,8 +24,8 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
     )
     create_payment(
       registration:,
-      method: TemplePayment::PAYMENT_METHODS[:line_pay],
-      provider: "line_pay"
+      method: TemplePayment::PAYMENT_METHODS[:ecpay],
+      provider: "ecpay"
     )
 
     gallery_entry = temple.temple_gallery_entries.create!(
@@ -45,7 +45,7 @@ class AccountPortalFlowTest < ActionDispatch::IntegrationTest
 
     get account_payments_path
     assert_response :success
-    assert_includes response.body, "LINE Pay"
+    assert_includes response.body, "ECPay"
 
     get account_registrations_path
     assert_response :success

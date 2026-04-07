@@ -44,7 +44,7 @@ module Payments
         metadata: metadata
       )
 
-      adapter_payload = adapter(provider).checkout(
+      adapter_payload = adapter(provider, temple: registration.temple).checkout(
         intent: intent_key,
         amount_cents: amount_cents,
         currency: currency,
@@ -68,8 +68,8 @@ module Payments
 
     attr_reader :provider_resolver, :payment_repository
 
-    def adapter(provider)
-      provider_resolver.resolve(provider: provider)
+    def adapter(provider, temple:)
+      provider_resolver.resolve(provider: provider, temple: temple)
     end
 
     def resolve_payment_method(provider)

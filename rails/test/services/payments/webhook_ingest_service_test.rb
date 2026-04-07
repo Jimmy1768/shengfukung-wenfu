@@ -12,7 +12,7 @@ module Payments
         @adapter = adapter
       end
 
-      def resolve(provider:)
+      def resolve(provider:, **)
         @adapter
       end
     end
@@ -73,10 +73,10 @@ module Payments
       )
 
       error = assert_raises(WebhookIngestService::InvalidWebhookSignature) do
-        service.call(temple: FakeTemple.new(1), provider: "stripe", payload: {}, headers: {})
+        service.call(temple: FakeTemple.new(1), provider: "fake", payload: {}, headers: {})
       end
 
-      assert_includes error.message, "Invalid stripe webhook signature"
+      assert_includes error.message, "Invalid fake webhook signature"
       assert_instance_of WebhookIngestService::InvalidWebhookSignature, event_repo.failed_error
       assert_nil event_repo.processed_called
     end
@@ -106,7 +106,7 @@ module Payments
         event_log_repository: event_repo
       )
 
-      result = service.call(temple: FakeTemple.new(1), provider: "stripe", payload: {}, headers: {})
+      result = service.call(temple: FakeTemple.new(1), provider: "fake", payload: {}, headers: {})
       assert result.duplicate
       assert_nil result.event_log
     end

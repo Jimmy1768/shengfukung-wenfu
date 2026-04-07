@@ -218,6 +218,8 @@ en:
           label: "Orders"
         payments:
           label: "Payments"
+        payment_methods:
+          label: "Payment Methods"
         gatherings:
           label: "Gatherings"
         offerings:
@@ -251,6 +253,42 @@ en:
         owner_only: "Temple switching is limited to owner accounts."
         forbidden: "You do not have access to that temple."
         switched: "Now viewing %{temple}."
+    payment_methods:
+      hero:
+        title: "Payment Methods"
+        body: "Use ECPay as the hosted checkout rail, keep cash/manual payments available, and track any Stripe platform fee settings in one owner-only place."
+      sections:
+        checkout:
+          title: "Checkout policy"
+          subtitle: "This temple now routes hosted online payments through ECPay only."
+        ecpay:
+          title: "ECPay credentials"
+          subtitle: "Store the merchant values used for hosted checkout and callbacks."
+          note: "These values are temple-specific. Owner admins can update them here when onboarding a new temple."
+        stripe_platform:
+          title: "Stripe platform fees"
+          subtitle: "Stripe is no longer a hosted checkout rail here, but you can still track platform-fee settings for internal operations."
+          note: "Use this section for platform fee planning and operations. It does not re-enable Stripe Checkout or Stripe Connect onboarding."
+      fields:
+        payment_mode: "Settlement mode"
+        ecpay_merchant_id: "ECPay Merchant ID"
+        ecpay_hash_key: "ECPay HashKey"
+        ecpay_hash_iv: "ECPay HashIV"
+        ecpay_environment: "ECPay environment"
+        stripe_platform_enabled: "Track Stripe platform fee collection"
+        stripe_platform_fee_bps: "Platform fee (basis points)"
+        stripe_platform_notes: "Internal notes"
+      status:
+        online_provider: "Hosted online checkout"
+        manual_provider: "Offline/manual payments"
+        ecpay_only: "ECPay"
+        cash_manual: "Cash / manual"
+      actions:
+        save: "Save payment methods"
+      flash:
+        updated: "Payment methods updated."
+        review_errors: "Please review the payment method settings."
+        owner_only: "Only owner admins can change payment methods."
     internal:
       layout:
         brand: "Internal Tools"
@@ -1053,6 +1091,7 @@ en:
         refunded: "Refunded"
       methods:
         cash: "Cash"
+        ecpay: "ECPay"
         bank_transfer: "Bank transfer"
         credit_card: "Credit card"
         line_pay: "LINE Pay"

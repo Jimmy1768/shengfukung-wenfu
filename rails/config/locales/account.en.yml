@@ -69,11 +69,10 @@ en:
           method: "Method"
           status: "Status"
           download: "Download"
-        line_pay_label: "Receipt in progress"
-        line_pay_title: "LINE Pay receipts are coming soon"
         paper_hint: "Paper copy provided"
         empty: "No payments yet."
       payment_methods:
+        ecpay: "ECPay"
         line_pay: "LINE Pay"
         cash: "Cash"
         bank: "Bank transfer"

@@ -11,7 +11,7 @@ module Payments
     end
 
     FakeTemple = Struct.new(:id)
-    FakeRegistration = Struct.new(:reference_code, :payment_status) do
+    FakeRegistration = Struct.new(:reference_code, :payment_status, :temple) do
       def paid?
         payment_status == TempleRegistration::PAYMENT_STATUSES[:paid]
       end
@@ -71,7 +71,7 @@ module Payments
         @adapter = adapter
       end
 
-      def resolve(provider:)
+      def resolve(provider:, **)
         @adapter
       end
     end
@@ -99,8 +99,8 @@ module Payments
       end
     end
 
-    test "line pay return confirms payment when transaction id is present" do
-      registration = FakeRegistration.new("REG-123", TempleRegistration::PAYMENT_STATUSES[:pending])
+    test "ecpay return queries payment status using callback payload" do
+      registration = FakeRegistration.new("REG-123", TempleRegistration::PAYMENT_STATUSES[:pending], FakeTemple.new(1))
       payment = FakePayment.new(
         id: 9,
         status: TemplePayment::STATUSES[:pending],
@@ -111,7 +111,7 @@ module Payments
         metadata: {},
         temple_registration: registration
       )
-      adapter = FakeAdapter.new(confirm_status: "completed")
+      adapter = FakeAdapter.new(query_status: "completed")
       repository = FakeRepository.new(payment)
       audit_logger = FakeAuditLogger.new([])
       registration.define_singleton_method(:temple_payments) { TemplePayment.none }
@@ -119,26 +119,26 @@ module Payments
       service.stub(:latest_payment_for!, payment) do
         result = service.call(
           registration: registration,
-          provider: "line_pay",
+          provider: "ecpay",
           params: { transaction_id: "tx_123", order_id: "order_123" }
         )
 
         assert_equal TemplePayment::STATUSES[:completed], result.payment.status
-        assert_equal "tx_123", result.payment.provider_reference
+        assert_equal "order_123", result.payment.provider_reference
         assert_equal TempleRegistration::PAYMENT_STATUSES[:paid], registration.payment_status
-        assert_equal 1, adapter.confirm_calls.length
-        assert_equal 0, adapter.query_calls.length
+        assert_equal 0, adapter.confirm_calls.length
+        assert_equal 1, adapter.query_calls.length
         assert_includes audit_logger.calls.map { |call| call[:action] }, "system.registrations.payment_status_updated"
         assert_includes audit_logger.calls.map { |call| call[:action] }, "system.payments.reconciled"
       end
     end
 
-    test "non line pay return queries status" do
-      registration = FakeRegistration.new("REG-321", TempleRegistration::PAYMENT_STATUSES[:pending])
+    test "fake provider return queries status" do
+      registration = FakeRegistration.new("REG-321", TempleRegistration::PAYMENT_STATUSES[:pending], FakeTemple.new(1))
       payment = FakePayment.new(
         id: 10,
         status: TemplePayment::STATUSES[:pending],
-        provider_reference: "stripe_pi_123",
+        provider_reference: "fake_ref_123",
         amount_cents: 1600,
         currency: "TWD",
         payment_payload: {},
@@ -153,7 +153,7 @@ module Payments
       service.stub(:latest_payment_for!, payment) do
         result = service.call(
           registration: registration,
-          provider: "stripe",
+          provider: "fake",
           params: {}
         )
 

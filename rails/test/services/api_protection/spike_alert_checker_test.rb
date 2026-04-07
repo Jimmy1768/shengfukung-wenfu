@@ -54,7 +54,7 @@ class ApiProtectionSpikeAlertCheckerTest < ActiveSupport::TestCase
 
   test "dry run does not send even when thresholds are exceeded" do
     5.times do |index|
-      create_decision_log("blacklist_deny", scope_id: index.to_s, path: "/api/v1/payments/webhooks/stripe")
+      create_decision_log("blacklist_deny", scope_id: index.to_s, path: "/api/v1/payments/webhooks/ecpay")
     end
 
     result = ApiProtection::SpikeAlertChecker.new(
