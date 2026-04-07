@@ -219,7 +219,7 @@ en:
         payments:
           label: "Payments"
         payment_methods:
-          label: "Payment Methods"
+          label: "Billing"
         gatherings:
           label: "Gatherings"
         offerings:
@@ -255,40 +255,70 @@ en:
         switched: "Now viewing %{temple}."
     payment_methods:
       hero:
-        title: "Payment Methods"
-        body: "Use ECPay as the hosted checkout rail, keep cash/manual payments available, and track any Stripe platform fee settings in one owner-only place."
+        title: "Billing"
+        body: "Set up ECPay for temple-owned online payments and keep a payment method on file for the monthly platform fee."
+        eyebrow: "Owner only"
+        heading: "Billing setup"
+        subheading: "ECPay is the only hosted checkout rail here. Cash and manual payments remain available."
+      tabs:
+        aria_label: "Billing setup tabs"
+        ecpay: "ECPay"
+        payment_method: "Payment Method"
       sections:
-        checkout:
-          title: "Checkout policy"
-          subtitle: "This temple now routes hosted online payments through ECPay only."
         ecpay:
-          title: "ECPay credentials"
-          subtitle: "Store the merchant values used for hosted checkout and callbacks."
-          note: "These values are temple-specific. Owner admins can update them here when onboarding a new temple."
-        stripe_platform:
-          title: "Stripe platform fees"
-          subtitle: "Stripe is no longer a hosted checkout rail here, but you can still track platform-fee settings for internal operations."
-          note: "Use this section for platform fee planning and operations. It does not re-enable Stripe Checkout or Stripe Connect onboarding."
+          title: "Connect this temple to ECPay"
+          subtitle: "Open ECPay in a new tab, sign in or register, then copy the credentials back here."
+          credentials_title: "ECPay credentials"
+          credentials_subtitle: "Save the values exactly as ECPay shows them."
+          actions:
+            open_portal: "Open ECPay"
+          steps:
+            open_portal:
+              title: "Open ECPay"
+              body: "Use this button to open the official ECPay login and registration screen in a new tab."
+            find_keys:
+              title: "Find the three ECPay values"
+              body: "After signing in, find the Merchant ID, HashKey, and HashIV for this temple account."
+            paste_back:
+              title: "Paste the values back here"
+              body: "Copy those values into the fields on this page, then save."
+          notes:
+            no_code_title: "Do we need to copy any TempleMate code into ECPay?"
+            no_code_body: "No TempleMate secret needs to be pasted into ECPay for this flow. In normal onboarding, you only copy ECPay values back into TempleMate. If ECPay later asks for callback URLs, we can provide those separately."
+        payment_method:
+          title: "Payment Method"
+          subtitle: "The system charges %{amount} per month. Temples cannot change this price."
+          status_title: "Billing status"
+          status_subtitle: "Turn this on once a valid payment method has been added."
+          missing_portal: "Set BILLING_PORTAL_URL before using the payment-method button in this environment."
+          actions:
+            open_billing: "Open payment method setup"
+          notes:
+            price_title: "Monthly platform fee: %{amount}"
+            price_body: "This amount is controlled by the system. Temple admins do not enter or edit the price."
+            freeze_title: "Grace period and freeze rule"
+            freeze_body: "If no payment method is on file, online ECPay checkout stays available for %{days} days, then automatically pauses until billing is fixed."
       fields:
-        payment_mode: "Settlement mode"
         ecpay_merchant_id: "ECPay Merchant ID"
         ecpay_hash_key: "ECPay HashKey"
         ecpay_hash_iv: "ECPay HashIV"
         ecpay_environment: "ECPay environment"
-        stripe_platform_enabled: "Track Stripe platform fee collection"
-        stripe_platform_fee_bps: "Platform fee (basis points)"
-        stripe_platform_notes: "Internal notes"
+        billing_payment_method_on_file: "A valid payment method is on file"
       status:
-        online_provider: "Hosted online checkout"
-        manual_provider: "Offline/manual payments"
-        ecpay_only: "ECPay"
-        cash_manual: "Cash / manual"
+        online_payments: "Online payments"
+        active: "Active"
+        frozen: "Frozen"
+        grace_period: "%{days} days left in grace period"
+        monthly_fee: "Monthly fee"
+        grace_period_label: "Grace period"
+        grace_period_value: "%{days} days"
+        current_state: "Current state"
       actions:
-        save: "Save payment methods"
+        save: "Save billing settings"
       flash:
-        updated: "Payment methods updated."
-        review_errors: "Please review the payment method settings."
-        owner_only: "Only owner admins can change payment methods."
+        updated: "Billing settings updated."
+        review_errors: "Please review the billing settings."
+        owner_only: "Only owner admins can change billing settings."
     internal:
       layout:
         brand: "Internal Tools"
@@ -1040,6 +1070,7 @@ en:
         checkout_reused: "A checkout attempt already exists for this registration."
         checkout_started: "%{provider} checkout started. Awaiting confirmation."
         checkout_failed: "Unable to start checkout: %{error}"
+        online_payments_frozen: "Online payments are frozen until billing is updated."
       statuses:
         pending: "Pending"
         completed: "Completed"

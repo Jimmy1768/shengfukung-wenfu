@@ -219,7 +219,7 @@ zh-TW:
         payments:
           label: "收款資料"
         payment_methods:
-          label: "付款方式"
+          label: "Billing"
         gatherings:
           label: "社群活動"
         offerings:
@@ -255,40 +255,70 @@ zh-TW:
         switched: "目前正在查看 %{temple}。"
     payment_methods:
       hero:
-        title: "付款方式"
-        body: "把 ECPay 當成唯一的線上代收流程，保留現金 / 人工收款，並在同一個擁有者頁面管理平台費設定。"
+        title: "Billing"
+        body: "在這裡設定 ECPay 線上收款，並維持平台月費的付款方式。"
+        eyebrow: "Owner only"
+        heading: "Billing setup"
+        subheading: "線上付款只走 ECPay；現金與人工收款仍然保留。"
+      tabs:
+        aria_label: "Billing 設定頁籤"
+        ecpay: "ECPay"
+        payment_method: "Payment Method"
       sections:
-        checkout:
-          title: "收款策略"
-          subtitle: "這間宮廟的線上代收流程現在只走 ECPay。"
         ecpay:
-          title: "ECPay 串接資料"
-          subtitle: "儲存線上付款與回傳通知需要的商家資料。"
-          note: "這些值是宮廟獨立設定。新增宮廟時，擁有者管理員可以在這裡完成 onboarding。"
-        stripe_platform:
-          title: "Stripe 平台費"
-          subtitle: "Stripe 不再是這裡的 hosted checkout，但仍可記錄平台費的內部設定。"
-          note: "這一區只用於平台費規劃與營運紀錄，不會重新啟用 Stripe Checkout 或 Stripe Connect onboarding。"
+          title: "連接這間宮廟的 ECPay"
+          subtitle: "開新分頁登入或註冊 ECPay，再把需要的資料複製回來。"
+          credentials_title: "ECPay 串接資料"
+          credentials_subtitle: "請依照 ECPay 顯示的值原樣貼上。"
+          actions:
+            open_portal: "開啟 ECPay"
+          steps:
+            open_portal:
+              title: "開啟 ECPay"
+              body: "按這個按鈕，用新分頁開啟官方 ECPay 登入／註冊頁面。"
+            find_keys:
+              title: "找到三個 ECPay 值"
+              body: "登入後，找到這間宮廟帳號的 Merchant ID、HashKey、HashIV。"
+            paste_back:
+              title: "把資料貼回這裡"
+              body: "把剛剛找到的值貼到這一頁，然後按儲存。"
+          notes:
+            no_code_title: "需要把 TempleMate 的程式碼貼到 ECPay 嗎？"
+            no_code_body: "一般情況下不用。這個流程只需要把 ECPay 的資料複製回 TempleMate。如果 ECPay 之後要求設定 callback URL，我們再另外提供。"
+        payment_method:
+          title: "Payment Method"
+          subtitle: "系統固定每月收取 %{amount}，宮廟不能自行修改價格。"
+          status_title: "帳務狀態"
+          status_subtitle: "新增有效付款方式後，再把這個狀態打開。"
+          missing_portal: "這個環境尚未設定 BILLING_PORTAL_URL，所以目前不能直接開啟付款方式頁面。"
+          actions:
+            open_billing: "開啟付款方式設定"
+          notes:
+            price_title: "平台月費：%{amount}"
+            price_body: "這個金額由系統控制，宮廟不需要也不能自行調整。"
+            freeze_title: "寬限期與凍結規則"
+            freeze_body: "如果沒有有效付款方式，ECPay 線上付款會先保留 %{days} 天，之後自動暫停，直到帳務補齊。"
       fields:
-        payment_mode: "收款模式"
         ecpay_merchant_id: "ECPay Merchant ID"
         ecpay_hash_key: "ECPay HashKey"
         ecpay_hash_iv: "ECPay HashIV"
         ecpay_environment: "ECPay 環境"
-        stripe_platform_enabled: "記錄 Stripe 平台費代收"
-        stripe_platform_fee_bps: "平台費（basis points）"
-        stripe_platform_notes: "內部備註"
+        billing_payment_method_on_file: "已經有有效付款方式"
       status:
-        online_provider: "線上 hosted checkout"
-        manual_provider: "線下 / 人工收款"
-        ecpay_only: "ECPay"
-        cash_manual: "現金 / 人工"
+        online_payments: "線上付款"
+        active: "正常"
+        frozen: "已凍結"
+        grace_period: "寬限期剩餘 %{days} 天"
+        monthly_fee: "每月費用"
+        grace_period_label: "寬限期"
+        grace_period_value: "%{days} 天"
+        current_state: "目前狀態"
       actions:
-        save: "儲存付款方式"
+        save: "儲存 Billing 設定"
       flash:
-        updated: "已更新付款方式設定。"
-        review_errors: "請檢查付款方式設定。"
-        owner_only: "只有擁有者管理員可以修改付款方式。"
+        updated: "已更新 Billing 設定。"
+        review_errors: "請檢查 Billing 設定。"
+        owner_only: "只有擁有者管理員可以修改 Billing 設定。"
     internal:
       layout:
         brand: "內部工具"
@@ -1038,6 +1068,7 @@ zh-TW:
         checkout_reused: "此報名已存在付款嘗試。"
         checkout_started: "已啟動 %{provider} 付款流程，等待確認。"
         checkout_failed: "無法啟動付款流程：%{error}"
+        online_payments_frozen: "帳務尚未完成設定，線上付款目前已凍結。"
       statuses:
         pending: "待付款"
         completed: "已完成"

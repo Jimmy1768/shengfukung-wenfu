@@ -32,8 +32,8 @@ module Admin
       },
       {
         key: :payment_methods,
-        label: "Payment Methods",
-        description: "設定 ECPay 與平台費用",
+        label: "Billing",
+        description: "設定 ECPay 與帳務狀態",
         path: -> { admin_payment_methods_path },
         owner_only: true
       },

@@ -153,7 +153,66 @@ class Temple < ApplicationRecord
     value.is_a?(Hash) ? value.deep_stringify_keys : {}
   end
 
-  def stripe_platform_settings
-    payment_gateway_settings_for(:stripe_platform)
+  def billing_settings
+    payment_gateway_settings_for(:billing)
+  end
+
+  def billing_portal_url
+    billing_settings["portal_url"].presence || ENV.fetch("BILLING_PORTAL_URL", nil).to_s.presence
+  end
+
+  def billing_payment_method_on_file?
+    ActiveModel::Type::Boolean.new.cast(billing_settings["payment_method_on_file"])
+  end
+
+  def billing_monthly_fee_cents
+    billing_settings["monthly_fee_cents"].presence&.to_i || 500_000
+  end
+
+  def billing_grace_days
+    billing_settings["grace_days"].presence&.to_i || 30
+  end
+
+  def billing_grace_started_at
+    raw = billing_settings["grace_started_at"].presence
+    return nil if raw.blank?
+
+    Time.zone.parse(raw)
+  rescue ArgumentError
+    nil
+  end
+
+  def billing_grace_deadline
+    started_at = billing_grace_started_at
+    return nil if started_at.blank?
+
+    started_at + billing_grace_days.days
+  end
+
+  def billing_grace_remaining_days(reference_time = Time.current)
+    deadline = billing_grace_deadline
+    return nil if deadline.blank?
+
+    remaining_seconds = deadline - reference_time
+    return 0 if remaining_seconds <= 0
+
+    (remaining_seconds / 1.day).ceil
+  end
+
+  def online_payments_frozen?(reference_time = Time.current)
+    return false if billing_payment_method_on_file?
+
+    deadline = billing_grace_deadline
+    deadline.present? && deadline <= reference_time
+  end
+
+  def online_payments_hold_message(reference_time = Time.current)
+    return nil if billing_payment_method_on_file?
+
+    remaining_days = billing_grace_remaining_days(reference_time)
+    return nil if remaining_days.blank?
+    return "Online payments are paused until a payment method is added." if remaining_days.zero?
+
+    "Add a payment method within #{remaining_days} days to keep online payments active."
   end
 end

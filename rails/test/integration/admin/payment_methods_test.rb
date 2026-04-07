@@ -11,29 +11,50 @@ class AdminPaymentMethodsTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "ECPay"
+    assert_includes response.body, "Billing"
 
     assert_difference -> { SystemAuditLog.where(action: "admin.payment_methods.updated").count }, 1 do
       patch admin_payment_methods_path, params: {
         payment_methods: {
-          payment_mode: "platform",
           ecpay_merchant_id: "2000132",
           ecpay_hash_key: "hash-key-value",
           ecpay_hash_iv: "hash-iv-value",
           ecpay_environment: "stage",
-          stripe_platform_enabled: "1",
-          stripe_platform_fee_bps: "450",
-          stripe_platform_notes: "Collect platform fee after payout reconciliation"
+          billing_payment_method_on_file: "1"
         }
       }
     end
 
     assert_redirected_to admin_payment_methods_path
     temple.reload
-    assert_equal "platform", temple.payment_mode
     assert_equal "2000132", temple.payment_gateway_settings_for(:ecpay)["merchant_id"]
     assert_equal "stage", temple.payment_gateway_settings_for(:ecpay)["environment"]
-    assert_equal true, temple.stripe_platform_settings["enabled"]
-    assert_equal 450, temple.stripe_platform_settings["application_fee_bps"]
+    assert temple.billing_payment_method_on_file?
+    assert_equal 500_000, temple.billing_settings["monthly_fee_cents"]
+    assert_nil temple.billing_settings["grace_started_at"]
+  end
+
+  test "saving without payment method starts grace period" do
+    temple = create_temple
+    owner = create_admin_user(temple: temple, role: "owner")
+
+    sign_in_admin(owner)
+
+    patch admin_payment_methods_path, params: {
+      payment_methods: {
+        ecpay_merchant_id: "2000132",
+        ecpay_hash_key: "hash-key-value",
+        ecpay_hash_iv: "hash-iv-value",
+        ecpay_environment: "stage",
+        billing_payment_method_on_file: "0"
+      }
+    }
+
+    assert_redirected_to admin_payment_methods_path
+    temple.reload
+    refute temple.billing_payment_method_on_file?
+    assert_equal 30, temple.billing_grace_days
+    assert temple.billing_grace_started_at.present?
   end
 
   test "non-owner is redirected away from payment methods" do

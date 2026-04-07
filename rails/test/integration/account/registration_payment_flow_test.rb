@@ -326,6 +326,42 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
     assert_equal TemplePayment::STATUSES[:completed], registration.temple_payments.order(:created_at).last.reload.status
   end
 
+  test "frozen online payments hide checkout and block checkout start" do
+    temple = create_temple(
+      payment_provider_settings: {
+        "billing" => {
+          "payment_method_on_file" => false,
+          "monthly_fee_cents" => 500_000,
+          "grace_days" => 30,
+          "grace_started_at" => 31.days.ago.iso8601
+        }
+      }
+    )
+    offering = create_offering(temple:, slug: "billing-frozen", title: "Billing Frozen Offering", price_cents: 1500)
+    user = User.create!(
+      email: "billingfrozen@example.com",
+      english_name: "Billing Frozen",
+      encrypted_password: User.password_hash("Password123!")
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+    registration = create_registration(user:, offering:)
+
+    get payment_account_registration_path(registration)
+
+    assert_response :success
+    assert_includes response.body, "線上付款目前已暫停"
+    refute_includes response.body, "前往付款"
+
+    assert_no_difference -> { registration.temple_payments.count } do
+      post start_checkout_account_registration_path(registration)
+    end
+
+    assert_redirected_to payment_account_registration_path(registration)
+    follow_redirect!
+    assert_includes response.body, "線上付款目前已暫停"
+  end
+
   test "repeat-enabled service allows multiple registrations for the same user" do
     temple = create_temple(
       metadata: {

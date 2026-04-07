@@ -17,86 +17,182 @@
         local: true,
         data: { turbo: false } do |form| %>
     <div class="admin-stack__row admin-stack__row--primary">
-      <section class="card stack-item stack-item--xl stack-item--with-gutter">
-        <div class="card-grid two-column">
-          <section class="card form-card">
-            <header>
-              <h2><%= t("admin.payment_methods.sections.checkout.title") %></h2>
-              <p><%= t("admin.payment_methods.sections.checkout.subtitle") %></p>
-            </header>
+      <section class="card stack-item stack-item--xl stack-item--with-gutter billing-shell" data-billing-tabs>
+        <header class="billing-shell__header">
+          <div>
+            <p class="eyebrow"><%= t("admin.payment_methods.hero.eyebrow") %></p>
+            <h2><%= t("admin.payment_methods.hero.heading") %></h2>
+            <p class="muted"><%= t("admin.payment_methods.hero.subheading") %></p>
+          </div>
 
-            <div class="field">
-              <%= form.label :payment_mode, t("admin.payment_methods.fields.payment_mode") %>
-              <%= form.select :payment_mode, options_for_select(@form.payment_mode_options, @form.payment_mode) %>
-            </div>
+          <div class="billing-status">
+            <span class="billing-status__label"><%= t("admin.payment_methods.status.online_payments") %></span>
+            <% if @form.online_payments_frozen? %>
+              <strong class="billing-status__value billing-status__value--danger"><%= t("admin.payment_methods.status.frozen") %></strong>
+            <% elsif @form.billing_payment_method_on_file? %>
+              <strong class="billing-status__value billing-status__value--success"><%= t("admin.payment_methods.status.active") %></strong>
+            <% else %>
+              <strong class="billing-status__value billing-status__value--warning"><%= t("admin.payment_methods.status.grace_period", days: @form.billing_grace_remaining_days || @form.billing_grace_days) %></strong>
+            <% end %>
+          </div>
+        </header>
 
-            <div class="derived-contact">
-              <div class="derived-contact__item">
-                <div class="label"><%= t("admin.payment_methods.status.online_provider") %></div>
-                <div class="muted"><%= t("admin.payment_methods.status.ecpay_only") %></div>
-              </div>
-              <div class="derived-contact__item">
-                <div class="label"><%= t("admin.payment_methods.status.manual_provider") %></div>
-                <div class="muted"><%= t("admin.payment_methods.status.cash_manual") %></div>
-              </div>
-            </div>
-          </section>
+        <% if @form.errors.any? %>
+          <div class="admin-flash admin-flash-alert">
+            <%= t("admin.payment_methods.flash.review_errors") %>
+          </div>
+        <% end %>
 
-          <section class="card form-card">
-            <header>
-              <h2><%= t("admin.payment_methods.sections.ecpay.title") %></h2>
-              <p><%= t("admin.payment_methods.sections.ecpay.subtitle") %></p>
-            </header>
-
-            <div class="field">
-              <%= form.label :ecpay_merchant_id, t("admin.payment_methods.fields.ecpay_merchant_id") %>
-              <%= form.text_field :ecpay_merchant_id, autocomplete: "off" %>
-            </div>
-
-            <div class="field">
-              <%= form.label :ecpay_hash_key, t("admin.payment_methods.fields.ecpay_hash_key") %>
-              <%= form.password_field :ecpay_hash_key, autocomplete: "new-password" %>
-            </div>
-
-            <div class="field">
-              <%= form.label :ecpay_hash_iv, t("admin.payment_methods.fields.ecpay_hash_iv") %>
-              <%= form.password_field :ecpay_hash_iv, autocomplete: "new-password" %>
-            </div>
-
-            <div class="field">
-              <%= form.label :ecpay_environment, t("admin.payment_methods.fields.ecpay_environment") %>
-              <%= form.select :ecpay_environment, options_for_select(@form.ecpay_environment_options, @form.ecpay_environment) %>
-            </div>
-
-            <p class="muted"><%= t("admin.payment_methods.sections.ecpay.note") %></p>
-          </section>
-
-          <section class="card form-card">
-            <header>
-              <h2><%= t("admin.payment_methods.sections.stripe_platform.title") %></h2>
-              <p><%= t("admin.payment_methods.sections.stripe_platform.subtitle") %></p>
-            </header>
-
-            <div class="field checkbox-field">
-              <label>
-                <%= form.check_box :stripe_platform_enabled %>
-                <span><%= t("admin.payment_methods.fields.stripe_platform_enabled") %></span>
-              </label>
-            </div>
-
-            <div class="field">
-              <%= form.label :stripe_platform_fee_bps, t("admin.payment_methods.fields.stripe_platform_fee_bps") %>
-              <%= form.number_field :stripe_platform_fee_bps, min: 0, max: 10_000, step: 1 %>
-            </div>
-
-            <div class="field">
-              <%= form.label :stripe_platform_notes, t("admin.payment_methods.fields.stripe_platform_notes") %>
-              <%= form.text_area :stripe_platform_notes, rows: 4 %>
-            </div>
-
-            <p class="muted"><%= t("admin.payment_methods.sections.stripe_platform.note") %></p>
-          </section>
+        <div class="billing-tabs" role="tablist" aria-label="<%= t("admin.payment_methods.tabs.aria_label") %>">
+          <button type="button" class="billing-tabs__tab is-active" data-billing-tab-target="button" data-tab-id="ecpay" role="tab" aria-selected="true">
+            <%= t("admin.payment_methods.tabs.ecpay") %>
+          </button>
+          <button type="button" class="billing-tabs__tab" data-billing-tab-target="button" data-tab-id="payment-method" role="tab" aria-selected="false">
+            <%= t("admin.payment_methods.tabs.payment_method") %>
+          </button>
         </div>
+
+        <section class="billing-panel is-active" data-billing-tab-panel="ecpay" role="tabpanel">
+          <div class="card-grid two-column">
+            <section class="card form-card">
+              <header>
+                <h3><%= t("admin.payment_methods.sections.ecpay.title") %></h3>
+                <p><%= t("admin.payment_methods.sections.ecpay.subtitle") %></p>
+              </header>
+
+              <div class="billing-steps">
+                <article class="billing-step" data-billing-highlight="ecpay-portal">
+                  <span class="billing-step__number">1</span>
+                  <div>
+                    <strong><%= t("admin.payment_methods.sections.ecpay.steps.open_portal.title") %></strong>
+                    <p><%= t("admin.payment_methods.sections.ecpay.steps.open_portal.body") %></p>
+                    <%= link_to t("admin.payment_methods.sections.ecpay.actions.open_portal"),
+                          @form.ecpay_portal_url,
+                          class: "btn btn-secondary",
+                          target: "_blank",
+                          rel: "noopener" %>
+                  </div>
+                </article>
+
+                <article class="billing-step" data-billing-highlight="ecpay-fields">
+                  <span class="billing-step__number">2</span>
+                  <div>
+                    <strong><%= t("admin.payment_methods.sections.ecpay.steps.find_keys.title") %></strong>
+                    <p><%= t("admin.payment_methods.sections.ecpay.steps.find_keys.body") %></p>
+                  </div>
+                </article>
+
+                <article class="billing-step" data-billing-highlight="ecpay-fields">
+                  <span class="billing-step__number">3</span>
+                  <div>
+                    <strong><%= t("admin.payment_methods.sections.ecpay.steps.paste_back.title") %></strong>
+                    <p><%= t("admin.payment_methods.sections.ecpay.steps.paste_back.body") %></p>
+                  </div>
+                </article>
+              </div>
+
+              <div class="billing-note" data-billing-highlight-key="ecpay-portal">
+                <strong><%= t("admin.payment_methods.sections.ecpay.notes.no_code_title") %></strong>
+                <p><%= t("admin.payment_methods.sections.ecpay.notes.no_code_body") %></p>
+              </div>
+            </section>
+
+            <section class="card form-card" data-billing-highlight-key="ecpay-fields">
+              <header>
+                <h3><%= t("admin.payment_methods.sections.ecpay.credentials_title") %></h3>
+                <p><%= t("admin.payment_methods.sections.ecpay.credentials_subtitle") %></p>
+              </header>
+
+              <div class="field">
+                <%= form.label :ecpay_merchant_id, t("admin.payment_methods.fields.ecpay_merchant_id") %>
+                <%= form.text_field :ecpay_merchant_id, autocomplete: "off" %>
+              </div>
+
+              <div class="field">
+                <%= form.label :ecpay_hash_key, t("admin.payment_methods.fields.ecpay_hash_key") %>
+                <%= form.password_field :ecpay_hash_key, autocomplete: "new-password" %>
+              </div>
+
+              <div class="field">
+                <%= form.label :ecpay_hash_iv, t("admin.payment_methods.fields.ecpay_hash_iv") %>
+                <%= form.password_field :ecpay_hash_iv, autocomplete: "new-password" %>
+              </div>
+
+              <div class="field">
+                <%= form.label :ecpay_environment, t("admin.payment_methods.fields.ecpay_environment") %>
+                <%= form.select :ecpay_environment, options_for_select(@form.ecpay_environment_options, @form.ecpay_environment) %>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="billing-panel" data-billing-tab-panel="payment-method" role="tabpanel" hidden>
+          <div class="card-grid two-column">
+            <section class="card form-card">
+              <header>
+                <h3><%= t("admin.payment_methods.sections.payment_method.title") %></h3>
+                <p><%= t("admin.payment_methods.sections.payment_method.subtitle", amount: @form.billing_monthly_fee_label) %></p>
+              </header>
+
+              <div class="billing-note">
+                <strong><%= t("admin.payment_methods.sections.payment_method.notes.price_title", amount: @form.billing_monthly_fee_label) %></strong>
+                <p><%= t("admin.payment_methods.sections.payment_method.notes.price_body") %></p>
+              </div>
+
+              <div class="billing-note">
+                <strong><%= t("admin.payment_methods.sections.payment_method.notes.freeze_title") %></strong>
+                <p><%= t("admin.payment_methods.sections.payment_method.notes.freeze_body", days: @form.billing_grace_days) %></p>
+              </div>
+
+              <% if @form.billing_portal_url.present? %>
+                <%= link_to t("admin.payment_methods.sections.payment_method.actions.open_billing"),
+                      @form.billing_portal_url,
+                      class: "btn btn-secondary",
+                      target: "_blank",
+                      rel: "noopener" %>
+              <% else %>
+                <p class="muted"><%= t("admin.payment_methods.sections.payment_method.missing_portal") %></p>
+              <% end %>
+            </section>
+
+            <section class="card form-card">
+              <header>
+                <h3><%= t("admin.payment_methods.sections.payment_method.status_title") %></h3>
+                <p><%= t("admin.payment_methods.sections.payment_method.status_subtitle") %></p>
+              </header>
+
+              <div class="field checkbox-field">
+                <label>
+                  <%= form.check_box :billing_payment_method_on_file %>
+                  <span><%= t("admin.payment_methods.fields.billing_payment_method_on_file") %></span>
+                </label>
+              </div>
+
+              <div class="derived-contact">
+                <div class="derived-contact__item">
+                  <div class="label"><%= t("admin.payment_methods.status.monthly_fee") %></div>
+                  <div class="muted"><%= @form.billing_monthly_fee_label %></div>
+                </div>
+                <div class="derived-contact__item">
+                  <div class="label"><%= t("admin.payment_methods.status.grace_period_label") %></div>
+                  <div class="muted"><%= t("admin.payment_methods.status.grace_period_value", days: @form.billing_grace_days) %></div>
+                </div>
+                <div class="derived-contact__item">
+                  <div class="label"><%= t("admin.payment_methods.status.current_state") %></div>
+                  <div class="muted">
+                    <% if @form.online_payments_frozen? %>
+                      <%= t("admin.payment_methods.status.frozen") %>
+                    <% elsif @form.billing_payment_method_on_file? %>
+                      <%= t("admin.payment_methods.status.active") %>
+                    <% else %>
+                      <%= t("admin.payment_methods.status.grace_period", days: @form.billing_grace_remaining_days || @form.billing_grace_days) %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
 
         <div class="form-actions form-actions--centered profile-form-actions">
           <%= form.submit t("admin.payment_methods.actions.save"), class: "btn btn-primary" %>
@@ -105,3 +201,68 @@
     </div>
   <% end %>
 </div>
+
+<% content_for :admin_footer_scripts do %>
+  <script>
+    (() => {
+      const initializeBillingTabs = () => {
+        document.querySelectorAll("[data-billing-tabs]").forEach((container) => {
+          const buttons = container.querySelectorAll("[data-billing-tab-target='button']");
+          const panels = container.querySelectorAll("[data-billing-tab-panel]");
+
+          const activate = (tabId) => {
+            buttons.forEach((button) => {
+              const active = button.dataset.tabId === tabId;
+              button.classList.toggle("is-active", active);
+              button.setAttribute("aria-selected", active ? "true" : "false");
+            });
+
+            panels.forEach((panel) => {
+              const active = panel.dataset.billingTabPanel === tabId;
+              panel.classList.toggle("is-active", active);
+              panel.hidden = !active;
+            });
+          };
+
+          buttons.forEach((button) => {
+            button.addEventListener("click", () => activate(button.dataset.tabId));
+          });
+
+          activate("ecpay");
+        });
+      };
+
+      const initializeBillingHighlights = () => {
+        document.querySelectorAll("[data-billing-highlight]").forEach((step) => {
+          const keys = (step.dataset.billingHighlight || "").split(/\s+/).filter(Boolean);
+          if (!keys.length) return;
+
+          const toggle = (state) => {
+            keys.forEach((key) => {
+              document.querySelectorAll(`[data-billing-highlight-key='${key}']`).forEach((node) => {
+                node.classList.toggle("is-highlighted", state);
+              });
+            });
+          };
+
+          step.addEventListener("mouseenter", () => toggle(true));
+          step.addEventListener("mouseleave", () => toggle(false));
+          step.addEventListener("focusin", () => toggle(true));
+          step.addEventListener("focusout", () => toggle(false));
+        });
+      };
+
+      const boot = () => {
+        initializeBillingTabs();
+        initializeBillingHighlights();
+      };
+
+      document.addEventListener("turbo:load", boot);
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", boot, { once: true });
+      } else {
+        boot();
+      }
+    })();
+  </script>
+<% end %>

@@ -157,6 +157,37 @@ class AdminPaymentsFlowTest < ActionDispatch::IntegrationTest
     assert_equal TemplePayment::STATUSES[:completed], registration.temple_payments.order(:created_at).last.reload.status
   end
 
+  test "frozen online payments block admin checkout start" do
+    temple = create_temple(
+      payment_provider_settings: {
+        "billing" => {
+          "payment_method_on_file" => false,
+          "monthly_fee_cents" => 500_000,
+          "grace_days" => 30,
+          "grace_started_at" => 31.days.ago.iso8601
+        }
+      }
+    )
+    offering = create_offering(temple:, slug: "admin-billing-frozen", title: "Admin Billing Frozen", price_cents: 1000)
+    user = User.create!(
+      email: "adminbillingfrozen@example.com",
+      english_name: "Admin Billing Frozen",
+      encrypted_password: User.password_hash("Password123!")
+    )
+    registration = create_registration(user:, offering:)
+    admin_user = create_admin_user(temple:)
+    permission = AdminPermission.find_by(admin_account: admin_user.admin_account, temple:)
+    permission.update!(record_cash_payments: true)
+
+    sign_in_admin(admin_user)
+
+    assert_no_difference -> { registration.temple_payments.count } do
+      post start_checkout_admin_payments_path(registration_id: registration.id)
+    end
+
+    assert_redirected_to admin_event_offering_order_path(offering, registration)
+  end
+
   test "ecpay checkout return for gathering redirects back to gathering order" do
     temple = create_temple
     gathering = temple.temple_gatherings.create!(

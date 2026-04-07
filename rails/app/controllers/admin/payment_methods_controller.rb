@@ -29,14 +29,11 @@ module Admin
 
     def payment_methods_params
       params.require(:payment_methods).permit(
-        :payment_mode,
         :ecpay_merchant_id,
         :ecpay_hash_key,
         :ecpay_hash_iv,
         :ecpay_environment,
-        :stripe_platform_enabled,
-        :stripe_platform_fee_bps,
-        :stripe_platform_notes
+        :billing_payment_method_on_file
       )
     end
   end

@@ -102,6 +102,22 @@
       <p data-payment-message><%= t("account.registrations.payment.refunded_notice") %></p>
       <%= link_to t("account.registrations.payment.back_to_registration"), account_registration_path(@registration), class: "pill-link secondary" %>
     </article>
+  <% elsif @online_payments_frozen %>
+    <article class="card payment-callout is-failed" data-payment-callout>
+      <div class="payment-amount">
+        <p class="eyebrow"><%= t("account.registrations.payment.amount_label") %></p>
+        <strong><%= amount_label %></strong>
+      </div>
+      <p class="payment-message" data-payment-message>
+        <% if @billing_grace_remaining_days.to_i.positive? %>
+          <%= t("account.registrations.payment.online_payments_grace_notice", days: @billing_grace_remaining_days) %>
+        <% else %>
+          <%= t("account.registrations.payment.online_payments_frozen_notice") %>
+        <% end %>
+      </p>
+      <p class="muted"><%= t("account.registrations.payment.online_payments_frozen_helper") %></p>
+      <%= link_to t("account.registrations.payment.pay_later"), account_registration_path(@registration), class: "pill-link secondary" %>
+    </article>
   <% else %>
     <article class="card payment-callout is-pending" data-payment-callout>
       <div class="payment-amount">

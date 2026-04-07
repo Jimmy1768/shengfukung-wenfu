@@ -5,30 +5,24 @@ module Admin
     include ActiveModel::Model
     include ActiveModel::Attributes
 
-    PAYMENT_MODES = %w[temple platform].freeze
     ECPAY_ENVIRONMENTS = %w[stage production].freeze
+    DEFAULT_BILLING_MONTHLY_FEE_CENTS = 500_000
+    DEFAULT_BILLING_GRACE_DAYS = 30
+    DEFAULT_ECPAY_PORTAL_URL = "https://login.ecpay.com.tw/Login?Mode=1&NextURL=https%3A%2F%2Fcashier.ecpay.com.tw%2Fmanage%2Flogin%2Fecpay%2Fcallback"
 
-    attribute :payment_mode, :string
     attribute :ecpay_merchant_id, :string
     attribute :ecpay_hash_key, :string
     attribute :ecpay_hash_iv, :string
     attribute :ecpay_environment, :string
-    attribute :stripe_platform_enabled, :boolean, default: false
-    attribute :stripe_platform_fee_bps, :integer
-    attribute :stripe_platform_notes, :string
+    attribute :billing_payment_method_on_file, :boolean, default: false
 
-    validates :payment_mode, inclusion: { in: PAYMENT_MODES }
     validates :ecpay_environment, inclusion: { in: ECPAY_ENVIRONMENTS }, allow_blank: true
-    validates :stripe_platform_fee_bps,
-      numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 10_000, only_integer: true },
-      allow_nil: true
 
     attr_reader :temple
 
     def initialize(temple:, params: nil)
       @temple = temple
-      attributes = params.presence || extracted_attributes.merge(payment_mode: temple.payment_mode.presence || "temple")
-      super(attributes)
+      super(params.presence || extracted_attributes)
     end
 
     def save(current_admin:)
@@ -36,7 +30,7 @@ module Admin
 
       previous_snapshot = persisted_snapshot
       temple.assign_attributes(
-        payment_mode: payment_mode,
+        payment_mode: temple.payment_mode.presence || "temple",
         payment_provider_settings: merged_provider_settings
       )
 
@@ -49,9 +43,8 @@ module Admin
           temple: temple,
           metadata: {
             changed_fields: changed_fields(previous_snapshot, snapshot_for_audit),
-            payment_mode: payment_mode,
             ecpay_configured: ecpay_configured?,
-            stripe_platform_enabled: stripe_platform_enabled
+            billing_payment_method_on_file: billing_payment_method_on_file?
           }
         )
       end
@@ -66,28 +59,53 @@ module Admin
       ECPAY_ENVIRONMENTS.map { |value| [value.titleize, value] }
     end
 
-    def payment_mode_options
-      PAYMENT_MODES.map { |value| [value.titleize, value] }
-    end
-
     def ecpay_configured?
       ecpay_merchant_id.present? && ecpay_hash_key.present? && ecpay_hash_iv.present?
+    end
+
+    def billing_payment_method_on_file?
+      ActiveModel::Type::Boolean.new.cast(billing_payment_method_on_file)
+    end
+
+    def billing_portal_url
+      temple.billing_portal_url
+    end
+
+    def billing_monthly_fee_cents
+      temple.billing_monthly_fee_cents
+    end
+
+    def billing_monthly_fee_label
+      Currency::Symbols.format_amount(billing_monthly_fee_cents, "TWD")
+    end
+
+    def billing_grace_days
+      temple.billing_grace_days
+    end
+
+    def billing_grace_remaining_days
+      temple.billing_grace_remaining_days
+    end
+
+    def online_payments_frozen?
+      temple.online_payments_frozen?
+    end
+
+    def ecpay_portal_url
+      ENV.fetch("ECPAY_PORTAL_URL", DEFAULT_ECPAY_PORTAL_URL).to_s
     end
 
     private
 
     def extracted_attributes
       ecpay = temple.payment_gateway_settings_for(:ecpay)
-      stripe_platform = temple.stripe_platform_settings
 
       {
         ecpay_merchant_id: ecpay["merchant_id"],
         ecpay_hash_key: ecpay["hash_key"],
         ecpay_hash_iv: ecpay["hash_iv"],
         ecpay_environment: ecpay["environment"].presence || Rails.configuration.x.ecpay.environment.to_s,
-        stripe_platform_enabled: stripe_platform["enabled"],
-        stripe_platform_fee_bps: stripe_platform["application_fee_bps"],
-        stripe_platform_notes: stripe_platform["notes"]
+        billing_payment_method_on_file: temple.billing_payment_method_on_file?
       }
     end
 
@@ -103,12 +121,20 @@ module Admin
         "hash_iv" => ecpay_hash_iv,
         "environment" => ecpay_environment
       )
-      base["stripe_platform"] = compact_hash(
-        "enabled" => ActiveModel::Type::Boolean.new.cast(stripe_platform_enabled),
-        "application_fee_bps" => stripe_platform_fee_bps,
-        "notes" => stripe_platform_notes
+      base["billing"] = compact_hash(
+        "payment_method_on_file" => billing_payment_method_on_file?,
+        "portal_url" => temple.billing_portal_url,
+        "monthly_fee_cents" => DEFAULT_BILLING_MONTHLY_FEE_CENTS,
+        "grace_days" => DEFAULT_BILLING_GRACE_DAYS,
+        "grace_started_at" => billing_grace_started_at_value
       )
       base
+    end
+
+    def billing_grace_started_at_value
+      return nil if billing_payment_method_on_file?
+
+      temple.billing_grace_started_at&.iso8601 || Time.current.iso8601
     end
 
     def compact_hash(hash)
@@ -122,17 +148,18 @@ module Admin
 
     def snapshot_for_audit
       {
-        payment_mode: payment_mode,
         ecpay: compact_hash(
           "merchant_id" => ecpay_merchant_id,
           "hash_key" => ecpay_hash_key,
           "hash_iv" => ecpay_hash_iv,
           "environment" => ecpay_environment
         ),
-        stripe_platform: compact_hash(
-          "enabled" => ActiveModel::Type::Boolean.new.cast(stripe_platform_enabled),
-          "application_fee_bps" => stripe_platform_fee_bps,
-          "notes" => stripe_platform_notes
+        billing: compact_hash(
+          "payment_method_on_file" => billing_payment_method_on_file?,
+          "portal_url" => temple.billing_portal_url,
+          "monthly_fee_cents" => DEFAULT_BILLING_MONTHLY_FEE_CENTS,
+          "grace_days" => DEFAULT_BILLING_GRACE_DAYS,
+          "grace_started_at" => billing_grace_started_at_value
         )
       }
     end
