@@ -108,7 +108,7 @@
                 </button>
                 <div class="nav-user-dropdown" role="menu" data-profile-menu-panel>
                   <div class="nav-dropdown-group">
-                    <% if current_admin&.admin_account&.owner_role? %>
+                    <% if can_manage_admins_for_current_temple? %>
                       <%= link_to admin_payment_methods_path,
                             class: "nav-dropdown-item",
                             role: "menuitem" do %>

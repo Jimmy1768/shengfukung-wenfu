@@ -39,6 +39,34 @@ class AdminPaymentMethodsTest < ActionDispatch::IntegrationTest
     assert_nil temple.billing_settings["grace_started_at"]
   end
 
+  test "temple owner by permission can view and update payment methods" do
+    temple = create_temple
+    owner = create_admin_user(temple: temple, role: "admin", membership_role: "owner", permission_overrides: { manage_permissions: true })
+
+    sign_in_admin(owner)
+
+    get admin_dashboard_path
+
+    assert_response :success
+    assert_includes response.body, "Billing"
+
+    get admin_payment_methods_path
+
+    assert_response :success
+
+    patch admin_payment_methods_path, params: {
+      payment_methods: {
+        ecpay_merchant_id: "2000132",
+        ecpay_hash_key: "hash-key-value",
+        ecpay_hash_iv: "hash-iv-value",
+        ecpay_environment: "stage",
+        billing_payment_method_on_file: "1"
+      }
+    }
+
+    assert_redirected_to admin_payment_methods_path
+  end
+
   test "saving without payment method starts grace period" do
     temple = create_temple
     owner = create_admin_user(temple: temple, role: "owner")

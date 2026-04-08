@@ -106,7 +106,7 @@ module Admin
     private
 
     def nav_item_visible?(item)
-      return false if item[:owner_only] && !owner_admin_account?
+      return false if item[:owner_only] && !can_manage_admins_for_current_temple?
 
       capabilities = Array(item[:capabilities]).compact
       return true if capabilities.empty?
@@ -115,10 +115,6 @@ module Admin
       return false if permissions.nil?
 
       capabilities.any? { |capability| permissions.allow?(capability) }
-    end
-
-    def owner_admin_account?
-      current_admin&.admin_account&.owner_role?
     end
 
     def nav_item_label(item)

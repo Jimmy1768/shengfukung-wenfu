@@ -4,7 +4,7 @@ module AdminPermissionEnforcer
   extend ActiveSupport::Concern
 
   included do
-    helper_method :current_admin_permissions
+    helper_method :current_admin_permissions, :can_manage_admins_for_current_temple?
   end
 
   def require_capability!(capability)
@@ -17,5 +17,9 @@ module AdminPermissionEnforcer
     return nil unless current_admin&.admin_account
 
     @current_admin_permissions ||= current_admin.admin_account.permissions_for(current_temple)
+  end
+
+  def can_manage_admins_for_current_temple?
+    current_admin_permissions&.allow?(:manage_permissions) || false
   end
 end
