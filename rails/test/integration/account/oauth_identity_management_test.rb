@@ -32,7 +32,7 @@ module Account
         assert_redirected_to central_oauth_start_path(
           provider: "google",
           surface: "account",
-          temple: temple.slug,
+          temple_slug: temple.slug,
           origin: account_oauth_identities_path,
           intent: "link"
         )
@@ -81,7 +81,7 @@ module Account
         assert_redirected_to central_oauth_start_path(
           provider: "apple",
           surface: "account",
-          temple: temple.slug,
+          temple_slug: temple.slug,
           origin: account_oauth_identities_path,
           intent: "link"
         )
@@ -174,8 +174,8 @@ module Account
         get central_oauth_start_path(
           provider: "apple",
           surface: "account",
-          temple: temple.slug,
-          origin: account_login_path(temple: temple.slug)
+          temple_slug: temple.slug,
+          origin: account_login_path(temple_slug: temple.slug)
         )
       end
 

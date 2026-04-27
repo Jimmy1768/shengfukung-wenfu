@@ -54,8 +54,8 @@ module Account
         get central_oauth_start_path(
           provider: "apple",
           surface: "account",
-          temple: temple.slug,
-          origin: account_login_path(temple: temple.slug)
+          temple_slug: temple.slug,
+          origin: account_login_path(temple_slug: temple.slug)
         )
       end
 
@@ -71,7 +71,7 @@ module Account
         get central_oauth_callback_path(code: "oauth-code", state: "oauth-state")
       end
 
-      assert_redirected_to account_login_path(temple: temple.slug)
+      assert_redirected_to account_login_path(temple_slug: temple.slug)
       follow_redirect!
       assert_includes response.body, I18n.t("account.sessions.flash.account_closed")
     end

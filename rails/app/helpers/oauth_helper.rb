@@ -17,7 +17,7 @@ module OAuthHelper
           path: central_oauth_start_path(
             provider: key,
             surface: oauth_surface,
-            temple: params[:temple].presence,
+            temple_slug: oauth_temple_slug,
             origin: request.fullpath,
             after_sign_in: after_sign_in
           )
@@ -48,5 +48,14 @@ module OAuthHelper
 
   def oauth_surface
     request.path.start_with?("/admin") ? "admin" : "account"
+  end
+
+  def oauth_temple_slug
+    [
+      params[:temple_slug],
+      params[:tenant_slug],
+      params[:temple],
+      current_temple&.slug
+    ].find { |value| value.respond_to?(:to_str) && value.to_str.strip.present? }&.to_str&.strip
   end
 end

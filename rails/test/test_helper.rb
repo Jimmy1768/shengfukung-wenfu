@@ -114,7 +114,7 @@ class ActionDispatch::IntegrationTest
 
   def sign_in_account(user, password: "Password123!", temple_slug: nil)
     request_params = {}
-    request_params[:temple] = temple_slug if temple_slug.present?
+    request_params[:temple_slug] = temple_slug if temple_slug.present?
     request_params[:session] = { email: user.email, password: }
     post account_sessions_path, params: request_params
     follow_redirect! if response.redirect?

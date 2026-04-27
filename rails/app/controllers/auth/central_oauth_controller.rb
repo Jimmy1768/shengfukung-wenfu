@@ -33,7 +33,7 @@ module Auth
 
       pending = {
         "surface" => requested_surface,
-        "temple" => params[:temple].presence,
+        "temple_slug" => requested_temple_slug,
         "origin" => params[:origin].presence,
         "intent" => normalized_intent(params[:intent]),
         "after_sign_in" => normalized_after_sign_in(params[:after_sign_in]),
@@ -174,7 +174,7 @@ module Auth
         return
       end
 
-      temple_slug = pending["temple"].presence
+      temple_slug = pending["temple_slug"].presence
       reset_session
       session[ACCOUNT_TEMPLE_SESSION_KEY] = temple_slug if temple_slug.present?
       session[AppConstants::Sessions.key(:account)] = user.id
@@ -316,7 +316,17 @@ module Auth
     end
 
     def central_tenant_slug(pending)
-      ENV["AUTH_TENANT_SLUG"].presence || pending["tenant"].presence
+      ENV["AUTH_TENANT_SLUG"].presence || pending["tenant_slug"].presence || pending["temple_slug"].presence
+    end
+
+    def requested_temple_slug
+      normalize_slug(params[:temple_slug]) || normalize_slug(params[:tenant_slug]) || normalize_slug(params[:temple])
+    end
+
+    def normalize_slug(value)
+      return unless value.respond_to?(:to_str)
+
+      value.to_str.strip.presence
     end
 
     def normalized_intent(value)
@@ -370,7 +380,7 @@ module Auth
     end
 
     def log_oauth_event(action, user:, pending:, provider:, **metadata)
-      temple = Temple.find_by(slug: pending["temple"]) if pending["temple"].present?
+      temple = Temple.find_by(slug: pending["temple_slug"]) if pending["temple_slug"].present?
       actor = user || current_account_user
       return if actor.blank?
 

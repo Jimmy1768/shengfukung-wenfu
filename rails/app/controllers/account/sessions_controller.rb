@@ -98,7 +98,7 @@ module Account
 
     def new_registration_flow_path(intent, offering)
       new_account_registration_path(
-        temple: intent[:temple].presence || current_temple&.slug,
+        temple_slug: intent[:temple_slug].presence || current_temple&.slug,
         account_action: account_action_for(offering),
         offering: offering.slug
       )

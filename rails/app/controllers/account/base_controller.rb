@@ -47,7 +47,7 @@ module Account
     end
 
     def assign_active_temple_slug
-      requested_slug = params[:temple].presence
+      requested_slug = temple_slug_param(params[:temple_slug]) || temple_slug_param(params[:temple])
       if requested_slug.present?
         session[ACCOUNT_TEMPLE_SESSION_KEY] = requested_slug
       end
@@ -139,10 +139,6 @@ module Account
       request.path == path
     end
 
-    def resolved_temple_slug
-      session[ACCOUNT_TEMPLE_SESSION_KEY].presence || super
-    end
-
     def store_account_entry_intent!(payload)
       session[ACCOUNT_ENTRY_INTENT_SESSION_KEY] = payload.compact
     end
@@ -197,7 +193,7 @@ module Account
       registration_ref = nil unless registration_ref.is_a?(String)
 
       intent = {
-        temple: params[:temple].presence,
+        temple_slug: temple_slug_param(params[:temple_slug]) || temple_slug_param(params[:temple]),
         account_action: params[:account_action].presence,
         offering_slug: params[:offering].presence,
         registration_reference: registration_ref,
@@ -237,7 +233,7 @@ module Account
         end
 
         intent_path = new_account_registration_path(
-          temple: intent[:temple].presence || current_temple&.slug,
+          temple_slug: intent[:temple_slug].presence || current_temple&.slug,
           account_action: account_action_for(offering),
           offering: offering.slug
         )

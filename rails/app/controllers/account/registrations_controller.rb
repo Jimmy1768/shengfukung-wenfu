@@ -94,7 +94,7 @@ module Account
           browser_return_url: checkout_return_account_registration_url(@registration, provider: provider),
           cancel_url: checkout_return_account_registration_url(@registration, provider: provider, canceled: 1),
           extra: {
-            server_callback_url: api_v1_payment_webhook_url(provider: provider, temple: current_temple.slug),
+            server_callback_url: api_v1_payment_webhook_url(provider: provider, temple_slug: current_temple.slug),
             item_name: @registration.registrable&.try(:title) || @registration.reference_code
           }
         )

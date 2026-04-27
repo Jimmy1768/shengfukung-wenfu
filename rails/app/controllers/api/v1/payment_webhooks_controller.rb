@@ -40,12 +40,20 @@ module Api
       end
 
       def resolve_temple(payload)
-        temple_slug = params[:temple].presence ||
+        temple_slug = string_param(params[:temple_slug]) ||
+          string_param(params[:tenant_slug]) ||
+          string_param(params[:temple]) ||
           payload[:temple_slug].presence ||
           payload.dig(:metadata, :temple_slug).presence
         return nil if temple_slug.blank?
 
         Temple.find_by(slug: temple_slug)
+      end
+
+      def string_param(value)
+        return unless value.respond_to?(:to_str)
+
+        value.to_str.strip.presence
       end
 
       def webhook_headers

@@ -8,54 +8,46 @@ module TempleContext
   end
 
   def current_temple
-    @current_temple ||= begin
-      slug = resolved_temple_slug
-      if admin_temple_context?
-        scoped = Temple.for_admin(current_admin.admin_account)
-        resolve_temple_from_scope(scoped, slug)
-      else
-        resolve_temple_from_scope(Temple.all, slug)
-      end
-    end
+    temple_context.temple
+  end
+
+  def temple_context
+    @temple_context ||= TempleContextResolver.new(
+      params: params,
+      session: context_session,
+      surface: temple_context_surface,
+      admin_account: admin_temple_context? ? current_admin.admin_account : nil,
+      active_temple_slug: context_active_temple_slug
+    ).resolve
   end
 
   private
 
-  def resolve_temple_from_scope(scope, slug)
-    temple =
-      find_temple(scope, slug) ||
-      find_temple(scope, AppConstants::Project.slug) ||
-      scope.first
+  def temple_context_surface
+    return :admin if admin_temple_context?
+    return :account if respond_to?(:active_temple_slug, true)
 
-    return unless temple
-
-    Temple.includes(temple_pages: :temple_sections).find_by(id: temple.id) || temple
+    :public
   end
 
-  def find_temple(scope, slug)
-    return if slug.blank?
+  def context_active_temple_slug
+    return unless respond_to?(:active_temple_slug, true)
 
-    scope.find_by(slug: slug)
+    active_temple_slug
+  end
+
+  def context_session
+    respond_to?(:session, true) ? session : {}
   end
 
   def resolved_temple_slug
-    slug =
-      params[:temple_slug].presence ||
-      params[:slug].presence ||
-      params[:temple].presence
-    return slug if slug.present?
+    temple_context.slug
+  end
 
-    if respond_to?(:admin_selected_temple_slug, true)
-      selected = admin_selected_temple_slug
-      return selected if selected.present?
-    end
+  def temple_slug_param(value)
+    return unless value.respond_to?(:to_str)
 
-    if respond_to?(:active_temple_slug, true)
-      selected = active_temple_slug
-      return selected if selected.present?
-    end
-
-    AppConstants::Project.slug
+    value.to_str.strip.presence
   end
 
   def admin_temple_context?

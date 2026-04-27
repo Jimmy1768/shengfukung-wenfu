@@ -20,7 +20,7 @@ module Account
       redirect_to central_oauth_start_path(
         provider: @provider_key,
         surface: "account",
-        temple: active_temple_slug,
+        temple_slug: active_temple_slug,
         origin: account_oauth_identities_path,
         intent: "link"
       )
