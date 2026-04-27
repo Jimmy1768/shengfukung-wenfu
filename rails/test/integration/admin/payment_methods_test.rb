@@ -10,13 +10,13 @@ class AdminPaymentMethodsTest < ActionDispatch::IntegrationTest
     get admin_dashboard_path
 
     assert_response :success
-    assert_includes response.body, "Billing"
+    assert_includes response.body, "帳務設定"
 
     get admin_payment_methods_path
 
     assert_response :success
     assert_includes response.body, "ECPay"
-    assert_includes response.body, "Billing"
+    assert_includes response.body, "帳務設定"
 
     assert_difference -> { SystemAuditLog.where(action: "admin.payment_methods.updated").count }, 1 do
       patch admin_payment_methods_path, params: {
@@ -48,7 +48,7 @@ class AdminPaymentMethodsTest < ActionDispatch::IntegrationTest
     get admin_dashboard_path
 
     assert_response :success
-    assert_includes response.body, "Billing"
+    assert_includes response.body, "帳務設定"
 
     get admin_payment_methods_path
 
@@ -121,7 +121,7 @@ class AdminPaymentMethodsTest < ActionDispatch::IntegrationTest
     get admin_dashboard_path
 
     assert_response :success
-    refute_includes response.body, "Billing"
+    refute_includes response.body, "帳務設定"
 
     get admin_payment_methods_path
 

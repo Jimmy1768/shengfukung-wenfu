@@ -11,7 +11,7 @@ module Admin
     end
 
     def update
-      @form = Admin::TempleProfileForm.new(temple: current_temple, params: temple_params)
+      @form = Admin::TempleProfileForm.new(temple: current_temple, params: profile_params_with_uploads)
 
       if @form.save(current_admin:)
         redirect_to admin_temple_profile_path, notice: t("admin.temple_profile.flash.updated")
@@ -19,9 +19,42 @@ module Admin
         flash.now[:alert] = t("admin.temple_profile.flash.review_errors")
         render :edit, status: :unprocessable_entity
       end
+    rescue MediaAssets::HeroImageUploader::UploadError => e
+      @form = Admin::TempleProfileForm.new(temple: current_temple, params: temple_params)
+      @form.errors.add(:hero_images, e.message)
+      flash.now[:alert] = t("admin.temple_profile.flash.review_errors")
+      render :edit, status: :unprocessable_entity
     end
 
     private
+
+    def profile_params_with_uploads
+      permitted = temple_params.to_h.deep_stringify_keys
+      uploaded_urls = upload_hero_images
+      return permitted if uploaded_urls.blank?
+
+      permitted["hero_images"] = (permitted["hero_images"] || {}).merge(uploaded_urls)
+      permitted
+    end
+
+    def upload_hero_images
+      upload_params.each_with_object({}) do |(tab, file), urls|
+        next if file.blank?
+
+        result = MediaAssets::HeroImageUploader.call(
+          temple: current_temple,
+          file: file,
+          hero_tab: tab,
+          admin: current_admin
+        )
+        urls[tab.to_s] = result[:url]
+      end
+    end
+
+    def upload_params
+      raw = params.fetch(:hero_image_upload, {})
+      raw.respond_to?(:to_unsafe_h) ? raw.to_unsafe_h.slice(*Temple::HERO_TABS) : {}
+    end
 
     def temple_params
       params.require(:temple).permit(
