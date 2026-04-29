@@ -160,12 +160,12 @@
               <div class="billing-card__header">
                 <p class="billing-card__eyebrow"><%= t("admin.payment_methods.sections.payment_method.eyebrow") %></p>
                 <h3><%= t("admin.payment_methods.sections.payment_method.title") %></h3>
-                <p><%= t("admin.payment_methods.sections.payment_method.subtitle", amount: @form.billing_monthly_fee_label) %></p>
+                <p><%= t("admin.payment_methods.sections.payment_method.subtitle", monthly_amount: @form.billing_monthly_fee_label, annual_amount: @form.billing_annual_fee_label) %></p>
               </div>
 
               <div class="billing-step-list">
                 <article class="billing-info-card">
-                  <span class="billing-info-card__label"><%= t("admin.payment_methods.sections.payment_method.notes.price_title", amount: @form.billing_monthly_fee_label) %></span>
+                  <span class="billing-info-card__label"><%= t("admin.payment_methods.sections.payment_method.notes.price_title", monthly_amount: @form.billing_monthly_fee_label, annual_amount: @form.billing_annual_fee_label) %></span>
                   <p><%= t("admin.payment_methods.sections.payment_method.notes.price_body") %></p>
                 </article>
                 <article class="billing-info-card">
@@ -206,6 +206,10 @@
                 <article class="billing-fact-card">
                   <span class="billing-fact-card__label"><%= t("admin.payment_methods.status.monthly_fee") %></span>
                   <strong><%= @form.billing_monthly_fee_label %></strong>
+                </article>
+                <article class="billing-fact-card">
+                  <span class="billing-fact-card__label"><%= t("admin.payment_methods.status.annual_fee") %></span>
+                  <strong><%= @form.billing_annual_fee_label %></strong>
                 </article>
                 <article class="billing-fact-card">
                   <span class="billing-fact-card__label"><%= t("admin.payment_methods.status.grace_period_label") %></span>

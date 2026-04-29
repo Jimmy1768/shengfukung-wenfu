@@ -35,7 +35,9 @@ class AdminPaymentMethodsTest < ActionDispatch::IntegrationTest
     assert_equal "2000132", temple.payment_gateway_settings_for(:ecpay)["merchant_id"]
     assert_equal "stage", temple.payment_gateway_settings_for(:ecpay)["environment"]
     assert temple.billing_payment_method_on_file?
-    assert_equal 500_000, temple.billing_settings["monthly_fee_cents"]
+    assert_equal 300_000, temple.billing_settings["monthly_fee_cents"]
+    assert_equal 3_600_000, temple.billing_settings["annual_fee_cents"]
+    assert_equal "year", temple.billing_settings["billing_interval"]
     assert_nil temple.billing_settings["grace_started_at"]
   end
 

@@ -6,7 +6,8 @@ module Admin
     include ActiveModel::Attributes
 
     ECPAY_ENVIRONMENTS = %w[stage production].freeze
-    DEFAULT_BILLING_MONTHLY_FEE_CENTS = 500_000
+    DEFAULT_BILLING_MONTHLY_FEE_CENTS = 300_000
+    DEFAULT_BILLING_INTERVAL_MONTHS = 12
     DEFAULT_BILLING_GRACE_DAYS = 30
     DEFAULT_ECPAY_PORTAL_URL = "https://login.ecpay.com.tw/Login?Mode=1&NextURL=https%3A%2F%2Fcashier.ecpay.com.tw%2Fmanage%2Flogin%2Fecpay%2Fcallback"
 
@@ -89,6 +90,14 @@ module Admin
 
     def billing_monthly_fee_label
       Currency::Symbols.format_amount(billing_monthly_fee_cents, "TWD")
+    end
+
+    def billing_annual_fee_cents
+      billing_monthly_fee_cents * DEFAULT_BILLING_INTERVAL_MONTHS
+    end
+
+    def billing_annual_fee_label
+      Currency::Symbols.format_amount(billing_annual_fee_cents, "TWD")
     end
 
     def billing_grace_days
@@ -185,6 +194,9 @@ module Admin
         "payment_method_on_file" => billing_payment_method_on_file?,
         "portal_url" => temple.billing_portal_url,
         "monthly_fee_cents" => DEFAULT_BILLING_MONTHLY_FEE_CENTS,
+        "billing_interval" => "year",
+        "billing_interval_months" => DEFAULT_BILLING_INTERVAL_MONTHS,
+        "annual_fee_cents" => DEFAULT_BILLING_MONTHLY_FEE_CENTS * DEFAULT_BILLING_INTERVAL_MONTHS,
         "grace_days" => DEFAULT_BILLING_GRACE_DAYS,
         "grace_started_at" => billing_grace_started_at_value
       )
@@ -219,6 +231,9 @@ module Admin
           "payment_method_on_file" => billing_payment_method_on_file?,
           "portal_url" => temple.billing_portal_url,
           "monthly_fee_cents" => DEFAULT_BILLING_MONTHLY_FEE_CENTS,
+          "billing_interval" => "year",
+          "billing_interval_months" => DEFAULT_BILLING_INTERVAL_MONTHS,
+          "annual_fee_cents" => DEFAULT_BILLING_MONTHLY_FEE_CENTS * DEFAULT_BILLING_INTERVAL_MONTHS,
           "grace_days" => DEFAULT_BILLING_GRACE_DAYS,
           "grace_started_at" => billing_grace_started_at_value
         )

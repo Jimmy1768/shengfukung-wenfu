@@ -290,7 +290,7 @@ zh-TW:
         payment_method:
           eyebrow: "平台帳務"
           title: "付款方式"
-          subtitle: "系統固定每月收取 %{amount}，宮廟不能自行修改價格。"
+          subtitle: "系統固定每月 %{monthly_amount}，以年繳 %{annual_amount} 收取，宮廟不能自行修改價格。"
           status_eyebrow: "帳務狀態"
           status_title: "帳務狀態"
           status_subtitle: "擁有者完成 Stripe 託管設定後，系統會自動更新。"
@@ -300,8 +300,8 @@ zh-TW:
             open_billing: "開啟付款方式設定"
             save: "儲存帳務狀態"
           notes:
-            price_title: "平台月費：%{amount}"
-            price_body: "這個金額由系統控制，宮廟不需要也不能自行調整。"
+            price_title: "平台費用：每月 %{monthly_amount}"
+            price_body: "此費用以年繳 %{annual_amount} 收取，金額由系統控制。"
             freeze_title: "寬限期與凍結規則"
             freeze_body: "如果沒有有效付款方式，ECPay 線上付款會先保留 %{days} 天，之後自動暫停，直到帳務補齊。"
       fields:
@@ -322,6 +322,7 @@ zh-TW:
         billing_overdue: "帳務逾期"
         grace_period: "寬限期剩餘 %{days} 天"
         monthly_fee: "每月費用"
+        annual_fee: "年繳金額"
         grace_period_label: "寬限期"
         grace_period_value: "%{days} 天"
         current_state: "目前狀態"

@@ -166,7 +166,15 @@ class Temple < ApplicationRecord
   end
 
   def billing_monthly_fee_cents
-    billing_settings["monthly_fee_cents"].presence&.to_i || 500_000
+    billing_settings["monthly_fee_cents"].presence&.to_i || 300_000
+  end
+
+  def billing_interval_months
+    billing_settings["billing_interval_months"].presence&.to_i || 12
+  end
+
+  def billing_annual_fee_cents
+    billing_settings["annual_fee_cents"].presence&.to_i || billing_monthly_fee_cents * billing_interval_months
   end
 
   def billing_grace_days

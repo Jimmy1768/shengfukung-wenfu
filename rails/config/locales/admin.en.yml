@@ -290,7 +290,7 @@ en:
         payment_method:
           eyebrow: "Platform billing"
           title: "Payment Method"
-          subtitle: "The system charges %{amount} per month. Temples cannot change this price."
+          subtitle: "The system charges %{monthly_amount} per month, billed yearly as %{annual_amount}. Temples cannot change this price."
           status_eyebrow: "Account status"
           status_title: "Billing status"
           status_subtitle: "Saved by Stripe after the owner completes the hosted setup flow."
@@ -300,8 +300,8 @@ en:
             open_billing: "Open payment method setup"
             save: "Save payment status"
           notes:
-            price_title: "Monthly platform fee: %{amount}"
-            price_body: "This amount is controlled by the system. Temple admins do not enter or edit the price."
+            price_title: "Platform fee: %{monthly_amount} / month"
+            price_body: "This is billed yearly as %{annual_amount}. The amount is controlled by the system."
             freeze_title: "Grace period and freeze rule"
             freeze_body: "If no payment method is on file, online ECPay checkout stays available for %{days} days, then automatically pauses until billing is fixed."
       fields:
@@ -322,6 +322,7 @@ en:
         billing_overdue: "Billing overdue"
         grace_period: "%{days} days left in grace period"
         monthly_fee: "Monthly fee"
+        annual_fee: "Yearly charge"
         grace_period_label: "Grace period"
         grace_period_value: "%{days} days"
         current_state: "Current state"
