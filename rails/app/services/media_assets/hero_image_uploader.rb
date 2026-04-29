@@ -44,6 +44,7 @@ module MediaAssets
     def object_key
       extension = File.extname(file.original_filename.to_s).presence || ".jpg"
       [
+        "uploads",
         "hero-images",
         temple.slug,
         hero_tab,
