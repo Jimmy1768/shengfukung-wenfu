@@ -330,6 +330,7 @@ GEM
       hashie (>= 0.1.0, < 6)
       version_gem (>= 1.1.8, < 3)
     stringio (3.1.8)
+    stripe (17.2.0)
     thor (1.4.0)
     timeout (0.4.4)
     tsort (0.2.0)
@@ -373,6 +374,7 @@ DEPENDENCIES
   rails (~> 7.1.5, >= 7.1.5.1)
   redis (>= 5.0)
   sidekiq (~> 7.2)
+  stripe (~> 17.0)
   tzinfo-data
 
 RUBY VERSION

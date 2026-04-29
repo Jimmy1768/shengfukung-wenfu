@@ -175,14 +175,14 @@
               </div>
 
               <div class="billing-card__actions">
-                <% if @form.billing_portal_url.present? %>
-                  <%= link_to t("admin.payment_methods.sections.payment_method.actions.open_billing"),
-                        @form.billing_portal_url,
+                <% if @form.stripe_billing_configured? %>
+                  <%= button_tag t("admin.payment_methods.sections.payment_method.actions.open_billing"),
+                        type: "submit",
+                        form: "stripe-billing-setup-form",
                         class: "billing-button billing-button--secondary",
-                        target: "_blank",
-                        rel: "noopener" %>
+                        data: { turbo: false } %>
                 <% else %>
-                  <p class="muted"><%= t("admin.payment_methods.sections.payment_method.missing_portal") %></p>
+                  <p class="muted"><%= t("admin.payment_methods.sections.payment_method.missing_stripe") %></p>
                 <% end %>
               </div>
             </section>
@@ -195,16 +195,11 @@
                   <p><%= t("admin.payment_methods.sections.payment_method.status_subtitle") %></p>
                 </div>
 
-                <div class="billing-form-field">
-                  <label class="billing-checkbox">
-                    <%= form.check_box :billing_payment_method_on_file %>
-                    <span><%= t("admin.payment_methods.fields.billing_payment_method_on_file") %></span>
-                  </label>
-                </div>
-
-                <div class="billing-card__actions">
-                  <%= form.submit t("admin.payment_methods.sections.payment_method.actions.save"), class: "billing-button billing-button--primary" %>
-                </div>
+                <% if @form.billing_payment_method_on_file? %>
+                  <p><strong><%= @form.billing_card_label || t("admin.payment_methods.status.active") %></strong></p>
+                <% else %>
+                  <p class="muted"><%= t("admin.payment_methods.sections.payment_method.no_card") %></p>
+                <% end %>
               </section>
 
               <div class="billing-facts-grid">
@@ -227,6 +222,13 @@
         </section>
       </section>
     </div>
+  <% end %>
+
+  <%= form_with url: start_billing_setup_admin_payment_methods_path,
+        method: :post,
+        id: "stripe-billing-setup-form",
+        local: true,
+        data: { turbo: false } do %>
   <% end %>
 </div>
 

@@ -19,6 +19,35 @@ module Admin
       end
     end
 
+    def start_billing_setup
+      result = Billing::StripePaymentMethodSetup.start(
+        temple: current_temple,
+        admin: current_admin,
+        success_url: billing_setup_return_admin_payment_methods_url,
+        cancel_url: admin_payment_methods_url
+      )
+
+      redirect_to result.url, allow_other_host: true
+    rescue StandardError => e
+      redirect_to admin_payment_methods_path, alert: t("admin.payment_methods.flash.billing_setup_failed", error: e.message)
+    end
+
+    def billing_setup_return
+      if params[:checkout_session_id].blank?
+        return redirect_to admin_payment_methods_path, alert: t("admin.payment_methods.flash.billing_setup_return_missing")
+      end
+
+      Billing::StripePaymentMethodSetup.complete(
+        temple: current_temple,
+        admin: current_admin,
+        checkout_session_id: params[:checkout_session_id]
+      )
+
+      redirect_to admin_payment_methods_path, notice: t("admin.payment_methods.flash.billing_setup_completed")
+    rescue StandardError => e
+      redirect_to admin_payment_methods_path, alert: t("admin.payment_methods.flash.billing_setup_failed", error: e.message)
+    end
+
     private
 
     def require_owner_admin!

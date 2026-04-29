@@ -21,6 +21,7 @@ gem "omniauth-apple"
 gem "aws-sdk-s3", "~> 1.147"
 gem "httparty"
 gem "googleauth"
+gem "stripe", "~> 17.0"
 
 # ==== Background jobs / caching =============================================
 gem "redis", ">= 5.0"

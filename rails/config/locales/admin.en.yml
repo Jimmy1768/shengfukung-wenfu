@@ -293,8 +293,9 @@ en:
           subtitle: "The system charges %{amount} per month. Temples cannot change this price."
           status_eyebrow: "Account status"
           status_title: "Billing status"
-          status_subtitle: "Turn this on once a valid payment method has been added."
-          missing_portal: "Set BILLING_PORTAL_URL before using the payment-method button in this environment."
+          status_subtitle: "Saved by Stripe after the owner completes the hosted setup flow."
+          missing_stripe: "Set STRIPE_SECRET_KEY before using Stripe payment-method setup in this environment."
+          no_card: "No platform billing card is saved yet."
           actions:
             open_billing: "Open payment method setup"
             save: "Save payment status"
@@ -328,6 +329,9 @@ en:
         save: "Save billing settings"
       flash:
         updated: "Billing settings updated."
+        billing_setup_completed: "Platform billing payment method saved."
+        billing_setup_failed: "Unable to start or complete Stripe billing setup: %{error}"
+        billing_setup_return_missing: "Stripe did not return a checkout session."
         review_errors: "Please review the billing settings."
         owner_only: "Only owner admins can change billing settings."
     internal:

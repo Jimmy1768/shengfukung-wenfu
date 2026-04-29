@@ -67,6 +67,18 @@ module Admin
       ActiveModel::Type::Boolean.new.cast(billing_payment_method_on_file)
     end
 
+    def stripe_billing_configured?
+      Rails.configuration.x.stripe.secret_key.present?
+    end
+
+    def billing_card_label
+      brand = temple.billing_settings["card_brand"].to_s.titleize.presence
+      last4 = temple.billing_settings["card_last4"].presence
+      return nil if brand.blank? || last4.blank?
+
+      "#{brand} ending in #{last4}"
+    end
+
     def billing_portal_url
       temple.billing_portal_url
     end

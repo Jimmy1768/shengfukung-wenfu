@@ -88,7 +88,10 @@ Rails.application.routes.draw do
         match :checkout_return, via: %i[get post]
       end
     end
-    resource :payment_methods, only: %i[show update]
+    resource :payment_methods, only: %i[show update] do
+      post :start_billing_setup
+      get :billing_setup_return
+    end
     resources :assistance_requests, only: :index do
       member do
         post :close

@@ -293,8 +293,9 @@ zh-TW:
           subtitle: "系統固定每月收取 %{amount}，宮廟不能自行修改價格。"
           status_eyebrow: "帳務狀態"
           status_title: "帳務狀態"
-          status_subtitle: "新增有效付款方式後，再把這個狀態打開。"
-          missing_portal: "這個環境尚未設定 BILLING_PORTAL_URL，所以目前不能直接開啟付款方式頁面。"
+          status_subtitle: "擁有者完成 Stripe 託管設定後，系統會自動更新。"
+          missing_stripe: "這個環境尚未設定 STRIPE_SECRET_KEY，所以目前不能開啟 Stripe 付款方式設定。"
+          no_card: "尚未儲存平台帳務付款卡。"
           actions:
             open_billing: "開啟付款方式設定"
             save: "儲存帳務狀態"
@@ -328,6 +329,9 @@ zh-TW:
         save: "儲存帳務設定"
       flash:
         updated: "已更新帳務設定。"
+        billing_setup_completed: "已儲存平台帳務付款方式。"
+        billing_setup_failed: "無法啟動或完成 Stripe 帳務設定：%{error}"
+        billing_setup_return_missing: "Stripe 未回傳 checkout session。"
         review_errors: "請檢查帳務設定。"
         owner_only: "只有擁有者管理員可以修改帳務設定。"
     internal:

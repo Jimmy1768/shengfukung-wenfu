@@ -90,6 +90,38 @@ class AdminPaymentMethodsTest < ActionDispatch::IntegrationTest
     assert temple.billing_grace_started_at.present?
   end
 
+  test "owner can start Stripe billing setup" do
+    temple = create_temple
+    owner = create_admin_user(temple: temple, role: "owner")
+    result = Billing::StripePaymentMethodSetup::Result.new(
+      session_id: "cs_setup_123",
+      url: "https://checkout.stripe.com/c/cs_setup_123"
+    )
+
+    sign_in_admin(owner)
+
+    Billing::StripePaymentMethodSetup.stub(:start, ->(**_args) { result }) do
+      post start_billing_setup_admin_payment_methods_path
+    end
+
+    assert_redirected_to result.url
+  end
+
+  test "owner can complete Stripe billing setup return" do
+    temple = create_temple
+    owner = create_admin_user(temple: temple, role: "owner")
+    completed_session_id = nil
+
+    sign_in_admin(owner)
+
+    Billing::StripePaymentMethodSetup.stub(:complete, ->(**args) { completed_session_id = args[:checkout_session_id] }) do
+      get billing_setup_return_admin_payment_methods_path(checkout_session_id: "cs_setup_123")
+    end
+
+    assert_equal "cs_setup_123", completed_session_id
+    assert_redirected_to admin_payment_methods_path
+  end
+
   test "setup incomplete does not start grace period" do
     temple = create_temple
     owner = create_admin_user(temple: temple, role: "owner")
