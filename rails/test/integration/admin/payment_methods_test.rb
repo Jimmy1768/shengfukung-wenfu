@@ -17,6 +17,8 @@ class AdminPaymentMethodsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "ECPay"
     assert_includes response.body, "帳務設定"
+    assert_includes response.body, "NT$36,000"
+    refute_includes response.body, "%{annual_amount}"
 
     assert_difference -> { SystemAuditLog.where(action: "admin.payment_methods.updated").count }, 1 do
       patch admin_payment_methods_path, params: {

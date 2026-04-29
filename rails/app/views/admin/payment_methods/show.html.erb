@@ -166,7 +166,7 @@
               <div class="billing-step-list">
                 <article class="billing-info-card">
                   <span class="billing-info-card__label"><%= t("admin.payment_methods.sections.payment_method.notes.price_title", monthly_amount: @form.billing_monthly_fee_label, annual_amount: @form.billing_annual_fee_label) %></span>
-                  <p><%= t("admin.payment_methods.sections.payment_method.notes.price_body") %></p>
+                  <p><%= t("admin.payment_methods.sections.payment_method.notes.price_body", annual_amount: @form.billing_annual_fee_label) %></p>
                 </article>
                 <article class="billing-info-card">
                   <span class="billing-info-card__label"><%= t("admin.payment_methods.sections.payment_method.notes.freeze_title") %></span>
