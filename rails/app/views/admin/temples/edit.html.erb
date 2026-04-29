@@ -202,14 +202,6 @@
                         accept: "image/*",
                         class: "hero-image-file-input" %>
                     </label>
-                    <button type="button"
-                      class="btn btn-primary hero-image-upload-button"
-                      disabled
-                      data-hero-upload-button
-                      data-upload-label="<%= t("admin.temple_profile.sections.hero_images.upload_button") %>"
-                      data-uploading-label="<%= t("admin.temple_profile.sections.hero_images.uploading_label") %>">
-                      <%= t("admin.temple_profile.sections.hero_images.upload_button") %>
-                    </button>
                     <span class="hero-image-file-name" data-hero-file-name></span>
                   </div>
 
@@ -251,20 +243,7 @@
 <script>
   (() => {
     const HERO_UPLOAD_I18N = {
-      success: "<%= j t("admin.temple_profile.sections.hero_images.upload_success") %>",
-      error: "<%= j t("admin.temple_profile.sections.hero_images.upload_error") %>",
-      generic: "<%= j t("admin.temple_profile.sections.hero_images.generic_error") %>"
-    };
-
-    const csrfToken = () => {
-      const meta = document.querySelector('meta[name="csrf-token"]');
-      return meta ? meta.content : null;
-    };
-
-    const resetButton = (button, label) => {
-      if (!button) return;
-      button.disabled = true;
-      button.textContent = label;
+      selected: "<%= j t("admin.temple_profile.sections.hero_images.selected_pending") %>"
     };
 
     const setStatus = (element, message, state = "muted") => {
@@ -278,61 +257,26 @@
       slot.dataset.heroUploaderBound = "true";
 
       const fileInput = slot.querySelector(".hero-image-file-input");
-      const uploadButton = slot.querySelector("[data-hero-upload-button]");
       const preview = slot.querySelector(".hero-image-preview");
-      const urlInput = slot.querySelector("[data-hero-url-input]");
       const fileName = slot.querySelector("[data-hero-file-name]");
       const statusEl = slot.querySelector("[data-hero-status]");
       const heroTab = slot.dataset.heroTab;
-      if (!fileInput || !uploadButton || !heroTab) return;
-
-      const defaultLabel = uploadButton.dataset.uploadLabel || uploadButton.textContent;
-      const uploadingLabel = uploadButton.dataset.uploadingLabel || "Uploading...";
+      if (!fileInput || !heroTab) return;
 
       fileInput.addEventListener("change", () => {
         if (fileInput.files && fileInput.files.length > 0) {
-          uploadButton.disabled = false;
-          if (fileName) fileName.textContent = fileInput.files[0].name;
+          const file = fileInput.files[0];
+          if (fileName) fileName.textContent = file.name;
+          if (preview) {
+            if (preview.dataset.objectUrl) URL.revokeObjectURL(preview.dataset.objectUrl);
+            const objectUrl = URL.createObjectURL(file);
+            preview.dataset.objectUrl = objectUrl;
+            preview.src = objectUrl;
+          }
+          setStatus(statusEl, HERO_UPLOAD_I18N.selected, "muted");
         } else {
-          resetButton(uploadButton, defaultLabel);
           if (fileName) fileName.textContent = "";
-        }
-      });
-
-      uploadButton.addEventListener("click", async () => {
-        const file = fileInput.files ? fileInput.files[0] : null;
-        if (!file) return;
-        uploadButton.disabled = true;
-        uploadButton.textContent = uploadingLabel;
-        setStatus(statusEl, "", "muted");
-
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("hero_tab", heroTab);
-
-        try {
-          const response = await fetch("/utils/uploads", {
-            method: "POST",
-            headers: csrfToken() ? { "X-CSRF-Token": csrfToken() } : {},
-            body: formData
-          });
-          const payload = await response.json().catch(() => ({}));
-          if (!response.ok) {
-            throw new Error(payload.error || HERO_UPLOAD_I18N.generic);
-          }
-
-          if (payload.url) {
-            if (preview) preview.src = payload.url;
-            if (urlInput) urlInput.value = payload.url;
-          }
-          if (fileName) fileName.textContent = "";
-          if (fileInput) fileInput.value = "";
-          resetButton(uploadButton, defaultLabel);
-          setStatus(statusEl, HERO_UPLOAD_I18N.success, "success");
-        } catch (error) {
-          uploadButton.disabled = false;
-          uploadButton.textContent = defaultLabel;
-          setStatus(statusEl, error.message || HERO_UPLOAD_I18N.error, "error");
+          setStatus(statusEl, "", "muted");
         }
       });
     };

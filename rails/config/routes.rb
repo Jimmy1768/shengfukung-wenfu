@@ -179,10 +179,6 @@ Rails.application.routes.draw do
   resource :password, controller: "utils/passwords", only: %i[new create edit]
   post "/password/reset", to: "utils/passwords#update", as: :password_update
 
-  namespace :utils do
-    resources :uploads, only: :create
-  end
-
 # --- Central auth bridge ----------------------------------------------------
 get "/auth/central/:provider/start", to: "auth/central_oauth#start", as: :central_oauth_start
 match "/auth/callback", to: "auth/central_oauth#callback", via: %i[get post], as: :central_oauth_callback

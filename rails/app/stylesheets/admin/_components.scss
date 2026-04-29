@@ -1265,14 +1265,6 @@
   color: var(--text-muted);
 }
 
-.hero-image-status[data-state="error"] {
-  color: var(--danger, #d1452f);
-}
-
-.hero-image-status[data-state="success"] {
-  color: var(--accent);
-}
-
 .hero-floating-save {
   position: fixed;
   left: var(--spacing-xl);
