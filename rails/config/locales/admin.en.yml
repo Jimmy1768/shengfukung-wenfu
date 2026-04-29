@@ -1031,6 +1031,7 @@ en:
         duplicate: "A matching registration already exists for this registrant."
         updated: "Registration updated."
         gathering_read_only: "Gathering attendance entries are read-only after creation."
+        registration_intake_frozen: "New registrations are paused until billing is updated."
       index:
         eyebrow: "Onsite desk"
         title: "Registrations for %{offering}"
@@ -1077,7 +1078,7 @@ en:
         checkout_reused: "A checkout attempt already exists for this registration."
         checkout_started: "%{provider} checkout started. Awaiting confirmation."
         checkout_failed: "Unable to start checkout: %{error}"
-        online_payments_frozen: "Online payments are frozen until billing is updated."
+        online_payments_frozen: "Registration payments are paused until billing is updated."
       statuses:
         pending: "Pending"
         completed: "Completed"

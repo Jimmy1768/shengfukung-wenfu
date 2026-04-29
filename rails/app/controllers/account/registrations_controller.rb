@@ -5,6 +5,7 @@ module Account
     skip_before_action :verify_authenticity_token, only: :checkout_return
     before_action :set_registration, only: %i[show edit update payment start_checkout checkout_return]
     before_action :assign_offering_from_params, only: %i[new create]
+    before_action :ensure_registration_intake_open!, only: %i[new create]
     before_action :assign_eligible_registrants, only: %i[new create edit update]
     before_action :ensure_selected_registrant, only: %i[new create]
     before_action :redirect_gathering_edits!, only: %i[edit update]
@@ -75,7 +76,7 @@ module Account
     end
 
     def start_checkout
-      if current_temple.online_payments_frozen?
+      if current_temple.registration_intake_frozen?
         return redirect_to payment_account_registration_path(@registration), alert: t("account.registrations.payment.online_payments_frozen")
       end
 
@@ -163,6 +164,12 @@ module Account
       else
         @account_action = params[:account_action].presence || account_action_for(@offering)
       end
+    end
+
+    def ensure_registration_intake_open!
+      return unless current_temple.registration_intake_frozen?
+
+      redirect_to account_registrations_path, alert: t("account.registrations.flash.registration_intake_frozen")
     end
 
     def set_registration

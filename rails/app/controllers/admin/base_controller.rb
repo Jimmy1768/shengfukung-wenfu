@@ -190,7 +190,7 @@ module Admin
     end
 
     def admin_registration_entry_enabled_for?(offering)
-      offering.is_a?(TempleGathering)
+      offering.is_a?(TempleGathering) && !current_temple&.registration_intake_frozen?
     end
 
     def filter_params

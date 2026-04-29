@@ -5,6 +5,7 @@ module Admin
     before_action :require_manage_registrations!
     before_action :set_offering_kind
     before_action :set_offering
+    before_action :ensure_registration_intake_open!, only: %i[new create]
     before_action :set_registration, only: %i[show edit update]
     before_action :redirect_gathering_edits!, only: %i[edit update]
 
@@ -124,6 +125,12 @@ module Admin
 
     def require_manage_registrations!
       require_capability!(:manage_registrations)
+    end
+
+    def ensure_registration_intake_open!
+      return unless current_temple.registration_intake_frozen?
+
+      redirect_to offering_orders_path(@offering), alert: t("admin.offering_orders.flash.registration_intake_frozen")
     end
 
     def registration_params
@@ -287,6 +294,17 @@ module Admin
         admin_gathering_offering_order_path(offering, registration)
       else
         admin_event_offering_order_path(offering, registration)
+      end
+    end
+
+    def offering_orders_path(offering)
+      case offering
+      when TempleService
+        admin_service_offering_orders_path(offering)
+      when TempleGathering
+        admin_gathering_offering_orders_path(offering)
+      else
+        admin_event_offering_orders_path(offering)
       end
     end
 

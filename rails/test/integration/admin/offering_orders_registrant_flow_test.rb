@@ -63,6 +63,33 @@ class AdminOfferingOrdersRegistrantFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Family Member"
   end
 
+  test "expired billing grace blocks new admin registrations" do
+    @temple.update!(
+      payment_provider_settings: {
+        "billing" => {
+          "payment_method_on_file" => false,
+          "monthly_fee_cents" => 500_000,
+          "grace_days" => 30,
+          "grace_started_at" => 31.days.ago.iso8601
+        }
+      }
+    )
+
+    sign_in_admin(@admin)
+
+    assert_no_difference -> { @temple.temple_event_registrations.count } do
+      post admin_gathering_offering_orders_path(@gathering), params: {
+        temple_event_registration: {
+          user_id: @patron.id,
+          quantity: 1,
+          registrant_scope: "self"
+        }
+      }
+    end
+
+    assert_redirected_to admin_gathering_offering_orders_path(@gathering)
+  end
+
   test "admin create redirects to existing registration for same dependent scope" do
     existing = create_registration(
       user: @patron,

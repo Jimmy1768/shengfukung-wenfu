@@ -139,6 +139,47 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
     assert_select "input[name='account_registration_intake_form[contact_name]']"
   end
 
+  test "expired billing grace blocks new account registrations" do
+    temple = create_temple(
+      payment_provider_settings: {
+        "billing" => {
+          "payment_method_on_file" => false,
+          "monthly_fee_cents" => 500_000,
+          "grace_days" => 30,
+          "grace_started_at" => 31.days.ago.iso8601
+        }
+      }
+    )
+    gathering = temple.temple_gatherings.create!(
+      slug: "billing-paused-gathering",
+      title: "Billing Paused Gathering",
+      currency: "TWD",
+      price_cents: 450,
+      status: "published",
+      starts_on: Date.current
+    )
+    user = User.create!(
+      email: "billingpaused@example.com",
+      english_name: "Billing Paused",
+      encrypted_password: User.password_hash("Password123!")
+    )
+
+    sign_in_account(user, temple_slug: temple.slug)
+
+    assert_no_difference -> { TempleEventRegistration.count } do
+      post account_registrations_path, params: {
+        offering: gathering.slug,
+        account_action: "gathering",
+        account_registration_intake_form: {
+          contact_name: "Billing Paused",
+          quantity: 1
+        }
+      }
+    end
+
+    assert_redirected_to account_registrations_path
+  end
+
   test "free registration payment page shows confirmation" do
     temple = create_temple
     offering = TempleOffering.create!(
@@ -326,7 +367,7 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
     assert_equal TemplePayment::STATUSES[:completed], registration.temple_payments.order(:created_at).last.reload.status
   end
 
-  test "frozen online payments hide checkout and block checkout start" do
+  test "frozen registration payments hide checkout and block checkout start" do
     temple = create_temple(
       payment_provider_settings: {
         "billing" => {
@@ -350,7 +391,7 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
     get payment_account_registration_path(registration)
 
     assert_response :success
-    assert_includes response.body, "線上付款目前已暫停"
+    assert_includes response.body, "報名付款目前已暫停"
     refute_includes response.body, "前往付款"
 
     assert_no_difference -> { registration.temple_payments.count } do
@@ -359,7 +400,7 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to payment_account_registration_path(registration)
     follow_redirect!
-    assert_includes response.body, "線上付款目前已暫停"
+    assert_includes response.body, "報名付款目前已暫停"
   end
 
   test "repeat-enabled service allows multiple registrations for the same user" do

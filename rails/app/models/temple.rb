@@ -206,6 +206,10 @@ class Temple < ApplicationRecord
     deadline.present? && deadline <= reference_time
   end
 
+  def registration_intake_frozen?(reference_time = Time.current)
+    online_payments_frozen?(reference_time)
+  end
+
   def online_payments_hold_message(reference_time = Time.current)
     return nil if billing_payment_method_on_file?
 

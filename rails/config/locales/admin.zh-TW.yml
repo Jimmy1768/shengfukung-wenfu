@@ -918,6 +918,7 @@ zh-TW:
         duplicate: "此報名對象已存在相同報名。"
         updated: "報名已更新。"
         gathering_read_only: "社群活動的出席紀錄建立後不可再編輯。"
+        registration_intake_frozen: "請先完成帳務設定，才可新增報名。"
       index:
         eyebrow: "現場報到"
         title: "%{offering} 的報名紀錄"
@@ -1075,7 +1076,7 @@ zh-TW:
         checkout_reused: "此報名已存在付款嘗試。"
         checkout_started: "已啟動 %{provider} 付款流程，等待確認。"
         checkout_failed: "無法啟動付款流程：%{error}"
-        online_payments_frozen: "帳務尚未完成設定，線上付款目前已凍結。"
+        online_payments_frozen: "請先完成帳務設定，報名付款目前已暫停。"
       statuses:
         pending: "待付款"
         completed: "已完成"

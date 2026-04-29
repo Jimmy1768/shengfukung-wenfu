@@ -66,7 +66,7 @@ module Admin
     end
 
     def start_checkout
-      if current_temple.online_payments_frozen?
+      if current_temple.registration_intake_frozen?
         return redirect_to offering_order_path(@registration.offering, @registration),
           alert: t("admin.payments.flash.online_payments_frozen")
       end
