@@ -30,12 +30,6 @@ RAILS_ENV=production rails console
 ```bash
 cd ~/Projects/shengfukung-wenfu/rails
 
-set -a
-source /etc/default/shengfukung-wenfu-env
-set +a
-
-RAILS_ENV=production rails console
-
 sudo nano /etc/default/shengfukung-wenfu-env
 
 # Restart services
