@@ -73,6 +73,27 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
     assert_equal "reviewed", draft.reload.status
     assert_equal "Ready to apply.", draft.review_notes
 
+    get edit_admin_offering_setup_draft_path(draft)
+    assert_redirected_to admin_offering_setup_draft_path(draft)
+
+    patch admin_offering_setup_draft_path(draft), params: {
+      temple_offering_setup_draft: {
+        offering_kind: "service",
+        label: "Changed After Review",
+        slug: "changed-after-review",
+        category: "lamp",
+        registration_period_key: "perennial",
+        price_cents: "900",
+        currency: "TWD",
+        field_requirements_text: "registrant_name",
+        options_text: "",
+        operational_notes: "Stale change."
+      }
+    }
+    assert_redirected_to admin_offering_setup_draft_path(draft)
+    assert_equal "Peace Light Deluxe", draft.reload.label
+    assert_equal "reviewed", draft.status
+
     assert_no_difference -> { @temple.temple_services.count } do
       post apply_admin_offering_setup_draft_path(draft)
     end

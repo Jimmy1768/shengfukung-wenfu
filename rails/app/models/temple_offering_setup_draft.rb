@@ -50,7 +50,7 @@ class TempleOfferingSetupDraft < ApplicationRecord
   end
 
   def editable?
-    status.in?(%w[draft reviewed])
+    status == "draft"
   end
 
   def generated_template_yaml

@@ -53,4 +53,24 @@ class TempleOfferingSetupDraftTest < ActiveSupport::TestCase
     assert draft.reviewed_at.present?
     assert draft.applied_at.present?
   end
+
+  test "reviewed drafts are not editable before apply" do
+    temple = create_temple
+    admin = create_admin_user(temple: temple, role: "owner")
+    draft = temple.temple_offering_setup_drafts.create!(
+      offering_kind: "service",
+      slug: "peace-light",
+      label: "Peace Light",
+      price_cents: 100_000,
+      currency: "TWD"
+    )
+
+    assert draft.editable?
+
+    draft.submit!(admin)
+    refute draft.editable?
+
+    draft.review!(admin, notes: "Ready")
+    refute draft.editable?
+  end
 end
