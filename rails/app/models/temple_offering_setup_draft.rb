@@ -41,15 +41,6 @@ class TempleOfferingSetupDraft < ApplicationRecord
     )
   end
 
-  def apply!(admin)
-    update!(
-      status: "applied",
-      applied_by_admin: admin.admin_account,
-      applied_at: Time.current,
-      generated_template: build_generated_template
-    )
-  end
-
   def editable?
     status == "draft"
   end

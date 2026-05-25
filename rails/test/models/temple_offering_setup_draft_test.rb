@@ -29,7 +29,7 @@ class TempleOfferingSetupDraftTest < ActiveSupport::TestCase
     assert_includes draft.generated_template_yaml, "ancestor-light"
   end
 
-  test "status transitions record review and apply admins without creating live offerings" do
+  test "review transition does not mark applied without applier target" do
     temple = create_temple
     admin = create_admin_user(temple: temple, role: "owner")
     draft = temple.temple_offering_setup_drafts.create!(
@@ -43,15 +43,16 @@ class TempleOfferingSetupDraftTest < ActiveSupport::TestCase
     assert_no_difference -> { temple.temple_services.count } do
       draft.submit!(admin)
       draft.review!(admin, notes: "Ready")
-      draft.apply!(admin)
     end
 
-    assert_equal "applied", draft.status
+    assert_equal "reviewed", draft.status
     assert_equal admin.admin_account, draft.reviewed_by_admin
-    assert_equal admin.admin_account, draft.applied_by_admin
+    assert_nil draft.applied_by_admin
+    assert_nil draft.applied_offering
     assert draft.submitted_at.present?
     assert draft.reviewed_at.present?
-    assert draft.applied_at.present?
+    assert_nil draft.applied_at
+    refute_respond_to draft, :apply!
   end
 
   test "reviewed drafts are not editable before apply" do
