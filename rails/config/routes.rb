@@ -58,6 +58,13 @@ Rails.application.routes.draw do
     match "/temple/profile", to: "temples#update", via: %i[patch post]
 
     resources :offerings, only: %i[index new create]
+    resources :offering_setup_drafts, path: "offering-setup" do
+      member do
+        post :submit
+        post :review
+        post :apply
+      end
+    end
     resources :events, controller: "events" do
       resources :offering_orders,
         path: "orders",

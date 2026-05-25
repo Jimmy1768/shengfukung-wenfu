@@ -1,0 +1,14 @@
+<div class="admin-stack">
+  <div class="admin-stack__row">
+    <section class="card stack-item">
+      <header>
+        <h1><%= t("admin.offering_setup_drafts.edit.title") %></h1>
+        <p class="muted"><%= @draft.label %></p>
+      </header>
+    </section>
+  </div>
+
+  <div class="admin-stack__row">
+    <%= render "form" %>
+  </div>
+</div>

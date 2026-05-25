@@ -694,6 +694,7 @@ zh-TW:
         created: "供品已建立。"
       index:
         title: "供品管理"
+        setup_drafts_button: "供品設定"
         new_button: "新增供品"
         new_button_disabled_hint: "待寺方供品設定完成審查後，會再恢復新增供品。"
         freeze_notice: "V1 期間暫停新增供品，待寺方供品設定完成審查後再開放。"
@@ -745,6 +746,75 @@ zh-TW:
         schedule_flexible: "彈性"
         manage_registrations: "管理報名"
         edit_offering: "編輯供品"
+    offering_setup_drafts:
+      kinds:
+        event: "法會項目"
+        service: "祈福服務"
+      statuses:
+        draft: "草稿"
+        submitted: "已送審"
+        reviewed: "已審查"
+        applied: "已套用"
+      flash:
+        created: "已建立供品設定草稿。"
+        updated: "已更新供品設定草稿。"
+        submitted: "已送出供品設定供審查。"
+        reviewed: "已標記為審查完成。"
+        applied: "已標記為套用完成。"
+        locked: "此供品設定草稿目前不能編輯。"
+        submit_blocked: "只有可編輯的設定草稿可以送審。"
+        review_blocked: "只有已送審的設定草稿可以審查。"
+        apply_blocked: "只有已審查的設定草稿可以套用。"
+      index:
+        title: "供品設定"
+        body: "先收集供品結構草稿，審查完成前不會改動正式供品。"
+        new_button: "新增設定草稿"
+        back_to_offerings: "返回供品管理"
+        empty: "尚未建立供品設定草稿。"
+      table:
+        kind: "類型"
+        price: "金額"
+        status: "狀態"
+        updated: "更新時間"
+        view: "檢視"
+      new:
+        title: "新增供品設定"
+        body: "建立可審查的供品結構草稿，確認後再套用。"
+      edit:
+        title: "編輯供品設定"
+      show:
+        subtitle: "狀態：%{status}"
+        summary: "設定摘要"
+        preview: "產生的設定預覽"
+        actions: "審查流程"
+        back: "返回"
+        edit: "編輯"
+      actions:
+        submit: "送出審查"
+        review: "標記已審查"
+        apply: "標記已套用"
+      form:
+        errors: "請修正以下問題"
+        sections:
+          basics: "基本資料"
+          pricing: "價格"
+          structure: "表單結構"
+        fields:
+          offering_kind: "供品類型"
+          label: "顯示名稱"
+          slug: "代碼"
+          category: "供品分類"
+          registration_period_key: "報名檔期"
+          registration_period_blank: "不指定檔期"
+          price: "金額"
+          currency: "幣別"
+          field_requirements: "必填欄位，每行一個"
+          options: "選項，每行一個；需要時使用 名稱 | value"
+          operational_notes: "作業備註"
+          review_notes: "審查備註"
+        actions:
+          save: "儲存草稿"
+          cancel: "取消"
     events:
       flash:
         created: "法會項目已建立。"

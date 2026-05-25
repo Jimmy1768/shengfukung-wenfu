@@ -807,6 +807,7 @@ en:
         created: "Offering created successfully."
       index:
         title: "Temple Offerings"
+        setup_drafts_button: "Offering Setup"
         new_button: "New Offering"
         new_button_disabled_hint: "Offering creation will reopen after the temple offering config is reviewed."
         freeze_notice: "Offering creation is paused for V1 while the temple offering config is being reviewed."
@@ -857,6 +858,75 @@ en:
         schedule_flexible: "Flexible"
         manage_registrations: "Manage registrations"
         edit_offering: "Edit offering"
+    offering_setup_drafts:
+      kinds:
+        event: "Event"
+        service: "Service"
+      statuses:
+        draft: "Draft"
+        submitted: "Submitted"
+        reviewed: "Reviewed"
+        applied: "Applied"
+      flash:
+        created: "Offering setup draft created."
+        updated: "Offering setup draft updated."
+        submitted: "Offering setup submitted for review."
+        reviewed: "Offering setup marked reviewed."
+        applied: "Offering setup marked applied."
+        locked: "This offering setup draft can no longer be edited."
+        submit_blocked: "Only editable setup drafts can be submitted."
+        review_blocked: "Only submitted setup drafts can be reviewed."
+        apply_blocked: "Only reviewed setup drafts can be applied."
+      index:
+        title: "Offering Setup"
+        body: "Collect setup details as drafts before anything changes live offerings."
+        new_button: "New setup draft"
+        back_to_offerings: "Back to offerings"
+        empty: "No setup drafts yet."
+      table:
+        kind: "Kind"
+        price: "Price"
+        status: "Status"
+        updated: "Updated"
+        view: "View"
+      new:
+        title: "New Offering Setup"
+        body: "Create a draft structure for review before applying it."
+      edit:
+        title: "Edit Offering Setup"
+      show:
+        subtitle: "Status: %{status}"
+        summary: "Setup summary"
+        preview: "Generated config preview"
+        actions: "Review workflow"
+        back: "Back"
+        edit: "Edit"
+      actions:
+        submit: "Submit for review"
+        review: "Mark reviewed"
+        apply: "Mark applied"
+      form:
+        errors: "Please fix the following issues"
+        sections:
+          basics: "Basics"
+          pricing: "Pricing"
+          structure: "Form structure"
+        fields:
+          offering_kind: "Offering kind"
+          label: "Label"
+          slug: "Slug"
+          category: "Offering category"
+          registration_period_key: "Registration period"
+          registration_period_blank: "No fixed period"
+          price: "Price"
+          currency: "Currency"
+          field_requirements: "Required fields, one per line"
+          options: "Options, one per line; use Label | value when needed"
+          operational_notes: "Operational notes"
+          review_notes: "Review notes"
+        actions:
+          save: "Save draft"
+          cancel: "Cancel"
     events:
       flash:
         created: "Event created successfully."

@@ -8,6 +8,7 @@
         </div>
         <div class="actions actions--inline">
           <% if current_admin_permissions&.allow?(:manage_offerings) %>
+            <%= link_to t("admin.offerings.index.setup_drafts_button"), admin_offering_setup_drafts_path, class: "btn btn-secondary" %>
             <% if offerings_v1_frozen? %>
               <span class="btn btn-primary is-disabled" title="<%= t("admin.offerings.index.new_button_disabled_hint") %>">
                 <%= t("admin.offerings.index.new_button") %>

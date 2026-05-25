@@ -6,6 +6,8 @@ class Temple < ApplicationRecord
     dependent: :destroy
   has_many :temple_sections,
     through: :temple_pages
+  has_many :temple_offering_setup_drafts,
+    dependent: :destroy
   has_many :media_assets,
     dependent: :destroy
   has_many :admin_temple_memberships,

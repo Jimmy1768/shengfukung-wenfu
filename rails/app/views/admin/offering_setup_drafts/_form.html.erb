@@ -1,0 +1,91 @@
+<% payload = (@draft.setup_payload || {}).with_indifferent_access %>
+<% field_requirements = Array(payload[:field_requirements]).join("\n") %>
+<% options_text = Array(payload[:options]).map { |option| [option["label"], option["value"]].compact.join(" | ") }.join("\n") %>
+
+<% form_url = @draft.persisted? ? admin_offering_setup_draft_path(@draft) : admin_offering_setup_drafts_path %>
+<%= form_with model: @draft, url: form_url, local: true, class: "form-stack" do |form| %>
+  <% if @draft.errors.any? %>
+    <div class="alert alert-danger">
+      <h3><%= t("admin.offering_setup_drafts.form.errors") %></h3>
+      <ul>
+        <% @draft.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <section class="card form-section">
+    <header>
+      <h2><%= t("admin.offering_setup_drafts.form.sections.basics") %></h2>
+    </header>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :offering_kind, t("admin.offering_setup_drafts.form.fields.offering_kind") %>
+        <%= form.select :offering_kind, options_for_select([
+          [t("admin.offering_setup_drafts.kinds.service"), "service"],
+          [t("admin.offering_setup_drafts.kinds.event"), "event"]
+        ], @draft.offering_kind || "service") %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :label, t("admin.offering_setup_drafts.form.fields.label") %>
+        <%= form.text_field :label %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :slug, t("admin.offering_setup_drafts.form.fields.slug") %>
+        <%= form.text_field :slug %>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= label_tag "temple_offering_setup_draft_category", t("admin.offering_setup_drafts.form.fields.category") %>
+        <%= text_field_tag "temple_offering_setup_draft[category]", payload[:category], id: "temple_offering_setup_draft_category" %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :registration_period_key, t("admin.offering_setup_drafts.form.fields.registration_period_key") %>
+        <%= form.select :registration_period_key,
+          options_for_select(current_temple.registration_period_options, @draft.registration_period_key),
+          { include_blank: t("admin.offering_setup_drafts.form.fields.registration_period_blank") } %>
+      </div>
+    </div>
+  </section>
+
+  <section class="card form-section">
+    <header>
+      <h2><%= t("admin.offering_setup_drafts.form.sections.pricing") %></h2>
+    </header>
+    <div class="field-row">
+      <div class="field-panel">
+        <%= form.label :price_cents, t("admin.offering_setup_drafts.form.fields.price") %>
+        <%= form.number_field :price_cents, min: 0, value: Currency::Symbols.admin_input_value(@draft.price_cents, @draft.currency || "TWD") %>
+      </div>
+      <div class="field-panel">
+        <%= form.label :currency, t("admin.offering_setup_drafts.form.fields.currency") %>
+        <%= form.select :currency, options_for_select(Currency::Symbols.options, @draft.currency || "TWD") %>
+      </div>
+    </div>
+  </section>
+
+  <section class="card form-section">
+    <header>
+      <h2><%= t("admin.offering_setup_drafts.form.sections.structure") %></h2>
+    </header>
+    <div class="field-panel">
+      <%= label_tag "temple_offering_setup_draft_field_requirements_text", t("admin.offering_setup_drafts.form.fields.field_requirements") %>
+      <%= text_area_tag "temple_offering_setup_draft[field_requirements_text]", field_requirements, id: "temple_offering_setup_draft_field_requirements_text", rows: 5 %>
+    </div>
+    <div class="field-panel">
+      <%= label_tag "temple_offering_setup_draft_options_text", t("admin.offering_setup_drafts.form.fields.options") %>
+      <%= text_area_tag "temple_offering_setup_draft[options_text]", options_text, id: "temple_offering_setup_draft_options_text", rows: 5 %>
+    </div>
+    <div class="field-panel">
+      <%= label_tag "temple_offering_setup_draft_operational_notes", t("admin.offering_setup_drafts.form.fields.operational_notes") %>
+      <%= text_area_tag "temple_offering_setup_draft[operational_notes]", payload[:operational_notes], id: "temple_offering_setup_draft_operational_notes", rows: 4 %>
+    </div>
+  </section>
+
+  <div class="form-actions">
+    <%= form.submit t("admin.offering_setup_drafts.form.actions.save"), class: "btn btn-primary" %>
+    <%= link_to t("admin.offering_setup_drafts.form.actions.cancel"), admin_offering_setup_drafts_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

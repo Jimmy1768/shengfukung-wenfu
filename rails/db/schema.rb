@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_16_000018) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_25_000019) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -690,6 +690,34 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_16_000018) do
     t.index ["temple_id"], name: "index_temple_news_posts_on_temple_id"
   end
 
+  create_table "temple_offering_setup_drafts", force: :cascade do |t|
+    t.bigint "temple_id", null: false
+    t.bigint "created_by_admin_id"
+    t.bigint "reviewed_by_admin_id"
+    t.bigint "applied_by_admin_id"
+    t.string "status", default: "draft", null: false
+    t.string "offering_kind", null: false
+    t.string "slug", null: false
+    t.string "label", null: false
+    t.string "registration_period_key"
+    t.integer "price_cents", default: 0, null: false
+    t.string "currency", default: "TWD", null: false
+    t.jsonb "setup_payload", default: {}, null: false
+    t.jsonb "generated_template", default: {}, null: false
+    t.text "review_notes"
+    t.datetime "submitted_at"
+    t.datetime "reviewed_at"
+    t.datetime "applied_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["applied_by_admin_id"], name: "index_temple_offering_setup_drafts_on_applied_by_admin_id"
+    t.index ["created_by_admin_id"], name: "index_temple_offering_setup_drafts_on_created_by_admin_id"
+    t.index ["reviewed_by_admin_id"], name: "index_temple_offering_setup_drafts_on_reviewed_by_admin_id"
+    t.index ["temple_id", "slug"], name: "idx_offering_setup_drafts_on_temple_slug"
+    t.index ["temple_id", "status"], name: "idx_offering_setup_drafts_on_temple_status"
+    t.index ["temple_id"], name: "index_temple_offering_setup_drafts_on_temple_id"
+  end
+
   create_table "temple_pages", force: :cascade do |t|
     t.bigint "temple_id", null: false
     t.string "kind", null: false
@@ -937,6 +965,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_16_000018) do
   add_foreign_key "temple_gallery_entries", "temples"
   add_foreign_key "temple_gatherings", "temples"
   add_foreign_key "temple_news_posts", "temples"
+  add_foreign_key "temple_offering_setup_drafts", "admins", column: "applied_by_admin_id"
+  add_foreign_key "temple_offering_setup_drafts", "admins", column: "created_by_admin_id"
+  add_foreign_key "temple_offering_setup_drafts", "admins", column: "reviewed_by_admin_id"
+  add_foreign_key "temple_offering_setup_drafts", "temples"
   add_foreign_key "temple_pages", "temples"
   add_foreign_key "temple_payments", "admins", column: "admin_account_id"
   add_foreign_key "temple_payments", "temple_registrations"
