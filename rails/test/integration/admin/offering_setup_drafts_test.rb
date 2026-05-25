@@ -29,8 +29,8 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
           registration_period_key: "perennial",
           price_cents: "600",
           currency: "TWD",
-          field_requirements_text: "registrant_name\nblessing_name",
-          options_text: "One year | year",
+          field_requirements_text: "fulfillment_method\nlogistics_notes",
+          options_text: "fulfillment_method | One year | year",
           operational_notes: "Confirm name plate."
         }
       }
@@ -40,7 +40,7 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_offering_setup_draft_path(draft)
     assert_equal "draft", draft.status
     assert_equal 60_000, draft.price_cents
-    assert_equal %w[registrant_name blessing_name], draft.setup_payload["field_requirements"]
+    assert_equal %w[fulfillment_method logistics_notes], draft.setup_payload["field_requirements"]
     assert_equal "year", draft.setup_payload.dig("options", 0, "value")
 
     patch admin_offering_setup_draft_path(draft), params: {
@@ -52,7 +52,7 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
         registration_period_key: "perennial",
         price_cents: "800",
         currency: "TWD",
-        field_requirements_text: "registrant_name",
+        field_requirements_text: "fulfillment_method",
         options_text: "",
         operational_notes: "Updated notes."
       }
@@ -94,10 +94,12 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
     assert_equal "Peace Light Deluxe", draft.reload.label
     assert_equal "reviewed", draft.status
 
-    assert_no_difference -> { @temple.temple_services.count } do
+    assert_difference -> { @temple.temple_services.count }, 1 do
       post apply_admin_offering_setup_draft_path(draft)
     end
     assert_equal "applied", draft.reload.status
+    assert_equal "TempleService", draft.applied_offering_type
+    assert_equal "draft", draft.applied_offering.status
   end
 
   test "admin without manage offerings cannot access setup drafts" do
@@ -107,5 +109,27 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
     get admin_offering_setup_drafts_path
 
     assert_redirected_to admin_dashboard_path
+  end
+
+  test "apply shows validation errors without creating offering" do
+    draft = @temple.temple_offering_setup_drafts.create!(
+      offering_kind: "service",
+      slug: "unsupported",
+      label: "Unsupported",
+      price_cents: 60_000,
+      currency: "TWD",
+      setup_payload: { "field_requirements" => %w[unsupported_field] }
+    )
+    draft.submit!(@admin)
+    draft.review!(@admin, notes: "Ready")
+    sign_in_admin(@admin)
+
+    assert_no_difference -> { @temple.temple_services.count } do
+      post apply_admin_offering_setup_draft_path(draft)
+    end
+
+    assert_response :unprocessable_content
+    assert_includes response.body, "unsupported_field"
+    assert_equal "reviewed", draft.reload.status
   end
 end

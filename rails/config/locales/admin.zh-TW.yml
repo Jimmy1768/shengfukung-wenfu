@@ -775,6 +775,7 @@ zh-TW:
         kind: "類型"
         price: "金額"
         status: "狀態"
+        applied_target: "已建立草稿供品"
         updated: "更新時間"
         view: "檢視"
       new:
@@ -784,9 +785,11 @@ zh-TW:
         title: "編輯供品設定"
       show:
         subtitle: "狀態：%{status}"
+        apply_hint: "套用只會建立或更新草稿供品，不會發布，也不會寫入 YAML。"
         summary: "設定摘要"
         preview: "產生的設定預覽"
         actions: "審查流程"
+        apply_errors: "無法套用"
         back: "返回"
         edit: "編輯"
       actions:
@@ -809,12 +812,21 @@ zh-TW:
           price: "金額"
           currency: "幣別"
           field_requirements: "必填欄位，每行一個"
-          options: "選項，每行一個；需要時使用 名稱 | value"
+          options: "選項，每行一個；使用 欄位 | 名稱 | value"
           operational_notes: "作業備註"
           review_notes: "審查備註"
         actions:
           save: "儲存草稿"
           cancel: "取消"
+      apply_errors:
+        not_reviewed: "只有已審查的設定草稿可以套用。"
+        events_blocked: "法會項目尚不能套用，因為建立法會前必須先收集開始與結束日期。"
+        unsupported_fields: "不支援的設定欄位：%{fields}。"
+        unsupported_option_field: "選項不能套用到不支援或非選項欄位：%{field}。"
+        slug_collision: "已有代碼為 %{slug} 的祈福服務，且未連結到此設定草稿。"
+      generated:
+        basics_title: "供品基本資料"
+        setup_title: "設定欄位"
     events:
       flash:
         created: "法會項目已建立。"

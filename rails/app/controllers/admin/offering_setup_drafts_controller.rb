@@ -72,13 +72,16 @@ module Admin
     end
 
     def apply
-      unless @draft.status == "reviewed"
-        redirect_to admin_offering_setup_draft_path(@draft), alert: t("admin.offering_setup_drafts.flash.apply_blocked")
+      result = Offerings::SetupDraftApplier.call(draft: @draft, admin: current_admin)
+      unless result.success?
+        @apply_errors = result.errors
+        flash.now[:alert] = result.errors.join(" ")
+        render :show, status: :unprocessable_content
         return
       end
 
-      @draft.apply!(current_admin)
-      log_draft_event("admin.offering_setup_drafts.apply")
+      @draft = @draft.reload
+      log_draft_event("admin.offering_setup_drafts.apply", applied_target: result.target)
       redirect_to admin_offering_setup_draft_path(@draft), notice: t("admin.offering_setup_drafts.flash.applied")
     end
 
@@ -128,15 +131,16 @@ module Admin
 
     def option_lines_from(value)
       lines_from(value).map do |line|
-        label, option_value = line.split("|", 2).map(&:strip)
+        field, label, option_value = line.split("|", 3).map(&:strip)
         {
+          "field" => field,
           "label" => label,
           "value" => option_value.presence || label.parameterize
         }
       end
     end
 
-    def log_draft_event(action)
+    def log_draft_event(action, applied_target: nil)
       SystemAuditLogger.log!(
         action: action,
         admin: current_admin,
@@ -146,8 +150,10 @@ module Admin
           draft_id: @draft.id,
           status: @draft.status,
           slug: @draft.slug,
-          offering_kind: @draft.offering_kind
-        }
+          offering_kind: @draft.offering_kind,
+          applied_offering_type: applied_target&.class&.name || @draft.applied_offering_type,
+          applied_offering_id: applied_target&.id || @draft.applied_offering_id
+        }.compact
       )
     end
   end

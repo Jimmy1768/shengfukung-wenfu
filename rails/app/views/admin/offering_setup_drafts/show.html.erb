@@ -5,6 +5,7 @@
         <div>
           <h1><%= @draft.label %></h1>
           <p class="muted"><%= t("admin.offering_setup_drafts.show.subtitle", status: t("admin.offering_setup_drafts.statuses.#{@draft.status}")) %></p>
+          <p class="muted"><%= t("admin.offering_setup_drafts.show.apply_hint") %></p>
         </div>
         <div class="actions actions--inline">
           <%= link_to t("admin.offering_setup_drafts.show.back"), admin_offering_setup_drafts_path, class: "btn btn-secondary" %>
@@ -38,9 +39,41 @@
           <dt class="admin-list__meta-label"><%= t("admin.offering_setup_drafts.table.status") %></dt>
           <dd class="admin-list__meta-value"><%= t("admin.offering_setup_drafts.statuses.#{@draft.status}") %></dd>
         </div>
+        <div class="admin-list__meta-item">
+          <dt class="admin-list__meta-label"><%= t("admin.offering_setup_drafts.table.applied_target") %></dt>
+          <dd class="admin-list__meta-value">
+            <% if @draft.applied_offering.present? %>
+              <% applied_path =
+                case @draft.applied_offering
+                when TempleService
+                  admin_service_path(@draft.applied_offering)
+                when TempleEvent
+                  admin_event_path(@draft.applied_offering)
+                end %>
+              <%= link_to @draft.applied_offering.title, applied_path, class: "link" %>
+            <% else %>
+              —
+            <% end %>
+          </dd>
+        </div>
       </dl>
     </section>
   </div>
+
+  <% if @apply_errors.present? %>
+    <div class="admin-stack__row">
+      <section class="card stack-item">
+        <header>
+          <h2><%= t("admin.offering_setup_drafts.show.apply_errors") %></h2>
+        </header>
+        <ul>
+          <% @apply_errors.each do |error| %>
+            <li><%= error %></li>
+          <% end %>
+        </ul>
+      </section>
+    </div>
+  <% end %>
 
   <div class="admin-stack__row">
     <section class="card stack-item stack-item--wide">

@@ -887,6 +887,7 @@ en:
         kind: "Kind"
         price: "Price"
         status: "Status"
+        applied_target: "Applied draft offering"
         updated: "Updated"
         view: "View"
       new:
@@ -896,9 +897,11 @@ en:
         title: "Edit Offering Setup"
       show:
         subtitle: "Status: %{status}"
+        apply_hint: "Apply creates or updates a draft DB offering only; it does not publish or write YAML."
         summary: "Setup summary"
         preview: "Generated config preview"
         actions: "Review workflow"
+        apply_errors: "Apply blocked"
         back: "Back"
         edit: "Edit"
       actions:
@@ -921,12 +924,21 @@ en:
           price: "Price"
           currency: "Currency"
           field_requirements: "Required fields, one per line"
-          options: "Options, one per line; use Label | value when needed"
+          options: "Options, one per line; use field | Label | value"
           operational_notes: "Operational notes"
           review_notes: "Review notes"
         actions:
           save: "Save draft"
           cancel: "Cancel"
+      apply_errors:
+        not_reviewed: "Only reviewed setup drafts can be applied."
+        events_blocked: "Event setup apply is not available yet because event dates must be captured before creating an event."
+        unsupported_fields: "Unsupported setup fields: %{fields}."
+        unsupported_option_field: "Options cannot be attached to unsupported or non-option field: %{field}."
+        slug_collision: "A service with slug %{slug} already exists and is not linked to this setup draft."
+      generated:
+        basics_title: "Offering basics"
+        setup_title: "Setup fields"
     events:
       flash:
         created: "Event created successfully."

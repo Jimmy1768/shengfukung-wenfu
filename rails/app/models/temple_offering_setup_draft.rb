@@ -10,6 +10,7 @@ class TempleOfferingSetupDraft < ApplicationRecord
   belongs_to :created_by_admin, class_name: "AdminAccount", optional: true
   belongs_to :reviewed_by_admin, class_name: "AdminAccount", optional: true
   belongs_to :applied_by_admin, class_name: "AdminAccount", optional: true
+  belongs_to :applied_offering, polymorphic: true, optional: true
 
   validates :status, inclusion: { in: STATUSES }
   validates :offering_kind, inclusion: { in: OFFERING_KINDS }
@@ -75,7 +76,7 @@ class TempleOfferingSetupDraft < ApplicationRecord
         operational_notes: payload[:operational_notes].presence
       }.compact,
       form_fields: Array(payload[:field_requirements]).compact_blank,
-      options: Array(payload[:options]).compact_blank,
+      options: normalized_options,
       ui: {
         generated_from: "admin_offering_setup_draft",
         draft_id: id
@@ -91,5 +92,13 @@ class TempleOfferingSetupDraft < ApplicationRecord
 
   def refresh_generated_template
     self.generated_template = build_generated_template
+  end
+
+  def normalized_options
+    Array(setup_payload.with_indifferent_access[:options]).filter_map do |option|
+      next unless option.is_a?(Hash)
+
+      option.with_indifferent_access.slice(:field, :label, :value).compact_blank
+    end
   end
 end

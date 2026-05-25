@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_25_000019) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_25_000020) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -710,6 +710,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_25_000019) do
     t.datetime "applied_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "applied_offering_type"
+    t.bigint "applied_offering_id"
+    t.index ["applied_offering_type", "applied_offering_id"], name: "idx_offering_setup_drafts_on_applied_target"
     t.index ["applied_by_admin_id"], name: "index_temple_offering_setup_drafts_on_applied_by_admin_id"
     t.index ["created_by_admin_id"], name: "index_temple_offering_setup_drafts_on_created_by_admin_id"
     t.index ["reviewed_by_admin_id"], name: "index_temple_offering_setup_drafts_on_reviewed_by_admin_id"
