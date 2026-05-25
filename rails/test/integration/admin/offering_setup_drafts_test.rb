@@ -130,6 +130,102 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Temple handles"
   end
 
+  test "edit preserves option lists longer than three rows" do
+    draft = @temple.temple_offering_setup_drafts.create!(
+      offering_kind: "service",
+      slug: "many-options",
+      label: "Many Options",
+      price_cents: 60_000,
+      currency: "TWD",
+      setup_payload: {
+        "field_requirements" => %w[lamp_type],
+        "options" => [
+          { "field" => "lamp_type", "label" => "光明燈", "value" => "bright" },
+          { "field" => "lamp_type", "label" => "文昌燈", "value" => "study" },
+          { "field" => "lamp_type", "label" => "財神燈", "value" => "wealth" },
+          { "field" => "lamp_type", "label" => "太歲燈", "value" => "taisui" }
+        ]
+      }
+    )
+    sign_in_admin(@admin)
+
+    get edit_admin_offering_setup_draft_path(draft)
+    assert_response :success
+    assert_includes response.body, "太歲燈"
+
+    patch admin_offering_setup_draft_path(draft), params: {
+      temple_offering_setup_draft: {
+        offering_kind: "service",
+        label: "Many Options",
+        slug: "many-options",
+        category: "lamp",
+        price_cents: "600",
+        currency: "TWD",
+        field_requirements: %w[lamp_type],
+        options: {
+          "0" => { field: "lamp_type", label: "光明燈", value: "bright" },
+          "1" => { field: "lamp_type", label: "文昌燈", value: "study" },
+          "2" => { field: "lamp_type", label: "財神燈", value: "wealth" },
+          "3" => { field: "lamp_type", label: "太歲燈", value: "taisui" }
+        },
+        options_text: "malformed",
+        operational_notes: ""
+      }
+    }
+
+    assert_redirected_to admin_offering_setup_draft_path(draft)
+    assert_equal 4, draft.reload.setup_payload["options"].size
+    assert_equal "taisui", draft.setup_payload.dig("options", 3, "value")
+  end
+
+  test "edit preserves unsupported legacy option targets as visible blockers" do
+    draft = @temple.temple_offering_setup_drafts.create!(
+      offering_kind: "service",
+      slug: "legacy-option",
+      label: "Legacy Option",
+      price_cents: 60_000,
+      currency: "TWD",
+      setup_payload: {
+        "field_requirements" => %w[logistics_notes],
+        "options" => [
+          { "field" => "legacy_option_field", "label" => "Legacy", "value" => "legacy" }
+        ]
+      }
+    )
+    sign_in_admin(@admin)
+
+    get edit_admin_offering_setup_draft_path(draft)
+    assert_response :success
+    assert_includes response.body, "legacy_option_field"
+    assert_includes response.body, "Legacy"
+
+    patch admin_offering_setup_draft_path(draft), params: {
+      temple_offering_setup_draft: {
+        offering_kind: "service",
+        label: "Legacy Option",
+        slug: "legacy-option",
+        category: "service",
+        price_cents: "600",
+        currency: "TWD",
+        field_requirements: %w[logistics_notes],
+        options: {
+          "0" => { field: "legacy_option_field", label: "Legacy", value: "legacy" }
+        },
+        operational_notes: ""
+      }
+    }
+
+    assert_redirected_to admin_offering_setup_draft_path(draft)
+    assert_equal "legacy_option_field", draft.reload.setup_payload.dig("options", 0, "field")
+
+    draft.submit!(@admin)
+    draft.review!(@admin, notes: "Ready")
+    post apply_admin_offering_setup_draft_path(draft)
+    assert_response :unprocessable_content
+    assert_includes response.body, "legacy_option_field"
+    assert_equal "reviewed", draft.reload.status
+  end
+
   test "admin without manage offerings cannot access setup drafts" do
     restricted = create_admin_user(temple: @temple, role: "admin")
     sign_in_admin(restricted)

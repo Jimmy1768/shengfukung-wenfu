@@ -928,6 +928,7 @@ en:
           options: "Options, one per line; use field | Label | value"
           option_field: "Option field"
           option_blank: "No option"
+          unsupported_option_field_choice: "Unsupported saved field: %{field}"
           option_label: "Option label"
           option_value: "Internal value"
           operational_notes: "Operational notes"

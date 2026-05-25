@@ -816,6 +816,7 @@ zh-TW:
           options: "選項，每行一個；使用 欄位 | 名稱 | value"
           option_field: "選項欄位"
           option_blank: "不設定選項"
+          unsupported_option_field_choice: "已儲存但尚未支援的欄位：%{field}"
           option_label: "選項名稱"
           option_value: "內部值"
           operational_notes: "作業備註"

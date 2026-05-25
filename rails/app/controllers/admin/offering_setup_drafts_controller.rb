@@ -165,8 +165,10 @@ module Admin
     end
 
     def option_lines_from(value)
-      lines_from(value).map do |line|
+      lines_from(value).filter_map do |line|
         field, label, option_value = line.split("|", 3).map(&:strip)
+        next if field.blank? || label.blank?
+
         {
           "field" => field,
           "label" => label,

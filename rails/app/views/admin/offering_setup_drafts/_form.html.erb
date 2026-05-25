@@ -3,6 +3,12 @@
 <% catalog_keys = Offerings::SetupFieldCatalog.supported_keys %>
 <% unsupported_fields = selected_fields - catalog_keys %>
 <% option_entries = Array(payload[:options]).map { |option| option.respond_to?(:with_indifferent_access) ? option.with_indifferent_access : {} } %>
+<% unsupported_option_fields = option_entries.map { |option| option[:field].to_s }.reject(&:blank?) - Offerings::SetupFieldCatalog.option_bearing_keys %>
+<% option_field_choices =
+  [[t("admin.offering_setup_drafts.form.fields.option_blank"), ""]] +
+  Offerings::SetupFieldCatalog.option_bearing_keys.map { |key| [Offerings::SetupFieldCatalog.find(key).label, key] } +
+  unsupported_option_fields.map { |key| [t("admin.offering_setup_drafts.form.fields.unsupported_option_field_choice", field: key), key] } %>
+<% option_row_count = [option_entries.size + 3, 3].max %>
 
 <% form_url = @draft.persisted? ? admin_offering_setup_draft_path(@draft) : admin_offering_setup_drafts_path %>
 <%= form_with model: @draft, url: form_url, local: true, class: "form-stack" do |form| %>
@@ -97,12 +103,12 @@
       </div>
     <% end %>
     <div class="field-row">
-      <% 3.times do |index| %>
+      <% option_row_count.times do |index| %>
         <% option = option_entries[index] || {} %>
         <div class="field-panel">
           <%= label_tag "temple_offering_setup_draft_options_#{index}_field", t("admin.offering_setup_drafts.form.fields.option_field") %>
           <%= select_tag "temple_offering_setup_draft[options][#{index}][field]",
-            options_for_select([[t("admin.offering_setup_drafts.form.fields.option_blank"), ""]] + Offerings::SetupFieldCatalog.option_bearing_keys.map { |key| [Offerings::SetupFieldCatalog.find(key).label, key] }, option[:field]),
+            options_for_select(option_field_choices, option[:field]),
             id: "temple_offering_setup_draft_options_#{index}_field" %>
           <%= label_tag "temple_offering_setup_draft_options_#{index}_label", t("admin.offering_setup_drafts.form.fields.option_label") %>
           <%= text_field_tag "temple_offering_setup_draft[options][#{index}][label]", option[:label], id: "temple_offering_setup_draft_options_#{index}_label" %>
