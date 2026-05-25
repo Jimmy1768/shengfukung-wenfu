@@ -29,8 +29,14 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
           registration_period_key: "perennial",
           price_cents: "600",
           currency: "TWD",
-          field_requirements_text: "fulfillment_method\nlogistics_notes",
-          options_text: "fulfillment_method | One year | year",
+          field_requirements: %w[fulfillment_method logistics_notes],
+          options: {
+            "0" => {
+              field: "fulfillment_method",
+              label: "One year",
+              value: "year"
+            }
+          },
           operational_notes: "Confirm name plate."
         }
       }
@@ -100,6 +106,28 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
     assert_equal "applied", draft.reload.status
     assert_equal "TempleService", draft.applied_offering_type
     assert_equal "draft", draft.applied_offering.status
+  end
+
+  test "edit form displays supported catalog fields and unsupported legacy fields" do
+    draft = @temple.temple_offering_setup_drafts.create!(
+      offering_kind: "service",
+      slug: "legacy",
+      label: "Legacy",
+      price_cents: 60_000,
+      currency: "TWD",
+      setup_payload: {
+        "field_requirements" => %w[fulfillment_method unsupported_legacy_field],
+        "options" => [{ "field" => "fulfillment_method", "label" => "Temple handles", "value" => "temple" }]
+      }
+    )
+    sign_in_admin(@admin)
+
+    get edit_admin_offering_setup_draft_path(draft)
+
+    assert_response :success
+    assert_includes response.body, "fulfillment_method"
+    assert_includes response.body, "unsupported_legacy_field"
+    assert_includes response.body, "Temple handles"
   end
 
   test "admin without manage offerings cannot access setup drafts" do

@@ -924,7 +924,12 @@ en:
           price: "Price"
           currency: "Currency"
           field_requirements: "Required fields, one per line"
+          unsupported_field_requirements: "Unsupported saved fields"
           options: "Options, one per line; use field | Label | value"
+          option_field: "Option field"
+          option_blank: "No option"
+          option_label: "Option label"
+          option_value: "Internal value"
           operational_notes: "Operational notes"
           review_notes: "Review notes"
         actions:
@@ -939,6 +944,14 @@ en:
       generated:
         basics_title: "Offering basics"
         setup_title: "Setup fields"
+      catalog:
+        groups:
+          basic: "Basic details"
+          operations: "Operations"
+          lamp: "Lamp services"
+          ritual: "Ritual details"
+          certificate: "Certificates"
+          table: "Table offerings"
     events:
       flash:
         created: "Event created successfully."

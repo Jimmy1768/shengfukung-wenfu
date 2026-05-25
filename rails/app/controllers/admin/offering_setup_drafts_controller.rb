@@ -102,7 +102,13 @@ module Admin
         :category,
         :field_requirements_text,
         :options_text,
-        :operational_notes
+        :operational_notes,
+        field_requirements: [],
+        options: [
+          :field,
+          :label,
+          :value
+        ]
       )
       currency = permitted[:currency].presence || "TWD"
       {
@@ -119,10 +125,39 @@ module Admin
     def setup_payload_from(permitted)
       {
         category: permitted[:category].presence,
-        field_requirements: lines_from(permitted[:field_requirements_text]),
-        options: option_lines_from(permitted[:options_text]),
+        field_requirements: selected_field_requirements(permitted),
+        options: selected_options(permitted),
         operational_notes: permitted[:operational_notes].presence
       }.compact
+    end
+
+    def selected_field_requirements(permitted)
+      selected = Array(permitted[:field_requirements]).map(&:presence).compact
+      legacy = lines_from(permitted[:field_requirements_text])
+      (selected + legacy).uniq
+    end
+
+    def selected_options(permitted)
+      raw_options =
+        case permitted[:options]
+        when ActionController::Parameters, Hash
+          permitted[:options].values
+        else
+          Array(permitted[:options])
+        end
+      structured = raw_options.filter_map do |entry|
+        next unless entry.respond_to?(:to_h)
+
+        option = entry.to_h.with_indifferent_access
+        next if option[:field].blank? || option[:label].blank?
+
+        {
+          "field" => option[:field],
+          "label" => option[:label],
+          "value" => option[:value].presence || option[:label].to_s.parameterize
+        }
+      end
+      (structured + option_lines_from(permitted[:options_text])).uniq
     end
 
     def lines_from(value)

@@ -1,6 +1,8 @@
 <% payload = (@draft.setup_payload || {}).with_indifferent_access %>
-<% field_requirements = Array(payload[:field_requirements]).join("\n") %>
-<% options_text = Array(payload[:options]).map { |option| [option["label"], option["value"]].compact.join(" | ") }.join("\n") %>
+<% selected_fields = Array(payload[:field_requirements]).map(&:to_s) %>
+<% catalog_keys = Offerings::SetupFieldCatalog.supported_keys %>
+<% unsupported_fields = selected_fields - catalog_keys %>
+<% option_entries = Array(payload[:options]).map { |option| option.respond_to?(:with_indifferent_access) ? option.with_indifferent_access : {} } %>
 
 <% form_url = @draft.persisted? ? admin_offering_setup_draft_path(@draft) : admin_offering_setup_drafts_path %>
 <%= form_with model: @draft, url: form_url, local: true, class: "form-stack" do |form| %>
@@ -70,13 +72,44 @@
     <header>
       <h2><%= t("admin.offering_setup_drafts.form.sections.structure") %></h2>
     </header>
-    <div class="field-panel">
-      <%= label_tag "temple_offering_setup_draft_field_requirements_text", t("admin.offering_setup_drafts.form.fields.field_requirements") %>
-      <%= text_area_tag "temple_offering_setup_draft[field_requirements_text]", field_requirements, id: "temple_offering_setup_draft_field_requirements_text", rows: 5 %>
+    <div class="admin-list">
+      <% Offerings::SetupFieldCatalog.grouped_fields.each do |group, fields| %>
+        <article class="admin-list__row">
+          <div>
+            <strong><%= t("admin.offering_setup_drafts.catalog.groups.#{group}", default: group.to_s.humanize) %></strong>
+            <div class="field-row">
+              <% fields.each do |field| %>
+                <label class="field-panel">
+                  <%= check_box_tag "temple_offering_setup_draft[field_requirements][]", field.key, selected_fields.include?(field.key), id: "temple_offering_setup_draft_field_#{field.key}" %>
+                  <strong><%= field.label %></strong>
+                  <span class="muted"><%= field.hint %></span>
+                </label>
+              <% end %>
+            </div>
+          </div>
+        </article>
+      <% end %>
     </div>
-    <div class="field-panel">
-      <%= label_tag "temple_offering_setup_draft_options_text", t("admin.offering_setup_drafts.form.fields.options") %>
-      <%= text_area_tag "temple_offering_setup_draft[options_text]", options_text, id: "temple_offering_setup_draft_options_text", rows: 5 %>
+    <% if unsupported_fields.any? %>
+      <div class="field-panel">
+        <%= label_tag "temple_offering_setup_draft_field_requirements_text", t("admin.offering_setup_drafts.form.fields.unsupported_field_requirements") %>
+        <%= text_area_tag "temple_offering_setup_draft[field_requirements_text]", unsupported_fields.join("\n"), id: "temple_offering_setup_draft_field_requirements_text", rows: 3 %>
+      </div>
+    <% end %>
+    <div class="field-row">
+      <% 3.times do |index| %>
+        <% option = option_entries[index] || {} %>
+        <div class="field-panel">
+          <%= label_tag "temple_offering_setup_draft_options_#{index}_field", t("admin.offering_setup_drafts.form.fields.option_field") %>
+          <%= select_tag "temple_offering_setup_draft[options][#{index}][field]",
+            options_for_select([[t("admin.offering_setup_drafts.form.fields.option_blank"), ""]] + Offerings::SetupFieldCatalog.option_bearing_keys.map { |key| [Offerings::SetupFieldCatalog.find(key).label, key] }, option[:field]),
+            id: "temple_offering_setup_draft_options_#{index}_field" %>
+          <%= label_tag "temple_offering_setup_draft_options_#{index}_label", t("admin.offering_setup_drafts.form.fields.option_label") %>
+          <%= text_field_tag "temple_offering_setup_draft[options][#{index}][label]", option[:label], id: "temple_offering_setup_draft_options_#{index}_label" %>
+          <%= label_tag "temple_offering_setup_draft_options_#{index}_value", t("admin.offering_setup_drafts.form.fields.option_value") %>
+          <%= text_field_tag "temple_offering_setup_draft[options][#{index}][value]", option[:value], id: "temple_offering_setup_draft_options_#{index}_value" %>
+        </div>
+      <% end %>
     </div>
     <div class="field-panel">
       <%= label_tag "temple_offering_setup_draft_operational_notes", t("admin.offering_setup_drafts.form.fields.operational_notes") %>

@@ -812,7 +812,12 @@ zh-TW:
           price: "金額"
           currency: "幣別"
           field_requirements: "必填欄位，每行一個"
+          unsupported_field_requirements: "已儲存但尚未支援的欄位"
           options: "選項，每行一個；使用 欄位 | 名稱 | value"
+          option_field: "選項欄位"
+          option_blank: "不設定選項"
+          option_label: "選項名稱"
+          option_value: "內部值"
           operational_notes: "作業備註"
           review_notes: "審查備註"
         actions:
@@ -827,6 +832,14 @@ zh-TW:
       generated:
         basics_title: "供品基本資料"
         setup_title: "設定欄位"
+      catalog:
+        groups:
+          basic: "基本資料"
+          operations: "作業方式"
+          lamp: "點燈服務"
+          ritual: "法會資料"
+          certificate: "證書"
+          table: "供桌"
     events:
       flash:
         created: "法會項目已建立。"

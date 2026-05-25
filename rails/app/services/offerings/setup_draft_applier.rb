@@ -4,18 +4,6 @@ module Offerings
   class SetupDraftApplier
     Result = Struct.new(:success?, :target, :errors, keyword_init: true)
 
-    SUPPORTED_ADMIN_FIELDS = %w[
-      offering_type period price_cents currency description starts_on ends_on available_slots quota
-      lamp_type lamp_location lamp_code_prefix blessing_purpose blessing_names fulfillment_method
-      logistics_notes blessing_target_type blessing_names_list ritual_date ritual_description
-      certificate_prefix certificate_hint certificate_enabled ancestor_name ancestor_generation
-      sponsor_name sponsor_relation table_size table_items
-    ].freeze
-
-    OPTION_BEARING_FIELDS = %w[
-      period currency lamp_type fulfillment_method blessing_target_type ancestor_generation table_size
-    ].freeze
-
     def self.call(...)
       new(...).call
     end
@@ -67,7 +55,7 @@ module Offerings
     end
 
     def validate_admin_fields
-      unsupported = admin_fields - SUPPORTED_ADMIN_FIELDS
+      unsupported = admin_fields.reject { |field| SetupFieldCatalog.supported?(field) }
       return if unsupported.empty?
 
       errors << I18n.t("admin.offering_setup_drafts.apply_errors.unsupported_fields", fields: unsupported.join(", "))
@@ -75,7 +63,7 @@ module Offerings
 
     def validate_options
       option_map.each_key do |field|
-        next if OPTION_BEARING_FIELDS.include?(field)
+        next if SetupFieldCatalog.option_bearing?(field)
 
         errors << I18n.t("admin.offering_setup_drafts.apply_errors.unsupported_option_field", field: field)
       end
@@ -134,7 +122,7 @@ module Offerings
     end
 
     def form_fields
-      fields = admin_fields
+      fields = admin_fields - %w[offering_type price_cents currency description]
       {
         "basics" => {
           "title" => I18n.t("admin.offering_setup_drafts.generated.basics_title"),
