@@ -8,11 +8,31 @@
   "themeLabel": "テーマ",
   "themeHelp": "Light または Dark テーマを選んでからショーケースを開きましょう。",
   "heroPills": [
-    { "id": "launch-ready", "icon": "🚀", "label": "すぐ公開できるサイト" },
-    { "id": "customer-staff", "icon": "🗂️", "label": "顧客・スタッフポータル" },
-    { "id": "mobile-apps", "icon": "📱", "label": "ブランドモバイルアプリ" },
-    { "id": "ops-automations", "icon": "📊", "label": "業務オートメーションと可視化" },
-    { "id": "managed-hosting", "icon": "🛡️", "label": "マネージドホスティング/サポート" }
+    {
+      "id": "launch-ready",
+      "icon": "🚀",
+      "label": "すぐ公開できるサイト"
+    },
+    {
+      "id": "customer-staff",
+      "icon": "🗂️",
+      "label": "顧客・スタッフポータル"
+    },
+    {
+      "id": "mobile-apps",
+      "icon": "📱",
+      "label": "ブランドモバイルアプリ"
+    },
+    {
+      "id": "ops-automations",
+      "icon": "📊",
+      "label": "業務オートメーションと可視化"
+    },
+    {
+      "id": "managed-hosting",
+      "icon": "🛡️",
+      "label": "マネージドホスティング/サポート"
+    }
   ],
   "offerEyebrow": "提供内容",
   "offerTitle": "構築・ローンチ・運用をひとつのプラットフォームで。",
@@ -56,9 +76,19 @@
   "demo": {
     "nav": {
       "items": [
-        { "id": "home", "label": "ショーケースホーム" },
-        { "id": "pricing", "label": "価格ガイド" },
-        { "id": "custom", "label": "カスタム機能（準備中）", "disabled": true }
+        {
+          "id": "home",
+          "label": "ショーケースホーム"
+        },
+        {
+          "id": "pricing",
+          "label": "価格ガイド"
+        },
+        {
+          "id": "custom",
+          "label": "カスタム機能（準備中）",
+          "disabled": true
+        }
       ]
     },
     "hero": {
@@ -115,17 +145,17 @@
       "step4Body": "キャンドルナイトスイムやアロマバス、ナイトキャップで静かな余韻を。"
     },
     "pricing": {
-      "headline": "SourceGrid Labs パッケージ",
-      "subhead": "納品範囲が明確な固定価格で、ウェブサイト、業務システム、モバイルアプリを中小企業向けに提供。",
-      "addonsTitle": "追加モジュール",
-      "maintenanceTitle": "保守プラン",
+      "headline": "SourceGrid エコシステム価格",
+      "subhead": "無料ファネル、サービスフィー型マーケットプレイス、ホスト型テナント業務フロー。多くのクライアントは単発のカスタムアプリではなく SourceGrid エコシステムに参加します。",
+      "addonsTitle": "プラットフォームオプション",
+      "maintenanceTitle": "継続ケア",
       "shotFallback": "サービスシーン",
       "maintenanceSuffix": " / 月",
       "labels": {
-        "included": "含まれる内容",
-        "typicalClients": "想定クライアント",
-        "addonsTagline": "追加モジュール",
-        "maintenanceNote": "保守費用は月額です。"
+        "included": "含まれるもの",
+        "typicalClients": "向いている顧客",
+        "addonsTagline": "プラットフォームオプション",
+        "maintenanceNote": "継続ケアは月額プラットフォーム契約に紐づきます。"
       },
       "valueHighlights": [
         {
@@ -207,66 +237,27 @@
           "hoverNote": "スマホ中心で顧客とやり取りしたい場合のベストセットです。"
         }
       },
-      "packages": {
-        "small-website": {
-          "name": "スモールサイト",
-          "summary": "6〜8 ページ、モバイル最適化、問い合わせフォーム、簡易管理。",
-          "description": "信頼感のあるオンラインプレゼンスと簡単な問い合わせ導線を備えた、プロフェッショナルなウェブサイト。",
-          "features": [
-            "6〜8 ページのレスポンシブサイト",
-            "メールへ転送される問い合わせフォーム",
-            "基本的な SEO 設定",
-            "コピーや画像を編集できる軽量 CMS",
-            "ホスティングとデプロイ込み"
-          ]
-        },
-        "business-system": {
-          "name": "ビジネスシステム",
-          "summary": "サイトにログイン & ダッシュボードを備えたモジュールを追加。",
-          "description": "顧客ログイン、スタッフダッシュボード、予約/レンタル/ワークフローモジュールを追加し、1 つのプラットフォームで業務を回せます。",
-          "features": [
-            "スモールサイトの内容をすべて含む",
-            "顧客向けログインエリア",
-            "スタッフ用ダッシュボード",
-            "中核モジュール 1 つ（予約・レンタル・ワークフロー）",
-            "オンライン決済と通知",
-            "CSV/Excel エクスポート"
-          ]
-        },
-        "mobile-suite": {
-          "name": "モバイルアプリスイート",
-          "summary": "iOS/Android アプリ + バックエンドシステム + ウェブサイト。",
-          "description": "プッシュ通知やアプリ内予約/注文を備えたブランドアプリを、ウェブサイトと同じバックエンドで展開します。",
-          "features": [
-            "ビジネスシステムの内容をすべて含む",
-            "iOS と Android（1 つのコードベース）",
-            "顧客プロファイル & プッシュ通知",
-            "アプリ内予約/注文",
-            "App Store / Play Store 申請支援"
-          ]
-        }
-      },
+      "packages": {},
       "addons": {
-        "online-booking": "オンライン予約",
-        "rental-system": "レンタルシステム",
-        "payment-integration": "決済連携",
-        "email-automations": "メール自動化",
-        "real-time-chat": "リアルタイムチャット",
-        "multi-language": "多言語",
-        "forum-system": "フォーラムシステム（Thredded）"
+        "dojomate-productivity-tools": "DojoMate 生産性ツール",
+        "custom-domain": "カスタムドメイン",
+        "payment-rail-integration": "決済レール連携",
+        "multi-language": "多言語対応",
+        "staff-training": "スタッフ研修",
+        "data-import": "データ移行"
       },
       "maintenance": {
-        "basic": {
-          "name": "ベーシック",
-          "scope": "セキュリティ更新、バックアップ、モニタリング。"
+        "included-platform-care": {
+          "name": "標準プラットフォームケア",
+          "scope": "月額利用料にホスティング、デプロイ保守、バックアップ、軽い監視を含みます。"
         },
-        "standard": {
-          "name": "スタンダード",
-          "scope": "ベーシックに加え、毎月 4 回までの軽微な調整をサポート。"
+        "priority-support": {
+          "name": "優先サポート",
+          "scope": "アクティブな顧客向けの早めの対応と小規模な運用更新。"
         },
-        "premium": {
-          "name": "プレミアム",
-          "scope": "スタンダードに週次調整と優先対応を追加。"
+        "custom-operations": {
+          "name": "カスタム運用支援",
+          "scope": "作業量に応じて見積もります。"
         }
       }
     },

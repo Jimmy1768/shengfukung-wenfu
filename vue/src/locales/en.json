@@ -8,11 +8,31 @@
   "themeLabel": "Theme",
   "themeHelp": "Select Light or Dark theme before opening the showcase.",
   "heroPills": [
-    { "id": "launch-ready", "icon": "🚀", "label": "Launch-Ready Website" },
-    { "id": "customer-staff", "icon": "🗂️", "label": "Customer & Staff Portals" },
-    { "id": "mobile-apps", "icon": "📱", "label": "Branded Mobile Apps" },
-    { "id": "ops-automations", "icon": "📊", "label": "Ops Automations & Insight" },
-    { "id": "managed-hosting", "icon": "🛡️", "label": "Managed Hosting & Support" }
+    {
+      "id": "launch-ready",
+      "icon": "🚀",
+      "label": "Launch-Ready Website"
+    },
+    {
+      "id": "customer-staff",
+      "icon": "🗂️",
+      "label": "Customer & Staff Portals"
+    },
+    {
+      "id": "mobile-apps",
+      "icon": "📱",
+      "label": "Branded Mobile Apps"
+    },
+    {
+      "id": "ops-automations",
+      "icon": "📊",
+      "label": "Ops Automations & Insight"
+    },
+    {
+      "id": "managed-hosting",
+      "icon": "🛡️",
+      "label": "Managed Hosting & Support"
+    }
   ],
   "offerEyebrow": "What We Offer",
   "offerTitle": "Build, launch, and operate under one platform.",
@@ -56,9 +76,19 @@
   "demo": {
     "nav": {
       "items": [
-        { "id": "home", "label": "Showcase Home" },
-        { "id": "pricing", "label": "Pricing Guide" },
-        { "id": "custom", "label": "Custom Feature Placeholder", "disabled": true }
+        {
+          "id": "home",
+          "label": "Showcase Home"
+        },
+        {
+          "id": "pricing",
+          "label": "Pricing Guide"
+        },
+        {
+          "id": "custom",
+          "label": "Custom Feature Placeholder",
+          "disabled": true
+        }
       ]
     },
     "hero": {
@@ -115,78 +145,39 @@
       "step4Body": "Guests linger over last sips, late-night playlists, and quiet second rounds while steam hangs in the air above the counter."
     },
     "pricing": {
-      "headline": "SourceGrid Labs Packages",
-      "subhead": "Fixed-price websites, business systems, and mobile apps built for small companies that want clear deliverables.",
-      "addonsTitle": "Add-on modules",
-      "maintenanceTitle": "Maintenance plans",
+      "headline": "SourceGrid Ecosystem Pricing",
+      "subhead": "Free funnels, service-fee marketplaces, and hosted tenant workflows. Most clients onboard into a SourceGrid ecosystem instead of buying a one-off custom app.",
+      "addonsTitle": "Platform options",
+      "maintenanceTitle": "Ongoing care",
       "shotFallback": "Service angle",
       "maintenanceSuffix": " / month",
       "labels": {
         "included": "Included",
-        "typicalClients": "Typical clients",
-        "addonsTagline": "Add-on modules",
-        "maintenanceNote": "Billing is monthly."
+        "typicalClients": "Best fit",
+        "addonsTagline": "Platform options",
+        "maintenanceNote": "Recurring care is tied to the monthly platform relationship."
       },
-      "packages": {
-        "small-website": {
-          "name": "Small Website",
-          "summary": "6–8 pages, mobile-friendly, contact form, basic admin.",
-          "description": "A clean, professional website for small businesses needing a credible online presence and simple enquiry flow.",
-          "features": [
-            "6–8 page responsive site",
-            "Contact form routed to email",
-            "Basic SEO setup",
-            "Lightweight admin to edit copy/images",
-            "Hosting + deployment included"
-          ]
-        },
-        "business-system": {
-          "name": "Business System",
-          "summary": "Website plus one online system module with login + dashboard.",
-          "description": "Add customer logins, staff dashboards, and a booking/rental/workflow module so teams can operate in one platform.",
-          "features": [
-            "Everything in Small Website",
-            "Customer login area",
-            "Staff dashboard",
-            "One core module (booking, rental, workflow)",
-            "Online payments + notifications",
-            "CSV/Excel export"
-          ]
-        },
-        "mobile-suite": {
-          "name": "Mobile App Suite",
-          "summary": "iOS and Android app plus backend system and website.",
-          "description": "Branded mobile apps with push notifications, in-app booking/ordering, and the same backend powering the website.",
-          "features": [
-            "Everything in Business System",
-            "iOS + Android app (single codebase)",
-            "Customer profiles + push notifications",
-            "In-app booking/ordering",
-            "App Store + Play Store submission"
-          ]
-        }
-      },
+      "packages": {},
       "addons": {
-        "online-booking": "Online Booking",
-        "rental-system": "Rental System",
-        "payment-integration": "Payment Integration",
-        "email-automations": "Email Automations",
-        "real-time-chat": "Real-Time Chat",
+        "dojomate-productivity-tools": "DojoMate Productivity Tools",
+        "custom-domain": "Custom Domain",
+        "payment-rail-integration": "Payment Rail Integration",
         "multi-language": "Multi-Language",
-        "forum-system": "Forum System (Thredded)"
+        "staff-training": "Staff Training",
+        "data-import": "Data Import"
       },
       "maintenance": {
-        "basic": {
-          "name": "Basic",
-          "scope": "Security updates, backups, monitoring."
+        "included-platform-care": {
+          "name": "Included Platform Care",
+          "scope": "Hosting, deployment upkeep, backups, and light monitoring included with monthly platform access."
         },
-        "standard": {
-          "name": "Standard",
-          "scope": "Basic plus up to four small content/config updates monthly."
+        "priority-support": {
+          "name": "Priority Support",
+          "scope": "Faster response and small operational updates for active clients."
         },
-        "premium": {
-          "name": "Premium",
-          "scope": "Standard plus weekly adjustments and priority handling."
+        "custom-operations": {
+          "name": "Custom Operations",
+          "scope": "Ongoing operational help quoted by workload."
         }
       }
     },

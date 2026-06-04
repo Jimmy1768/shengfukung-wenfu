@@ -8,11 +8,31 @@
   "themeLabel": "主題",
   "themeHelp": "進入展示頁前，先在此選擇 Light 或 Dark 主題。",
   "heroPills": [
-    { "id": "launch-ready", "icon": "🚀", "label": "隨時上線的網站" },
-    { "id": "customer-staff", "icon": "🗂️", "label": "客戶與內部門戶" },
-    { "id": "mobile-apps", "icon": "📱", "label": "專屬品牌行動 App" },
-    { "id": "ops-automations", "icon": "📊", "label": "營運自動化與洞察" },
-    { "id": "managed-hosting", "icon": "🛡️", "label": "託管主機與支援" }
+    {
+      "id": "launch-ready",
+      "icon": "🚀",
+      "label": "隨時上線的網站"
+    },
+    {
+      "id": "customer-staff",
+      "icon": "🗂️",
+      "label": "客戶與內部門戶"
+    },
+    {
+      "id": "mobile-apps",
+      "icon": "📱",
+      "label": "專屬品牌行動 App"
+    },
+    {
+      "id": "ops-automations",
+      "icon": "📊",
+      "label": "營運自動化與洞察"
+    },
+    {
+      "id": "managed-hosting",
+      "icon": "🛡️",
+      "label": "託管主機與支援"
+    }
   ],
   "offerEyebrow": "我們提供",
   "offerTitle": "在同一平台完成建置、上線與營運。",
@@ -56,9 +76,19 @@
   "demo": {
     "nav": {
       "items": [
-        { "id": "home", "label": "展示首頁" },
-        { "id": "pricing", "label": "價格指南" },
-        { "id": "custom", "label": "自訂模組占位", "disabled": true }
+        {
+          "id": "home",
+          "label": "展示首頁"
+        },
+        {
+          "id": "pricing",
+          "label": "價格指南"
+        },
+        {
+          "id": "custom",
+          "label": "自訂模組占位",
+          "disabled": true
+        }
       ]
     },
     "hero": {
@@ -115,17 +145,17 @@
       "step4Body": "蠟燭夜泳、香氛泡浴與客製化夜宵，為旅程收尾。"
     },
     "pricing": {
-      "headline": "SourceGrid Labs 套餐",
-      "subhead": "為希望透過明確交付成果的中小企業打造的固定價格網站、商務系統與行動應用。",
-      "addonsTitle": "加值模組",
-      "maintenanceTitle": "維運方案",
+      "headline": "SourceGrid 生態系價格",
+      "subhead": "免費漏斗、服務費型市場，以及託管式租戶流程。多數客戶不是購買一次性的客製 App，而是加入 SourceGrid 生態系。",
+      "addonsTitle": "平台選項",
+      "maintenanceTitle": "持續維護",
       "shotFallback": "服務場景",
       "maintenanceSuffix": " / 每月",
       "labels": {
         "included": "包含內容",
-        "typicalClients": "適用對象",
-        "addonsTagline": "加購模組",
-        "maintenanceNote": "維護費以月計價。"
+        "typicalClients": "適合客戶",
+        "addonsTagline": "平台選項",
+        "maintenanceNote": "持續維護與每月平台關係綁定。"
       },
       "valueHighlights": [
         {
@@ -207,66 +237,27 @@
           "hoverNote": "當主要互動集中在手機 App 時，這套組合最合適。"
         }
       },
-      "packages": {
-        "small-website": {
-          "name": "小型網站",
-          "summary": "6–8 頁響應式網站、行動優化、聯絡表單與簡單管理後台。",
-          "description": "為小型企業打造專業網站，提供可信任的首頁與簡單聯絡流程。",
-          "features": [
-            "6–8 頁響應式網站",
-            "表單訊息轉信 & 後台通知",
-            "基礎 SEO 設定",
-            "輕量化後台編輯文案與圖片",
-            "含部署與主機管理"
-          ]
-        },
-        "business-system": {
-          "name": "商務系統",
-          "summary": "網站加上具登入與儀表板的系統模組。",
-          "description": "新增客戶登入、員工儀表板與訂單/租借/工作流程模組，讓團隊在同一平台作業。",
-          "features": [
-            "包含小型網站內容",
-            "客戶登入專區",
-            "員工儀表板",
-            "一個核心模組（預訂/租借/工作流程）",
-            "線上付款與通知",
-            "CSV/Excel 匯出"
-          ]
-        },
-        "mobile-suite": {
-          "name": "行動應用套件",
-          "summary": "iOS + Android 應用搭配網站與後台系統。",
-          "description": "品牌化行動應用含推播、內建預訂/點餐，與網站共用後端服務。",
-          "features": [
-            "包含商務系統功能",
-            "iOS + Android（單一程式碼庫）",
-            "客戶資料與推播通知",
-            "內建預訂/點餐流程",
-            "協助上架 App Store & Play Store"
-          ]
-        }
-      },
+      "packages": {},
       "addons": {
-        "online-booking": "線上預訂",
-        "rental-system": "租借系統",
-        "payment-integration": "付款串接",
-        "email-automations": "電子郵件自動化",
-        "real-time-chat": "即時聊天",
-        "multi-language": "多語言",
-        "forum-system": "論壇系統（Thredded）"
+        "dojomate-productivity-tools": "DojoMate 生產力工具",
+        "custom-domain": "自訂網域",
+        "payment-rail-integration": "付款通道串接",
+        "multi-language": "多語系",
+        "staff-training": "人員訓練",
+        "data-import": "資料匯入"
       },
       "maintenance": {
-        "basic": {
-          "name": "基礎",
-          "scope": "資安更新、備份與監控。"
+        "included-platform-care": {
+          "name": "內含平台維護",
+          "scope": "每月平台費包含主機、部署維護、備份與基本監控。"
         },
-        "standard": {
-          "name": "標準",
-          "scope": "包含基礎，並提供每月最多四次的小型內容/設定更新。"
+        "priority-support": {
+          "name": "優先支援",
+          "scope": "為活躍客戶提供較快回應與小型營運更新。"
         },
-        "premium": {
-          "name": "進階",
-          "scope": "標準方案外加每週調整與優先處理。"
+        "custom-operations": {
+          "name": "客製營運支援",
+          "scope": "依實際工作量報價。"
         }
       }
     },

@@ -334,7 +334,6 @@ eas build --platform ios --local --profile production
 
 # iOS Simulator
 eas build --platform ios --local --profile simulator
-## 🔐 SSH Access
 
 ```
 
@@ -353,14 +352,6 @@ adb install -r /Volumes/DevSSD/Projects/sourcegrid-labs/mobile/dev-client-2.apk
 adb install -r /Volumes/DevSSD/Projects/sourcegrid-labs/mobilebuild-1765454955888.apk
 ```
 
----
-
-```bash
-
-# Droplet (digital ocean)
-ssh jimmy1768_user@143.198.91.24
-
-```
 ---
 
 # Dummy Logins

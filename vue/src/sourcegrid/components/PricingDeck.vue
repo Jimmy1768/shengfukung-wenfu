@@ -33,11 +33,20 @@
             <div>
               <p class="pd-detail-tagline">{{ detail.tagline }}</p>
               <h3>{{ detail.title }}</h3>
+              <span v-if="detail.categoryLabel || detail.readinessLabel" class="pd-badges">
+                <span v-if="detail.categoryLabel" class="pd-readiness">
+                  {{ detail.categoryLabel }}
+                </span>
+                <span v-if="detail.readinessLabel" class="pd-readiness">
+                  {{ detail.readinessLabel }}
+                </span>
+              </span>
             </div>
           </div>
           <div class="pd-detail-price">
-            {{ formatUSD(detail.priceUSD) }}
-            <small>{{ formatTWD(detail.priceTWD) }}</small>
+            <template v-for="line in formatPriceLines(detail)" :key="line">
+              <span>{{ line }}</span>
+            </template>
           </div>
           <div v-if="detail.hoverNote" class="pd-detail-note" tabindex="0">
             <span>?</span>
@@ -84,8 +93,8 @@
           <li v-for="addon in addonsData" :key="addon.id">
             <span>{{ addon.displayName || addon.id }}</span>
             <span class="pd-double-price">
-              <strong>{{ formatUSD(addon.priceUSD) }}</strong>
-              <em>{{ formatTWD(addon.priceTWD) }}</em>
+              <strong>{{ formatPriceLines(addon)[0] }}</strong>
+              <em v-if="formatPriceLines(addon)[1]">{{ formatPriceLines(addon)[1] }}</em>
             </span>
           </li>
         </ul>
@@ -97,8 +106,8 @@
             <li v-for="plan in maintenanceData" :key="plan.id">
               <span>{{ plan.displayName || plan.id }}</span>
               <span class="pd-double-price">
-                <strong>{{ formatUSD(plan.priceUSD) }}</strong>
-                <em>{{ formatTWD(plan.priceTWD) }}</em>
+                <strong>{{ formatPriceLines(plan)[0] }}</strong>
+                <em v-if="formatPriceLines(plan)[1]">{{ formatPriceLines(plan)[1] }}</em>
               </span>
             </li>
           </ul>
@@ -169,13 +178,13 @@ const packagesData = computed(() =>
 );
 const pricingOverview = computed(() => pricingContent.overview || {});
 const pricingHeadline = computed(
-  () => props.copy?.headline || pricingOverview.value.headline || 'SourceGrid Labs Packages'
+  () => props.copy?.headline || pricingOverview.value.headline || 'SourceGrid Platform Access'
 );
 const pricingSubhead = computed(
   () =>
     props.copy?.subhead ||
     pricingOverview.value.subhead ||
-    'Fixed-price websites, systems, and apps built with clear scope.'
+    'Hosted tenant websites and workflow systems with clear platform scope.'
 );
 const pricingIntro = computed(() => props.copy?.intro || pricingOverview.value.intro || '');
 
@@ -206,6 +215,35 @@ const scrollToDetail = async (id) => {
 
 const formatUSD = (value) => `$${value.toLocaleString('en-US')}`;
 const formatTWD = (value) => `NT$${value.toLocaleString('zh-Hant')}`;
+const formatSetupMonthly = (item, currency) => {
+  const setup = currency === 'TWD' ? item.setupTWD : item.setupUSD;
+  const monthly = currency === 'TWD' ? item.monthlyTWD : item.monthlyUSD;
+  const format = currency === 'TWD' ? formatTWD : formatUSD;
+  if (setup && monthly) return `${format(setup)} setup + ${format(monthly)}/mo`;
+  if (setup) return `${format(setup)} setup`;
+  if (monthly) return `${format(monthly)}/mo`;
+  return null;
+};
+
+const formatPriceLines = (item) => {
+  if (item.priceLabel) return [item.priceLabel];
+  if (item.priceMode === 'free') return ['Free'];
+  if (item.priceMode === 'service_fee') return ['Service fee'];
+
+  const usd = formatSetupMonthly(item, 'USD');
+  const twd = formatSetupMonthly(item, 'TWD');
+  if (usd || twd) return [usd, twd].filter(Boolean);
+
+  if (item.priceUSD || item.priceTWD) {
+    return [
+      item.priceUSD ? formatUSD(item.priceUSD) : null,
+      item.priceTWD ? formatTWD(item.priceTWD) : null
+    ].filter(Boolean);
+  }
+
+  if (item.priceMode === 'included') return ['Included'];
+  return ['Quoted after intake'];
+};
 </script>
 
 <style scoped>
@@ -337,12 +375,32 @@ const formatTWD = (value) => `NT$${value.toLocaleString('zh-Hant')}`;
   opacity: 0.7;
 }
 
+.pd-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.pd-readiness {
+  display: inline-block;
+  border-radius: 999px;
+  border: 1px solid rgba(248, 250, 252, 0.32);
+  padding: 0.16rem 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .pd-detail-price {
   text-align: right;
   font-weight: 600;
+  display: grid;
+  gap: 0.18rem;
 }
 
-.pd-detail-price small {
+.pd-detail-price span + span {
   display: block;
   font-size: 0.75rem;
   opacity: 0.75;

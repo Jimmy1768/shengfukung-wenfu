@@ -8,11 +8,31 @@
   "themeLabel": "테마",
   "themeHelp": "쇼케이스를 열기 전에 Light 또는 Dark 테마를 선택하세요.",
   "heroPills": [
-    { "id": "launch-ready", "icon": "🚀", "label": "즉시 공개 가능한 웹사이트" },
-    { "id": "customer-staff", "icon": "🗂️", "label": "고객·스태프 포털" },
-    { "id": "mobile-apps", "icon": "📱", "label": "브랜드 모바일 앱" },
-    { "id": "ops-automations", "icon": "📊", "label": "운영 자동화 & 인사이트" },
-    { "id": "managed-hosting", "icon": "🛡️", "label": "매니지드 호스팅·지원" }
+    {
+      "id": "launch-ready",
+      "icon": "🚀",
+      "label": "즉시 공개 가능한 웹사이트"
+    },
+    {
+      "id": "customer-staff",
+      "icon": "🗂️",
+      "label": "고객·스태프 포털"
+    },
+    {
+      "id": "mobile-apps",
+      "icon": "📱",
+      "label": "브랜드 모바일 앱"
+    },
+    {
+      "id": "ops-automations",
+      "icon": "📊",
+      "label": "운영 자동화 & 인사이트"
+    },
+    {
+      "id": "managed-hosting",
+      "icon": "🛡️",
+      "label": "매니지드 호스팅·지원"
+    }
   ],
   "offerEyebrow": "What We Offer",
   "offerTitle": "하나의 플랫폼으로 구축·런칭·운영까지.",
@@ -56,9 +76,19 @@
   "demo": {
     "nav": {
       "items": [
-        { "id": "home", "label": "쇼케이스 홈" },
-        { "id": "pricing", "label": "가격 가이드" },
-        { "id": "custom", "label": "커스텀 모듈 (준비중)", "disabled": true }
+        {
+          "id": "home",
+          "label": "쇼케이스 홈"
+        },
+        {
+          "id": "pricing",
+          "label": "가격 가이드"
+        },
+        {
+          "id": "custom",
+          "label": "커스텀 모듈 (준비중)",
+          "disabled": true
+        }
       ]
     },
     "hero": {
@@ -115,78 +145,39 @@
       "step4Body": "캔들 스윔, 아로마 배스, 나이트캡으로 조용히 마무리합니다."
     },
     "pricing": {
-      "headline": "SourceGrid Labs 패키지",
-      "subhead": "명확한 납품 범위를 가진 고정가 형태로 웹, 시스템, 모바일 앱을 제공합니다.",
-      "addonsTitle": "추가 모듈",
-      "maintenanceTitle": "유지보수 플랜",
+      "headline": "SourceGrid 생태계 가격",
+      "subhead": "무료 퍼널, 서비스 수수료형 마켓플레이스, 호스팅형 테넌트 워크플로입니다. 대부분의 고객은 일회성 커스텀 앱이 아니라 SourceGrid 생태계에 온보딩합니다.",
+      "addonsTitle": "플랫폼 옵션",
+      "maintenanceTitle": "지속 관리",
       "shotFallback": "서비스 장면",
       "maintenanceSuffix": " / 월",
       "labels": {
         "included": "포함 내용",
-        "typicalClients": "주요 고객",
-        "addonsTagline": "추가 모듈",
-        "maintenanceNote": "유지보수 비용은 월 단위입니다."
+        "typicalClients": "적합한 고객",
+        "addonsTagline": "플랫폼 옵션",
+        "maintenanceNote": "지속 관리는 월간 플랫폼 관계에 포함됩니다."
       },
-      "packages": {
-        "small-website": {
-          "name": "Small Website",
-          "summary": "6~8페이지, 모바일 대응, 문의 폼, 경량 CMS.",
-          "description": "신뢰도 있는 온라인 거점을 빠르게 갖추고 싶은 소규모 팀을 위한 패키지입니다.",
-          "features": [
-            "6~8페이지 반응형 사이트",
-            "지정 이메일로 연결되는 문의 폼",
-            "기본 SEO 설정",
-            "문구·이미지를 수정할 수 있는 경량 CMS",
-            "호스팅 및 배포 포함"
-          ]
-        },
-        "business-system": {
-          "name": "Business System",
-          "summary": "웹사이트 + 로그인 + 대시보드 + 핵심 모듈",
-          "description": "예약·렌탈·워크플로를 하나의 포털로 묶어 고객과 스태프가 함께 작업할 수 있습니다.",
-          "features": [
-            "Small Website 모든 기능 포함",
-            "회원 로그인 영역",
-            "스태프 대시보드",
-            "핵심 모듈 1개(예약, 렌탈, 워크플로)",
-            "온라인 결제 및 알림",
-            "CSV/Excel 내보내기"
-          ]
-        },
-        "mobile-suite": {
-          "name": "Mobile App Suite",
-          "summary": "iOS·Android 앱 + 백엔드 + 웹사이트",
-          "description": "푸시, 인앱 예약/주문, 동일 백엔드로 동기화된 모바일 경험을 한 번에 제공합니다.",
-          "features": [
-            "Business System 모든 기능 포함",
-            "단일 코드베이스의 iOS/Android 앱",
-            "고객 프로필 & 푸시 알림",
-            "인앱 예약·주문 기능",
-            "스토어 심사/출시 지원"
-          ]
-        }
-      },
+      "packages": {},
       "addons": {
-        "online-booking": "온라인 예약",
-        "rental-system": "렌탈 시스템",
-        "payment-integration": "결제 연동",
-        "email-automations": "이메일 자동화",
-        "real-time-chat": "실시간 채팅",
-        "multi-language": "다국어 지원",
-        "forum-system": "포럼 시스템 (Thredded)"
+        "dojomate-productivity-tools": "DojoMate 생산성 도구",
+        "custom-domain": "커스텀 도메인",
+        "payment-rail-integration": "결제 레일 연동",
+        "multi-language": "다국어",
+        "staff-training": "스태프 교육",
+        "data-import": "데이터 가져오기"
       },
       "maintenance": {
-        "basic": {
-          "name": "Basic",
-          "scope": "보안 업데이트, 백업, 모니터링."
+        "included-platform-care": {
+          "name": "포함된 플랫폼 관리",
+          "scope": "월간 플랫폼 이용료에 호스팅, 배포 유지, 백업, 기본 모니터링을 포함합니다."
         },
-        "standard": {
-          "name": "Standard",
-          "scope": "Basic + 월 4회 이하의 소규모 콘텐츠/설정 업데이트."
+        "priority-support": {
+          "name": "우선 지원",
+          "scope": "활성 고객을 위한 빠른 응답과 소규모 운영 업데이트."
         },
-        "premium": {
-          "name": "Premium",
-          "scope": "Standard + 주간 조정과 우선 대응."
+        "custom-operations": {
+          "name": "맞춤 운영 지원",
+          "scope": "업무량에 따라 견적합니다."
         }
       }
     },

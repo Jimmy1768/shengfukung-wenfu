@@ -36,15 +36,15 @@ const heroStyle = computed(() => {
   return { backgroundImage: `url(${heroImage.value})` };
 });
 
-const heroEyebrow = computed(() => props.copy?.eyebrow || 'SourceGrid Labs Packages');
+const heroEyebrow = computed(() => props.copy?.eyebrow || 'SourceGrid Platform Access');
 const heroHeadline = computed(
-  () => props.copy?.headline || 'Fixed-scope website and system builds.'
+  () => props.copy?.headline || 'Hosted tenant websites and workflow systems.'
 );
 const heroIntro = computed(
   () =>
     props.copy?.intro ||
     props.copy?.subhead ||
-    'We build brand systems, content surfaces, and commerce-ready storefronts as fixed engagements.'
+    'Clients onboard into a managed SourceGrid platform instead of buying one-off custom apps.'
 );
 
 const backCtaLabel = computed(
