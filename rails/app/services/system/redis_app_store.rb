@@ -1,4 +1,3 @@
-
 # app/services/system/redis_app_store.rb
 #
 # Wrapper around the "app state" Redis instance (NOT the Sidekiq Redis).
@@ -6,27 +5,38 @@
 # - rate limit buckets
 # - ephemeral feature flags
 # - cached tokens, etc.
+# - temporary workflow/session state
 #
 # NOTE:
 # - Configure REDIS_APPSTATE_URL in env to point at a separate Redis DB.
 module System
   class RedisAppStore
+    KEY_PREFIX = "#{Profile::Identity.app_codename}:appstate"
+
     # Returns a Redis client connected to the app-state Redis.
     def self.client
-      # TODO: implement using Redis.new(url: ENV["REDIS_APPSTATE_URL"])
-      raise NotImplementedError, "System::RedisAppStore.client is not implemented yet"
+      REDIS_APPSTATE
     end
 
-    # Example helper: read a key.
     def self.get(key)
-      # TODO: client.get(key)
-      raise NotImplementedError, "System::RedisAppStore.get is not implemented yet"
+      client.get(namespaced_key(key))
     end
 
-    # Example helper: write a key with expiry.
     def self.set(key, value, ttl: nil)
-      # TODO: client.set(key, value, ex: ttl)
-      raise NotImplementedError, "System::RedisAppStore.set is not implemented yet"
+      options = ttl.present? ? { ex: ttl.to_i } : {}
+
+      client.set(namespaced_key(key), value, **options)
+    end
+
+    def self.delete(key)
+      client.del(namespaced_key(key))
+    end
+
+    def self.namespaced_key(key)
+      clean_key = key.to_s.strip
+      raise ArgumentError, "Redis app-state key cannot be blank" if clean_key.blank?
+
+      "#{KEY_PREFIX}:#{clean_key}"
     end
   end
 end

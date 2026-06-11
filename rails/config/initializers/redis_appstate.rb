@@ -13,6 +13,7 @@
 
 require "redis"
 require Rails.root.join("app", "lib", "profile", "identity").to_s
+require Rails.root.join("app", "lib", "system", "redis_url_sanitizer").to_s
 
 redis_appstate_url = ENV.fetch("REDIS_APPSTATE_URL", "redis://localhost:6379/2")
 
@@ -23,4 +24,5 @@ REDIS_APPSTATE = Redis.new(
   write_timeout: 2.0
 )
 
-Rails.logger.info "[RedisAppState] Using Redis appstate at #{redis_appstate_url} "                   "for codename=#{Profile::Identity.app_codename}"
+Rails.logger.info "[RedisAppState] Using Redis appstate at #{System::RedisUrlSanitizer.call(redis_appstate_url)} " \
+                  "for codename=#{Profile::Identity.app_codename}"
