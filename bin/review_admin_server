@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+RAILS_DIR="$ROOT_DIR/rails"
+
+HOST="${ADMIN_REVIEW_HOST:-127.0.0.1}"
+PORT="${ADMIN_REVIEW_PORT:-3312}"
+DATABASE="${ADMIN_REVIEW_DATABASE:-golden_template_review}"
+SESSION_COOKIE="${ADMIN_REVIEW_SESSION_COOKIE:-_shengfukung_wenfu_review_session}"
+EMAIL="${ADMIN_REVIEW_EMAIL:-operator-ui-review@example.test}"
+PASSWORD="${ADMIN_REVIEW_PASSWORD:-Password123!}"
+
+usage() {
+  cat <<EOF
+Usage: bin/review_admin_server
+
+Starts a local admin browser-review server without using RAILS_ENV=test.
+
+Defaults:
+  URL:      http://$HOST:$PORT/admin/login
+  Database: $DATABASE
+  Cookie:   $SESSION_COOKIE
+  Email:    $EMAIL
+  Password: $PASSWORD
+
+Environment overrides:
+  ADMIN_REVIEW_HOST
+  ADMIN_REVIEW_PORT
+  ADMIN_REVIEW_DATABASE
+  ADMIN_REVIEW_SESSION_COOKIE
+  ADMIN_REVIEW_EMAIL
+  ADMIN_REVIEW_PASSWORD
+  ADMIN_REVIEW_TEMPLE_SLUG
+  ADMIN_REVIEW_TEMPLE_NAME
+  ADMIN_REVIEW_NAME
+EOF
+}
+
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+  usage
+  exit 0
+fi
+
+cd "$RAILS_DIR"
+
+export RAILS_ENV=development
+export RACK_ENV=development
+export WEB_CONCURRENCY="${WEB_CONCURRENCY:-0}"
+export PGDATABASE="$DATABASE"
+export RAILS_SESSION_COOKIE_KEY="$SESSION_COOKIE"
+export ADMIN_REVIEW_EMAIL="$EMAIL"
+export ADMIN_REVIEW_PASSWORD="$PASSWORD"
+
+echo "Preparing isolated local admin review database: $PGDATABASE"
+bin/rails db:create db:migrate
+bin/rails admin_review:prepare
+
+cat <<EOF
+
+Admin review server starting:
+  URL:      http://$HOST:$PORT/admin/login
+  Email:    $EMAIL
+  Password: $PASSWORD
+  Database: $PGDATABASE
+  Cookie:   $RAILS_SESSION_COOKIE_KEY
+
+EOF
+
+exec bin/rails server -p "$PORT" -b "$HOST"

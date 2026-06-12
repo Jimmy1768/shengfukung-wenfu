@@ -37,9 +37,10 @@ module Backend
     # Enable the full middleware stack so HTML admin/account consoles work out
     # of the box (method override, CSRF, helpers, etc.) while API namespaces
     # can still opt into lightweight controllers.
+    session_cookie_key = ENV.fetch("RAILS_SESSION_COOKIE_KEY", "_#{Profile::Identity.app_codename}_session")
     config.api_only = false
     config.session_store :cookie_store,
-                         key: "_#{Profile::Identity.app_codename}_session",
+                         key: session_cookie_key,
                          secure: Rails.env.production?,
                          same_site: :lax
 
