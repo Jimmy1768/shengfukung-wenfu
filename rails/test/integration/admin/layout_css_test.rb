@@ -1,13 +1,18 @@
 require "test_helper"
 
 class AdminLayoutCssTest < ActiveSupport::TestCase
-  test "admin stack items use available workspace instead of shrink wrapping" do
-    source_css = Rails.root.join("app/stylesheets/admin/_layout.scss").read
+  test "setup draft form uses droplet-style fluid two-column offering stage" do
+    layout_css = Rails.root.join("app/stylesheets/admin/_layout.scss").read
+    components_css = Rails.root.join("app/stylesheets/admin/_components.scss").read
+    setup_form = Rails.root.join("app/views/admin/offering_setup_drafts/_form.html.erb").read
     compiled_css = Rails.root.join("public/backend/assets/admin.css").read
 
-    assert_match(/\.admin-stack__row > \.stack-item\s*\{[^}]*width:\s*100%;/m, source_css)
-    assert_match(/\.admin-stack__row > \.stack-item\.stack-item--wide\s*\{[^}]*max-width:\s*min\(100%, 960px\);/m, source_css)
-    assert_no_match(/\.admin-stack__row > \.stack-item[^}]*fit-content/m, source_css)
-    assert_no_match(/\.admin-stack__row > \.stack-item[^}]*fit-content/m, compiled_css)
+    assert_match(/@supports \(width: fit-content\(560px\)\)/, layout_css)
+    assert_includes setup_form, 'class: "form-stack stack-item stack-item--fluid"'
+    assert_includes setup_form, 'class="offering-form-stage offering-setup-form-stage"'
+    assert_includes setup_form, 'class="offering-form-stage__primary"'
+    assert_includes setup_form, 'class="offering-form-stage__secondary-list"'
+    assert_match(/@media \(min-width: 900px\)\s*\{[^}]*\.offering-form-stage\s*\{[^}]*grid-template-columns:\s*minmax\(360px, 1\.15fr\) minmax\(280px, 0\.9fr\);/m, components_css)
+    assert_match(/@media \(min-width: 900px\)\s*\{[^}]*\.offering-form-stage\s*\{[^}]*grid-template-columns:\s*minmax\(360px, 1\.15fr\) minmax\(280px, 0\.9fr\);/m, compiled_css)
   end
 end

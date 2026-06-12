@@ -703,18 +703,18 @@ body.admin-body--internal .admin-layout--public .admin-main {
 
 .admin-stack__row > .stack-item {
   margin: 0;
-  width: 100%;
-  max-width: min(100%, 960px);
-  flex: 1 1 auto;
+  width: auto;
+  max-width: min(100%, 560px);
+  flex: 0 1 auto;
   min-width: 0;
 }
 
 .admin-stack__row > .stack-item.stack-item--hero {
-  max-width: min(100%, 960px);
+  max-width: min(100%, 520px);
 }
 
 .admin-stack__row > .stack-item.stack-item--wide {
-  max-width: min(100%, 960px);
+  max-width: min(100%, 720px);
 }
 
 .admin-stack__row > .stack-item.stack-item--xl {
@@ -732,6 +732,7 @@ body.admin-body--internal .admin-layout--public .admin-main {
 }
 
 .admin-stack__row > .stack-item.stack-item--centered {
+  width: auto;
   max-width: min(100%, 960px);
 }
 
@@ -742,8 +743,8 @@ body.admin-body--internal .admin-layout--public .admin-main {
 }
 
 .admin-stack__row > .stack-item.stack-item--fluid.admin-table-card {
-  flex: 1 1 auto;
-  width: 100%;
+  flex: 0 0 auto;
+  width: auto;
   max-width: 100%;
 }
 
@@ -755,6 +756,53 @@ body.admin-body--internal .admin-layout--public .admin-main {
   width: min(100%, 760px);
   max-width: min(100%, 820px);
   flex: 0 1 auto;
+}
+
+@supports (width: fit-content(560px)) {
+  .admin-stack__row > .stack-item {
+    width: fit-content(560px);
+  }
+
+  .admin-stack__row > .stack-item.stack-item--hero {
+    width: fit-content(520px);
+  }
+
+  .admin-stack__row > .stack-item.stack-item--wide {
+    width: fit-content(720px);
+  }
+
+  .admin-stack__row > .stack-item.stack-item--xl {
+    width: min(100%, clamp(0px, 80vw, 1200px));
+  }
+
+  .admin-stack__row > .stack-item.stack-item--metrics {
+    width: fit-content(960px);
+  }
+
+  .admin-stack__row > .stack-item.stack-item--with-gutter {
+    margin-right: clamp(var(--spacing-md), 4vw, var(--spacing-xl));
+  }
+
+  .admin-stack__row > .stack-item.stack-item--centered {
+    width: fit-content(960px);
+  }
+
+  .admin-stack__row > .stack-item.stack-item--narrow {
+    width: fit-content(520px);
+  }
+
+  .admin-stack__row > .stack-item.stack-item--fluid {
+    width: 100%;
+  }
+
+  .admin-stack__row > .stack-item.stack-item--fluid.admin-table-card {
+    width: fit-content(1040px);
+    max-width: 100%;
+  }
+
+  .admin-stack__row > .stack-item.admin-form-card {
+    width: min(100%, clamp(640px, 60vw, 820px));
+  }
 }
 
 .card {

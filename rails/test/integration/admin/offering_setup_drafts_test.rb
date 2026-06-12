@@ -12,6 +12,18 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
     @admin = create_admin_user(temple: @temple, role: "admin", permission_overrides: { manage_offerings: true })
   end
 
+  test "new setup draft renders fluid two-column form stage" do
+    sign_in_admin(@admin)
+
+    get new_admin_offering_setup_draft_path
+
+    assert_response :success
+    assert_includes response.body, 'class="form-stack stack-item stack-item--fluid"'
+    assert_includes response.body, 'class="offering-form-stage offering-setup-form-stage"'
+    assert_includes response.body, 'class="offering-form-stage__primary"'
+    assert_includes response.body, 'class="offering-form-stage__secondary-list"'
+  end
+
   test "manager can create edit submit review and apply setup draft without mutating live offerings" do
     sign_in_admin(@admin)
 
