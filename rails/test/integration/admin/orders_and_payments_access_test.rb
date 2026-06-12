@@ -152,6 +152,7 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
       admin = create_admin_user(temple: @temple)
       permission = AdminPermission.find_by(admin_account: admin.admin_account, temple: @temple)
       permission.update!(view_financials: true)
+      @payment.update!(processed_at: Time.zone.now)
 
       last_month_registration = TempleEventRegistration.create!(
         temple: @temple,
@@ -198,7 +199,7 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
       permission = AdminPermission.find_by(admin_account: admin.admin_account, temple: @temple)
       permission.update!(view_financials: true)
 
-      @payment.update!(status: TemplePayment::STATUSES[:refunded], amount_cents: 900)
+      @payment.update!(status: TemplePayment::STATUSES[:refunded], amount_cents: 900, processed_at: Time.zone.now)
       TemplePayment.create!(
         temple: @temple,
         temple_event_registration: @registration,
