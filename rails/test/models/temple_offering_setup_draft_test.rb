@@ -13,6 +13,10 @@ class TempleOfferingSetupDraftTest < ActiveSupport::TestCase
       setup_payload: {
         "category" => "lamp",
         "field_requirements" => %w[ancestor_name blessing_name],
+        "registration_fields" => {
+          "order" => %w[quantity unit_price_cents currency certificate_number],
+          "ritual_metadata" => %w[ancestor_placard_name dedication_message]
+        },
         "options" => [{ "label" => "One year", "value" => "year" }],
         "operational_notes" => "Confirm name plate before printing."
       }
@@ -26,6 +30,8 @@ class TempleOfferingSetupDraftTest < ActiveSupport::TestCase
     assert_equal 60_000, template.dig("attributes", "price_cents")
     assert_equal "lamp", template.dig("defaults", "offering_type")
     assert_equal %w[ancestor_name blessing_name], template["form_fields"]
+    assert_equal %w[quantity unit_price_cents currency certificate_number], template.dig("registration_fields", "order")
+    assert_equal %w[ancestor_placard_name dedication_message], template.dig("registration_fields", "ritual_metadata")
     assert_includes draft.generated_template_yaml, "ancestor-light"
   end
 

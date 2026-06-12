@@ -49,6 +49,50 @@ module Offerings
       assert_equal service, draft.applied_offering
     end
 
+    test "applies selected registration intake fields to draft service metadata" do
+      draft = reviewed_draft(
+        slug: "ancestor-blessing",
+        label: "Ancestor Blessing",
+        setup_payload: {
+          "category" => "ritual",
+          "field_requirements" => %w[blessing_target_type blessing_names],
+          "registration_fields" => {
+            "order" => %w[quantity unit_price_cents currency certificate_number],
+            "contact" => %w[primary_contact phone],
+            "logistics" => %w[preferred_date preferred_slot],
+            "ritual_metadata" => %w[ancestor_placard_name dedication_message]
+          }
+        }
+      )
+
+      result = Offerings::SetupDraftApplier.call(draft: draft, admin: @admin)
+      assert result.success?, result.errors.inspect
+
+      form = result.target.metadata["registration_form"]
+      assert_equal %w[quantity unit_price_cents currency certificate_number], form.dig("sections", "order", "fields")
+      assert_equal %w[primary_contact phone], form.dig("sections", "contact", "fields")
+      assert_equal %w[preferred_date preferred_slot], form.dig("sections", "logistics", "fields")
+      assert_equal %w[ancestor_placard_name dedication_message], form.dig("sections", "ritual_metadata", "fields")
+      assert_equal({ "quantity" => 1 }, form.dig("defaults", "order"))
+    end
+
+    test "draft without registration field selection keeps conservative default form" do
+      draft = reviewed_draft(
+        slug: "default-registration",
+        label: "Default Registration",
+        setup_payload: { "field_requirements" => %w[fulfillment_method] }
+      )
+
+      result = Offerings::SetupDraftApplier.call(draft: draft, admin: @admin)
+      assert result.success?, result.errors.inspect
+
+      form = result.target.metadata["registration_form"]
+      assert_equal %w[quantity unit_price_cents currency], form.dig("sections", "order", "fields")
+      assert_equal %w[primary_contact phone email notes], form.dig("sections", "contact", "fields")
+      assert_equal false, form.dig("sections", "logistics")
+      assert_equal false, form.dig("sections", "ritual_metadata")
+    end
+
     test "reapplying an already applied draft does not create duplicates" do
       draft = reviewed_draft(
         slug: "incense",
@@ -95,6 +139,26 @@ module Offerings
         result = Offerings::SetupDraftApplier.call(draft: draft, admin: @admin)
         refute result.success?
         assert_includes result.errors.join, "logistics_notes"
+      end
+    end
+
+    test "unsupported registration fields block apply without creating service" do
+      draft = reviewed_draft(
+        slug: "bad-registration",
+        label: "Bad Registration",
+        setup_payload: {
+          "field_requirements" => %w[fulfillment_method],
+          "registration_fields" => {
+            "order" => %w[quantity],
+            "ritual_metadata" => %w[primary_contact]
+          }
+        }
+      )
+
+      assert_no_difference -> { @temple.temple_services.count } do
+        result = Offerings::SetupDraftApplier.call(draft: draft, admin: @admin)
+        refute result.success?
+        assert_includes result.errors.join, "ritual_metadata.primary_contact"
       end
     end
 

@@ -802,6 +802,7 @@ zh-TW:
           basics: "基本資料"
           pricing: "價格"
           structure: "表單結構"
+          registration_intake: "報名欄位"
         fields:
           offering_kind: "供品類型"
           label: "顯示名稱"
@@ -829,6 +830,7 @@ zh-TW:
         events_blocked: "法會項目尚不能套用，因為建立法會前必須先收集開始與結束日期。"
         unsupported_fields: "不支援的設定欄位：%{fields}。"
         unsupported_option_field: "選項不能套用到不支援或非選項欄位：%{field}。"
+        unsupported_registration_fields: "不支援的報名欄位：%{fields}。"
         slug_collision: "已有代碼為 %{slug} 的祈福服務，且未連結到此設定草稿。"
       generated:
         basics_title: "供品基本資料"

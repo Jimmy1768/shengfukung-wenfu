@@ -67,6 +67,7 @@ class TempleOfferingSetupDraft < ApplicationRecord
         operational_notes: payload[:operational_notes].presence
       }.compact,
       form_fields: Array(payload[:field_requirements]).compact_blank,
+      registration_fields: normalized_registration_fields,
       options: normalized_options,
       ui: {
         generated_from: "admin_offering_setup_draft",
@@ -91,5 +92,17 @@ class TempleOfferingSetupDraft < ApplicationRecord
 
       option.with_indifferent_access.slice(:field, :label, :value).compact_blank
     end
+  end
+
+  def normalized_registration_fields
+    raw = setup_payload.with_indifferent_access[:registration_fields]
+    return if raw.blank?
+    return unless raw.respond_to?(:to_h)
+
+    raw = raw.to_h.with_indifferent_access
+    Offerings::SetupFieldCatalog.registration_sections.each_with_object({}) do |section, memo|
+      fields = Array(raw[section]).map(&:to_s).compact_blank
+      memo[section] = fields if fields.any?
+    end.presence
   end
 end

@@ -47,6 +47,7 @@ module Offerings
       errors << I18n.t("admin.offering_setup_drafts.apply_errors.events_blocked") if draft.offering_kind == "event"
       validate_admin_fields
       validate_options
+      validate_registration_fields
       validate_slug_collision
     end
 
@@ -67,6 +68,13 @@ module Offerings
 
         errors << I18n.t("admin.offering_setup_drafts.apply_errors.unsupported_option_field", field: field)
       end
+    end
+
+    def validate_registration_fields
+      unsupported = unsupported_registration_fields
+      return if unsupported.empty?
+
+      errors << I18n.t("admin.offering_setup_drafts.apply_errors.unsupported_registration_fields", fields: unsupported.join(", "))
     end
 
     def validate_slug_collision
@@ -153,12 +161,7 @@ module Offerings
 
     def registration_form
       {
-        "sections" => {
-          "order" => { "fields" => %w[quantity unit_price_cents currency] },
-          "contact" => { "fields" => %w[primary_contact phone email notes] },
-          "logistics" => false,
-          "ritual_metadata" => false
-        },
+        "sections" => registration_sections,
         "defaults" => {
           "order" => { "quantity" => 1 }
         }
@@ -176,6 +179,44 @@ module Offerings
 
         memo[field] ||= []
         memo[field] << (option["value"].presence || option["label"])
+      end
+    end
+
+    def registration_sections
+      registration_fields.each_with_object({}) do |(section, fields), memo|
+        memo[section] = fields.any? ? { "fields" => fields } : false
+      end
+    end
+
+    def registration_fields
+      @registration_fields ||= begin
+        raw = payload["registration_fields"]
+        selected_fields =
+          if raw.present? && raw.respond_to?(:to_h)
+            raw.to_h.with_indifferent_access
+          else
+            SetupFieldCatalog.default_registration_fields
+          end
+
+        SetupFieldCatalog.registration_sections.each_with_object({}) do |section, memo|
+          memo[section] = Array(selected_fields[section]).map { |field| field.to_s.strip }.reject(&:blank?).uniq
+        end
+      end
+    end
+
+    def unsupported_registration_fields
+      raw = payload["registration_fields"]
+      return [] if raw.blank?
+      return [] unless raw.respond_to?(:to_h)
+
+      raw.to_h.each_with_object([]) do |(section, fields), memo|
+        Array(fields).each do |field|
+          field = field.to_s.strip
+          next if field.blank?
+          next if SetupFieldCatalog.registration_field_supported?(section, field)
+
+          memo << "#{section}.#{field}"
+        end
       end
     end
 

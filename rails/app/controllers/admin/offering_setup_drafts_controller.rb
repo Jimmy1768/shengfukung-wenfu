@@ -2,6 +2,13 @@
 
 module Admin
   class OfferingSetupDraftsController < BaseController
+    REGISTRATION_FIELD_PARAMS = {
+      order: [],
+      contact: [],
+      logistics: [],
+      ritual_metadata: []
+    }.freeze
+
     before_action -> { require_capability!(:manage_offerings) }
     before_action :set_draft, only: %i[show edit update submit review apply]
 
@@ -108,7 +115,8 @@ module Admin
           :field,
           :label,
           :value
-        ]
+        ],
+        registration_fields: REGISTRATION_FIELD_PARAMS
       )
       currency = permitted[:currency].presence || "TWD"
       {
@@ -127,6 +135,7 @@ module Admin
         category: permitted[:category].presence,
         field_requirements: selected_field_requirements(permitted),
         options: selected_options(permitted),
+        registration_fields: selected_registration_fields(permitted),
         operational_notes: permitted[:operational_notes].presence
       }.compact
     end
@@ -158,6 +167,16 @@ module Admin
         }
       end
       (structured + option_lines_from(permitted[:options_text])).uniq
+    end
+
+    def selected_registration_fields(permitted)
+      raw = permitted[:registration_fields]
+      return Offerings::SetupFieldCatalog.default_registration_fields if raw.blank?
+
+      raw = raw.to_h.with_indifferent_access
+      Offerings::SetupFieldCatalog.registration_sections.each_with_object({}) do |section, memo|
+        memo[section] = Array(raw[section]).map(&:presence).compact.uniq
+      end
     end
 
     def lines_from(value)

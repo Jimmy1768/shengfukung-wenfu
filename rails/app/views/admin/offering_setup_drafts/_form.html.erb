@@ -1,5 +1,6 @@
 <% payload = (@draft.setup_payload || {}).with_indifferent_access %>
 <% selected_fields = Array(payload[:field_requirements]).map(&:to_s) %>
+<% selected_registration_fields = (payload[:registration_fields].presence || Offerings::SetupFieldCatalog.default_registration_fields).with_indifferent_access %>
 <% catalog_keys = Offerings::SetupFieldCatalog.supported_keys %>
 <% unsupported_fields = selected_fields - catalog_keys %>
 <% option_entries = Array(payload[:options]).map { |option| option.respond_to?(:with_indifferent_access) ? option.with_indifferent_access : {} } %>
@@ -120,6 +121,31 @@
     <div class="field-panel">
       <%= label_tag "temple_offering_setup_draft_operational_notes", t("admin.offering_setup_drafts.form.fields.operational_notes") %>
       <%= text_area_tag "temple_offering_setup_draft[operational_notes]", payload[:operational_notes], id: "temple_offering_setup_draft_operational_notes", rows: 4 %>
+    </div>
+  </section>
+
+  <section class="card form-section">
+    <header>
+      <h2><%= t("admin.offering_setup_drafts.form.sections.registration_intake") %></h2>
+    </header>
+    <div class="admin-list">
+      <% Offerings::SetupFieldCatalog.registration_grouped_fields.each do |section, fields| %>
+        <article class="admin-list__row">
+          <div>
+            <strong><%= t("admin.registration_form.sections.#{section}", default: section.to_s.humanize) %></strong>
+            <%= hidden_field_tag "temple_offering_setup_draft[registration_fields][#{section}][]", "" %>
+            <div class="field-row">
+              <% fields.each do |field| %>
+                <label class="field-panel">
+                  <%= check_box_tag "temple_offering_setup_draft[registration_fields][#{section}][]", field.key, Array(selected_registration_fields[section]).include?(field.key), id: "temple_offering_setup_draft_registration_#{section}_#{field.key}" %>
+                  <strong><%= field.label %></strong>
+                  <span class="muted"><%= field.hint %></span>
+                </label>
+              <% end %>
+            </div>
+          </div>
+        </article>
+      <% end %>
     </div>
   </section>
 

@@ -23,5 +23,17 @@ module Offerings
       assert Offerings::SetupFieldCatalog.registration_field?("ancestor_placard_name")
       refute Offerings::SetupFieldCatalog.supported?("ancestor_placard_name")
     end
+
+    test "exposes registration fields grouped by schema section" do
+      grouped = Offerings::SetupFieldCatalog.registration_grouped_fields
+
+      assert_includes grouped.keys, "order"
+      assert_includes grouped.keys, "contact"
+      assert_includes grouped.keys, "logistics"
+      assert_includes grouped.keys, "ritual_metadata"
+      assert Offerings::SetupFieldCatalog.registration_field_supported?("ritual_metadata", "ancestor_placard_name")
+      refute Offerings::SetupFieldCatalog.registration_field_supported?("ritual_metadata", "primary_contact")
+      assert_equal %w[quantity unit_price_cents currency], Offerings::SetupFieldCatalog.default_registration_fields["order"]
+    end
   end
 end

@@ -226,6 +226,62 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
     assert_equal "reviewed", draft.reload.status
   end
 
+  test "create and update persist selected registration intake fields" do
+    sign_in_admin(@admin)
+
+    post admin_offering_setup_drafts_path, params: {
+      temple_offering_setup_draft: {
+        offering_kind: "service",
+        label: "Ancestor Blessing",
+        slug: "ancestor-blessing",
+        category: "ritual",
+        registration_period_key: "perennial",
+        price_cents: "1200",
+        currency: "TWD",
+        field_requirements: %w[blessing_target_type blessing_names],
+        registration_fields: {
+          order: %w[quantity unit_price_cents currency certificate_number],
+          contact: %w[primary_contact phone],
+          logistics: %w[preferred_date preferred_slot],
+          ritual_metadata: %w[ancestor_placard_name dedication_message]
+        }
+      }
+    }
+
+    draft = @temple.temple_offering_setup_drafts.find_by!(slug: "ancestor-blessing")
+    assert_redirected_to admin_offering_setup_draft_path(draft)
+    assert_equal %w[quantity unit_price_cents currency certificate_number], draft.setup_payload.dig("registration_fields", "order")
+    assert_equal %w[ancestor_placard_name dedication_message], draft.setup_payload.dig("registration_fields", "ritual_metadata")
+
+    get edit_admin_offering_setup_draft_path(draft)
+    assert_response :success
+    assert_includes response.body, "祖先牌位姓名"
+
+    patch admin_offering_setup_draft_path(draft), params: {
+      temple_offering_setup_draft: {
+        offering_kind: "service",
+        label: "Ancestor Blessing",
+        slug: "ancestor-blessing",
+        category: "ritual",
+        registration_period_key: "perennial",
+        price_cents: "1200",
+        currency: "TWD",
+        field_requirements: %w[blessing_target_type blessing_names],
+        registration_fields: {
+          order: %w[quantity unit_price_cents currency],
+          contact: %w[primary_contact phone email],
+          logistics: [],
+          ritual_metadata: %w[ancestor_placard_name certificate_notes]
+        }
+      }
+    }
+
+    assert_redirected_to admin_offering_setup_draft_path(draft)
+    assert_equal %w[primary_contact phone email], draft.reload.setup_payload.dig("registration_fields", "contact")
+    assert_equal [], draft.setup_payload.dig("registration_fields", "logistics")
+    assert_equal %w[ancestor_placard_name certificate_notes], draft.setup_payload.dig("registration_fields", "ritual_metadata")
+  end
+
   test "admin setup rehearsal applies realistic service examples as draft offerings" do
     sign_in_admin(@admin)
     examples = [
@@ -245,6 +301,12 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
         expected_options: {
           "lamp_type" => %w[bright_light study_lamp wealth_lamp taisui_lamp],
           "fulfillment_method" => %w[temple_handles]
+        },
+        registration_fields: {
+          "order" => %w[quantity unit_price_cents currency certificate_number],
+          "contact" => %w[primary_contact phone email],
+          "logistics" => %w[preferred_slot],
+          "ritual_metadata" => []
         }
       },
       {
@@ -263,6 +325,12 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
         expected_options: {
           "blessing_target_type" => %w[main_dou earth_god_dou seven_star_dou wealth_dou],
           "fulfillment_method" => %w[onsite_confirm]
+        },
+        registration_fields: {
+          "order" => %w[quantity unit_price_cents currency certificate_number],
+          "contact" => %w[primary_contact phone],
+          "logistics" => %w[preferred_date preferred_slot],
+          "ritual_metadata" => %w[ancestor_placard_name dedication_message certificate_notes]
         }
       },
       {
@@ -280,6 +348,12 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
         expected_options: {
           "table_size" => %w[small_table medium_table large_table],
           "fulfillment_method" => %w[onsite]
+        },
+        registration_fields: {
+          "order" => %w[quantity unit_price_cents currency],
+          "contact" => %w[primary_contact phone email notes],
+          "logistics" => %w[preferred_date preferred_slot ceremony_location],
+          "ritual_metadata" => []
         }
       }
     ]
@@ -296,6 +370,7 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
       assert_equal "draft", draft.status
       assert_equal example[:fields], draft.setup_payload["field_requirements"]
       assert_equal example[:options].size, draft.setup_payload["options"].size
+      assert_equal example[:registration_fields], draft.setup_payload["registration_fields"]
 
       get edit_admin_offering_setup_draft_path(draft)
       assert_response :success
@@ -331,6 +406,7 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
       assert_equal example[:category], service.metadata["offering_type"]
       assert_equal example[:fields], service.metadata.dig("form_fields", "setup", "fields")
       assert_equal example[:expected_options], service.metadata["form_options"].slice(*example[:expected_options].keys)
+      assert_equal expected_registration_sections(example[:registration_fields]), service.metadata.dig("registration_form", "sections")
       assert_equal "admin_offering_setup_draft", service.metadata.dig("form_ui", "generated_from")
       assert_equal({ "quantity" => 1 }, service.metadata.dig("registration_form", "defaults", "order"))
     end
@@ -383,6 +459,7 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
       price_cents: example.fetch(:price),
       currency: "TWD",
       field_requirements: example.fetch(:fields),
+      registration_fields: example.fetch(:registration_fields),
       options: options_params_for(example.fetch(:options)),
       operational_notes: "Local admin setup rehearsal."
     }
@@ -391,6 +468,12 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
   def options_params_for(options)
     options.each_with_index.to_h do |option, index|
       [index.to_s, option]
+    end
+  end
+
+  def expected_registration_sections(registration_fields)
+    registration_fields.transform_values do |fields|
+      fields.any? ? { "fields" => fields } : false
     end
   end
 end
