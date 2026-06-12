@@ -83,12 +83,18 @@ Result: pass.
 
 The work was driven by user-provided authenticated local browser screenshots showing the repaired offering setup page and the still-broken gathering form.
 
-Post-fix authenticated browser verification was not performed by this thread because the approved in-app Browser surface cannot control the authenticated external browser tab. The local test server remains available for manual refresh.
+Post-commit browser eval was later completed by this thread:
+
+- eval record: `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/eval_records/2026-06-12-admin-gathering-form-browser-eval.md`
+- in-app Browser login succeeded;
+- `/admin/gatherings/new` rendered as a two-column desktop form;
+- primary sections rendered at `x=292`;
+- secondary sections rendered at `x=844`;
+- disposable browser-created gathering `Browser Test Gathering 1781259954731` submitted successfully and appeared on `/admin/gatherings`.
 
 ## Skipped Checks
 
 - Full Rails suite was not run.
-- Automated post-fix screenshot was not captured by this thread.
 
 ## Boundary
 
@@ -104,7 +110,9 @@ Post-fix authenticated browser verification was not performed by this thread bec
 
 ## Residual Risk
 
-Manual visual confirmation is still needed on the authenticated admin gathering page to confirm the layout matches the approved offering setup pattern in the browser viewport.
+Manual user confirmation is still useful, but the coordinator thread has now completed an authenticated in-app Browser review for layout geometry and create-submit behavior.
+
+The local browser server still uses `RAILS_ENV=test`; future Rails test runs can wipe the disposable browser DB/session.
 
 ## Next Owner
 

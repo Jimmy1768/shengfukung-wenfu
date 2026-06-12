@@ -43,6 +43,10 @@ Branch/worktree state: branch `offering-setup-admin-workflow`; latest commit bef
 - Added focused layout and create-submit tests.
 - Ran focused verification and diff hygiene.
 - Created return and acceptance records.
+- After commit `ef7bd06`, took over the in-app Browser for authenticated local UI review.
+- Confirmed the gathering form rendered as two desktop columns.
+- Submitted a disposable local gathering through the browser UI.
+- Created a supplemental eval record for browser evidence.
 
 ## Files Read
 
@@ -62,6 +66,7 @@ Branch/worktree state: branch `offering-setup-admin-workflow`; latest commit bef
 - `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/returns/2026-06-12-admin-gathering-form-two-column-return.md`
 - `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/acceptances/2026-06-12-admin-gathering-form-two-column-acceptance.md`
 - `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/execution_records/2026-06-12-admin-gathering-form-two-column-execution.md`
+- `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/eval_records/2026-06-12-admin-gathering-form-browser-eval.md`
 - `/Users/jimmy1768/Projects/shengfukung-wenfu/rails/app/stylesheets/admin/_components.scss`
 - `/Users/jimmy1768/Projects/shengfukung-wenfu/rails/app/views/admin/gatherings/_form.html.erb`
 - `/Users/jimmy1768/Projects/shengfukung-wenfu/rails/app/views/admin/gatherings/edit.html.erb`
@@ -118,9 +123,17 @@ None.
 
 The gathering new page now renders `form-stack stack-item stack-item--fluid gathering-form`, `offering-form-stage gathering-form-stage`, `offering-form-stage__primary`, and `offering-form-stage__secondary-list`. The submit test confirms the same gathering params still create a `TempleGathering` record.
 
+Supplemental browser evidence:
+
+- eval record: `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/eval_records/2026-06-12-admin-gathering-form-browser-eval.md`;
+- in-app Browser authenticated login succeeded;
+- `/admin/gatherings/new` rendered two columns at desktop viewport;
+- primary sections rendered at `x=292`;
+- secondary sections rendered at `x=844`;
+- disposable gathering `Browser Test Gathering 1781259954731` submitted and appeared on the gathering list.
+
 ## Skipped/Refused Actions
 
-- No post-fix authenticated browser takeover was performed because the approved in-app Browser surface cannot control the authenticated external browser tab.
 - Full Rails suite was not run.
 - No deployment was performed.
 - No server, secret, payment, accounting behavior, or production-data action was performed.

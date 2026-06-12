@@ -12,6 +12,8 @@ Related return: `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/retur
 
 Related execution record: `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/execution_records/2026-06-12-admin-gathering-form-two-column-execution.md`
 
+Related eval record: `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/eval_records/2026-06-12-admin-gathering-form-browser-eval.md`
+
 ## Decision
 
 accepted_with_gaps
@@ -27,6 +29,8 @@ Accepted behavior:
 - the form uses the same desktop two-column `offering-form-stage` convention as the repaired setup form;
 - existing gathering params and create behavior are covered by focused integration tests;
 - adjacent gathering order/accounting tests still pass;
+- authenticated in-app Browser review confirms the gathering form renders in two columns at desktop width;
+- authenticated in-app Browser create-submit flow succeeded for a disposable local gathering;
 - admin CSS was rebuilt;
 - no deployment, server config, secret, payment, accounting behavior, production data, or YAML-write action occurred.
 
@@ -76,6 +80,22 @@ git diff --check
 
 Result: pass.
 
+Browser eval:
+
+```text
+/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/eval_records/2026-06-12-admin-gathering-form-browser-eval.md
+```
+
+Result: pass for local prototype.
+
+Evidence summary:
+
+- login reached `/admin/dashboard`;
+- `/admin/gatherings/new` rendered the gathering form as a two-column desktop stage;
+- primary column sections rendered at `x=292`;
+- secondary column sections rendered at `x=844`;
+- disposable gathering `Browser Test Gathering 1781259954731` submitted and appeared on `/admin/gatherings`.
+
 ## Branch/Worktree Reviewed
 
 Repo: `/Users/jimmy1768/Projects/shengfukung-wenfu`
@@ -113,14 +133,14 @@ Observed changed files before acceptance/execution records were added:
 
 ## Accepted Gaps
 
-- Post-fix visual screenshot was not captured by this thread because the approved in-app Browser surface cannot control the authenticated external browser tab.
 - Full Rails suite was not run.
+- Browser server still used `RAILS_ENV=test`, so future Rails test runs can wipe the disposable browser data/session.
 
-These gaps are acceptable for this local prototype layout fix, pending manual browser refresh.
+These gaps are acceptable for this local prototype layout fix.
 
 ## Required Retry
 
-None unless manual browser refresh still shows the gathering form as a narrow single-column surface.
+None.
 
 ## Friction To Record
 
@@ -128,7 +148,7 @@ No new friction record required beyond the existing browser-control limitation.
 
 ## Next Owner
 
-Coordinator should create the execution record and commit the checkpoint. User should hard refresh the local admin gathering form and confirm the visual result.
+Coordinator should commit the docs-only browser evidence update. Next implementation work should start by stabilizing the local review environment so browser sessions are not backed by the Rails test database.
 
 ## Meeting Needed
 
