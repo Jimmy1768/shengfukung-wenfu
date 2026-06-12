@@ -800,6 +800,12 @@ en:
         archive: "Archive this gathering? Registrations remain for reporting."
       form:
         errors: "%{count} issues prevented saving"
+        sections:
+          basics: "Basic details"
+          pricing: "Pricing"
+          schedule: "Schedule"
+          cover_image: "Cover image"
+          location: "Location & status"
       empty: "No gatherings yet."
     offerings:
       flash:

@@ -1172,6 +1172,12 @@ zh-TW:
         archive: "確定要封存這個聚會嗎？（原有報名仍保留於報表）"
       form:
         errors: "%{count} 項問題需要修正"
+        sections:
+          basics: "基本資料"
+          pricing: "收費"
+          schedule: "時間"
+          cover_image: "封面圖片"
+          location: "地點與狀態"
       empty: "尚未建立任何聚會。"
     payments:
       flash:

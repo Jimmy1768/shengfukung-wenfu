@@ -2149,30 +2149,20 @@ body.admin-body--internal .admin-layout--public .admin-main {
   background: color-mix(in srgb, var(--surface-muted, #f3f4f6) 75%, transparent);
 }
 
-.gathering-form {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--spacing-md);
-  align-items: start;
+.gathering-form-stage {
+  width: 100%;
 }
 
-.gathering-form > .field,
-.gathering-form > .segmented-field {
+.gathering-form-stage .media-upload,
+.gathering-form-stage .field,
+.gathering-form-stage .field-panel,
+.gathering-form-stage .login-card .login-credentials,
+.login-card .gathering-form-stage .login-credentials,
+.gathering-form-stage .login-card .login-actions,
+.login-card .gathering-form-stage .login-actions {
   min-width: 0;
 }
 
-.gathering-form__full {
-  grid-column: 1/-1;
-}
-
-@media (max-width: 900px) {
-  .gathering-form {
-    grid-template-columns: 1fr;
-  }
-  .gathering-form__full {
-    grid-column: auto;
-  }
-}
 .field {
   display: flex;
   flex-direction: column;
