@@ -226,6 +226,116 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
     assert_equal "reviewed", draft.reload.status
   end
 
+  test "admin setup rehearsal applies realistic service examples as draft offerings" do
+    sign_in_admin(@admin)
+    examples = [
+      {
+        label: "光明燈服務",
+        slug: "bright-lamp-service",
+        category: "lamp",
+        price: "600",
+        fields: %w[lamp_type lamp_location fulfillment_method logistics_notes],
+        options: [
+          option_entry("lamp_type", "光明燈", "bright_light"),
+          option_entry("lamp_type", "文昌燈", "study_lamp"),
+          option_entry("lamp_type", "財神燈", "wealth_lamp"),
+          option_entry("lamp_type", "太歲燈", "taisui_lamp"),
+          option_entry("fulfillment_method", "廟方代辦", "temple_handles")
+        ],
+        expected_options: {
+          "lamp_type" => %w[bright_light study_lamp wealth_lamp taisui_lamp],
+          "fulfillment_method" => %w[temple_handles]
+        }
+      },
+      {
+        label: "祈福斗燈",
+        slug: "blessing-dou-lamp",
+        category: "ritual",
+        price: "1200",
+        fields: %w[blessing_target_type blessing_names certificate_hint fulfillment_method],
+        options: [
+          option_entry("blessing_target_type", "總斗主", "main_dou"),
+          option_entry("blessing_target_type", "福德正神斗", "earth_god_dou"),
+          option_entry("blessing_target_type", "七星斗", "seven_star_dou"),
+          option_entry("blessing_target_type", "五路財神斗", "wealth_dou"),
+          option_entry("fulfillment_method", "現場確認", "onsite_confirm")
+        ],
+        expected_options: {
+          "blessing_target_type" => %w[main_dou earth_god_dou seven_star_dou wealth_dou],
+          "fulfillment_method" => %w[onsite_confirm]
+        }
+      },
+      {
+        label: "供桌服務",
+        slug: "offering-table-service",
+        category: "table",
+        price: "2000",
+        fields: %w[table_size table_items logistics_notes fulfillment_method],
+        options: [
+          option_entry("table_size", "小供桌", "small_table"),
+          option_entry("table_size", "中供桌", "medium_table"),
+          option_entry("table_size", "大供桌", "large_table"),
+          option_entry("fulfillment_method", "親至現場確認", "onsite")
+        ],
+        expected_options: {
+          "table_size" => %w[small_table medium_table large_table],
+          "fulfillment_method" => %w[onsite]
+        }
+      }
+    ]
+
+    examples.each do |example|
+      assert_difference -> { @temple.temple_offering_setup_drafts.count }, 1 do
+        post admin_offering_setup_drafts_path, params: {
+          temple_offering_setup_draft: draft_params_for(example)
+        }
+      end
+
+      draft = @temple.temple_offering_setup_drafts.find_by!(slug: example[:slug])
+      assert_redirected_to admin_offering_setup_draft_path(draft)
+      assert_equal "draft", draft.status
+      assert_equal example[:fields], draft.setup_payload["field_requirements"]
+      assert_equal example[:options].size, draft.setup_payload["options"].size
+
+      get edit_admin_offering_setup_draft_path(draft)
+      assert_response :success
+      example[:options].each do |option|
+        assert_includes response.body, option.fetch(:label)
+      end
+
+      post submit_admin_offering_setup_draft_path(draft)
+      assert_redirected_to admin_offering_setup_draft_path(draft)
+      assert_equal "submitted", draft.reload.status
+
+      post review_admin_offering_setup_draft_path(draft), params: {
+        temple_offering_setup_draft: { review_notes: "Local rehearsal approved." }
+      }
+      assert_redirected_to admin_offering_setup_draft_path(draft)
+      assert_equal "reviewed", draft.reload.status
+
+      patch admin_offering_setup_draft_path(draft), params: {
+        temple_offering_setup_draft: draft_params_for(example).merge(label: "Changed after review")
+      }
+      assert_redirected_to admin_offering_setup_draft_path(draft)
+      assert_equal example[:label], draft.reload.label
+
+      assert_difference -> { @temple.temple_services.count }, 1 do
+        post apply_admin_offering_setup_draft_path(draft)
+      end
+      assert_redirected_to admin_offering_setup_draft_path(draft)
+      assert_equal "applied", draft.reload.status
+
+      service = draft.applied_offering
+      assert_equal "draft", service.status
+      assert_equal example[:label], service.title
+      assert_equal example[:category], service.metadata["offering_type"]
+      assert_equal example[:fields], service.metadata.dig("form_fields", "setup", "fields")
+      assert_equal example[:expected_options], service.metadata["form_options"].slice(*example[:expected_options].keys)
+      assert_equal "admin_offering_setup_draft", service.metadata.dig("form_ui", "generated_from")
+      assert_equal({ "quantity" => 1 }, service.metadata.dig("registration_form", "defaults", "order"))
+    end
+  end
+
   test "admin without manage offerings cannot access setup drafts" do
     restricted = create_admin_user(temple: @temple, role: "admin")
     sign_in_admin(restricted)
@@ -255,5 +365,32 @@ class AdminOfferingSetupDraftsTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
     assert_includes response.body, "unsupported_field"
     assert_equal "reviewed", draft.reload.status
+  end
+
+  private
+
+  def option_entry(field, label, value)
+    { field:, label:, value: }
+  end
+
+  def draft_params_for(example)
+    {
+      offering_kind: "service",
+      label: example.fetch(:label),
+      slug: example.fetch(:slug),
+      category: example.fetch(:category),
+      registration_period_key: "perennial",
+      price_cents: example.fetch(:price),
+      currency: "TWD",
+      field_requirements: example.fetch(:fields),
+      options: options_params_for(example.fetch(:options)),
+      operational_notes: "Local admin setup rehearsal."
+    }
+  end
+
+  def options_params_for(options)
+    options.each_with_index.to_h do |option, index|
+      [index.to_s, option]
+    end
   end
 end
