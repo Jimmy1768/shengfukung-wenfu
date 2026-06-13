@@ -110,6 +110,37 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "付款報表"
   end
 
+  test "payments index shows payment status for reconciliation" do
+    admin = create_admin_user(temple: @temple)
+    permission = AdminPermission.find_by(admin_account: admin.admin_account, temple: @temple)
+    permission.update!(view_financials: true)
+
+    @payment.update!(status: TemplePayment::STATUSES[:refunded])
+    %i[pending failed completed].each do |status_key|
+      registration = create_registration(
+        user: @user,
+        offering: @offering,
+        reference_code: "PAYMENT-STATUS-#{status_key.to_s.upcase}"
+      )
+      create_payment(
+        registration:,
+        amount_cents: 100,
+        status: TemplePayment::STATUSES.fetch(status_key)
+      )
+    end
+
+    sign_in_admin(admin)
+
+    get admin_payments_path
+
+    assert_response :success
+    assert_includes response.body, "狀態"
+    assert_select ".admin-payments-table .status-pill.status-refunded", text: "已退款"
+    assert_select ".admin-payments-table .status-pill.status-pending", text: "待處理"
+    assert_select ".admin-payments-table .status-pill.status-failed", text: "失敗"
+    assert_select ".admin-payments-table .status-pill.status-completed", text: "已完成"
+  end
+
   test "payments index shows matching total when visible ledger is capped" do
     admin = create_admin_user(temple: @temple)
     permission = AdminPermission.find_by(admin_account: admin.admin_account, temple: @temple)
