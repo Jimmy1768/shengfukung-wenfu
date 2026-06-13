@@ -120,6 +120,56 @@ module Api
         assert_equal TempleRegistration::PAYMENT_STATUSES[:paid], registration.reload.payment_status
       end
 
+      test "ecpay failed server callback does not mark payment received" do
+        temple = create_temple(slug: "ecpay-webhook-failed-temple")
+        offering = create_offering(temple:, slug: "ecpay-webhook-failed-offering", price_cents: 1000)
+        user = User.create!(
+          email: "ecpay-webhook-failed-user@example.com",
+          english_name: "ECPay Webhook Failed User",
+          encrypted_password: User.password_hash("Password123!")
+        )
+        registration = create_registration(user:, offering:)
+        payment = create_payment(
+          registration: registration,
+          status: TemplePayment::STATUSES[:pending],
+          method: TemplePayment::PAYMENT_METHODS[:ecpay],
+          provider: "ecpay",
+          provider_reference: "TMFAILED1234567",
+          processed_at: nil
+        )
+
+        with_env(
+          "ECPAY_MERCHANT_ID" => "2000132",
+          "ECPAY_HASH_KEY" => "5294y06JbISpM5x9",
+          "ECPAY_HASH_IV" => "v77hoKGq4kWxNNIS"
+        ) do
+          fields = {
+            "MerchantID" => "2000132",
+            "MerchantTradeNo" => payment.provider_reference,
+            "RtnCode" => "0",
+            "RtnMsg" => "Failed",
+            "TradeNo" => "2404070000000000",
+            "TradeAmt" => payment.amount_cents.to_s,
+            "TradeStatus" => "0",
+            "PaymentType" => "Credit_CreditCard",
+            "CheckMacValue" => ""
+          }
+          fields["CheckMacValue"] = Payments::Taiwan::EcpayChecksum.generate(
+            fields: fields,
+            hash_key: ENV.fetch("ECPAY_HASH_KEY"),
+            hash_iv: ENV.fetch("ECPAY_HASH_IV")
+          )
+
+          post api_v1_payment_webhook_path(provider: "ecpay", temple: temple.slug), params: fields
+        end
+
+        assert_response :success
+        assert_equal "1|OK", response.body
+        assert_equal TemplePayment::STATUSES[:failed], payment.reload.status
+        assert_equal TempleRegistration::PAYMENT_STATUSES[:failed], registration.reload.payment_status
+        assert_nil payment.processed_at
+      end
+
       private
 
       def with_env(overrides)

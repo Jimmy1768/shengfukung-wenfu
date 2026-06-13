@@ -133,6 +133,40 @@ module Payments
       end
     end
 
+    test "ecpay cancelled return does not mark registration paid" do
+      registration = FakeRegistration.new("REG-124", TempleRegistration::PAYMENT_STATUSES[:pending], FakeTemple.new(1))
+      payment = FakePayment.new(
+        id: 11,
+        status: TemplePayment::STATUSES[:pending],
+        provider_reference: "order_cancelled_123",
+        amount_cents: 1200,
+        currency: "TWD",
+        payment_payload: {},
+        metadata: {},
+        temple_registration: registration
+      )
+      adapter = FakeAdapter.new(query_status: "cancelled")
+      repository = FakeRepository.new(payment)
+      audit_logger = FakeAuditLogger.new([])
+      registration.define_singleton_method(:temple_payments) { TemplePayment.none }
+      service = CheckoutReturnService.new(provider_resolver: FakeResolver.new(adapter), payment_repository: repository, audit_logger: audit_logger)
+      service.stub(:latest_payment_for!, payment) do
+        result = service.call(
+          registration: registration,
+          provider: "ecpay",
+          params: { MerchantTradeNo: "order_cancelled_123", RtnCode: "0" }
+        )
+
+        assert_equal TemplePayment::STATUSES[:failed], result.payment.status
+        assert_equal TempleRegistration::PAYMENT_STATUSES[:failed], registration.payment_status
+        assert_equal 0, adapter.confirm_calls.length
+        assert_equal 1, adapter.query_calls.length
+        refute registration.paid?
+        assert_includes audit_logger.calls.map { |call| call[:action] }, "system.registrations.payment_status_updated"
+        assert_includes audit_logger.calls.map { |call| call[:action] }, "system.payments.reconciled"
+      end
+    end
+
     test "fake provider return queries status" do
       registration = FakeRegistration.new("REG-321", TempleRegistration::PAYMENT_STATUSES[:pending], FakeTemple.new(1))
       payment = FakePayment.new(

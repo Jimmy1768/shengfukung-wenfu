@@ -29,11 +29,15 @@ module Payments
     end
 
     class FakeResolver
+      attr_reader :resolved_provider, :resolved_kwargs
+
       def initialize(adapter)
         @adapter = adapter
       end
 
-      def resolve(provider:)
+      def resolve(provider:, **kwargs)
+        @resolved_provider = provider
+        @resolved_kwargs = kwargs
         @adapter
       end
     end
@@ -124,6 +128,34 @@ module Payments
 
       assert_equal TemplePayment::STATUSES[:completed], repository.applied_status
       assert_equal TemplePayment::STATUSES[:completed], result.payment.status
+      assert_equal false, result.reused
+    end
+
+    test "ecpay checkout stays pending until provider confirmation" do
+      repository = FakeRepository.new
+      resolver = FakeResolver.new(FakeAdapter.new(status: "pending"))
+      service = CheckoutService.new(
+        payment_repository: repository,
+        provider_resolver: resolver
+      )
+      temple = FakeTemple.new(1)
+
+      result = service.call(
+        registration: FakeRegistration.new(temple, nil),
+        amount_cents: 1200,
+        currency: "TWD",
+        provider: "ecpay",
+        idempotency_key: "idem-ecpay-pending",
+        intent_key: "intent-ecpay-pending"
+      )
+
+      assert_equal "ecpay", repository.created_attrs[:provider]
+      assert_equal TemplePayment::PAYMENT_METHODS[:ecpay], repository.created_attrs[:payment_method]
+      assert_equal TemplePayment::STATUSES[:pending], repository.applied_status
+      assert_equal TemplePayment::STATUSES[:pending], result.payment.status
+      assert_equal "pay_ref_123", result.payment.provider_reference
+      assert_equal "ecpay", resolver.resolved_provider
+      assert_equal temple, resolver.resolved_kwargs[:temple]
       assert_equal false, result.reused
     end
 
