@@ -1241,11 +1241,6 @@ en:
         title: "Filter payments"
         subtitle: "Search patrons, offerings, payment methods, or provide a custom date range."
         default_window_hint: "Default view limits results to the last 90 days. Add a range to expand."
-      statuses:
-        pending: "Pending"
-        completed: "Completed"
-        failed: "Failed"
-        refunded: "Refunded"
       methods:
         cash: "Cash"
         ecpay: "ECPay"

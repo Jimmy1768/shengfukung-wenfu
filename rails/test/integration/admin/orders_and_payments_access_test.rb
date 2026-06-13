@@ -136,9 +136,10 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "狀態"
     assert_select ".admin-payments-table .status-pill.status-refunded", text: "已退款"
-    assert_select ".admin-payments-table .status-pill.status-pending", text: "待處理"
+    assert_select ".admin-payments-table .status-pill.status-pending", text: "待付款"
     assert_select ".admin-payments-table .status-pill.status-failed", text: "失敗"
     assert_select ".admin-payments-table .status-pill.status-completed", text: "已完成"
+    assert_select "select[name='filter[status]'] option[value='pending']", text: "待付款"
   end
 
   test "payments index shows matching total when visible ledger is capped" do

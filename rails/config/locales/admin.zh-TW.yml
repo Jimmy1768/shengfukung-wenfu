@@ -1239,11 +1239,6 @@ zh-TW:
         title: "篩選付款"
         subtitle: "可依信眾、供品、付款方式或自訂日期區間搜尋。"
         default_window_hint: "預設僅顯示最近 90 天，如需查看更多請輸入日期區間。"
-      statuses:
-        pending: "待處理"
-        completed: "已完成"
-        failed: "失敗"
-        refunded: "已退款"
       methods:
         cash: "現金"
         ecpay: "ECPay"
