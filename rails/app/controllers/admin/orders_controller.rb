@@ -8,14 +8,21 @@ module Admin
       @filters = normalized_filter_params
       scoped = current_temple.temple_event_registrations
         .merge(TempleEventRegistration.admin_filtered(@filters))
-      @unpaid_orders = scoped
+      @orders_visible_limit = 50
+      unpaid_scope = scoped
         .where.not(payment_status: TempleEventRegistration::PAYMENT_STATUSES[:paid])
-        .order(created_at: :desc)
-        .limit(50)
-      @recent_orders = scoped
+      paid_scope = scoped
         .where(payment_status: TempleEventRegistration::PAYMENT_STATUSES[:paid])
+      @unpaid_orders_total_count = unpaid_scope.count
+      @recent_orders_total_count = paid_scope.count
+      @unpaid_orders = unpaid_scope
         .order(created_at: :desc)
-        .limit(50)
+        .limit(@orders_visible_limit)
+        .to_a
+      @recent_orders = paid_scope
+        .order(created_at: :desc)
+        .limit(@orders_visible_limit)
+        .to_a
       @filter_offerings = [
         current_temple.temple_events.order(:title),
         current_temple.temple_services.order(:title),

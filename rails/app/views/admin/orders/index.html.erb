@@ -22,8 +22,17 @@
       <section class="card stack-item stack-item--fluid admin-table-card">
         <header class="admin-section-header">
           <div>
-            <h2>Needs payment</h2>
-            <p class="muted">Unpaid registrations are shown here first.</p>
+            <h2><%= t("admin.orders.index.unpaid.title") %></h2>
+            <p class="muted">
+              <%= t(
+                "admin.orders.index.unpaid.count_summary",
+                visible: @unpaid_orders.size,
+                total: @unpaid_orders_total_count
+              ) %>
+              <% if @unpaid_orders_total_count > @unpaid_orders.size %>
+                <%= t("admin.orders.index.cap_hint", limit: @orders_visible_limit) %>
+              <% end %>
+            </p>
           </div>
         </header>
 
@@ -36,8 +45,17 @@
     <section class="card stack-item stack-item--fluid admin-table-card">
       <header class="admin-section-header">
         <div>
-          <h2>Recent orders</h2>
-          <p class="muted">Paid registrations sorted by newest first.</p>
+          <h2><%= t("admin.orders.index.recent.title") %></h2>
+          <p class="muted">
+            <%= t(
+              "admin.orders.index.recent.count_summary",
+              visible: @recent_orders.size,
+              total: @recent_orders_total_count
+            ) %>
+            <% if @recent_orders_total_count > @recent_orders.size %>
+              <%= t("admin.orders.index.cap_hint", limit: @orders_visible_limit) %>
+            <% end %>
+          </p>
         </div>
       </header>
 

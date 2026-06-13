@@ -978,6 +978,13 @@ zh-TW:
         body: "在這裡先檢閱近期報名，後續會再加入進階篩選。"
         empty: "此宮廟尚未建立任何報名。"
         guest_fallback: "訪客"
+        cap_hint: "表格先顯示最新 %{limit} 筆；請使用篩選條件縮小清單。"
+        unpaid:
+          title: "待付款"
+          count_summary: "目前顯示 %{visible} 筆，共 %{total} 筆符合條件的待付款報名。"
+        recent:
+          title: "最新訂單"
+          count_summary: "目前顯示 %{visible} 筆，共 %{total} 筆符合條件的已付款報名。"
         table:
           patron: "申請人"
           source: "來源"
@@ -1214,7 +1221,9 @@ zh-TW:
           by_date: "依日期"
         recent:
           eyebrow: "最新紀錄"
-          title: "最近 100 筆付款"
+          title: "最近 200 筆付款"
+          count_summary: "目前顯示 %{visible} 筆，共 %{total} 筆符合條件的付款紀錄。"
+          cap_hint: "表格先顯示最新 %{limit} 筆；CSV 匯出會包含完整篩選結果。"
         table:
           reference: "編號"
           patron: "信眾"

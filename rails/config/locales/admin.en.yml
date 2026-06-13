@@ -1097,6 +1097,13 @@ en:
         body: "Use this list to review recent registrations before refining the reporting filters in the next phase."
         empty: "No registrations have been recorded for this temple yet."
         guest_fallback: "Guest"
+        cap_hint: "Showing the latest %{limit} first; use filters to narrow the list."
+        unpaid:
+          title: "Needs payment"
+          count_summary: "Showing %{visible} of %{total} matching unpaid registrations."
+        recent:
+          title: "Recent orders"
+          count_summary: "Showing %{visible} of %{total} matching paid registrations."
         table:
           patron: "Patron"
           source: "Source"
@@ -1216,7 +1223,9 @@ en:
           by_date: "By date"
         recent:
           eyebrow: "Recent activity"
-          title: "Latest 100 payments"
+          title: "Latest 200 payments"
+          count_summary: "Showing %{visible} of %{total} matching payment records."
+          cap_hint: "Showing the latest %{limit} first; CSV export includes the full filtered result."
         table:
           reference: "Reference"
           patron: "Patron"

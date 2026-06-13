@@ -54,6 +54,38 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
     assert_includes response.body, @registration.reference_code
   end
 
+  test "orders index shows matching totals when visible tables are capped" do
+    admin = create_admin_user(temple: @temple)
+    permission = AdminPermission.find_by(admin_account: admin.admin_account, temple: @temple)
+    permission.update!(manage_registrations: true)
+
+    52.times do |index|
+      create_registration(
+        user: @user,
+        offering: @offering,
+        reference_code: "PENDING-#{index}",
+        payment_status: TempleEventRegistration::PAYMENT_STATUSES[:pending]
+      )
+    end
+    51.times do |index|
+      create_registration(
+        user: @user,
+        offering: @offering,
+        reference_code: "PAID-#{index}",
+        payment_status: TempleEventRegistration::PAYMENT_STATUSES[:paid]
+      )
+    end
+
+    sign_in_admin(admin)
+
+    get admin_orders_path
+
+    assert_response :success
+    assert_includes response.body, "目前顯示 50 筆，共 53 筆符合條件的待付款報名。"
+    assert_includes response.body, "目前顯示 50 筆，共 51 筆符合條件的已付款報名。"
+    assert_includes response.body, "表格先顯示最新 50 筆"
+  end
+
   test "admin without manage_registrations is redirected from orders index" do
     admin = create_admin_user(temple: @temple)
     permission = AdminPermission.find_by(admin_account: admin.admin_account, temple: @temple)
@@ -76,6 +108,30 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "付款報表"
+  end
+
+  test "payments index shows matching total when visible ledger is capped" do
+    admin = create_admin_user(temple: @temple)
+    permission = AdminPermission.find_by(admin_account: admin.admin_account, temple: @temple)
+    permission.update!(view_financials: true)
+
+    200.times do |index|
+      registration = create_registration(
+        user: @user,
+        offering: @offering,
+        reference_code: "PAYMENT-#{index}",
+        payment_status: TempleEventRegistration::PAYMENT_STATUSES[:paid]
+      )
+      create_payment(registration:, amount_cents: 100)
+    end
+
+    sign_in_admin(admin)
+
+    get admin_payments_path
+
+    assert_response :success
+    assert_includes response.body, "目前顯示 200 筆，共 201 筆符合條件的付款紀錄。"
+    assert_includes response.body, "CSV 匯出會包含完整篩選結果"
   end
 
   test "admin without view_financials is redirected from payments index" do

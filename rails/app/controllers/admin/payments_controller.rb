@@ -15,9 +15,12 @@ module Admin
       apply_month_preset!
       apply_default_payment_range!
       scoped = filtered_payments_scope
+      @payments_visible_limit = 200
+      @payments_total_count = scoped.count
       @payments = scoped
         .order(Arel.sql("COALESCE(temple_payments.processed_at, temple_payments.created_at) DESC"))
-        .limit(200)
+        .limit(@payments_visible_limit)
+        .to_a
       @payment_summary = Reporting::PaymentSummary.new(payments: scoped)
       @show_export = current_admin_permissions&.allow?(:export_financials)
       @filter_offerings = [

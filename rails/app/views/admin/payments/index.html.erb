@@ -134,6 +134,16 @@
     <section class="card stack-item stack-item--fluid stack-item--with-gutter admin-table-card">
       <header>
         <h2><%= t("admin.payments.index.recent.title") %></h2>
+        <p class="muted">
+          <%= t(
+            "admin.payments.index.recent.count_summary",
+            visible: @payments.size,
+            total: @payments_total_count
+          ) %>
+          <% if @payments_total_count > @payments.size %>
+            <%= t("admin.payments.index.recent.cap_hint", limit: @payments_visible_limit) %>
+          <% end %>
+        </p>
       </header>
 
       <%= render "ledger_table", payments: @payments, empty_message: t("admin.payments.index.empty") %>
