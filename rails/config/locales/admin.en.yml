@@ -1204,6 +1204,7 @@ en:
         eyebrow: "Payments"
         title: "Payment reporting"
         body: "Use this as the primary monthly reporting screen: review the current payment summary first, then narrow filters and export CSV for finance handoff."
+        policy_note: "ECPay online payments count as received after provider confirmation. Cash is an admin-attested receipt when staff marks it received. Failed or canceled attempts are not received; refunds are not completed revenue."
         export: "Download CSV export"
         presets:
           this_month: "This month"
@@ -1233,6 +1234,7 @@ en:
           method: "Method"
           amount: "Amount"
           status: "Status"
+          source: "Source"
           registration: "Registration"
           recorded_by: "Recorded by"
           processed: "Processed"
@@ -1241,6 +1243,13 @@ en:
         title: "Filter payments"
         subtitle: "Search patrons, offerings, payment methods, or provide a custom date range."
         default_window_hint: "Default view limits results to the last 90 days. Add a range to expand."
+        month_close_hint: "On the 1st of each month, choose Last month and export CSV for external accounting. V1 does not lock the month."
+      sources:
+        admin_attested_cash: "Admin cash receipt"
+        provider_confirmed: "%{provider} confirmed"
+        provider_pending: "%{provider} pending"
+        provider_failed: "%{provider} failed/canceled"
+        provider_refunded: "%{provider} refunded"
       methods:
         cash: "Cash"
         ecpay: "ECPay"

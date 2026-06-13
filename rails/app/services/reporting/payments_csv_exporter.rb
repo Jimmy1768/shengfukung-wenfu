@@ -14,6 +14,9 @@ module Reporting
       "Registration Period Key",
       "Method",
       "Status",
+      "Source",
+      "Provider",
+      "Provider Reference",
       "Amount",
       "Currency",
       "Recorded By"
@@ -52,6 +55,9 @@ module Reporting
         registration_period_key_for(registration),
         payment.payment_method,
         payment.status,
+        source_for(payment),
+        payment.provider,
+        provider_reference_for(payment),
         format_amount(payment.amount_cents),
         payment.currency,
         recorded_by
@@ -91,6 +97,21 @@ module Reporting
       else
         "—"
       end
+    end
+
+    def source_for(payment)
+      return "admin_attested_cash" if payment.cash? || payment.provider == "manual_cash"
+      return "provider_confirmed" if payment.completed?
+      return "provider_pending" if payment.pending?
+      return "provider_refunded" if payment.refunded?
+
+      "provider_failed_or_cancelled"
+    end
+
+    def provider_reference_for(payment)
+      payment.provider_reference.presence ||
+        payment.external_reference.presence ||
+        payment.id
     end
   end
 end

@@ -1202,6 +1202,7 @@ zh-TW:
         eyebrow: "收款"
         title: "付款報表"
         body: "每月帳務以此頁為主，先看本月收款摘要，再依條件縮小並匯出 CSV 給財務彙整。"
+        policy_note: "ECPay 線上付款以金流確認為準；現金收款為管理員按下已收款後的人工紀錄。失敗或取消不列入已收款，退款不列入完成收入。"
         export: "下載 CSV 匯出"
         presets:
           this_month: "本月"
@@ -1231,6 +1232,7 @@ zh-TW:
           method: "付款方式"
           amount: "金額"
           status: "狀態"
+          source: "收款依據"
           registration: "報名"
           recorded_by: "紀錄人員"
           processed: "處理時間"
@@ -1239,6 +1241,13 @@ zh-TW:
         title: "篩選付款"
         subtitle: "可依信眾、供品、付款方式或自訂日期區間搜尋。"
         default_window_hint: "預設僅顯示最近 90 天，如需查看更多請輸入日期區間。"
+        month_close_hint: "每月 1 日請選擇「上月」並匯出 CSV，交由外部帳務處理；V1 不會鎖定月份。"
+      sources:
+        admin_attested_cash: "管理員收現"
+        provider_confirmed: "%{provider} 已確認"
+        provider_pending: "%{provider} 待確認"
+        provider_failed: "%{provider} 失敗/取消"
+        provider_refunded: "%{provider} 已退款"
       methods:
         cash: "現金"
         ecpay: "ECPay"

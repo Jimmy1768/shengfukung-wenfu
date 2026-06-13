@@ -108,6 +108,8 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "付款報表"
+    assert_includes response.body, "ECPay 線上付款以金流確認為準"
+    assert_includes response.body, "每月 1 日請選擇「上月」並匯出 CSV"
   end
 
   test "payments index shows payment status for reconciliation" do
@@ -135,10 +137,12 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "狀態"
+    assert_includes response.body, "收款依據"
     assert_select ".admin-payments-table .status-pill.status-refunded", text: "已退款"
     assert_select ".admin-payments-table .status-pill.status-pending", text: "待付款"
     assert_select ".admin-payments-table .status-pill.status-failed", text: "失敗"
     assert_select ".admin-payments-table .status-pill.status-completed", text: "已完成"
+    assert_select ".admin-payments-table .payment-method-pill", text: "管理員收現"
     assert_select "select[name='filter[status]'] option[value='pending']", text: "待付款"
   end
 
@@ -181,6 +185,11 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
     admin = create_admin_user(temple: @temple)
     permission = AdminPermission.find_by(admin_account: admin.admin_account, temple: @temple)
     permission.update!(view_financials: true, export_financials: true)
+    @payment.update!(
+      provider: "ecpay",
+      payment_method: TemplePayment::PAYMENT_METHODS[:ecpay],
+      provider_reference: "ECPAY-REF-123"
+    )
 
     sign_in_admin(admin)
 
@@ -189,6 +198,8 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.content_type, "text/csv"
     assert_includes response.body, "Reference"
+    assert_includes response.body, "Source,Provider,Provider Reference"
+    assert_includes response.body, "provider_confirmed,ecpay,ECPAY-REF-123"
   end
 
   test "payments export respects active date filters" do
