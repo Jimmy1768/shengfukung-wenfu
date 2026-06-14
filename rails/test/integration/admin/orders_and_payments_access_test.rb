@@ -84,6 +84,8 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "目前顯示 50 筆，共 53 筆符合條件的待付款報名。"
     assert_includes response.body, "目前顯示 50 筆，共 51 筆符合條件的已付款報名。"
     assert_includes response.body, "表格先顯示最新 50 筆"
+    assert_includes response.body, "標記已收款"
+    refute_includes response.body, "Mark as paid"
   end
 
   test "admin without manage_registrations is redirected from orders index" do

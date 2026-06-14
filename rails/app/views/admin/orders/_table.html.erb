@@ -68,7 +68,7 @@
             <td class="table-actions">
               <div class="table-actions__buttons">
                 <% if show_mark_button && registration.payment_status != TempleEventRegistration::PAYMENT_STATUSES[:paid] %>
-                  <button type="button" class="btn btn-ghost btn-small" disabled>Mark as paid</button>
+                  <button type="button" class="btn btn-ghost btn-small" disabled><%= t("admin.orders.index.table.mark_received") %></button>
                 <% end %>
                 <% if registration.offering.present? %>
                   <%= link_to t("admin.orders.index.table.view"),

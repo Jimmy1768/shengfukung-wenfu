@@ -1113,6 +1113,7 @@ en:
           status: "Status"
           actions: "Actions"
           view: "View"
+          mark_received: "Mark as received"
           unpaid_payment: "Unpaid"
           no_payment_required: "No payment required"
           reference_hint: "Reference %{reference}"

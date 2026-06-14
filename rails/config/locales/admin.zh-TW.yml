@@ -994,6 +994,7 @@ zh-TW:
           status: "狀態"
           actions: "操作"
           view: "檢視"
+          mark_received: "標記已收款"
           unpaid_payment: "未付款"
           no_payment_required: "無需付款"
           reference_hint: "訂單編號 %{reference}"
