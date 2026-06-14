@@ -246,6 +246,61 @@ class AdminOrdersAndPaymentsAccessTest < ActionDispatch::IntegrationTest
     refute_includes response.body, older_registration.reference_code
   end
 
+  test "payments export applies last month preset for previous month accounting handoff" do
+    travel_to Time.zone.local(2026, 3, 1, 10, 0, 0) do
+      admin = create_admin_user(temple: @temple)
+      permission = AdminPermission.find_by(admin_account: admin.admin_account, temple: @temple)
+      permission.update!(view_financials: true, export_financials: true)
+
+      last_month_registration = create_registration(
+        user: @user,
+        offering: @offering,
+        reference_code: "REG-LAST-MONTH-EXPORT"
+      )
+      create_payment(
+        registration: last_month_registration,
+        amount_cents: 1200,
+        status: TemplePayment::STATUSES[:completed],
+        method: TemplePayment::PAYMENT_METHODS[:ecpay],
+        provider: "ecpay",
+        provider_reference: "ECPAY-LAST-MONTH-REF",
+        processed_at: Time.zone.local(2026, 2, 10, 9, 30, 0)
+      )
+
+      current_month_registration = create_registration(
+        user: @user,
+        offering: @offering,
+        reference_code: "REG-CURRENT-MONTH-EXPORT"
+      )
+      create_payment(
+        registration: current_month_registration,
+        amount_cents: 3400,
+        status: TemplePayment::STATUSES[:completed],
+        method: TemplePayment::PAYMENT_METHODS[:ecpay],
+        provider: "ecpay",
+        provider_reference: "ECPAY-CURRENT-MONTH-REF",
+        processed_at: Time.zone.local(2026, 3, 1, 9, 30, 0)
+      )
+
+      sign_in_admin(admin)
+
+      get export_admin_payments_path(format: :csv), params: {
+        filter: {
+          month_preset: "last_month"
+        }
+      }
+
+      assert_response :success
+      assert_includes response.content_type, "text/csv"
+      assert_includes response.headers["Content-Disposition"], "2026-02-01-to-2026-02-28"
+      assert_includes response.body, "Processed At,Reference,Patron,Patron Phone,Offering Type,Offering,Registration Period Key,Method,Status,Source,Provider,Provider Reference,Amount,Currency,Recorded By"
+      assert_includes response.body, "REG-LAST-MONTH-EXPORT"
+      assert_includes response.body, "provider_confirmed,ecpay,ECPAY-LAST-MONTH-REF"
+      refute_includes response.body, "REG-CURRENT-MONTH-EXPORT"
+      refute_includes response.body, "ECPAY-CURRENT-MONTH-REF"
+    end
+  end
+
   test "payments month preset filters the visible report" do
     travel_to Time.zone.local(2026, 3, 12, 12, 0, 0) do
       admin = create_admin_user(temple: @temple)

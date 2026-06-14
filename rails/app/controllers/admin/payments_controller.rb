@@ -34,6 +34,7 @@ module Admin
     end
 
     def export
+      apply_month_preset!
       exporter = Reporting::PaymentsCsvExporter.new(
         payments: filtered_payments_scope.includes(:temple_registration, :user, admin_account: :user)
       )
