@@ -19,11 +19,6 @@ Bundler.require(*Rails.groups)
 require_relative "../app/lib/profile/identity"
 require_relative "../app/middleware/api_protection/audit_middleware"
 
-#
-# IMPORTANT:
-# Replace "Backend" with the **actual module name** of your backend folder.
-# Since your Golden Template folder is called /backend, the module name is Backend.
-#
 module Backend
   class Application < Rails::Application
     # Initialize configuration defaults for Rails 7.1

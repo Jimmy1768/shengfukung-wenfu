@@ -1,6 +1,6 @@
 # config/initializers/cors.rb
 #
-# CORS configuration for the Golden Template.
+# CORS configuration for Sheng Fu Kung Wen Fu.
 #
 # Principle:
 # - Allow specific trusted domains only (from ENV).
