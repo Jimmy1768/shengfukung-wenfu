@@ -6,7 +6,7 @@ files_changed:
 exact_css_repair:
   - Replaced the invalid mixed rule `@media (prefers-color-scheme: light), [data-theme='golden-light'] .lumen-harbor .lh-hero-copy` with a valid `@media (prefers-color-scheme: light)` block targeting `.lumen-harbor .lh-hero-copy`.
   - Added a separate standalone selector `[data-theme='golden-light'] .lumen-harbor .lh-hero-copy { color: #f8fafc; }`.
-commit_hash_and_subject: ccaca757de42cd896ce2b4c2ac8a97fb4821e4ca Fix LumenHarbor light theme CSS
+commit_hash_and_subject: 1b17335167a58162d8c26274019f6131d0c81529 Fix LumenHarbor light theme CSS
 checks:
   - `git status --short --branch` before edits showed `## main...origin/main` and only `?? docs/operator/handoffs/2026-07-11-lumenharbor-css-warning-repair.md`.
   - `git rev-parse HEAD main origin/main` returned `34194796ffcb1ec24c3f88f0c562c2272753d4a1` for all three refs.
