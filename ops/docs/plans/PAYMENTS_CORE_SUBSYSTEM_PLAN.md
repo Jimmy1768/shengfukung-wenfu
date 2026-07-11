@@ -8,9 +8,12 @@
 ## Locked Decisions
 
 - Build and use the shared payments core now.
-- Use `ECPay` as the main hosted online payment provider for this Taiwan-only repo.
+- Use `ECPay` as the default hosted online payment provider for this
+  Taiwan-only repo.
 - Keep `PAYMENTS_PROVIDER=fake` available for tests and dummy local flows.
 - Do not depend on LINE Pay or Stripe Connect onboarding for launch.
+- Cash is a trusted admin-marked `received` action with audit evidence; the
+  system does not independently verify cash movement.
 
 ## What Is Already Built
 
@@ -47,6 +50,14 @@ Completed:
 Not in scope right now:
 - [ ] Any hosted checkout provider besides ECPay
 - [ ] Advanced reconciliation/admin tooling
+
+## Evidence Boundary
+
+- Local and sandbox verification can prove code-path readiness and status
+  handling.
+- Local and sandbox verification do not equal production acceptance.
+- Production payment readiness still depends on separate credential, callback,
+  and promotion approval work under the production boundary.
 
 ## Remaining Work
 

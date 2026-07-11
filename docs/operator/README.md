@@ -1,21 +1,27 @@
 # Shengfukung Wenfu Operator Workflow
 
-This folder holds Shengfukung Wenfu-local OperatorKit records.
+This folder holds Shengfukung Wenfu-local handoff records used by Wenfu Control
+and Wenfu Handoff tasks.
 
 SourceGrid remains the cross-repo and product coordinator of record. These files
 coordinate Shengfukung Wenfu-internal Rails, Vue, Expo, deployment, and docs
 work only.
+
+These records support Codex collaboration only. Codex is not governed by
+OperatorKit, and no OperatorKit kernel is installed into Codex for this repo.
 
 ## Folder Shape
 
 - `docs/operator/workflows/`
   Active or durable local workflow packets.
 - `docs/operator/handoffs/`
-  Detailed coordinator handoffs for Shengfukung Wenfu implementation, research, or docs threads.
+  Detailed Wenfu Control handoffs for Shengfukung Wenfu implementation,
+  research, or docs tasks.
 - `docs/operator/returns/`
-  Detailed implementation or research returns from local threads.
+  Detailed implementation or research returns from Wenfu Handoff tasks.
 - `docs/operator/acceptances/`
-  Coordinator acceptance, retry, rejection, blocked, or route-onward decisions.
+  Wenfu Control acceptance, retry, rejection, blocked, or route-onward
+  decisions.
 - `docs/operator/execution_records/`
   Durable records of what happened after a return and acceptance decision.
 - `docs/operator/friction_records/`
@@ -44,12 +50,23 @@ Do not paste the full handoff or return in chat if the file exists.
 
 Do not ask the receiving thread to infer the file path.
 
-Do not let implementation threads decide acceptance.
+Do not let Handoff tasks decide acceptance. Acceptance belongs to Wenfu
+Control only.
+
+## Dispatch
+
+Wenfu Control dispatches work only to an exact-idle Wenfu Handoff task. It does
+not queue new work behind an active task.
+
+Every executable handoff should declare the worker model and reasoning profile
+explicitly. The current accepted default is GPT-5.4 with medium reasoning for a
+bounded Handoff unless Wenfu Control records a different profile in the Handoff
+itself.
 
 ## Authority
 
-Shengfukung Wenfu uses manual OperatorKit Level 0/1 in this lane unless a later
-owner decision upgrades the permission model.
+Shengfukung Wenfu uses manual Wenfu Control/Handoff coordination in this lane
+unless a later owner decision upgrades the permission model.
 
 This folder does not authorize automation, release promotion, deployment,
 server changes, secret access, payment changes, account changes, destructive
@@ -78,7 +95,7 @@ Implementation returns should include:
 
 ## Acceptance
 
-Implementation threads report evidence. They do not decide acceptance.
+Wenfu Handoff tasks report evidence. They do not decide acceptance.
 
 Acceptance records should use one of:
 

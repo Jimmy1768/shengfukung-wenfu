@@ -7,6 +7,20 @@
 - Make the admin onboarding flow low-friction: prefill as much as possible, prefer selectors over free text, and keep repeated patron data flowing through user metadata.
 - Follow the canonical model in `ops/docs/plans/TEMPLE_OFFERING_SYSTEM_SPEC.md` when translating temple-filled worksheets into YAML/runtime structures.
 
+## Current V1 Source Truth
+
+- Current V1 exit path: the real temple admin/staff rehearsal packet at
+  `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/workflows/2026-06-14-real-temple-admin-staff-rehearsal-packet.md`
+  is the single remaining external acceptance gate.
+- Accepted local implementation evidence already exists for the offering setup
+  and adjacent admin flows:
+  - `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/acceptances/2026-06-12-admin-onboarding-qa-sweep-acceptance.md`
+  - `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/acceptances/2026-06-13-ecpay-default-path-local-verification-acceptance.md`
+  - `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/acceptances/2026-06-14-local-admin-agent-qa-sweep-acceptance.md`
+  - `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/acceptances/2026-06-14-real-temple-admin-staff-rehearsal-readiness-acceptance.md`
+- Those acceptances prove local prototype/admin readiness only. They do not
+  claim production acceptance or production promotion.
+
 ## Product Rules
 
 - `rails/db/temples/offerings/<slug>.yml` is the single source of truth for offering template shape.
@@ -68,9 +82,12 @@ And do so without breaking the long-term separation between:
 - [x] Shengfukung V1 offerings YAML is in place and replaces the dummy file.
 - [x] Admin offering creation now reads the YAML correctly, with template-owned lifecycle UI and TWD whole-unit pricing input.
 - [x] Duplicate-policy behavior is now modeled as an offering-level template/runtime flag (`allow_repeat_registrations`).
+- [x] Local admin onboarding, offering setup, and ECPay-default-path QA evidence has been accepted for repo-local review.
+- [x] Rehearsal-readiness packet is accepted and ready for a real participant session.
 - [ ] Duplicate-policy behavior still needs end-to-end validation on the patron registration path.
 - [ ] Patron-side registration reuse / write-back still needs full validation against the finalized Shengfukung templates.
-- [ ] Production rollout still needs temple bootstrap + first real offering creation on the droplet.
+- [ ] Real temple admin/staff rehearsal remains the required external V1 gate.
+- [ ] Production rollout still needs a separate production-promotion workflow and approval.
 
 ## Phase 1: Source Mapping
 

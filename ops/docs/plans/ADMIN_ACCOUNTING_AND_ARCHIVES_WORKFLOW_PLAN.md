@@ -6,6 +6,21 @@
 - Close the gap between current CSV export tooling and the expected "monthly report" task.
 - Refine Archives so staff can search by patron name without being forced to enter a date range first.
 
+## Current V1 Source Truth
+
+- Accepted local accounting/admin evidence already exists:
+  - large-data admin QA:
+    `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/acceptances/2026-06-12-accounting-large-data-admin-qa-sweep-acceptance.md`
+  - accounting policy readiness:
+    `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/acceptances/2026-06-13-v1-admin-accounting-policy-readiness-acceptance.md`
+  - previous-month export rehearsal:
+    `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/acceptances/2026-06-14-previous-month-accounting-export-rehearsal-acceptance.md`
+- These records establish local/admin workflow evidence, not production
+  accounting acceptance.
+- The real temple admin/staff rehearsal remains pending as the external V1
+  usability gate:
+  `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/workflows/2026-06-14-real-temple-admin-staff-rehearsal-packet.md`
+
 ## Why This Needs A Dedicated Plan
 
 Current repo reality:
@@ -233,7 +248,8 @@ This prevents accidental broad unbounded archive queries while matching staff wo
 ## Open Decisions
 
 - [x] Monthly reporting lives under `Payments`; `Archives` is the lookup/history surface.
-- [ ] Is CSV sufficient for temple accounting handoff, or is `.xlsx` required?
+- [x] CSV is sufficient for the current V1 local/admin handoff path unless a
+  real staff rehearsal shows it is inadequate.
 - [ ] Should patron resolution show a picker list when 2-5 matches exist, or force search refinement?
 - [ ] For one matched patron, should archive history include:
   - registrations
@@ -278,6 +294,10 @@ This prevents accidental broad unbounded archive queries while matching staff wo
 
 - `Payments` is the monthly reporting entry point because monthly reporting is normal operating work.
 - `Archives` is the historical lookup surface used to dig up past records, especially when staff are investigating an issue.
+- Cash remains an admin-attested workflow and previous-month export remains an
+  external/manual accounting handoff, not an in-app close process.
+- Production acceptance remains pending and requires the real temple rehearsal
+  plus a separate production-promotion decision.
 
 ## Regression Coverage Implemented
 

@@ -23,6 +23,15 @@ Important current gap:
 - payment and money-adjacent actions should be treated as high-value audit events
 - account self-service actions need a deliberate policy so the app does not log everything blindly
 
+Recent integrated hardening evidence:
+
+- `origin/main` commit `5e5ad16f4f254109cf7cb0f33d0757c617f4de6c` and local
+  offering-setup commit `dab42756e23496c2f04ab487d7c315ee0edc57a4` are
+  patch-equivalent API audit middleware hardening commits.
+- That hardening tightened API audit middleware behavior and added focused
+  integration coverage without completing the remaining retention or audit-log
+  access phases.
+
 ## Goal
 
 Make audit logging intentional:

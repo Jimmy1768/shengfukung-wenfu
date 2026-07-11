@@ -18,6 +18,13 @@ This packet prepares the first real temple admin/staff rehearsal required before
 
 The rehearsal is not a sales demo and not a production launch. It is a structured usability and operational-readiness session proving whether ordinary temple staff can use the admin console to operate V1 without editing YAML or relying on an engineer-led interview for ordinary offering setup.
 
+This packet is also the current external V1 acceptance gate. The consolidated
+current-source plan evidence that leads into this gate is:
+
+- `/Users/jimmy1768/Projects/shengfukung-wenfu/ops/docs/plans/SHENGFUKUNG_OFFERINGS_CONFIG_PLAN.md`
+- `/Users/jimmy1768/Projects/shengfukung-wenfu/ops/docs/plans/ADMIN_ACCOUNTING_AND_ARCHIVES_WORKFLOW_PLAN.md`
+- `/Users/jimmy1768/Projects/shengfukung-wenfu/ops/docs/plans/PAYMENTS_CORE_SUBSYSTEM_PLAN.md`
+
 ## Session Boundary
 
 Allowed:
