@@ -673,7 +673,13 @@ onUnmounted(() => {
   color: var(--primaryForeground);
 }
 
-@media (prefers-color-scheme: light), [data-theme='golden-light'] .lumen-harbor .lh-hero-copy {
+@media (prefers-color-scheme: light) {
+  .lumen-harbor .lh-hero-copy {
+    color: #f8fafc;
+  }
+}
+
+[data-theme='golden-light'] .lumen-harbor .lh-hero-copy {
   color: #f8fafc;
 }
 
