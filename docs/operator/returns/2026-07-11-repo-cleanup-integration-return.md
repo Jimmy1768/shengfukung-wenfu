@@ -1,0 +1,90 @@
+# Wenfu Repository Cleanup Integration Return
+
+Return file:
+`/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/returns/2026-07-11-repo-cleanup-integration-return.md`
+
+- status: complete
+- canonical_branch: `main`
+- starting_state:
+  - repo path: `/Users/jimmy1768/Projects/shengfukung-wenfu`
+  - starting branch: `offering-setup-admin-workflow`
+  - starting worktree state: only untracked handoff file `docs/operator/handoffs/2026-07-11-repo-cleanup-integration.md`
+  - starting branch facts confirmed from Git:
+    - `origin/HEAD -> origin/main`
+    - local `main` at `8b25d09`
+    - `origin/main` at `5e5ad16`
+    - local `offering-setup-admin-workflow` at `dab4275`
+    - `dab4275` and `5e5ad16` were patch-equivalent `Harden API audit middleware` commits
+- plan_and_source_truth_changes:
+  - updated `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/README.md` to use Wenfu Control/Handoff terminology, exact-idle-first dispatch, explicit worker model/reasoning declaration, Control-only acceptance, and the truth that Codex is not governed OperatorKit and no OperatorKit kernel is installed into Codex
+  - deleted stale `/Users/jimmy1768/Projects/shengfukung-wenfu/ops/docs/plans/SHENGFUKUNG_V1_STABILIZATION_PLAN.md`
+  - updated `/Users/jimmy1768/Projects/shengfukung-wenfu/ops/docs/plans/SHENGFUKUNG_OFFERINGS_CONFIG_PLAN.md` to mark the real temple admin/staff rehearsal packet as the single current external V1 gate and to record accepted local offering/admin evidence
+  - updated `/Users/jimmy1768/Projects/shengfukung-wenfu/ops/docs/plans/ADMIN_ACCOUNTING_AND_ARCHIVES_WORKFLOW_PLAN.md` to record accepted large-data QA and previous-month export rehearsal evidence while keeping real staff rehearsal and production acceptance pending
+  - updated `/Users/jimmy1768/Projects/shengfukung-wenfu/ops/docs/plans/PAYMENTS_CORE_SUBSYSTEM_PLAN.md` to keep ECPay as the Taiwan default, state that cash is admin-trusted/manual, and state that local or sandbox evidence is not production acceptance
+  - updated `/Users/jimmy1768/Projects/shengfukung-wenfu/ops/docs/plans/SYSTEM_AUDIT_COVERAGE_AND_RETENTION_PLAN.md` with the integrated API audit middleware hardening evidence without claiming retention/access completion
+  - updated `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/workflows/2026-06-14-real-temple-admin-staff-rehearsal-packet.md` to mark it explicitly as the current external V1 acceptance gate and link the consolidated plan evidence
+  - scanned for stale current-source links to the deleted stabilization plan and found none beyond the executing handoff itself
+- commits_created:
+  - `62049f4` `Consolidate Wenfu cleanup checkpoint`
+  - `b6bf8c3` `Merge remote-tracking branch 'origin/main' into offering-setup-admin-workflow`
+  - `Record Wenfu cleanup integration return` on local `main`
+- integration_evidence:
+  - committed the handoff and source-truth consolidation on `offering-setup-admin-workflow`
+  - merged `origin/main` into `offering-setup-admin-workflow` with an explicit merge commit
+  - merge conflict resolution was not required; `ort` completed the history reconciliation cleanly
+  - fast-forwarded local `main` from `8b25d09` to verified integration commit `b6bf8c3`
+  - verified both required histories are ancestors of local `main`:
+    - `git merge-base --is-ancestor origin/main main` -> exit `0`
+    - `git merge-base --is-ancestor dab42756e23496c2f04ab487d7c315ee0edc57a4 main` -> exit `0`
+  - verified merged-branch visibility before cleanup:
+    - `git branch --merged main` -> `* main`, `offering-setup-admin-workflow`
+  - verified merged-branch visibility after cleanup:
+    - `git branch --merged main` -> `* main`
+- branches_or_worktrees_removed:
+  - deleted local branch `offering-setup-admin-workflow` after it was fully merged into local `main`
+  - no local worktrees existed before the handoff, and none were created by this execution
+- branches_preserved_and_reason:
+  - preserved local `main` as the canonical verified branch
+  - preserved `origin/main` because remote mutation is blocked
+  - preserved `origin/offering-setup-admin-workflow` because remote branch cleanup is blocked by the handoff
+- smoke_checks_with_exact_results:
+  - `git status --short --branch` on merged work branch before fast-forward:
+    - `## offering-setup-admin-workflow...origin/offering-setup-admin-workflow [ahead 4]`
+  - `git diff --check` -> pass, no output
+  - `RAILS_ENV=test bin/rails db:test:prepare` -> exit `0`
+  - Rails focused verification bundle -> pass:
+    - command: `RAILS_ENV=test bin/rails test test/integration/api_protection_middleware_test.rb test/models/temple_offering_setup_draft_test.rb test/services/offerings/setup_field_catalog_test.rb test/services/offerings/setup_draft_applier_test.rb test/integration/admin/offering_setup_drafts_test.rb test/integration/admin/offerings_audit_test.rb test/services/offerings/template_parity_test.rb test/integration/admin/orders_and_payments_access_test.rb test/integration/admin/accounting_reporting_gatherings_test.rb test/integration/admin/payments_flow_test.rb test/integration/admin/archives_access_test.rb test/services/reporting/payments_csv_exporter_test.rb test/services/payments/provider_resolver_test.rb test/services/payments/checkout_service_test.rb test/services/payments/checkout_return_service_test.rb test/services/payments/status_mapper_test.rb test/services/payment_gateway/ecpay_adapter_test.rb test/integration/api/v1/payment_webhooks_test.rb test/integration/admin/layout_css_test.rb test/integration/admin/gatherings_layout_test.rb`
+    - result: `87 runs, 712 assertions, 0 failures, 0 errors, 0 skips`
+  - `npm run build` from `/Users/jimmy1768/Projects/shengfukung-wenfu/vue` -> exit `0`
+    - Vite build completed successfully
+    - esbuild emitted one CSS syntax warning:
+      - `Expected identifier but found "["` at generated CSS around `(prefers-color-scheme: light), [data-theme='golden-light']`
+  - temporary Rails test-mode server smoke:
+    - started `RAILS_ENV=test bin/rails server -b 127.0.0.1 -p 4010`
+    - `curl -s -o /tmp/wenfu-up-body.txt -w "%{http_code}" http://127.0.0.1:4010/up` -> `200`
+    - response body captured as `<!DOCTYPE html><html><body style="background-color: green"></body></html>`
+    - stop verified and port closure proven separately below
+  - `git merge-base --is-ancestor origin/main main` -> exit `0`
+  - `git merge-base --is-ancestor dab42756e23496c2f04ab487d7c315ee0edc57a4 main` -> exit `0`
+  - `git branch --merged main` before local branch deletion -> `* main`, `offering-setup-admin-workflow`
+  - `git status --short --branch` on final main after return commit -> recorded after commit below
+- final_git_status:
+  - `## main...origin/main [ahead 37]`
+- temporary_service_pid_port_and_stop_evidence:
+  - port chosen: `4010`
+  - listener before start check: `lsof -nP -iTCP:4010 -sTCP:LISTEN` -> exit `1`
+  - Puma master PID: `22799`
+  - Puma worker PIDs: `23075`, `23076`
+  - listener during smoke:
+    - `ruby 22799 127.0.0.1:4010 (LISTEN)`
+    - `ruby 23075 127.0.0.1:4010 (LISTEN)`
+    - `ruby 23076 127.0.0.1:4010 (LISTEN)`
+  - stop action: sent `Ctrl-C` to the exact temporary server session
+  - shutdown evidence:
+    - `Gracefully shutting down workers...`
+    - `Goodbye!`
+    - `Exiting`
+  - port closed proof after stop:
+    - `lsof -nP -iTCP:4010 -sTCP:LISTEN` -> exit `1`
+- blockers:
+  - none
