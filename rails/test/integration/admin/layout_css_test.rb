@@ -25,4 +25,16 @@ class AdminLayoutCssTest < ActiveSupport::TestCase
     assert_includes components_css, ".gathering-form-stage"
     assert_includes compiled_css, ".gathering-form-stage"
   end
+
+  test "admin flash badges wrap instead of forcing horizontal overflow" do
+    layout_css = Rails.root.join("app/stylesheets/admin/_layout.scss").read
+    compiled_css = Rails.root.join("public/backend/assets/admin.css").read
+
+    assert_match(/\.admin-flash-tray\s*\{[^}]*min-width:\s*0;/m, layout_css)
+    assert_match(/\.admin-flash\s*\{[^}]*white-space:\s*normal;/m, layout_css)
+    assert_match(/\.admin-flash\s*\{[^}]*overflow-wrap:\s*anywhere;/m, layout_css)
+    assert_match(/\.admin-flash-tray\s*\{[^}]*min-width:\s*0;/m, compiled_css)
+    assert_match(/\.admin-flash\s*\{[^}]*white-space:\s*normal;/m, compiled_css)
+    assert_match(/\.admin-flash\s*\{[^}]*overflow-wrap:\s*anywhere;/m, compiled_css)
+  end
 end

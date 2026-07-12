@@ -792,6 +792,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  min-width: 0;
 }
 .admin-nav .admin-flash {
   padding: 0.25rem 0.75rem;
@@ -800,7 +801,8 @@ body {
   color: var(--accent-foreground, #1b1409);
   font-size: 0.85rem;
   font-weight: 600;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .admin-nav .admin-flash.admin-flash-alert {
   background: var(--danger, #d1452f);

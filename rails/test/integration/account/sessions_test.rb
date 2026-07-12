@@ -85,5 +85,14 @@ module Account
       assert_response :success
       assert_includes response.body, "temple_slug"
     end
+
+    test "login page includes responsive viewport metadata" do
+      temple = create_temple(slug: "shengfukung-wenfu")
+
+      get account_login_path(temple_slug: temple.slug)
+
+      assert_response :success
+      assert_includes response.body, '<meta name="viewport" content="width=device-width, initial-scale=1" />'
+    end
   end
 end

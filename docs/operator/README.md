@@ -87,7 +87,15 @@ unresponsive, unreachable, corrupted, retired, or in system error, and create
 a replacement only after that archival.
 
 Mirrored Codex Work Mode source truth: OperatorKit commits `5f011c4e`,
-`9854262d`, and `b5175f8d`.
+`9854262d`, `b5175f8d`, and `859bf872`.
+
+Wenfu Control's requested repository-Control profile is GPT-5.6-sol / high.
+Wenfu Control owns repo-local planning, readiness, Handoff construction,
+acceptance review, approvals, and Git state. Kernel architecture,
+cross-repository contracts, and authority-boundary analysis route
+Control-to-Control to OperatorKit Control instead of increasing Wenfu Control
+to xhigh. This requested profile is configuration evidence, not runtime
+telemetry proof.
 
 Handoff has no permanent model or reasoning classification. Control selects a
 profile for every bounded job and records `requested_model`,

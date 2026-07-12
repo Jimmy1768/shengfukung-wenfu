@@ -16,4 +16,11 @@ class AdminSessionsTest < ActionDispatch::IntegrationTest
     post admin_sessions_path, params: { session: { email: admin.email, password: "wrong" } }
     assert_response :unprocessable_entity
   end
+
+  test "login page includes responsive viewport metadata" do
+    get admin_login_path
+
+    assert_response :success
+    assert_includes response.body, '<meta name="viewport" content="width=device-width, initial-scale=1" />'
+  end
 end
