@@ -25,6 +25,8 @@ class ArchivesAnnualRollupTest < ActiveSupport::TestCase
     offering = temple.temple_offerings.create!(
       slug: "offering-#{year}-#{SecureRandom.hex(1)}",
       title: "Offering #{year}",
+      starts_on: Time.zone.local(year, 2, 1).to_date,
+      ends_on: Time.zone.local(year, 2, 2).to_date,
       price_cents: amount_cents / [registrations, 1].max,
       currency: "TWD",
       offering_type: "general"
@@ -32,7 +34,7 @@ class ArchivesAnnualRollupTest < ActiveSupport::TestCase
 
     registrations.times do |index|
       registration = temple.temple_event_registrations.create!(
-        temple_offering: offering,
+        registrable: offering,
         reference_code: "REG-#{year}-#{index}",
         quantity: 1,
         unit_price_cents: offering.price_cents,
@@ -46,6 +48,8 @@ class ArchivesAnnualRollupTest < ActiveSupport::TestCase
       TemplePayment.create!(
         temple_event_registration: registration,
         temple:,
+        provider: "demo",
+        provider_account: "temple",
         amount_cents: offering.price_cents,
         currency: "TWD",
         payment_method: TemplePayment::PAYMENT_METHODS[:cash],

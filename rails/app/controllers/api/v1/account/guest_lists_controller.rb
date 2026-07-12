@@ -14,7 +14,7 @@ module Api
           end
 
           registrations = offering.temple_event_registrations.includes(:user).order(created_at: :asc)
-          render json: Account::Api::GuestListSerializer.new(offering:, registrations:).as_json
+          render json: ::Account::Api::GuestListSerializer.new(offering:, registrations:).as_json
         end
 
         private

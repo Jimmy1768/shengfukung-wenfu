@@ -15,9 +15,9 @@ class AdminRegistrationsAccessTest < ActionDispatch::IntegrationTest
     get admin_registrations_path
 
     assert_response :success
-    assert_includes response.body, "Create New Registration"
+    assert_includes response.body, "建立新報名"
     assert_includes response.body, "Lamp Offering"
-    assert_includes response.body, new_admin_event_offering_order_path(@offering)
+    assert_includes response.body, "V1 暫停"
   end
 
   test "admin without manage_registrations is redirected from registrations entry page" do

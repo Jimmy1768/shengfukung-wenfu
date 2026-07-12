@@ -28,12 +28,14 @@ class ArchivesLookupTest < ActiveSupport::TestCase
     offering = temple.temple_offerings.create!(
       slug: "offering-#{SecureRandom.hex(2)}",
       title: "Offering #{year}",
+      starts_on: Time.zone.local(year, 3, 1).to_date,
+      ends_on: Time.zone.local(year, 3, 2).to_date,
       price_cents: 1000,
       currency: "TWD",
       offering_type: "general"
     )
     registration = temple.temple_event_registrations.create!(
-      temple_offering: offering,
+      registrable: offering,
       reference_code: "REG-#{SecureRandom.hex(2)}",
       quantity: 1,
       unit_price_cents: 1000,
@@ -46,6 +48,8 @@ class ArchivesLookupTest < ActiveSupport::TestCase
     TemplePayment.create!(
       temple_event_registration: registration,
       temple:,
+      provider: "demo",
+      provider_account: "temple",
       amount_cents: 1000,
       currency: "TWD",
       payment_method: TemplePayment::PAYMENT_METHODS[:cash],

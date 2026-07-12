@@ -45,8 +45,13 @@ class AdminPatronPickerTest < ActionDispatch::IntegrationTest
   end
 
   test "unauthorized admin cannot access patron endpoints" do
-    @permission.update!(manage_registrations: false)
-    sign_in_admin(@admin)
+    staff = create_admin_user(
+      temple: @temple,
+      role: "admin",
+      membership_role: "admin",
+      permission_overrides: { manage_registrations: false, manage_permissions: false }
+    )
+    sign_in_admin(staff)
 
     get admin_patrons_path(format: :json)
 

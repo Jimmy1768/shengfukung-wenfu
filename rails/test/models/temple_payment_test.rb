@@ -3,10 +3,18 @@ require "test_helper"
 class TemplePaymentTest < ActiveSupport::TestCase
   test "validates payment method" do
     temple = create_temple
-    offering = TempleOffering.create!(temple:, slug: "lamp", title: "Lamp", currency: "TWD", price_cents: 500)
+    offering = TempleOffering.create!(
+      temple:,
+      slug: "lamp",
+      title: "Lamp",
+      currency: "TWD",
+      price_cents: 500,
+      starts_on: Date.current,
+      ends_on: Date.current + 1.day
+    )
     registration = TempleEventRegistration.create!(
       temple:,
-      temple_offering: offering,
+      registrable: offering,
       quantity: 1,
       contact_payload: {},
       logistics_payload: {},
@@ -27,10 +35,18 @@ class TemplePaymentTest < ActiveSupport::TestCase
 
   test "admin_filtered respects date range filtering" do
     temple = create_temple
-    offering = TempleOffering.create!(temple:, slug: "candle", title: "Candle", currency: "TWD", price_cents: 400)
+    offering = TempleOffering.create!(
+      temple:,
+      slug: "candle",
+      title: "Candle",
+      currency: "TWD",
+      price_cents: 400,
+      starts_on: Date.current,
+      ends_on: Date.current + 1.day
+    )
     recent = TempleEventRegistration.create!(
       temple:,
-      temple_offering: offering,
+      registrable: offering,
       quantity: 1,
       contact_payload: {},
       logistics_payload: {},
@@ -38,7 +54,7 @@ class TemplePaymentTest < ActiveSupport::TestCase
     )
     older = TempleEventRegistration.create!(
       temple:,
-      temple_offering: offering,
+      registrable: offering,
       quantity: 1,
       contact_payload: {},
       logistics_payload: {},
@@ -47,6 +63,8 @@ class TemplePaymentTest < ActiveSupport::TestCase
     old_payment = TemplePayment.create!(
       temple:,
       temple_event_registration: older,
+      provider: "demo",
+      provider_account: "temple",
       payment_method: TemplePayment::PAYMENT_METHODS[:cash],
       status: TemplePayment::STATUSES[:completed],
       amount_cents: 400,
@@ -56,6 +74,8 @@ class TemplePaymentTest < ActiveSupport::TestCase
     recent_payment = TemplePayment.create!(
       temple:,
       temple_event_registration: recent,
+      provider: "demo",
+      provider_account: "temple",
       payment_method: TemplePayment::PAYMENT_METHODS[:cash],
       status: TemplePayment::STATUSES[:completed],
       amount_cents: 400,

@@ -10,7 +10,7 @@ class Account::Api::RegistrationsTest < ActionDispatch::IntegrationTest
     registration = create_registration(user:, offering:)
 
     sign_in_account(user)
-    get account_api_registrations_path
+    get api_v1_account_registrations_path
 
     assert_response :success
     payload = JSON.parse(response.body)

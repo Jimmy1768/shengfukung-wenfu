@@ -10,7 +10,7 @@ class Account::Api::CertificatesTest < ActionDispatch::IntegrationTest
     create_registration(user:, offering:, certificate_number: "CERT-123")
 
     sign_in_account(user)
-    get account_api_certificates_path
+    get api_v1_account_certificates_path
 
     assert_response :success
     payload = JSON.parse(response.body)

@@ -17,9 +17,11 @@ class AgreementAcceptanceTest < ActiveSupport::TestCase
   end
 
   test "requires accepted_at and body_snapshot" do
-    acceptance = AgreementAcceptance.new(agreement: @agreement, user: @user)
-    assert_not acceptance.valid?
-    assert_includes acceptance.errors[:accepted_at], "can't be blank"
-    assert_includes acceptance.errors[:body_snapshot], "can't be blank"
+    I18n.with_locale(:en) do
+      acceptance = AgreementAcceptance.new(agreement: @agreement, user: @user)
+      assert_not acceptance.valid?
+      assert_includes acceptance.errors[:accepted_at], "can't be blank"
+      assert_includes acceptance.errors[:body_snapshot], "can't be blank"
+    end
   end
 end

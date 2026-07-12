@@ -10,8 +10,10 @@ class NotificationTest < ActiveSupport::TestCase
   end
 
   test "enforces known statuses" do
-    notification = Notification.new(channel: "email", status: "unknown")
-    assert_not notification.valid?
-    assert_includes notification.errors[:status], "is not included in the list"
+    I18n.with_locale(:en) do
+      notification = Notification.new(channel: "email", status: "unknown")
+      assert_not notification.valid?
+      assert_includes notification.errors[:status], "is not included in the list"
+    end
   end
 end

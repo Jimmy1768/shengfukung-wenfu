@@ -10,7 +10,7 @@ class Account::Api::GuestListsTest < ActionDispatch::IntegrationTest
     registration = create_registration(user: owner, offering:, certificate_number: "CERT-GL")
 
     sign_in_account(owner)
-    get account_api_guest_list_path(offering.slug)
+    get api_v1_account_guest_list_path(offering.slug)
 
     assert_response :success
     payload = JSON.parse(response.body)
@@ -29,7 +29,7 @@ class Account::Api::GuestListsTest < ActionDispatch::IntegrationTest
     )
 
     sign_in_account(staff)
-    get account_api_guest_list_path(offering.slug)
+    get api_v1_account_guest_list_path(offering.slug)
 
     assert_response :forbidden
   end

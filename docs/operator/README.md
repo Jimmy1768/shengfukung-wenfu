@@ -70,13 +70,29 @@ Control `019e5f01-c434-70c2-8225-5bc71dd83b8d` and retired Handoff
 `019f5442-186d-7a61-8cf8-ebaf17ede89c` must never be targeted.
 
 The Handoff writes its terminal return in its own task and stops. Return does
-not deliver across tasks. Heartbeat is the sole Handoff wakeup path for Wenfu
-Control.
+not deliver across tasks. After all mutations and checks, Handoff sends one
+minimal terminal wake signal to its bound Control as its final tool action. The
+signal contains only `handoff_thread_id`, terminal status, and the instruction
+to read the Handoff terminal return once; it is not the return itself.
+
+The explicit terminal wake signal is the primary continuation path. The
+workload-sized Heartbeat remains fallback recovery if the wake fails or the
+task becomes unreachable. Control never polls, reads an active transcript,
+narrates Handoff progress, or sends status steering.
+
+Control and Handoff are a long-lived pair. Completed, blocked, and failed end a
+bounded job, not the Handoff task. After Control review, the healthy Handoff
+returns to idle and is reused. Archive it only when the task itself is
+unresponsive, unreachable, corrupted, retired, or in system error, and create
+a replacement only after that archival.
+
+Mirrored Codex Work Mode source truth: OperatorKit commits `5f011c4e` and
+`9854262d`.
 
 Every executable handoff should declare the worker model and reasoning profile
-explicitly. The current accepted default is GPT-5.4 with medium reasoning for a
-bounded Handoff unless Wenfu Control records a different profile in the Handoff
-itself.
+explicitly. The current accepted default is GPT-5.4-mini with medium reasoning
+for a bounded Handoff unless Wenfu Control records a different profile in the
+Handoff itself.
 
 ## Authority
 

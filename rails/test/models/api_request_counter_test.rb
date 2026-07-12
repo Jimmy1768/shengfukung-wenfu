@@ -2,9 +2,11 @@ require "test_helper"
 
 class ApiRequestCounterTest < ActiveSupport::TestCase
   test "requires bucket value" do
-    counter = ApiRequestCounter.new(scope_type: "IpAddress")
-    assert_not counter.valid?
-    assert_includes counter.errors[:bucket], "can't be blank"
+    I18n.with_locale(:en) do
+      counter = ApiRequestCounter.new(scope_type: "IpAddress")
+      assert_not counter.valid?
+      assert_includes counter.errors[:bucket], "can't be blank"
+    end
   end
 
   test "can track with a bucket" do

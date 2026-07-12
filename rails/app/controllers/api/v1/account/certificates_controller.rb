@@ -10,7 +10,7 @@ module Api
             .includes(:registrable)
             .order(updated_at: :desc)
           render json: {
-            certificates: registrations.map { |registration| Account::Api::CertificateSerializer.new(registration).as_json }
+            certificates: registrations.map { |registration| ::Account::Api::CertificateSerializer.new(registration).as_json }
           }
         end
       end

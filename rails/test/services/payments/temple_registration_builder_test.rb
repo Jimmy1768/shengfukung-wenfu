@@ -4,7 +4,15 @@ module Payments
   class TempleRegistrationBuilderTest < ActiveSupport::TestCase
     test "creates registration with defaults" do
       temple = create_temple
-      offering = TempleOffering.create!(temple:, slug: "lamp", title: "Lamp", currency: "TWD", price_cents: 400)
+      offering = TempleOffering.create!(
+        temple:,
+        slug: "lamp",
+        title: "Lamp",
+        currency: "TWD",
+        price_cents: 400,
+        starts_on: Date.current,
+        ends_on: Date.current + 1.day
+      )
       admin = create_admin_user(temple:)
 
       builder = TempleRegistrationBuilder.new(

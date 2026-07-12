@@ -13,13 +13,15 @@ class DataAnomalyTest < ActiveSupport::TestCase
   end
 
   test "restricts to known statuses" do
-    anomaly = DataAnomaly.new(
-      detector_key: "test",
-      severity: "critical",
-      status: "unknown",
-      detected_at: Time.current
-    )
-    assert_not anomaly.valid?
-    assert_includes anomaly.errors[:status], "is not included in the list"
+    I18n.with_locale(:en) do
+      anomaly = DataAnomaly.new(
+        detector_key: "test",
+        severity: "critical",
+        status: "unknown",
+        detected_at: Time.current
+      )
+      assert_not anomaly.valid?
+      assert_includes anomaly.errors[:status], "is not included in the list"
+    end
   end
 end

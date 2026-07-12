@@ -10,7 +10,7 @@ module Api
             .order(created_at: :desc)
             .limit(limit_param)
           render json: {
-            registrations: registrations.map { |registration| Account::Api::RegistrationSerializer.new(registration).as_json }
+            registrations: registrations.map { |registration| ::Account::Api::RegistrationSerializer.new(registration).as_json }
           }
         end
 
