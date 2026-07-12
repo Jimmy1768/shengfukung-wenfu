@@ -86,13 +86,24 @@ returns to idle and is reused. Archive it only when the task itself is
 unresponsive, unreachable, corrupted, retired, or in system error, and create
 a replacement only after that archival.
 
-Mirrored Codex Work Mode source truth: OperatorKit commits `5f011c4e` and
-`9854262d`.
+Mirrored Codex Work Mode source truth: OperatorKit commits `5f011c4e`,
+`9854262d`, and `b5175f8d`.
 
-Every executable handoff should declare the worker model and reasoning profile
-explicitly. The current accepted default is GPT-5.4-mini with medium reasoning
-for a bounded Handoff unless Wenfu Control records a different profile in the
-Handoff itself.
+Handoff has no permanent model or reasoning classification. Control selects a
+profile for every bounded job and records `requested_model`,
+`requested_reasoning`, `execution_profile`, and `selection_reason` in both the
+packet and dispatch override. The same bound Handoff may use different profiles
+for serial jobs.
+
+Profile baselines:
+
+- mechanical docs, tests, and fixtures: GPT-5.4-mini / medium;
+- ordinary bounded implementation: GPT-5.4 / medium;
+- architecture, persistence, authority, security, or cross-contract-sensitive
+  implementation: GPT-5.4 / high.
+
+Requested model and reasoning are configuration evidence, not proof of actual
+runtime telemetry.
 
 ## Authority
 
