@@ -122,7 +122,7 @@ module Admin
     end
 
     def allow_archive_details?
-      current_admin.admin_account.owner_role? || current_admin_permissions&.allow?(:view_financials)
+      current_admin.admin_account.owner_for_temple?(current_temple) || current_admin_permissions&.allow?(:view_financials)
     end
 
     def selected_year
@@ -137,7 +137,7 @@ module Admin
     end
 
     def allow_archive_exports?
-      current_admin.admin_account.owner_role? || current_admin_permissions&.allow?(:export_financials)
+      current_admin.admin_account.owner_for_temple?(current_temple) || current_admin_permissions&.allow?(:export_financials)
     end
 
     def allow_archive_access?

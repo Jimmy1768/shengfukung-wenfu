@@ -18,10 +18,9 @@ module Admin
 
       admin_account = user.admin_account
       raise Error, I18n.t("admin.patrons.flash.not_admin") unless admin_account
-      raise Error, I18n.t("admin.patrons.flash.cannot_remove_owner") if admin_account.owner_role?
-
-      membership = admin_account.admin_temple_memberships.find_by(temple:)
+      membership = admin_account.membership_for(temple)
       raise Error, I18n.t("admin.patrons.flash.not_admin") unless membership
+      raise Error, I18n.t("admin.patrons.flash.cannot_remove_owner") if membership.owner_role?
 
       membership.destroy!
       admin_account.admin_permissions.where(temple:).destroy_all
@@ -40,7 +39,9 @@ module Admin
     end
 
     def ensure_membership!(admin_account:, temple:)
-      AdminTempleMembership.find_or_create_by!(admin_account:, temple:, role: admin_account.role)
+      AdminTempleMembership.find_or_create_by!(admin_account:, temple:) do |membership|
+        membership.role = "admin"
+      end
       AdminPermission.find_or_create_by!(admin_account:, temple:)
     end
 

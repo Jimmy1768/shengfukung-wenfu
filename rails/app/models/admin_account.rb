@@ -39,11 +39,19 @@ class AdminAccount < ApplicationRecord
     admin_permissions.find_by(temple:) || default_permissions_for(temple)
   end
 
+  def membership_for(temple)
+    admin_temple_memberships.find_by(temple:)
+  end
+
+  def owner_for_temple?(temple)
+    membership_for(temple)&.owner_role? || false
+  end
+
   private
 
   def default_permissions_for(temple)
     record = admin_permissions.build(temple:)
-    if owner_role?
+    if owner_for_temple?(temple)
       AdminPermission::CAPABILITIES.each do |capability|
         record[capability] = true if record.respond_to?(capability)
       end

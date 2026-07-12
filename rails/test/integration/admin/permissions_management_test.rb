@@ -46,4 +46,31 @@ class AdminPermissionsManagementTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_dashboard_path
     assert_equal "You do not have access to manage permissions.", flash[:alert]
   end
+
+  test "owner in one temple does not inherit manage permissions in another temple" do
+    alpha = create_temple(name: "Alpha Temple", slug: "alpha-temple")
+    beta = create_temple(name: "Beta Temple", slug: "beta-temple")
+    owner = create_admin_user(temple: alpha, role: "owner")
+
+    AdminTempleMembership.create!(
+      admin_account: owner.admin_account,
+      temple: beta,
+      role: "admin"
+    )
+    AdminPermission.create!(
+      admin_account: owner.admin_account,
+      temple: beta,
+      manage_permissions: false,
+      manage_offerings: true
+    )
+
+    sign_in_admin(owner)
+    post admin_temple_switch_path, params: { temple_switch: { temple_slug: beta.slug } }
+    follow_redirect!
+
+    get admin_permissions_path
+
+    assert_redirected_to admin_dashboard_path
+    assert_equal "You do not have access to manage permissions.", flash[:alert]
+  end
 end

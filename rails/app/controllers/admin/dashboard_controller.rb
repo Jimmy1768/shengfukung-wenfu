@@ -69,7 +69,7 @@ module Admin
     end
 
     def owner_account?
-      current_admin&.admin_account&.owner_role?
+      current_admin&.admin_account&.owner_for_temple?(current_temple)
     end
 
     def profile_incomplete?

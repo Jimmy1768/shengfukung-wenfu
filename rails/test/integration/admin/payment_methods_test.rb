@@ -43,6 +43,28 @@ class AdminPaymentMethodsTest < ActionDispatch::IntegrationTest
     assert_nil temple.billing_settings["grace_started_at"]
   end
 
+  test "stored ecpay secrets do not render back into html" do
+    temple = create_temple(
+      payment_provider_settings: {
+        "ecpay" => {
+          "merchant_id" => "2000132",
+          "hash_key" => "TempleHashKeySecret",
+          "hash_iv" => "TempleHashIvSecret",
+          "environment" => "stage"
+        }
+      }
+    )
+    owner = create_admin_user(temple: temple, role: "owner")
+
+    sign_in_admin(owner)
+    get admin_payment_methods_path
+
+    assert_response :success
+    assert_includes response.body, "2000132"
+    refute_includes response.body, "TempleHashKeySecret"
+    refute_includes response.body, "TempleHashIvSecret"
+  end
+
   test "temple owner by permission can view and update payment methods" do
     temple = create_temple
     owner = create_admin_user(temple: temple, role: "admin", membership_role: "owner", permission_overrides: { manage_permissions: true })

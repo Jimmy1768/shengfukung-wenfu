@@ -57,4 +57,48 @@ class AdminPatronPickerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to admin_dashboard_path
   end
+
+  test "promote creates an admin membership for the current temple without inheriting owner role" do
+    beta = create_temple(name: "Beta Temple", slug: "beta-temple")
+    promoter = create_admin_user(temple: beta, role: "owner")
+    target = create_admin_user(temple: @temple, role: "owner")
+
+    sign_in_admin(promoter)
+
+    assert_difference -> { target.admin_account.admin_temple_memberships.where(temple: beta).count }, 1 do
+      post promote_admin_patron_path(target)
+    end
+
+    assert_redirected_to admin_patrons_path
+    target.admin_account.reload
+    assert_equal "admin", target.admin_account.membership_for(beta)&.role
+  end
+
+  test "revoke removes an admin membership from the current temple even when the account owns another temple" do
+    beta = create_temple(name: "Beta Temple", slug: "beta-temple")
+    revoker = create_admin_user(temple: beta, role: "owner")
+    target = create_admin_user(temple: @temple, role: "owner")
+
+    AdminTempleMembership.create!(
+      admin_account: target.admin_account,
+      temple: beta,
+      role: "admin"
+    )
+    AdminPermission.create!(
+      admin_account: target.admin_account,
+      temple: beta,
+      manage_offerings: true
+    )
+
+    sign_in_admin(revoker)
+
+    assert_difference -> { target.admin_account.admin_temple_memberships.where(temple: beta).count }, -1 do
+      assert_difference -> { target.admin_account.admin_permissions.where(temple: beta).count }, -1 do
+        delete revoke_admin_patron_path(target)
+      end
+    end
+
+    assert_redirected_to admin_patrons_path
+    assert_nil target.admin_account.reload.membership_for(beta)
+  end
 end

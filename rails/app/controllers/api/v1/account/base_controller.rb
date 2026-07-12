@@ -39,8 +39,8 @@ module Api
         def default_registration_scope
           return current_user.temple_event_registrations unless admin_scope?
 
-          if current_user.admin_account.owner_role?
-            TempleEventRegistration.where(temple_id: accessible_admin_temples.select(:id))
+          if owned_admin_temples.exists?
+            TempleEventRegistration.where(temple_id: owned_admin_temples.select(:id))
           else
             current_user.temple_event_registrations
           end
@@ -53,6 +53,15 @@ module Api
           return false unless permission.allow?(capability)
 
           true
+        end
+
+        def owned_admin_temples
+          return Temple.none unless admin_scope?
+
+          @owned_admin_temples ||= accessible_admin_temples
+            .joins(:admin_temple_memberships)
+            .where(admin_temple_memberships: { admin_account_id: current_user.admin_account.id, role: "owner" })
+            .distinct
         end
       end
     end

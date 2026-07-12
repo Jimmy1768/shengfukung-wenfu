@@ -143,7 +143,7 @@ module Admin
     end
 
     def can_manage_admins?
-      current_admin&.admin_account&.owner_role? || current_admin_permissions&.allow?(:manage_permissions)
+      current_admin&.admin_account&.owner_for_temple?(current_temple) || current_admin_permissions&.allow?(:manage_permissions)
     end
 
     helper_method :can_manage_admins?
