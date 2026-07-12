@@ -63,11 +63,13 @@ not queue new work behind an active task.
 The active Wenfu Control/Handoff binding is one-to-one:
 
 - owner Control task: `019f5518-af59-74f3-af7f-a37241bf418d`;
-- exclusive Handoff task: `019f5519-0f72-7273-b50e-65739e5a2a36`.
+- exclusive Handoff task: `019f55bd-3447-74f3-8225-eabfdc511e64`.
 
 Wenfu Control must never target a Handoff owned by another Control. Retired
 Control `019e5f01-c434-70c2-8225-5bc71dd83b8d` and retired Handoff
-`019f5442-186d-7a61-8cf8-ebaf17ede89c` must never be targeted.
+`019f5442-186d-7a61-8cf8-ebaf17ede89c` must never be targeted. Handoff
+`019f5519-0f72-7273-b50e-65739e5a2a36` was archived after an interrupted,
+unavailable job and must also never be targeted.
 
 The Handoff writes its terminal return in its own task and stops. Return does
 not deliver across tasks. After all mutations and checks, Handoff sends one
