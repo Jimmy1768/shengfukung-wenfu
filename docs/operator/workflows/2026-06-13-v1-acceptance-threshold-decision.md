@@ -47,7 +47,7 @@ The following are not required for V1 acceptance:
 
 V1 acceptance means:
 
-- the admin console supports repeatable temple onboarding without manual YAML editing;
+- the admin console supports repeatable temple onboarding without temple staff editing YAML;
 - normal offering setup can be submitted, reviewed, and applied through the product workflow;
 - admins can manage registrations, orders, payments, cash receipt, ECPay payment status, refunds/cancellations, and CSV export with enough clarity to operate;
 - the system has enough evidence to start broader rollout planning and then Expo work.
