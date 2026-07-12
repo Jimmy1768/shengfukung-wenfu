@@ -18,54 +18,35 @@ Related session handoff: `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/opera
 
 ## Summary
 
-The next V1 acceptance step is the actual real temple admin/staff rehearsal. The repo-local packet and session handoff are ready, but the coordinator/implementation thread cannot execute the session without a real participant and an approved safe rehearsal environment.
+This friction is resolved by owner policy change. Synthetic end-to-end onboarding proof is sufficient for V1 acceptance, so no real temple participant or approved rehearsal environment is required for the acceptance gate.
 
-This must not be converted into simulated acceptance. Local browser dry-runs and docs readiness do not prove staff usability or support burden.
+This record is preserved as a historical note for the superseded real-participant rehearsal path and must not be read as proof that a real rehearsal occurred.
 
 ## Blocking Condition
 
-Missing external evidence:
-
-- real temple staff/admin participant;
-- approved rehearsal environment;
-- prepared real-vocabulary offering/service example;
-- approved observer notes/screenshots/recording policy;
-- session evidence from staff performing the tasks.
+No current blocker for V1 acceptance from this record.
 
 ## Impact
 
-V1 acceptance remains blocked until the actual session evidence exists and is recorded.
-
-The next acceptance record must review the real session return/eval, not this friction record alone.
+V1 acceptance can proceed on the synthetic proof path.
 
 ## Allowed Next Action
 
-Run the real temple admin/staff rehearsal using:
-
-`/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/workflows/2026-06-14-real-temple-admin-staff-rehearsal-packet.md`
-
-Use the session handoff:
-
-`/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/handoffs/2026-06-14-real-temple-admin-staff-rehearsal-session.md`
+Use synthetic onboarding proof and then continue the web-to-Expo sequence.
 
 ## Not Allowed
 
-- Do not mark V1 accepted from docs-only readiness.
-- Do not substitute a local browser simulation for the real participant session.
-- Do not contact a temple from an agent thread without explicit user direction and communication authority.
+- Do not claim that a real temple rehearsal occurred.
 - Do not deploy or use production data to force the rehearsal.
 - Do not change real ECPay/payment provider state.
 - Do not access secrets.
 
 ## Resolution Criteria
 
-Resolve this friction when the session owner provides enough evidence to create:
+This friction is resolved by the policy decision documented in:
 
-- `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/returns/2026-06-14-real-temple-admin-staff-rehearsal-session-return.md`
-- `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/eval_records/2026-06-14-real-temple-admin-staff-rehearsal-session-eval.md`
-- `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/acceptances/2026-06-14-real-temple-admin-staff-rehearsal-session-acceptance.md`
-- `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/execution_records/2026-06-14-real-temple-admin-staff-rehearsal-session-execution.md`
+`/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/workflows/2026-07-12-synthetic-onboarding-proof-decision.md`
 
 ## Current Status
 
-Blocked on real participant and approved rehearsal environment.
+Resolved for V1 acceptance; superseded by synthetic onboarding proof.

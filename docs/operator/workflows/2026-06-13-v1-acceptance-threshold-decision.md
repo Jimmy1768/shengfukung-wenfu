@@ -22,13 +22,14 @@ V1 acceptance requires:
 
 - focused Rails tests passing for onboarding, registrations, orders, payments, refund/cancel paths, and exports;
 - large seeded admin QA passing for orders, payments, and accounting/admin reporting surfaces;
-- browser/admin rehearsal passing for temple profile setup, offering setup draft, review/apply, registration, order, and payment flows;
+- synthetic end-to-end onboarding proof passing in a local browser or equivalent walkthrough using a synthetic temple and realistic fake offering;
+- the proof must cover temple profile setup, offering setup draft, review/apply, registration, order, and payment-status behavior;
 - ECPay default path verified locally or in sandbox;
 - cash `Received` flow verified as admin-attested, with admin identity and timestamp preserved;
 - previous-month export flow working for the 1st-day-of-month accounting process;
-- comprehensive help guide completed after V1 behavior settles;
+- comprehensive help guide completed after V1 behavior settles as a broader-rollout deliverable, not a prerequisite to begin Expo work;
 - help guide linked from temple public/marketing pages for patrons and from the admin console for admins;
-- at least one real temple admin or staff-assisted rehearsal completed without requiring YAML editing or engineer-led interview for ordinary offerings.
+- no real temple, real offering, employee, marketing manager, or outside participant is required for V1 acceptance proof.
 
 ## Explicit Non-Requirements For V1
 
@@ -46,10 +47,10 @@ The following are not required for V1 acceptance:
 
 V1 acceptance means:
 
-- the admin console supports repeatable temple onboarding without manual YAML editing by temple staff;
+- the admin console supports repeatable temple onboarding without manual YAML editing;
 - normal offering setup can be submitted, reviewed, and applied through the product workflow;
 - admins can manage registrations, orders, payments, cash receipt, ECPay payment status, refunds/cancellations, and CSV export with enough clarity to operate;
-- the system has enough evidence to start broader rollout planning.
+- the system has enough evidence to start broader rollout planning and then Expo work.
 
 V1 acceptance does not mean:
 
@@ -67,6 +68,9 @@ V1 acceptance does not mean:
 - Offering onboarding moves into admin-console draft/submission/review/apply flow.
 - V1 uses a controlled supported field catalog.
 - A comprehensive help guide is required after V1 functional acceptance and before broader rollout.
+- Shengfukung was the initial development temple, declined onboarding, and is no longer a product-progress dependency.
+- The real temple rehearsal packet and session handoff are superseded for V1 acceptance and remain optional future market-validation references.
+- Sequence: amend criteria, polish account/admin pages, prove synthetic onboarding end-to-end, accept web onboarding, then begin Expo work.
 
 ## Future Handoff Trigger
 

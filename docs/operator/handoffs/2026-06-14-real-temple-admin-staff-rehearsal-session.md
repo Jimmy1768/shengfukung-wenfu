@@ -16,7 +16,9 @@ Expected branch: continue `offering-setup-admin-workflow`.
 
 ## Goal
 
-Run the first real temple admin/staff rehearsal required for V1 acceptance evidence.
+This handoff is superseded for V1 acceptance by synthetic onboarding proof and is preserved as an optional future market-validation reference.
+
+It originally targeted the first real temple admin/staff rehearsal required for V1 acceptance evidence.
 
 This handoff does not authorize product implementation, deployment, production data access, server/provider configuration changes, payment-provider calls, secret access, or real ECPay merchant changes.
 
@@ -43,6 +45,8 @@ Before the session starts, confirm:
 - one cash receipt scenario is prepared;
 - one ECPay status scenario is prepared from non-production/static data;
 - one previous-month accounting export scenario is prepared.
+
+For V1 acceptance, these preconditions are no longer mandatory because synthetic onboarding proof is sufficient.
 
 ## Session Instructions
 
@@ -105,6 +109,8 @@ Accepted:
 - staff can explain ECPay completed/pending/failed/refunded boundaries;
 - staff can find previous-month export and explain external accounting handoff;
 - no production/provider/server/secret/payment boundary is crossed.
+
+For V1 acceptance, this handoff is superseded and should not be used as the active gate.
 
 Accepted with gaps:
 

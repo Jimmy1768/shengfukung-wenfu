@@ -14,7 +14,9 @@ Related production boundary: `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/o
 
 ## Purpose
 
-This packet prepares the first real temple admin/staff rehearsal required before V1 can be considered ready for broader temple rollout planning.
+This packet is superseded for V1 acceptance by synthetic onboarding proof and is preserved as an optional future market-validation reference.
+
+It originally prepared the first real temple admin/staff rehearsal required before V1 could be considered ready for broader temple rollout planning.
 
 The rehearsal is not a sales demo and not a production launch. It is a structured usability and operational-readiness session proving whether ordinary temple staff can use the admin console to operate V1 without editing YAML or relying on an engineer-led interview for ordinary offering setup.
 
@@ -24,6 +26,8 @@ current-source plan evidence that leads into this gate is:
 - `/Users/jimmy1768/Projects/shengfukung-wenfu/ops/docs/plans/SHENGFUKUNG_OFFERINGS_CONFIG_PLAN.md`
 - `/Users/jimmy1768/Projects/shengfukung-wenfu/ops/docs/plans/ADMIN_ACCOUNTING_AND_ARCHIVES_WORKFLOW_PLAN.md`
 - `/Users/jimmy1768/Projects/shengfukung-wenfu/ops/docs/plans/PAYMENTS_CORE_SUBSYSTEM_PLAN.md`
+
+For V1 acceptance, this packet is no longer the active gate.
 
 ## Session Boundary
 
