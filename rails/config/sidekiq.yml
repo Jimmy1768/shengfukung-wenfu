@@ -1,4 +1,6 @@
 
+<% require File.expand_path("app/lib/profile/infrastructure", Dir.pwd) %>
+
 :require: ./config/environment
 
 :concurrency: <%= Profile::Infrastructure::JOB_CONCURRENCY %>

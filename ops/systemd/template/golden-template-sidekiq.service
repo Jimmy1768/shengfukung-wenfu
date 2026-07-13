@@ -14,7 +14,7 @@ Type=simple
 User=jimmy1768_user
 WorkingDirectory=/home/jimmy1768_user/Projects/{{project_slug}}/rails
 EnvironmentFile=/etc/default/{{project_slug}}-env
-ExecStart=/usr/bin/bash -lc 'bundle exec sidekiq -C config/sidekiq.yml'
+ExecStart=/usr/bin/bash -lc 'bundle exec sidekiq -r . -C config/sidekiq.yml'
 Restart=always
 
 [Install]
