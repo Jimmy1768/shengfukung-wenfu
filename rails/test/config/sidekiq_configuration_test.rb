@@ -10,7 +10,7 @@ class SidekiqConfigurationTest < ActiveSupport::TestCase
     rendered = Dir.chdir(Rails.root) { ERB.new(path.read).result }
     config = YAML.safe_load(rendered, permitted_classes: [Symbol], aliases: true)
 
-    assert_equal "./config/environment", config.fetch(:require)
+    assert_equal ".", config.fetch(:require)
     assert_equal Profile::Infrastructure::JOB_CONCURRENCY, config.fetch(:concurrency)
     assert_equal Profile::Infrastructure::JobQueues.ordered.map(&:to_s), config.fetch(:queues)
   end
