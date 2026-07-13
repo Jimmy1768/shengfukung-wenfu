@@ -1,0 +1,30 @@
+slug: readiness-synthetic
+name: 台灣祈福示範宮
+tagline: 合成驗證專用・非真實廟方
+hero_copy: 這是 WR-4 合成驗證用的示範宮廟設定，僅供本地配置與付款契約測試。
+primary_image_url: https://placehold.co/1600x900/2f4858/ffffff?text=Readiness+Synthetic
+about_html: >
+  台灣祈福示範宮是本地驗證專用的合成 temple fixture。
+  它用來證明 operator-assisted intake 可以穩定翻譯成 temple profile 與 service offering 設定。
+hero_images:
+  home: https://placehold.co/1600x900/2f4858/ffffff?text=Readiness+Synthetic+Home
+  services: https://placehold.co/1600x900/33658a/ffffff?text=Readiness+Synthetic+Services
+contact:
+  addressZh: 台北市中正區驗證路 108 號
+  addressEn: No. 108, Verification Rd., Zhongzheng District, Taipei City
+  phone: "02-0000-1234"
+  plusCode: TEST+108 Taipei
+  mapUrl: https://maps.example.test/readiness-synthetic
+service_times:
+  weekday: 09:00 – 18:00
+  weekend: 09:00 – 17:00
+  notes: 僅供本地驗證，無真實對外開放。
+metadata:
+  seed_profile: readiness-synthetic
+registration_periods:
+  - key: "2026-q4-peace-light"
+    label_zh: "2026 第四季平安祈福"
+    label_en: "Q4 2026 Peace Blessing Cycle"
+  - key: "perennial"
+    label_zh: "常年驗證"
+    label_en: "Perennial Validation"

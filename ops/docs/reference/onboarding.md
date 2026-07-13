@@ -117,6 +117,7 @@ Slug convention:
    - Each offering entry stores its form definition in metadata. Use `form_fields` + `registration_form` to describe which inputs render and how registration payloads are structured.
    - Keep `rails/db/temples/offerings/working-draft.yml` as the reusable onboarding scratch file. Paste each new temple's raw offerings config there first, then convert it into the finalized per-temple file at `rails/db/temples/offerings/<slug>.yml`.
    - Do not delete `working-draft.yml`. Overwrite it during each new temple onboarding cycle as the current staging draft.
+   - For the accepted WR-4 synthetic onboarding proof, use `docs/operator/workflows/2026-07-13-readiness-synthetic-intake.md` as the human-facing one-offering intake example and map it into `rails/db/temples/readiness-synthetic.yml` plus `rails/db/temples/offerings/readiness-synthetic.yml`. This records the operator translation path without asking temple staff to edit YAML.
    - During onboarding, create `rails/db/temples/offerings/<slug>.yml` with a strict split shape:
      ```yaml
      schema_version: 2
@@ -186,6 +187,7 @@ Slug convention:
    - Loader behavior: `Offerings::TemplateLoader` reads `events:` + `services:` and syncs `form_fields`, `defaults`, `options`, `registration_form`, and labels into offering metadata. The admin `_form.html.erb` partial reads `@offering.metadata['form_fields']`, so each temple sees a tailored form without separate partials.
    - Store the YAML in Git so the config remains the source of truth. When a temple needs tweaks, edit the YAML, rerun the sync task, and the form will update automatically.
    - After editing `rails/db/temples/offerings/<slug>.yml`, run `ruby ops/scripts/sync_offering_configs.rb` to push the latest metadata (`form_fields`, defaults, registration schema, attributes) into each offering’s `metadata` column. Without this sync, the admin UI will keep rendering the stale metadata from the DB.
+   - For isolated local review of one temple, you may set `SLUG=<slug>` when running `ruby ops/scripts/audit_offering_configs.rb` or `ruby ops/scripts/sync_offering_configs.rb`.
    - Validation checklist before committing onboarding YAML:
      - Every slug is unique within a temple.
      - Every service `registration_period_key` exists in `rails/db/temples/<slug>.yml` `registration_periods`.

@@ -8,28 +8,22 @@ require 'yaml'
 require 'json'
 require_relative '../../rails/config/environment'
 require_relative '../../rails/app/services/offerings/template_loader'
+require_relative '../../rails/app/services/offerings/template_sync'
 
-Temple.find_each do |temple|
-  loader = Offerings::TemplateLoader.new(temple.slug)
-  next if loader.templates.empty?
+def resolve_selected_temple!
+  slug = ENV["SLUG"].to_s.strip
+  return nil if slug.blank?
 
-  { events: loader.events, services: loader.services }.each do |kind, entries|
-    scope = kind == :services ? temple.temple_services : temple.temple_events
-    entries.each do |entry|
-      offering = scope.find_by(slug: entry[:slug])
-      next unless offering
+  Temple.find_by(slug:) || abort("Unknown SLUG: #{slug}")
+end
 
-      offering.metadata ||= {}
-      offering.metadata['offering_type'] = entry.dig(:defaults, :offering_type) if entry.dig(:defaults, :offering_type)
-      offering.metadata['form_fields'] = entry[:form_fields] if entry[:form_fields]
-      offering.metadata['form_defaults'] = entry[:defaults] if entry[:defaults]
-      offering.metadata['form_options'] = entry[:options] if entry[:options]
-      offering.metadata['form_ui'] = entry[:ui] if entry[:ui]
-      offering.metadata['form_label'] = entry[:label] if entry[:label]
-      offering.metadata['registration_form'] = entry[:registration_form] if entry[:registration_form]
-      offering.metadata['allow_repeat_registrations'] = entry[:allow_repeat_registrations] unless entry[:allow_repeat_registrations].nil?
-      offering.save!
-      puts "Updated #{kind} #{offering.slug} for #{temple.slug}"
-    end
-  end
+selected_temple = resolve_selected_temple!
+scope = selected_temple ? [selected_temple] : Temple.all
+
+scope.each do |temple|
+  result = Offerings::TemplateSync.call(temple)
+  next if result.updated_events.empty? && result.updated_services.empty?
+
+  result.updated_events.each { |slug| puts "Updated events #{slug} for #{temple.slug}" }
+  result.updated_services.each { |slug| puts "Updated services #{slug} for #{temple.slug}" }
 end

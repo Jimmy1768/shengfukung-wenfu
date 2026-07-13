@@ -63,6 +63,32 @@ class AdminPaymentMethodsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "2000132"
     refute_includes response.body, "TempleHashKeySecret"
     refute_includes response.body, "TempleHashIvSecret"
+    assert_includes response.body, "Merchant ID"
+    assert_includes response.body, "HashKey"
+    assert_includes response.body, "HashIV"
+  end
+
+  test "payment method audit log does not persist raw ecpay secrets" do
+    temple = create_temple
+    owner = create_admin_user(temple: temple, role: "owner")
+
+    sign_in_admin(owner)
+
+    patch admin_payment_methods_path, params: {
+      payment_methods: {
+        ecpay_merchant_id: "2000132",
+        ecpay_hash_key: "hash-key-value",
+        ecpay_hash_iv: "hash-iv-value",
+        ecpay_environment: "stage",
+        billing_payment_method_on_file: "1"
+      }
+    }
+
+    log = SystemAuditLog.order(created_at: :desc).find_by!(action: "admin.payment_methods.updated")
+    serialized = log.metadata.to_json
+    refute_includes serialized, "hash-key-value"
+    refute_includes serialized, "hash-iv-value"
+    assert_includes Array(log.metadata["changed_fields"]), "ecpay"
   end
 
   test "temple owner by permission can view and update payment methods" do

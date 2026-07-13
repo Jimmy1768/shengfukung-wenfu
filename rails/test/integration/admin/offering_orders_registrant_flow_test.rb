@@ -1,4 +1,5 @@
 require "test_helper"
+require Rails.root.join("db", "seeds", "temples").to_s
 
 class AdminOfferingOrdersRegistrantFlowTest < ActionDispatch::IntegrationTest
   setup do
@@ -249,6 +250,39 @@ class AdminOfferingOrdersRegistrantFlowTest < ActionDispatch::IntegrationTest
     registration.reload
     assert_equal "self", registration.metadata["registrant_scope"]
     assert_nil registration.metadata["dependent_id"]
+  end
+
+  test "synthetic configured service supports admin order creation without publishing the offering" do
+    Seeds::Temples.bootstrap(slug: "readiness-synthetic")
+    synthetic_temple = Temple.find_by!(slug: "readiness-synthetic")
+    Offerings::TemplateParity.ensure_missing!(synthetic_temple, kinds: [:services])
+    service = synthetic_temple.temple_services.find_by!(slug: "readiness-peace-lamp")
+    admin = create_admin_user(temple: synthetic_temple)
+    permission = AdminPermission.find_by(admin_account: admin.admin_account, temple: synthetic_temple)
+    permission.update!(manage_registrations: true)
+    user = User.create!(
+      email: "synthetic-service-admin-order@example.com",
+      english_name: "Synthetic Service Admin Order",
+      encrypted_password: User.password_hash("Password123!")
+    )
+
+    sign_in_admin(admin)
+
+    assert_difference -> { synthetic_temple.temple_event_registrations.count }, 1 do
+      post admin_service_offering_orders_path(service), params: {
+        temple_event_registration: {
+          user_id: user.id,
+          quantity: 1,
+          registrant_scope: "self"
+        }
+      }
+    end
+
+    registration = synthetic_temple.temple_event_registrations.order(created_at: :desc).first
+    assert_redirected_to admin_service_offering_order_path(service, registration)
+    assert_equal service, registration.registrable
+    assert_equal "pending", registration.payment_status
+    assert_equal "self", registration.metadata["registrant_scope"]
   end
 
   private

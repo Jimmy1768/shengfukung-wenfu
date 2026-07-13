@@ -8,7 +8,17 @@ require_relative "../../rails/config/environment"
 require_relative "../../rails/app/services/offerings/template_loader"
 require_relative "../../rails/app/services/offerings/template_parity"
 
-Temple.find_each do |temple|
+def resolve_selected_temple!
+  slug = ENV["SLUG"].to_s.strip
+  return nil if slug.blank?
+
+  Temple.find_by(slug:) || abort("Unknown SLUG: #{slug}")
+end
+
+selected_temple = resolve_selected_temple!
+scope = selected_temple ? [selected_temple] : Temple.all
+
+scope.each do |temple|
   result = Offerings::TemplateParity.report(temple)
   next if [
     result.missing_events,

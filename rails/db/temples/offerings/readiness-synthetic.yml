@@ -1,0 +1,61 @@
+schema_version: 2
+services:
+  - slug: readiness-peace-lamp
+    label: "平安祈福燈"
+    registration_period_key: "2026-q4-peace-light"
+    allow_repeat_registrations: true
+    ui:
+      show_availability_window: false
+      lock_registration_period_key: true
+    defaults:
+      offering_type: "lamp"
+      currency: "TWD"
+      fulfillment_method: "廟方代辦"
+    attributes:
+      price_cents: 1200
+      currency: "TWD"
+      description: "適用季度平安祈福燈服務，信眾可登記祈福姓名、聯絡方式與偏好時段，由廟方代為安燈與後續通知。"
+    options:
+      lamp_type:
+        - "平安燈"
+        - "光明燈"
+        - "闔家燈"
+      fulfillment_method:
+        - "廟方代辦"
+        - "現場確認"
+    form_fields:
+      basics:
+        title: "祈福燈設定"
+        fields:
+          - offering_type
+          - price_cents
+          - currency
+          - description
+      lamp_details:
+        title: "燈位與作業資訊"
+        fields:
+          - lamp_type
+          - lamp_location
+          - fulfillment_method
+          - certificate_hint
+          - logistics_notes
+    registration_form:
+      sections:
+        order:
+          fields: [quantity, unit_price_cents, currency, certificate_number]
+        contact:
+          fields: [primary_contact, phone, email, notes]
+        logistics:
+          fields: [preferred_date, preferred_slot]
+        ritual_metadata:
+          fields: [ancestor_placard_name, dedication_message, certificate_notes]
+      defaults:
+        order:
+          quantity: 1
+      field_settings:
+        preferred_slot:
+          options: ["上午", "下午", "晚上"]
+        ancestor_placard_name:
+          allow_multiple: true
+        dedication_message:
+          allow_multiple: true

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require Rails.root.join("db", "seeds", "temples").to_s
 
 class Account::Api::PaymentStatusesTest < ActionDispatch::IntegrationTest
   test "returns payment status for the user's registration" do
@@ -32,5 +33,29 @@ class Account::Api::PaymentStatusesTest < ActionDispatch::IntegrationTest
     get api_v1_account_payment_status_path(reference: other_registration.reference_code)
 
     assert_response :not_found
+  end
+
+  test "returns payment status for registration created against synthetic configured service" do
+    Seeds::Temples.bootstrap(slug: "readiness-synthetic")
+    temple = Temple.find_by!(slug: "readiness-synthetic")
+    Offerings::TemplateParity.ensure_missing!(temple, kinds: [:services])
+    service = temple.temple_services.find_by!(slug: "readiness-peace-lamp")
+    user = create_admin_user(temple:, role: "admin")
+    registration = create_registration(
+      user: user,
+      offering: service,
+      payment_status: "paid",
+      metadata: { "registration_period_key" => service.registration_period_key }
+    )
+    create_payment(registration:, amount_cents: registration.total_price_cents)
+
+    sign_in_account(user, temple_slug: temple.slug)
+    get api_v1_account_payment_status_path(reference: registration.reference_code)
+
+    assert_response :success
+    payload = JSON.parse(response.body)
+    assert_equal "paid", payload["payment_status"]
+    assert_equal registration.total_price_cents, payload["total_amount_cents"]
+    assert_equal 1, payload["payments"].length
   end
 end
