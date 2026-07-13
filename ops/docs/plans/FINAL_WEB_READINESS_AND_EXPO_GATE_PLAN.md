@@ -1,8 +1,10 @@
 # Final Web Readiness And Expo Gate Plan
 
-Status: ready_for_execution
+Status: ready
 
 Created: 2026-07-12
+
+Completed: 2026-07-13
 
 Owner: Wenfu Control
 
@@ -386,6 +388,40 @@ agent, live merchant account, or production deployment is unavailable.
 5. Reconcile docs in WR-7.
 6. Complete WR-8 and issue `ready` or `not_ready`.
 7. On `ready`, allow marketing-manager hiring and start the Expo implementation plan.
+
+## Final Readiness Decision (2026-07-13)
+
+Decision: `ready`
+
+WR-1 through WR-8 are complete and accepted. The final independent Control
+review confirmed:
+
+- account/admin integration: `149 runs, 1093 assertions, 0 failures, 0 errors`;
+- full Rails suite: `324 runs, 1846 assertions, 0 failures, 0 errors`;
+- Rails CSS build, Vue production build, offering-config audit, documentation
+  reconciliation, and `git diff --check`: pass;
+- no concrete account/admin UX, authority, tenant-isolation, payment-contract,
+  secret-handling, configuration-safety, or documentation blocker remains;
+- direct browser control was unavailable for WR-6, so the plan-authorized
+  rendered-source, compiled-CSS, and integration-test fallback was used;
+- real offering intake and live ECPay verification remain accepted rollout
+  gaps, not bugs and not readiness blockers.
+
+The web product is technically ready for operator-assisted temple onboarding.
+The owner may hire a marketing manager and Expo implementation may begin. The
+first approved temple can be onboarded jointly through the documented assisted
+process.
+
+This decision does not authorize production deployment, real provider action,
+secret access, customer-state changes, or claims of legal/accounting
+certification.
+
+Durable evidence:
+
+- `docs/operator/acceptances/2026-07-13-final-web-readiness-acceptance.md`
+- `docs/operator/execution_records/2026-07-13-final-web-readiness-execution.md`
+- `docs/operator/eval_records/2026-07-13-final-web-readiness-wr6-wr8-eval.md`
+- `docs/operator/returns/2026-07-13-final-web-readiness-wr6-wr8-return.md`
 
 ## Post-Ready Work
 

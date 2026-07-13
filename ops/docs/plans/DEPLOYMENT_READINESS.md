@@ -190,3 +190,11 @@ Current interpretation after production Google OAuth validation and shared-DB cl
 - Repeat DNS/TLS/deploy/smoke flow for production hostnames.
 - Enable live Stripe/LINE Pay only after provider credential validation and callback verification.
 - Add S3/media upload rollout once bucket + IAM credentials are provisioned.
+
+## Relationship to final web readiness closeout (2026-07-13)
+
+This deployment readiness plan is staging- and production-promotion-specific. It does not override the current final web readiness plan, which treats operator-assisted onboarding as the accepted launch operating model for hiring and Expo preparation.
+
+The remaining real offering intake and live ECPay exercises are accepted rollout gaps for production promotion, not blockers to a local ready recommendation, Expo preparation, or marketing-manager hiring. Help-guide publication remains a later documentation milestone before broader temple rollout and does not block the final local web readiness closeout.
+
+Production deployment, live provider use, real customer data, secrets, DNS/TLS changes, and external provider submissions remain governed by the separate approved production workflow. Historical staging status in this file should be read as deployment evidence, not as a reversal of the current final readiness decisions.
