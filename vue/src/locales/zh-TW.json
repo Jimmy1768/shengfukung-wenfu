@@ -145,121 +145,303 @@
       "step4Body": "蠟燭夜泳、香氛泡浴與客製化夜宵，為旅程收尾。"
     },
     "pricing": {
-      "headline": "SourceGrid 生態系價格",
-      "subhead": "免費漏斗、服務費型市場，以及託管式租戶流程。多數客戶不是購買一次性的客製 App，而是加入 SourceGrid 生態系。",
-      "addonsTitle": "平台選項",
-      "maintenanceTitle": "持續維護",
+      "headline": "SourceGrid 企業服務價格",
+      "subhead": "為公司建置並營運官網、後台儀表板與 App 的累積式方案。",
+      "intro": "方案價格為累積式。加購項目依照延伸的方案分組，每月維護費與建置費分開計算。",
+      "addonsTitle": "依方案分組的加購項目",
+      "maintenanceTitle": "每月平台維護",
       "shotFallback": "服務場景",
       "maintenanceSuffix": " / 每月",
       "labels": {
         "included": "包含內容",
         "typicalClients": "適合客戶",
-        "addonsTagline": "平台選項",
-        "maintenanceNote": "持續維護與每月平台關係綁定。"
+        "addonsTagline": "依方案分組的加購項目",
+        "maintenanceNote": "每月維護費與建置費、功能加購分開計算。",
+        "enterprise": "企業服務",
+        "tierIncluded": "方案內含",
+        "tierAddons": "方案加購",
+        "apprelayAddons": "AppRelay 加購",
+        "pricingArea": "價格區",
+        "currencyNote": "顯示幣別依照目前語言切換，僅作為行銷估算。",
+        "packageHeadline": "累積式企業方案",
+        "packageNote": "第二階包含第一階。第三階包含第一階與第二階。",
+        "tierAddonsNote": "加購項目依照延伸的方案分組，不再放在單一全域清單。",
+        "setup": "建置費",
+        "monthly": "每月費用",
+        "monthlyMinimum": "每月最低維護費",
+        "addonColumn": "加購項目",
+        "apprelaySurfaceColumn": "AppRelay 服務面",
+        "apprelayTitle": "AppRelay 加購服務",
+        "apprelayDescription": "AppRelay 在此只作為附加在客戶官網、入口、後台、App 或核准通道上的助理／通道服務報價。",
+        "customScope": "客製範圍"
       },
       "valueHighlights": [
         {
-          "id": "small-website",
-          "title": "小型官網",
-          "body": "6–8 頁、行動優化、聯絡表單、簡易後台。",
-          "hover": "適合只需要穩定門面的商家，包含乾淨的行銷頁面、SEO 設定與輕量後台。"
+          "id": "tier-1-website",
+          "title": "第一階",
+          "body": "完整 6-8 頁公司官網，適合需要可靠線上門面的公司。"
         },
         {
-          "id": "business-system",
-          "title": "商務系統",
-          "body": "官網搭配登入、儀表板與一個核心模組。",
-          "hover": "給有預約、租借或流程需求的團隊，讓客戶與員工都能在同一套系統作業。"
+          "id": "tier-2-dashboard-console",
+          "title": "第二階",
+          "body": "第一階加上登入、客戶／管理後台、資料紀錄與商務控制台。"
         },
         {
-          "id": "mobile-suite",
-          "title": "行動 App 全套",
-          "body": "iOS／Android App + 後端系統 + 官網。",
-          "hover": "當主要互動集中在 App 時，一次交付行動體驗、後台與網站。"
+          "id": "tier-3-expo-app",
+          "title": "第三階",
+          "body": "第二階加上連接同一 SourceGrid 伺服器、帳號與後台的 iOS／Android 行動 App。"
         }
       ],
       "details": {
-        "small-website": {
-          "title": "小型官網",
-          "tagline": "典型範圍",
-          "summary": "給需要專業門面的品牌：資訊清楚、好搜尋、好聯絡，而不是複雜功能。",
+        "tier-1-website": {
+          "tierLabel": "第一階",
+          "title": "6-8 頁官網",
+          "tagline": "公司公開網站",
+          "monthlyMinimumLabel": "最低或標準維護",
+          "dependencyNote": "可獨立購買的公開官網方案。",
+          "summary": "適合需要專業公開網站、聯絡路徑與託管部署，但不需要登入或客製流程系統的公司。",
           "included": [
-            "6–8 頁官網（首頁、關於、服務／課程、價格、聯絡我們，可選部落格或最新消息）。",
-            "RWD 響應式版型，支援手機與桌機瀏覽。",
-            "聯絡表單，訪客填寫後直接寄到指定信箱。",
-            "基本 SEO 設定（標題、描述、乾淨網址）。",
-            "簡易後台，可自行編輯文字與圖片。",
-            "伺服器設定與部署。"
+            "6-8 個公開頁面，例如首頁、關於、服務、價格、聯絡與支援頁。",
+            "手機優先的響應式版型，支援手機與桌機訪客。",
+            "聯絡表單或聯絡連結，導向客戶指定窗口。",
+            "基本 SEO metadata、清楚頁面標題與可分享頁面結構。",
+            "客戶自行購買網域後，SourceGrid 協助連接網域。",
+            "SourceGrid 管理部署、主機設定與基本備份路徑。"
           ],
           "typicalClients": [
-            "咖啡廳、餐廳、小型零售店。",
-            "顧問、教練、家教或講師。",
-            "維修、清潔、美容等在地服務。"
-          ],
-          "hoverNote": "適合只需要可信門面的品牌，不含自訂系統。"
+            "在地服務公司與顧問。",
+            "需要穩定線上門面的中小型公司。",
+            "暫時不需要登入、資料紀錄、後台或 App 上架工作的客戶。"
+          ]
         },
-        "business-system": {
-          "title": "商務系統",
-          "tagline": "官網 + 線上系統",
-          "summary": "讓預約、租借或申請流程搬到線上，客戶與員工可以在同一平台處理工作。",
+        "tier-2-dashboard-console": {
+          "tierLabel": "第二階",
+          "title": "登入 + 客戶／管理後台",
+          "tagline": "官網加商務控制台",
+          "monthlyMinimumLabel": "標準維護起",
+          "dependencyNote": "包含第一階所有內容。",
+          "summary": "適合需要真正 Web 應用程式表面的公司：客戶登入、員工後台、管理控制台、資料紀錄與流程狀態。",
           "included": [
-            "含小型官網方案的所有項目。",
-            "會員登入區（客戶帳號）。",
-            "後台管理介面供工作人員檢視與處理資料。",
-            "一個核心系統模組（線上預約、設備租借或內部流程管理）。",
-            "金流整合，支援主要信用卡與部分在地支付。",
-            "自動寄信（預約確認、通知等）。",
-            "資料匯出（CSV／Excel）。"
+            "第一階所有內容。",
+            "經核准角色使用的帳號／登入系統。",
+            "核准流程用的客戶或訪客後台。",
+            "管理員／員工控制台，用於資料紀錄與營運狀態。",
+            "基本資料模型、角色檢查與權限檢查。",
+            "需要時加入核准的通知或 email 流程。",
+            "由 SourceGrid 管理基礎設施下的伺服器功能。"
           ],
           "typicalClients": [
-            "小型旅館、民宿、青年旅館。",
-            "車輛、自行車或器材租借店。",
-            "診所、美髮／美容與需預約的服務。"
-          ],
-          "hoverNote": "適合需要在同一後台服務顧客與員工的團隊。"
+            "需要客戶或員工登入的公司。",
+            "有預約、報名、紀錄或內部流程的服務業。",
+            "需要受管理營運表面，而不只是公開頁面的客戶。"
+          ]
         },
-        "mobile-suite": {
-          "title": "行動 App 全套",
-          "tagline": "App + 後端 + 官網",
-          "summary": "給希望客戶主要透過手機 App 使用服務的品牌：行動體驗、後台與網站一次交付。",
+        "tier-3-expo-app": {
+          "tierLabel": "第三階",
+          "title": "iOS／Android 行動 App",
+          "tagline": "官網、控制台與 iOS／Android App",
+          "monthlyMinimumLabel": "標準維護起",
+          "dependencyNote": "包含第一階與第二階所有內容。",
+          "summary": "適合需要手機 App 連接同一 SourceGrid 伺服器、帳號模型與管理後台的公司。",
           "included": [
-            "含商務系統方案的所有項目。",
-            "iOS 與 Android App（單一程式碼庫維護）。",
-            "App 內登入與個人資料管理。",
-            "推播通知（預約狀態、重要提醒等）。",
-            "App 內預約、下單或其他核心操作。",
-            "協助送審到 App Store 與 Google Play。"
+            "第一階與第二階所有內容。",
+            "iOS／Android 行動 App 連接同一套 SourceGrid 伺服器。",
+            "使用核准帳號模型的手機登入流程。",
+            "核准客戶流程的手機畫面。",
+            "手機安全資料連接與目標裝置測試。",
+            "核准後協助 App Store 與 Google Play 上架。",
+            "除非另外報價，不新增第二階核准伺服器以外的後端。"
           ],
           "typicalClients": [
-            "配送／物流服務平台。",
-            "會員制、集點或月費型服務。",
-            "希望用 App 與客戶互動的品牌或機構。"
-          ],
-          "hoverNote": "當主要互動集中在手機 App 時，這套組合最合適。"
+            "客戶需要反覆使用手機介面的公司。",
+            "通知、手機使用頻率或 App 商店存在感重要的產品。",
+            "已準備承擔較高維護與發布管理成本的客戶。"
+          ]
         }
+      },
+      "serviceTiers": {
+        "minimal-care": {
+          "title": "最低維護",
+          "appliesTo": "僅第一階",
+          "summary": "只包含主機、在線檢查、備份與重大修復。不包含急件期待。"
+        },
+        "standard-care": {
+          "title": "標準維護",
+          "appliesTo": "第一階、第二階、第三階",
+          "summary": "包含主機、監控、備份、維護、合理回應、小型更新與一般支援。第二階以上必選。"
+        },
+        "emergency-build-mode": {
+          "title": "緊急／建置模式",
+          "appliesTo": "任何方案",
+          "summary": "優先／急件工作、更快回應、主動建置、加班或暫停其他工作支援。"
+        }
+      },
+      "tierAddonGroups": {
+        "tier-1-website-addons": {
+          "title": "官網加購項目",
+          "appliesTo": "第一階以上",
+          "summary": "不需要完整登入／後台系統的公開網站增強項目。",
+          "addons": {
+            "extra-page": {
+              "title": "額外頁面",
+              "setupLabel": "NT$2,000 / 頁"
+            },
+            "multilingual-version": {
+              "title": "多語版本",
+              "setupLabel": "NT$12,000 / 語言",
+              "monthlyLabel": "NT$1,000 / 語言"
+            },
+            "copywriting-rewrite": {
+              "title": "文案撰寫／重寫"
+            },
+            "photo-image-generation": {
+              "title": "照片／圖片生成或素材整理"
+            },
+            "blog-news-admin": {
+              "title": "部落格／最新消息後台"
+            },
+            "advanced-seo": {
+              "title": "進階 SEO pass"
+            },
+            "analytics-setup": {
+              "title": "分析工具設定"
+            },
+            "extra-contact-form": {
+              "title": "額外聯絡表單"
+            },
+            "dns-domain-support": {
+              "title": "DNS／網域連接支援",
+              "setupLabel": "已包含"
+            }
+          }
+        },
+        "tier-2-dashboard-addons": {
+          "title": "後台／控制台加購項目",
+          "appliesTo": "第二階與第三階",
+          "summary": "延伸登入式 Web app 與員工控制台的商務流程模組。",
+          "addons": {
+            "booking-reservation": {
+              "title": "預約／訂位系統"
+            },
+            "rental-inventory": {
+              "title": "租借庫存系統"
+            },
+            "registration-system": {
+              "title": "報名系統"
+            },
+            "class-program-scheduling": {
+              "title": "課程／活動排程"
+            },
+            "membership-account-tiers": {
+              "title": "會員／帳號等級"
+            },
+            "payment-rail-integration": {
+              "title": "金流串接"
+            },
+            "data-import": {
+              "title": "資料匯入"
+            },
+            "extra-user-role": {
+              "title": "額外使用者角色",
+              "setupLabel": "NT$8,000 / 角色"
+            },
+            "complex-permissions": {
+              "title": "複雜權限"
+            },
+            "multi-location-support": {
+              "title": "多據點支援"
+            },
+            "staff-workflow": {
+              "title": "員工流程"
+            },
+            "care-dependent-records": {
+              "title": "照護／被照護者紀錄"
+            },
+            "third-party-api": {
+              "title": "第三方服務串接"
+            },
+            "reporting-export": {
+              "title": "報表／匯出工具"
+            }
+          }
+        },
+        "tier-3-app-addons": {
+          "title": "第三階 App 專用加購",
+          "appliesTo": "第三階",
+          "summary": "增加 App 商店、裝置或平台風險的手機專用功能與發布工作。",
+          "addons": {
+            "push-notifications": {
+              "title": "推播通知"
+            },
+            "offline-mode": {
+              "title": "離線模式"
+            },
+            "camera-media-upload": {
+              "title": "相機／媒體上傳"
+            },
+            "map-gps-location": {
+              "title": "地圖／GPS／定位功能"
+            },
+            "mobile-chat": {
+              "title": "手機聊天／訊息"
+            },
+            "payment-iap-flow": {
+              "title": "付款／IAP 流程"
+            },
+            "app-onboarding": {
+              "title": "App 專用 onboarding"
+            },
+            "store-compliance-heavy": {
+              "title": "App Store／Google Play 高合規功能"
+            },
+            "device-platform-qa": {
+              "title": "額外裝置／平台測試"
+            },
+            "release-management": {
+              "title": "額外發布管理",
+              "setupLabel": "NT$10,000 / 次發布"
+            }
+          }
+        }
+      },
+      "appRelayAddons": {
+        "embedded-website-assistant": {
+          "title": "嵌入式網站助理",
+          "monthlyLabel": "NT$3,000 + 使用量"
+        },
+        "authenticated-dashboard-assistant": {
+          "title": "登入後台助理",
+          "monthlyLabel": "NT$5,000 + 使用量"
+        },
+        "app-assistant": {
+          "title": "App 助理",
+          "monthlyLabel": "NT$5,000 + 使用量"
+        },
+        "messenger-assistant": {
+          "title": "LINE／WhatsApp／Messenger 助理",
+          "setupLabel": "NT$35,000 / 通道",
+          "monthlyLabel": "NT$5,000 / 通道 + 使用量"
+        },
+        "source-material-cleanup": {
+          "title": "額外來源資料整理／匯入"
+        },
+        "extra-enabled-language": {
+          "title": "額外啟用語言",
+          "setupLabel": "NT$12,000 / 語言",
+          "monthlyLabel": "NT$1,000 / 語言"
+        },
+        "higher-runtime-usage": {
+          "title": "更高 runtime／使用量額度",
+          "monthlyLabel": "報價"
+        }
+      },
+      "discovery": {
+        "title": "需求釐清／客製範圍",
+        "summary": "當流程不清楚、資料敏感、角色很多、需要整合／遷移或有合規風險時，先用付費 discovery 再報價。"
       },
       "packages": {},
-      "addons": {
-        "dojomate-productivity-tools": "DojoMate 生產力工具",
-        "custom-domain": "自訂網域",
-        "payment-rail-integration": "付款通道串接",
-        "multi-language": "多語系",
-        "staff-training": "人員訓練",
-        "data-import": "資料匯入"
-      },
-      "maintenance": {
-        "included-platform-care": {
-          "name": "內含平台維護",
-          "scope": "每月平台費包含主機、部署維護、備份與基本監控。"
-        },
-        "priority-support": {
-          "name": "優先支援",
-          "scope": "為活躍客戶提供較快回應與小型營運更新。"
-        },
-        "custom-operations": {
-          "name": "客製營運支援",
-          "scope": "依實際工作量報價。"
-        }
-      }
+      "addons": {},
+      "maintenance": {}
     },
     "contact": {
       "heading": "禮賓服務詢問",

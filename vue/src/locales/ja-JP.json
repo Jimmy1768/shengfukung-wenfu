@@ -145,121 +145,303 @@
       "step4Body": "キャンドルナイトスイムやアロマバス、ナイトキャップで静かな余韻を。"
     },
     "pricing": {
-      "headline": "SourceGrid エコシステム価格",
-      "subhead": "無料ファネル、サービスフィー型マーケットプレイス、ホスト型テナント業務フロー。多くのクライアントは単発のカスタムアプリではなく SourceGrid エコシステムに参加します。",
-      "addonsTitle": "プラットフォームオプション",
-      "maintenanceTitle": "継続ケア",
+      "headline": "SourceGrid エンタープライズ料金",
+      "subhead": "企業向けに Web サイト、ダッシュボード、アプリを構築・運用する累積式パッケージです。",
+      "intro": "ティア料金は累積式です。追加オプションは拡張するティアごとに分類し、月額ケアはセットアップ費用とは別に計算します。",
+      "addonsTitle": "ティア別追加オプション",
+      "maintenanceTitle": "月額プラットフォームケア",
       "shotFallback": "サービスシーン",
       "maintenanceSuffix": " / 月",
       "labels": {
         "included": "含まれるもの",
         "typicalClients": "向いている顧客",
-        "addonsTagline": "プラットフォームオプション",
-        "maintenanceNote": "継続ケアは月額プラットフォーム契約に紐づきます。"
+        "addonsTagline": "ティア別追加オプション",
+        "maintenanceNote": "月額ケアはセットアップ費用や機能追加とは別です。",
+        "enterprise": "エンタープライズサービス",
+        "tierIncluded": "ティアに含まれるもの",
+        "tierAddons": "ティア追加オプション",
+        "apprelayAddons": "AppRelay 追加オプション",
+        "pricingArea": "料金エリア",
+        "currencyNote": "表示通貨は選択中の言語に合わせたマーケティング上の目安です。",
+        "packageHeadline": "累積式エンタープライズパッケージ",
+        "packageNote": "第2ティアは第1ティアを含みます。第3ティアは第1ティアと第2ティアを含みます。",
+        "tierAddonsNote": "追加オプションは、拡張するティアごとに分類します。単一の全体リストにはしません。",
+        "setup": "セットアップ",
+        "monthly": "月額",
+        "monthlyMinimum": "月額最低ケア",
+        "addonColumn": "追加オプション",
+        "apprelaySurfaceColumn": "AppRelay サーフェス",
+        "apprelayTitle": "AppRelay 追加サービス",
+        "apprelayDescription": "AppRelay は、顧客サイト、ポータル、ダッシュボード、アプリ、承認済みチャネルに付属するアシスタント／チャネルサービスとしてのみここで料金化します。",
+        "customScope": "カスタム範囲"
       },
       "valueHighlights": [
         {
-          "id": "small-website",
-          "title": "スモールサイト",
-          "body": "6〜8 ページ、モバイル最適化、問い合わせフォーム、軽量CMS。",
-          "hover": "カスタムシステムまでは不要で、信頼できるオンラインの玄関口をすぐ欲しい場合に最適です。"
+          "id": "tier-1-website",
+          "title": "第1ティア",
+          "body": "信頼できるオンライン窓口が必要な企業向けの完全な 6〜8 ページ公開サイト。"
         },
         {
-          "id": "business-system",
-          "title": "ビジネスシステム",
-          "body": "サイト + ログイン + ダッシュボード + コアモジュール。",
-          "hover": "予約やレンタルなどを一つのポータルにまとめ、顧客とスタッフどちらも同じ画面で作業できます。"
+          "id": "tier-2-dashboard-console",
+          "title": "第2ティア",
+          "body": "第1ティアにログイン、顧客／管理ダッシュボード、記録、業務コンソールを追加。"
         },
         {
-          "id": "mobile-suite",
-          "title": "モバイルアプリスイート",
-          "body": "iOS / Android アプリ + バックエンド + サイト。",
-          "hover": "顧客との主要タッチポイントをアプリに集約したいブランド向けのフルセットです。"
+          "id": "tier-3-expo-app",
+          "title": "第3ティア",
+          "body": "第2ティアに、同じ SourceGrid サーバー、アカウント、管理画面につながる iOS／Android モバイルアプリを追加。"
         }
       ],
       "details": {
-        "small-website": {
-          "title": "スモールサイト",
-          "tagline": "想定スコープ",
-          "summary": "信頼感のあるオンライン玄関口を用意したい小規模ビジネス向け。情報を探しやすく、すぐ問い合わせできることを重視します。",
+        "tier-1-website": {
+          "tierLabel": "第1ティア",
+          "title": "6〜8 ページ Web サイト",
+          "tagline": "企業公開サイト",
+          "monthlyMinimumLabel": "最小ケアまたは標準ケア",
+          "dependencyNote": "単独で購入できる公開サイトパッケージ。",
+          "summary": "ログインや業務システムまでは不要で、専門的な公開サイト、問い合わせ導線、管理されたデプロイが必要な企業向け。",
           "included": [
-            "6〜8 ページのサイト（ホーム、会社情報、サービス／プラン、料金、問い合わせ、オプションでブログ／ニュース）。",
-            "モバイルフレンドリーなレスポンシブデザイン。",
-            "問い合わせフォーム（送信内容は指定メールに転送）。",
-            "基本的な SEO 設定（タイトル、ディスクリプション、クリーンURL）。",
-            "テキストと画像を更新できる軽量 CMS。",
-            "ホスティング設定とデプロイ。"
+            "ホーム、会社情報、サービス、料金、問い合わせ、サポートなど 6〜8 個の公開ページ。",
+            "スマートフォン優先のレスポンシブレイアウト。",
+            "顧客指定の窓口へ届く問い合わせフォームまたは連絡リンク。",
+            "基本 SEO metadata、明確なページタイトル、共有しやすいページ構造。",
+            "顧客が自身でドメインを購入した後のドメイン接続サポート。",
+            "SourceGrid 管理のデプロイ、ホスティング設定、基本バックアップ導線。"
           ],
           "typicalClients": [
-            "カフェ、レストラン、小規模小売店。",
-            "コンサルタント、コーチ、家庭教師、講師。",
-            "修理、クリーニング、美容などのローカルサービス。"
-          ],
-          "hoverNote": "カスタムシステムなしで信頼できるサイトを公開したい場合に最適です。"
+            "ローカルサービス企業やコンサルタント。",
+            "安定したオンライン窓口が必要な中小企業。",
+            "ログイン、記録、ダッシュボード、アプリ公開がまだ不要な顧客。"
+          ]
         },
-        "business-system": {
-          "title": "ビジネスシステム",
-          "tagline": "サイト + オンラインシステム",
-          "summary": "予約、レンタル、簡易な社内ワークフローなどを 1 つのプラットフォームにまとめ、顧客とスタッフを同時にサポートします。",
+        "tier-2-dashboard-console": {
+          "tierLabel": "第2ティア",
+          "title": "ログイン + 顧客／管理ダッシュボード",
+          "tagline": "サイト + 業務コンソール",
+          "monthlyMinimumLabel": "標準ケア以上",
+          "dependencyNote": "第1ティアのすべてを含みます。",
+          "summary": "顧客ログイン、スタッフダッシュボード、管理コンソール、記録、業務状態を扱う実際の Web アプリサーフェスが必要な企業向け。",
           "included": [
-            "スモールサイトの内容をすべて含む。",
-            "顧客向けログインエリア。",
-            "スタッフが状況を把握できる管理ダッシュボード。",
-            "コアモジュールを 1 つ（オンライン予約、レンタル管理、ワークフローツールなど）。",
-            "主要クレジットカードや一部ローカル決済との連携。",
-            "自動メール（予約確認や通知）。",
-            "CSV／Excel へのエクスポート。"
+            "第1ティアのすべて。",
+            "承認済みユーザーロール向けアカウント／ログインシステム。",
+            "承認済みワークフロー向けの顧客またはゲストダッシュボード。",
+            "記録と業務状態を管理する管理者／スタッフコンソール。",
+            "基本データモデル、ロール確認、権限確認。",
+            "必要に応じた承認済み通知またはメールフロー。",
+            "SourceGrid 管理インフラ上のサーバー機能。"
           ],
           "typicalClients": [
-            "小規模ホテル、ホステル、ゲストハウス。",
-            "車両・自転車・機材レンタルショップ。",
-            "予約中心のクリニックやサロン。"
-          ],
-          "hoverNote": "ゲストとスタッフが同じポータルで作業でき、ブティック系ビジネスに最適です。"
+            "顧客またはスタッフのログインが必要な企業。",
+            "予約、登録、記録、社内フローを持つサービス業。",
+            "公開ページだけでなく管理された運用サーフェスが必要な顧客。"
+          ]
         },
-        "mobile-suite": {
-          "title": "モバイルアプリスイート",
-          "tagline": "アプリ + バックエンド + サイト",
-          "summary": "顧客との主要タッチポイントをアプリに集約したいブランド向け。モバイル体験、バックエンド、サイトまで一式提供します。",
+        "tier-3-expo-app": {
+          "tierLabel": "第3ティア",
+          "title": "iOS／Android モバイルアプリ",
+          "tagline": "Web サイト、コンソール、iOS／Android アプリ",
+          "monthlyMinimumLabel": "標準ケア以上",
+          "dependencyNote": "第1ティアと第2ティアのすべてを含みます。",
+          "summary": "同じ SourceGrid サーバー、アカウントモデル、管理ダッシュボードにつながるモバイルアプリが必要な企業向け。",
           "included": [
-            "ビジネスシステムの内容をすべて含む。",
-            "iOS と Android アプリ（単一コードベース）。",
-            "アプリ内ログインとプロフィール管理。",
-            "プッシュ通知（予約状況やリマインダーなど）。",
-            "アプリ内での予約・注文などの主要操作。",
-            "App Store / Google Play 申請サポート。"
+            "第1ティアと第2ティアのすべて。",
+            "同じ SourceGrid サーバーに接続する iOS／Android モバイルアプリ。",
+            "承認済みアカウントモデルを使うモバイルログインフロー。",
+            "承認済み顧客ワークフロー用のモバイル画面。",
+            "モバイル安全なデータ接続と対象デバイスでのテスト。",
+            "承認後の App Store と Google Play 公開サポート。",
+            "別途見積もりがない限り、第2ティアで承認されたサーバー以外の新規バックエンドは含みません。"
           ],
           "typicalClients": [
-            "デリバリー／ロジスティクスサービス。",
-            "会員制・サブスクリプション型サービス。",
-            "アプリでのエンゲージメントを重視するブランドや団体。"
-          ],
-          "hoverNote": "スマホ中心で顧客とやり取りしたい場合のベストセットです。"
+            "顧客が繰り返しモバイルアクセスする企業。",
+            "通知、モバイル利用頻度、アプリストアでの存在感が重要な製品。",
+            "高めの保守とリリース管理負荷を受け入れられる顧客。"
+          ]
         }
+      },
+      "serviceTiers": {
+        "minimal-care": {
+          "title": "最小ケア",
+          "appliesTo": "第1ティアのみ",
+          "summary": "ホスティング、稼働確認、バックアップ、重大修正のみ。緊急対応は含みません。"
+        },
+        "standard-care": {
+          "title": "標準ケア",
+          "appliesTo": "第1〜第3ティア",
+          "summary": "ホスティング、監視、バックアップ、保守、通常応答、小規模更新、通常サポート。第2ティア以上は必須。"
+        },
+        "emergency-build-mode": {
+          "title": "緊急／構築モード",
+          "appliesTo": "すべてのティア",
+          "summary": "優先／急ぎ作業、早い応答、能動的な開発、時間外対応、他作業を止めての支援。"
+        }
+      },
+      "tierAddonGroups": {
+        "tier-1-website-addons": {
+          "title": "Web サイト追加オプション",
+          "appliesTo": "第1ティア以上",
+          "summary": "完全なログイン／ダッシュボードシステムを必要としない公開サイト強化。",
+          "addons": {
+            "extra-page": {
+              "title": "追加ページ",
+              "setupLabel": "NT$2,000 / ページ"
+            },
+            "multilingual-version": {
+              "title": "多言語版",
+              "setupLabel": "NT$12,000 / 言語",
+              "monthlyLabel": "NT$1,000 / 言語"
+            },
+            "copywriting-rewrite": {
+              "title": "コピーライティング／リライト"
+            },
+            "photo-image-generation": {
+              "title": "写真／画像生成または素材整理"
+            },
+            "blog-news-admin": {
+              "title": "ブログ／ニュース管理画面"
+            },
+            "advanced-seo": {
+              "title": "高度 SEO 対応"
+            },
+            "analytics-setup": {
+              "title": "分析設定"
+            },
+            "extra-contact-form": {
+              "title": "追加問い合わせフォーム"
+            },
+            "dns-domain-support": {
+              "title": "DNS／ドメイン接続サポート",
+              "setupLabel": "含まれる"
+            }
+          }
+        },
+        "tier-2-dashboard-addons": {
+          "title": "ダッシュボード／コンソール追加オプション",
+          "appliesTo": "第2・第3ティア",
+          "summary": "認証付き Web アプリとスタッフコンソールを拡張する業務モジュール。",
+          "addons": {
+            "booking-reservation": {
+              "title": "予約／リザベーションシステム"
+            },
+            "rental-inventory": {
+              "title": "レンタル在庫システム"
+            },
+            "registration-system": {
+              "title": "登録システム"
+            },
+            "class-program-scheduling": {
+              "title": "クラス／プログラム日程管理"
+            },
+            "membership-account-tiers": {
+              "title": "会員／アカウント階層"
+            },
+            "payment-rail-integration": {
+              "title": "決済レール連携"
+            },
+            "data-import": {
+              "title": "データインポート"
+            },
+            "extra-user-role": {
+              "title": "追加ユーザーロール",
+              "setupLabel": "NT$8,000 / ロール"
+            },
+            "complex-permissions": {
+              "title": "複雑な権限"
+            },
+            "multi-location-support": {
+              "title": "複数拠点対応"
+            },
+            "staff-workflow": {
+              "title": "スタッフワークフロー"
+            },
+            "care-dependent-records": {
+              "title": "ケア／被扶養者記録"
+            },
+            "third-party-api": {
+              "title": "外部サービス連携"
+            },
+            "reporting-export": {
+              "title": "レポート／エクスポートツール"
+            }
+          }
+        },
+        "tier-3-app-addons": {
+          "title": "第3ティア アプリ専用追加オプション",
+          "appliesTo": "第3ティア",
+          "summary": "アプリストア、デバイス、プラットフォームリスクを増やすモバイル専用機能とリリース作業。",
+          "addons": {
+            "push-notifications": {
+              "title": "プッシュ通知"
+            },
+            "offline-mode": {
+              "title": "オフラインモード"
+            },
+            "camera-media-upload": {
+              "title": "カメラ／メディアアップロード"
+            },
+            "map-gps-location": {
+              "title": "地図／GPS／位置情報機能"
+            },
+            "mobile-chat": {
+              "title": "モバイルチャット／メッセージ"
+            },
+            "payment-iap-flow": {
+              "title": "決済／IAP フロー"
+            },
+            "app-onboarding": {
+              "title": "アプリ専用オンボーディング"
+            },
+            "store-compliance-heavy": {
+              "title": "App Store／Google Play 高コンプライアンス機能"
+            },
+            "device-platform-qa": {
+              "title": "追加デバイス／プラットフォームテスト"
+            },
+            "release-management": {
+              "title": "追加リリース管理",
+              "setupLabel": "NT$10,000 / リリース"
+            }
+          }
+        }
+      },
+      "appRelayAddons": {
+        "embedded-website-assistant": {
+          "title": "埋め込み Web サイトアシスタント",
+          "monthlyLabel": "NT$3,000 + 使用量"
+        },
+        "authenticated-dashboard-assistant": {
+          "title": "認証済みダッシュボードアシスタント",
+          "monthlyLabel": "NT$5,000 + 使用量"
+        },
+        "app-assistant": {
+          "title": "アプリアシスタント",
+          "monthlyLabel": "NT$5,000 + 使用量"
+        },
+        "messenger-assistant": {
+          "title": "LINE／WhatsApp／Messenger アシスタント",
+          "setupLabel": "NT$35,000 / チャネル",
+          "monthlyLabel": "NT$5,000 / チャネル + 使用量"
+        },
+        "source-material-cleanup": {
+          "title": "追加ソース資料整理／インポート"
+        },
+        "extra-enabled-language": {
+          "title": "追加有効言語",
+          "setupLabel": "NT$12,000 / 言語",
+          "monthlyLabel": "NT$1,000 / 言語"
+        },
+        "higher-runtime-usage": {
+          "title": "より高い runtime／使用量枠",
+          "monthlyLabel": "見積もり"
+        }
+      },
+      "discovery": {
+        "title": "要件確認／カスタム範囲",
+        "summary": "ワークフローが不明確、データが敏感、ロールが多い、連携／移行／コンプライアンスリスクがある場合は、有料 discovery 後に見積もります。"
       },
       "packages": {},
-      "addons": {
-        "dojomate-productivity-tools": "DojoMate 生産性ツール",
-        "custom-domain": "カスタムドメイン",
-        "payment-rail-integration": "決済レール連携",
-        "multi-language": "多言語対応",
-        "staff-training": "スタッフ研修",
-        "data-import": "データ移行"
-      },
-      "maintenance": {
-        "included-platform-care": {
-          "name": "標準プラットフォームケア",
-          "scope": "月額利用料にホスティング、デプロイ保守、バックアップ、軽い監視を含みます。"
-        },
-        "priority-support": {
-          "name": "優先サポート",
-          "scope": "アクティブな顧客向けの早めの対応と小規模な運用更新。"
-        },
-        "custom-operations": {
-          "name": "カスタム運用支援",
-          "scope": "作業量に応じて見積もります。"
-        }
-      }
+      "addons": {},
+      "maintenance": {}
     },
     "contact": {
       "heading": "コンシェルジュへのお問い合わせ",

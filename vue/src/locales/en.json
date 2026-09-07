@@ -145,41 +145,39 @@
       "step4Body": "Guests linger over last sips, late-night playlists, and quiet second rounds while steam hangs in the air above the counter."
     },
     "pricing": {
-      "headline": "SourceGrid Ecosystem Pricing",
-      "subhead": "Free funnels, service-fee marketplaces, and hosted tenant workflows. Most clients onboard into a SourceGrid ecosystem instead of buying a one-off custom app.",
-      "addonsTitle": "Platform options",
-      "maintenanceTitle": "Ongoing care",
+      "headline": "SourceGrid Enterprise Pricing",
+      "subhead": "Cumulative website, dashboard, and app packages for companies that need SourceGrid to build and operate their business surfaces.",
+      "intro": "Tier prices are cumulative. Add-ons are grouped by the tier they extend, and monthly care is priced separately from setup.",
+      "addonsTitle": "Tier-linked add-ons",
+      "maintenanceTitle": "Monthly platform care",
       "shotFallback": "Service angle",
       "maintenanceSuffix": " / month",
       "labels": {
         "included": "Included",
         "typicalClients": "Best fit",
-        "addonsTagline": "Platform options",
-        "maintenanceNote": "Recurring care is tied to the monthly platform relationship."
+        "addonsTagline": "Tier-linked add-ons",
+        "maintenanceNote": "Monthly care is separate from setup and feature add-ons.",
+        "enterprise": "Enterprise services",
+        "tierIncluded": "Tier - included",
+        "tierAddons": "Tier - add-on",
+        "apprelayAddons": "AppRelay add-on",
+        "pricingArea": "Clear pricing",
+        "currencyNote": "Display currency follows the selected language and is a marketing estimate.",
+        "packageHeadline": "Cumulative Enterprise packages",
+        "packageNote": "Tier 2 includes Tier 1. Tier 3 includes Tier 1 and Tier 2.",
+        "tierAddonsNote": "Add-ons are grouped by the tier they extend, not by one global menu.",
+        "setup": "Setup",
+        "monthly": "Monthly",
+        "monthlyMinimum": "Monthly minimum",
+        "addonColumn": "Add-on",
+        "apprelaySurfaceColumn": "AppRelay surface",
+        "apprelayTitle": "AppRelay Add-On Service",
+        "apprelayDescription": "AppRelay is priced here only as an assistant/channel service attached to a client website, portal, dashboard, app, or approved channel.",
+        "customScope": "Custom scope"
       },
       "packages": {},
-      "addons": {
-        "dojomate-productivity-tools": "DojoMate Productivity Tools",
-        "custom-domain": "Custom Domain",
-        "payment-rail-integration": "Payment Rail Integration",
-        "multi-language": "Multi-Language",
-        "staff-training": "Staff Training",
-        "data-import": "Data Import"
-      },
-      "maintenance": {
-        "included-platform-care": {
-          "name": "Included Platform Care",
-          "scope": "Hosting, deployment upkeep, backups, and light monitoring included with monthly platform access."
-        },
-        "priority-support": {
-          "name": "Priority Support",
-          "scope": "Faster response and small operational updates for active clients."
-        },
-        "custom-operations": {
-          "name": "Custom Operations",
-          "scope": "Ongoing operational help quoted by workload."
-        }
-      }
+      "addons": {},
+      "maintenance": {}
     },
     "contact": {
       "heading": "Concierge inquiry",

@@ -145,41 +145,303 @@
       "step4Body": "캔들 스윔, 아로마 배스, 나이트캡으로 조용히 마무리합니다."
     },
     "pricing": {
-      "headline": "SourceGrid 생태계 가격",
-      "subhead": "무료 퍼널, 서비스 수수료형 마켓플레이스, 호스팅형 테넌트 워크플로입니다. 대부분의 고객은 일회성 커스텀 앱이 아니라 SourceGrid 생태계에 온보딩합니다.",
-      "addonsTitle": "플랫폼 옵션",
-      "maintenanceTitle": "지속 관리",
+      "headline": "SourceGrid 기업 서비스 가격",
+      "subhead": "기업을 위한 웹사이트, 대시보드, 앱 구축 및 운영 누적 패키지입니다.",
+      "intro": "티어 가격은 누적형입니다. 추가 항목은 확장하는 티어별로 묶고, 월간 관리는 구축 비용과 별도로 계산합니다.",
+      "addonsTitle": "티어별 추가 항목",
+      "maintenanceTitle": "월간 플랫폼 관리",
       "shotFallback": "서비스 장면",
       "maintenanceSuffix": " / 월",
       "labels": {
         "included": "포함 내용",
         "typicalClients": "적합한 고객",
-        "addonsTagline": "플랫폼 옵션",
-        "maintenanceNote": "지속 관리는 월간 플랫폼 관계에 포함됩니다."
+        "addonsTagline": "티어별 추가 항목",
+        "maintenanceNote": "월간 관리는 구축 비용 및 기능 추가와 별도로 계산합니다.",
+        "enterprise": "기업 서비스",
+        "tierIncluded": "티어 포함 항목",
+        "tierAddons": "티어 추가 항목",
+        "apprelayAddons": "AppRelay 추가 항목",
+        "pricingArea": "가격 영역",
+        "currencyNote": "표시 통화는 선택한 언어에 따른 마케팅용 추정값입니다.",
+        "packageHeadline": "누적형 기업 패키지",
+        "packageNote": "2단계는 1단계를 포함합니다. 3단계는 1단계와 2단계를 포함합니다.",
+        "tierAddonsNote": "추가 항목은 확장하는 티어 기준으로 묶고, 하나의 전체 목록으로 두지 않습니다.",
+        "setup": "구축비",
+        "monthly": "월 비용",
+        "monthlyMinimum": "월 최소 관리비",
+        "addonColumn": "추가 항목",
+        "apprelaySurfaceColumn": "AppRelay 표면",
+        "apprelayTitle": "AppRelay 추가 서비스",
+        "apprelayDescription": "AppRelay는 고객 웹사이트, 포털, 대시보드, 앱 또는 승인된 채널에 붙는 어시스턴트/채널 서비스로만 이 가격표에 포함됩니다.",
+        "customScope": "맞춤 범위"
+      },
+      "valueHighlights": [
+        {
+          "id": "tier-1-website",
+          "title": "1단계",
+          "body": "신뢰할 수 있는 온라인 존재가 필요한 회사를 위한 완성형 6-8페이지 공개 웹사이트."
+        },
+        {
+          "id": "tier-2-dashboard-console",
+          "title": "2단계",
+          "body": "1단계에 로그인, 고객/관리자 대시보드, 기록, 비즈니스 콘솔을 추가합니다."
+        },
+        {
+          "id": "tier-3-expo-app",
+          "title": "3단계",
+          "body": "2단계에 같은 SourceGrid 서버, 계정, 관리자 화면에 연결되는 iOS/Android 모바일 앱을 추가합니다."
+        }
+      ],
+      "details": {
+        "tier-1-website": {
+          "tierLabel": "1단계",
+          "title": "6-8페이지 웹사이트",
+          "tagline": "회사 공개 사이트",
+          "monthlyMinimumLabel": "최소 또는 표준 관리",
+          "dependencyNote": "독립 구매 가능한 공개 웹사이트 패키지입니다.",
+          "summary": "로그인이나 맞춤 워크플로 소프트웨어 없이 전문적인 공개 웹사이트, 문의 경로, 관리형 배포가 필요한 회사에 적합합니다.",
+          "included": [
+            "홈, 소개, 서비스, 가격, 문의, 지원 등 6-8개 공개 페이지.",
+            "모바일 우선 반응형 레이아웃.",
+            "고객 지정 연락처로 전달되는 문의 양식 또는 연락 링크.",
+            "기본 SEO metadata, 명확한 페이지 제목, 공유 가능한 페이지 구조.",
+            "고객이 직접 도메인을 구매한 뒤 도메인 연결 지원.",
+            "SourceGrid 관리형 배포, 호스팅 설정, 기본 백업 경로."
+          ],
+          "typicalClients": [
+            "지역 서비스 회사와 컨설턴트.",
+            "안정적인 온라인 존재가 필요한 중소기업.",
+            "아직 로그인, 기록, 대시보드, 앱 출시가 필요 없는 고객."
+          ]
+        },
+        "tier-2-dashboard-console": {
+          "tierLabel": "2단계",
+          "title": "로그인 + 고객/관리자 대시보드",
+          "tagline": "웹사이트와 비즈니스 콘솔",
+          "monthlyMinimumLabel": "표준 관리 이상",
+          "dependencyNote": "1단계의 모든 내용을 포함합니다.",
+          "summary": "고객 로그인, 직원 대시보드, 관리자 콘솔, 기록, 업무 상태를 다루는 실제 웹앱 표면이 필요한 회사에 적합합니다.",
+          "included": [
+            "1단계의 모든 내용.",
+            "승인된 사용자 역할을 위한 계정/로그인 시스템.",
+            "승인된 워크플로를 위한 고객 또는 게스트 대시보드.",
+            "기록과 운영 상태를 관리하는 관리자/직원 콘솔.",
+            "기본 데이터 모델, 역할 검토, 권한 검토.",
+            "필요 시 승인된 알림 또는 이메일 흐름.",
+            "SourceGrid 관리 인프라에서 운영되는 서버 기능."
+          ],
+          "typicalClients": [
+            "고객 또는 직원 로그인이 필요한 회사.",
+            "예약, 등록, 기록 또는 내부 워크플로가 있는 서비스 비즈니스.",
+            "공개 페이지뿐 아니라 관리형 운영 표면이 필요한 고객."
+          ]
+        },
+        "tier-3-expo-app": {
+          "tierLabel": "3단계",
+          "title": "iOS/Android 모바일 앱",
+          "tagline": "웹사이트, 콘솔, iOS/Android 앱",
+          "monthlyMinimumLabel": "표준 관리 이상",
+          "dependencyNote": "1단계와 2단계의 모든 내용을 포함합니다.",
+          "summary": "같은 SourceGrid 서버, 계정 모델, 관리 대시보드에 연결된 모바일 앱 표면이 필요한 회사에 적합합니다.",
+          "included": [
+            "1단계와 2단계의 모든 내용.",
+            "같은 SourceGrid 서버에 연결되는 iOS/Android 모바일 앱.",
+            "승인된 계정 모델을 사용하는 모바일 로그인 흐름.",
+            "승인된 고객 워크플로를 위한 모바일 화면.",
+            "모바일에 안전한 데이터 연결과 대상 기기 테스트.",
+            "승인 후 App Store와 Google Play 출시 지원.",
+            "별도 견적이 없으면 승인된 2단계 서버 외 새 백엔드는 포함하지 않습니다."
+          ],
+          "typicalClients": [
+            "고객이 반복적으로 모바일 접근을 해야 하는 회사.",
+            "알림, 모바일 사용 빈도, 앱스토어 존재감이 중요한 제품.",
+            "높은 유지보수와 출시 관리 부담을 감당할 준비가 된 고객."
+          ]
+        }
+      },
+      "serviceTiers": {
+        "minimal-care": {
+          "title": "최소 관리",
+          "appliesTo": "1단계만",
+          "summary": "호스팅, 가동 확인, 백업, 중대 수정만 포함합니다. 긴급 작업 기대는 포함하지 않습니다."
+        },
+        "standard-care": {
+          "title": "표준 관리",
+          "appliesTo": "1-3단계",
+          "summary": "호스팅, 모니터링, 백업, 유지보수, 합리적 응답, 소규모 업데이트, 일반 지원. 2단계 이상은 필수입니다."
+        },
+        "emergency-build-mode": {
+          "title": "긴급／빌드 모드",
+          "appliesTo": "모든 티어",
+          "summary": "우선/긴급 작업, 빠른 응답, 적극적 개발, 초과 근무 또는 다른 작업을 멈추고 지원하는 방식입니다."
+        }
+      },
+      "tierAddonGroups": {
+        "tier-1-website-addons": {
+          "title": "웹사이트 추가 항목",
+          "appliesTo": "1단계 이상",
+          "summary": "전체 로그인/대시보드 시스템이 필요 없는 공개 사이트 강화 항목입니다.",
+          "addons": {
+            "extra-page": {
+              "title": "추가 페이지",
+              "setupLabel": "NT$2,000 / 페이지"
+            },
+            "multilingual-version": {
+              "title": "다국어 버전",
+              "setupLabel": "NT$12,000 / 언어",
+              "monthlyLabel": "NT$1,000 / 언어"
+            },
+            "copywriting-rewrite": {
+              "title": "카피라이팅/문구 재작성"
+            },
+            "photo-image-generation": {
+              "title": "사진/이미지 생성 또는 자산 정리"
+            },
+            "blog-news-admin": {
+              "title": "블로그/뉴스 관리 화면"
+            },
+            "advanced-seo": {
+              "title": "고급 SEO 작업"
+            },
+            "analytics-setup": {
+              "title": "분석 도구 설정"
+            },
+            "extra-contact-form": {
+              "title": "추가 문의 양식"
+            },
+            "dns-domain-support": {
+              "title": "DNS/도메인 연결 지원",
+              "setupLabel": "포함"
+            }
+          }
+        },
+        "tier-2-dashboard-addons": {
+          "title": "대시보드/콘솔 추가 항목",
+          "appliesTo": "2단계와 3단계",
+          "summary": "인증형 웹앱과 직원 콘솔을 확장하는 비즈니스 워크플로 모듈입니다.",
+          "addons": {
+            "booking-reservation": {
+              "title": "예약 시스템"
+            },
+            "rental-inventory": {
+              "title": "렌탈 재고 시스템"
+            },
+            "registration-system": {
+              "title": "등록 시스템"
+            },
+            "class-program-scheduling": {
+              "title": "수업/프로그램 일정 관리"
+            },
+            "membership-account-tiers": {
+              "title": "멤버십/계정 등급"
+            },
+            "payment-rail-integration": {
+              "title": "결제 레일 연동"
+            },
+            "data-import": {
+              "title": "데이터 가져오기"
+            },
+            "extra-user-role": {
+              "title": "추가 사용자 역할",
+              "setupLabel": "NT$8,000 / 역할"
+            },
+            "complex-permissions": {
+              "title": "복잡한 권한"
+            },
+            "multi-location-support": {
+              "title": "다중 지점 지원"
+            },
+            "staff-workflow": {
+              "title": "직원 워크플로"
+            },
+            "care-dependent-records": {
+              "title": "케어/피보호자 기록"
+            },
+            "third-party-api": {
+              "title": "타사 서비스 연동"
+            },
+            "reporting-export": {
+              "title": "리포트/내보내기 도구"
+            }
+          }
+        },
+        "tier-3-app-addons": {
+          "title": "3단계 앱 전용 추가 항목",
+          "appliesTo": "3단계",
+          "summary": "앱스토어, 기기 또는 플랫폼 리스크를 늘리는 모바일 전용 기능과 출시 작업입니다.",
+          "addons": {
+            "push-notifications": {
+              "title": "푸시 알림"
+            },
+            "offline-mode": {
+              "title": "오프라인 모드"
+            },
+            "camera-media-upload": {
+              "title": "카메라/미디어 업로드"
+            },
+            "map-gps-location": {
+              "title": "지도/GPS/위치 기능"
+            },
+            "mobile-chat": {
+              "title": "모바일 채팅/메시징"
+            },
+            "payment-iap-flow": {
+              "title": "결제/IAP 흐름"
+            },
+            "app-onboarding": {
+              "title": "앱 전용 온보딩"
+            },
+            "store-compliance-heavy": {
+              "title": "App Store/Google Play 고준수 기능"
+            },
+            "device-platform-qa": {
+              "title": "추가 기기/플랫폼 테스트"
+            },
+            "release-management": {
+              "title": "추가 릴리스 관리",
+              "setupLabel": "NT$10,000 / 릴리스"
+            }
+          }
+        }
+      },
+      "appRelayAddons": {
+        "embedded-website-assistant": {
+          "title": "임베디드 웹사이트 어시스턴트",
+          "monthlyLabel": "NT$3,000 + 사용량"
+        },
+        "authenticated-dashboard-assistant": {
+          "title": "인증 대시보드 어시스턴트",
+          "monthlyLabel": "NT$5,000 + 사용량"
+        },
+        "app-assistant": {
+          "title": "앱 어시스턴트",
+          "monthlyLabel": "NT$5,000 + 사용량"
+        },
+        "messenger-assistant": {
+          "title": "LINE/WhatsApp/Messenger 어시스턴트",
+          "setupLabel": "NT$35,000 / 채널",
+          "monthlyLabel": "NT$5,000 / 채널 + 사용량"
+        },
+        "source-material-cleanup": {
+          "title": "추가 소스 자료 정리/가져오기"
+        },
+        "extra-enabled-language": {
+          "title": "추가 활성 언어",
+          "setupLabel": "NT$12,000 / 언어",
+          "monthlyLabel": "NT$1,000 / 언어"
+        },
+        "higher-runtime-usage": {
+          "title": "더 높은 runtime/사용량 한도",
+          "monthlyLabel": "견적"
+        }
+      },
+      "discovery": {
+        "title": "요건 확인／맞춤 범위",
+        "summary": "워크플로가 불명확하거나, 데이터 민감도/역할/연동/마이그레이션/컴플라이언스 리스크가 있으면 유료 discovery 후 견적합니다."
       },
       "packages": {},
-      "addons": {
-        "dojomate-productivity-tools": "DojoMate 생산성 도구",
-        "custom-domain": "커스텀 도메인",
-        "payment-rail-integration": "결제 레일 연동",
-        "multi-language": "다국어",
-        "staff-training": "스태프 교육",
-        "data-import": "데이터 가져오기"
-      },
-      "maintenance": {
-        "included-platform-care": {
-          "name": "포함된 플랫폼 관리",
-          "scope": "월간 플랫폼 이용료에 호스팅, 배포 유지, 백업, 기본 모니터링을 포함합니다."
-        },
-        "priority-support": {
-          "name": "우선 지원",
-          "scope": "활성 고객을 위한 빠른 응답과 소규모 운영 업데이트."
-        },
-        "custom-operations": {
-          "name": "맞춤 운영 지원",
-          "scope": "업무량에 따라 견적합니다."
-        }
-      }
+      "addons": {},
+      "maintenance": {}
     },
     "contact": {
       "heading": "Concierge Inquiry",
