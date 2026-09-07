@@ -14,7 +14,8 @@ const props = defineProps({
   copy: { type: Object, required: true },
   pricingPackages: { type: Array, default: () => [] },
   addons: { type: Array, default: () => [] },
-  maintenance: { type: Array, default: () => [] }
+  maintenance: { type: Array, default: () => [] },
+  selectedLocale: { type: String, default: 'zh-TW' }
 });
 
 const emit = defineEmits(['navigate', 'contact']);
@@ -575,6 +576,7 @@ onUnmounted(() => {
           :pricing-packages="pricingPackages"
           :addons="addons"
           :maintenance="maintenance"
+          :pricing-locale="selectedLocale"
           @back="() => emit('navigate', 'home')"
         />
       </article>

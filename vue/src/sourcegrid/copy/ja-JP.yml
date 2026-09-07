@@ -76,29 +76,6 @@ brands:
       mise-rituals:
         label: ミゼリチュアル
         description: タレやオイル、ボタニカルを静物画のように並べる座席ごとの儀式。
-    ctaButtons:
-      ajitama-flight:
-        label: 味玉トーチ
-        description: 黒糖タレをまとわせ卓上で炙る半熟味玉。
-      midnight-toppings:
-        label: ミッドナイトトッピング
-        description: 刻みネギ、ふりかけ、唐辛子糸を各席で仕上げます。
-      mise-tray:
-        label: ミゼリチュアル
-        description: ハーブやソース、香味油を小さな静物のように並べる演出。
-    ritualScenes:
-      chef-counter:
-        label: シェフズカウンター
-        description: バイナルライトに包まれた 12 席で仕上げの一振りを目の前で。
-      broth-lab:
-        label: ブロスラボ
-        description: スモーク塩、柚子醤油、炙り担々を順に注ぐ蒸気のラボ。
-      ceramic-atelier:
-        label: セラミックアトリエ
-        description: 窯出しの丼、マットな箸、真鍮レードルが整然と並ぶ。
-      lounge:
-        label: アフターグローラウンジ
-        description: 低い照明と蒸気、レイトナイトのプレイリストで余韻を引き延ばします。
     highlights:
       broth-ceremony:
         title: ブロスセレモニー
@@ -116,6 +93,52 @@ brands:
         source: ノクターン・ダイニング
       - quote: 「煙と柑橘と余熱が一杯に封じ込められている。」
         source: スチーム・アトラス
+    ctaButtons:
+      ajitama-flight:
+        label: 味玉トーチ
+        description: 黒糖たれで炙り上げる半熟卵をカウンターで仕上げます。
+      midnight-toppings:
+        label: ミッドナイト・トッピング
+        description: 刻みネギやふりかけクランブル、唐辛子スレッドを各席に。
+      mise-tray:
+        label: Mise リチュアル
+        description: ゲストごとに用意された小さなボタニカル、たれ、香味油。
+    ritualScenes:
+      chef-counter:
+        label: シェフカウンター
+        description: 12 席のみのカウンターで、バイナルの光が器を照らします。
+      broth-lab:
+        label: ブロスラボ
+        description: スモーク塩・柚子醤油・炙り担々を順番に注ぎ分ける工程。
+      ceramic-atelier:
+        label: セラミックアトリエ
+        description: 窯焼きの丼とマットな箸、真鍮レードルが並びます。
+      lounge:
+        label: ミッドナイトラウンジ
+        description: 低い照明と蒸気、遅いプレイリストが余韻を延ばします。
+    ctaButtons:
+      ajitama-flight:
+        label: 味玉トーチ
+        description: 黒糖だれで炙り上げる半熟卵をカウンターで仕上げます。
+      midnight-toppings:
+        label: ミッドナイト・トッピング
+        description: 刻みネギ、ふりかけクランブル、唐辛子スレッドを各席へ。
+      mise-tray:
+        label: Mise リチュアル
+        description: 小さなボタニカルやタレ、香味油をゲストごとに供します。
+    ritualScenes:
+      chef-counter:
+        label: シェフカウンター
+        description: 12 席のみのカウンターで、バイナルの灯りが器を照らします。
+      broth-lab:
+        label: ブロスラボ
+        description: スモーク塩、柚子醤油、炙り担々を順番に注ぐ工程。
+      ceramic-atelier:
+        label: セラミックアトリエ
+        description: 窯焼きの丼とマットな箸、真鍮レードルが並ぶ工房。
+      lounge:
+        label: ミッドナイトラウンジ
+        description: 低い照明と蒸気、レイトナイトプレイリストが余韻を延ばします。
   clothing:
     name: Loom & Light アトリエ
     tagline: スロウラグジュアリーのためのモジュールワードローブ。
@@ -193,19 +216,6 @@ brands:
       candle-smoke:
         label: キャンドルスモークリチュアル
         description: コースとコースの間を漂い、室内を香らせる囁きの煙柱。
-    ritualScenes:
-      wine-service:
-        label: ソムリエリチュアル
-        description: 火入れした香りとクリスタルサービスが紫の光を漂います。
-      kitchen-pass:
-        label: キッチンパス
-        description: 蒸気と低照度の中でシェフがキャンドル席へ皿を送り出す瞬間。
-      bar-ritual:
-        label: バーリチュアル
-        description: マーブルのバーがアメジストのグラデーションと香煙で輝きます。
-      salon-table:
-        label: サロントーブル
-        description: ベルベットのブース、リネンのドレープ、グラファイトメニューを温かな真鍮が縁取ります。
     highlights:
       obsidian-menu:
         title: オブシディアンメニュー
@@ -223,3 +233,16 @@ brands:
         source: オブシディアン・テーブル
       - quote: 「舞台にも匹敵するソムリエの所作。」
         source: アフターアワーズ・レビュー
+    ritualScenes:
+      wine-service:
+        label: ソムリエ・リチュアル
+        description: 紫の光の下でクリスタルに炎を纏わせるポワリング。
+      kitchen-pass:
+        label: キッチンパス
+        description: 蒸気を裂く低い光の中で、皿がキャンドルランナーへ渡されます。
+      bar-ritual:
+        label: バー・リチュアル
+        description: アメジストのグラデーションが輝くマーブルバーと香るスモーク。
+      salon-table:
+        label: サロンテーブル
+        description: ベルベットブースとリネンドレープ、石墨メニューを暖かな真鍮でまとめます。

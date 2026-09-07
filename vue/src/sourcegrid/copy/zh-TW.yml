@@ -1,6 +1,6 @@
 brands:
   hotel:
-    name: Emberlight Boutique Hotel
+    name: Emberlight 精品酒店
     tagline: 為都市品味旅人準備的光影居所。
     description: 城市奢華度假宅，含水療、庭院與季節品味菜單。
     settings:
@@ -47,7 +47,7 @@ brands:
       - quote: 庭院晚宴彷彿私人燈籠節的光影。
         source: Maison Review
   ramen:
-    name: Kintsu Ramen
+    name: 琴壽拉麵研究所
     tagline: 夜市魂的湯底儀式。
     description: 煙燻高湯、黑膠燈光與手作陶瓷，為拉麵信徒打造。
     settings:
@@ -76,29 +76,6 @@ brands:
       mise-rituals:
         label: 擺盤儀式
         description: 醬汁、油脂與香草在座位上排列成靜物畫。
-    ctaButtons:
-      ajitama-flight:
-        label: 炙燒味玉
-        description: 黑糖醬油炙烤的溫泉蛋在桌邊完成。
-      midnight-toppings:
-        label: 午夜配料
-        description: 蔥花、海苔粉與辣椒絲為每位客人現場撒上。
-      mise-tray:
-        label: 備料儀式
-        description: 迷你香草、醬汁與油脂依座位擺成靜物。
-    ritualScenes:
-      chef-counter:
-        label: 主廚吧檯
-        description: 黑膠燈光下僅十二席，近距離看湯麵完工。
-      broth-lab:
-        label: 湯底實驗室
-        description: 煙燻鹽、柚香醬油與炙燒擔擔依序出場。
-      ceramic-atelier:
-        label: 陶藝工作桌
-        description: 窯燒碗器、霧面筷與黃銅勺整齊待命。
-      lounge:
-        label: 餘暉休息室
-        description: 低光、蒸氣與深夜歌單延續席間餘溫。
     highlights:
       broth-ceremony:
         title: 湯底儀式
@@ -116,6 +93,29 @@ brands:
         source: 夜曲食堂
       - quote: 煙、柑橘與餘燼都封進同一碗裡。
         source: 蒸汽圖鑑
+    ctaButtons:
+      ajitama-flight:
+        label: 炙燒味玉
+        description: 吧檯現場以黑糖醬油炙燒的溏心蛋。
+      midnight-toppings:
+        label: 午夜配料
+        description: 蔥絲、海苔香酥與辣椒絲，為每一席添香。
+      mise-tray:
+        label: Mise 儀式
+        description: 每位客人專屬的小份香草、醬汁與油脂。
+    ritualScenes:
+      chef-counter:
+        label: 主廚吧檯
+        description: 僅有十二席的吧檯，黑膠燈光映照桌前服務。
+      broth-lab:
+        label: 湯底實驗室
+        description: 煙燻鹽、柚香醬油與炙燒擔擔依序淋下。
+      ceramic-atelier:
+        label: 陶藝工坊
+        description: 窯燒碗器、霧面筷與黃銅湯勺在此等候。
+      lounge:
+        label: 午夜休息室
+        description: 柔和燈光、蒸汽與播放清單延長每一席餘韻。
   clothing:
     name: Loom & Light Atelier
     tagline: 慢奢模組化衣櫥。
@@ -193,19 +193,6 @@ brands:
       candle-smoke:
         label: 燭煙儀式
         description: 細語般的煙柱在菜序之間繚繞並添香整個房間。
-    ritualScenes:
-      wine-service:
-        label: 侍酒儀式
-        description: 火焰收尾的倒酒與水晶服務穿梭於紫羅蘭燈光。
-      kitchen-pass:
-        label: 廚房傳菜口
-        description: 蒸氣切過低光，主廚把盤飾交給燭光侍者。
-      bar-ritual:
-        label: 吧檯儀式
-        description: 大理石吧檯映出紫晶漸層、香煙與酒杯剪影。
-      salon-table:
-        label: 沙龍餐桌
-        description: 天鵝絨座位、亞麻垂簾與石墨菜單配上暖色黃銅。
     highlights:
       obsidian-menu:
         title: 黑曜菜單
@@ -223,3 +210,16 @@ brands:
         source: 黑曜餐桌
       - quote: 侍酒的編排足以登上舞台。
         source: 余暉評論
+    ritualScenes:
+      wine-service:
+        label: 侍酒儀式
+        description: 紫羅蘭燈光下，晶透酒具與火焰淋洒的桌邊服務。
+      kitchen-pass:
+        label: 廚房傳菜口
+        description: 低光穿透蒸汽，主廚將料理交到燭光跑堂手中。
+      bar-ritual:
+        label: 吧檯儀式
+        description: 大理石吧檯映出紫水晶漸層、香氛煙霧與雞尾酒剪影。
+      salon-table:
+        label: 沙龍餐桌
+        description: 天鵝絨卡座、亞麻簾幕與石墨菜單搭配暖色黃銅。

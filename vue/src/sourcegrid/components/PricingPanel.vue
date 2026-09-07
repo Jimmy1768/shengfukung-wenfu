@@ -9,6 +9,7 @@ const props = defineProps({
   pricingPackages: { type: Array, default: () => [] },
   addons: { type: Array, default: () => [] },
   maintenance: { type: Array, default: () => [] },
+  pricingLocale: { type: String, default: 'zh-TW' },
   showBackButton: { type: Boolean, default: false },
   backLabel: { type: String, default: '' }
 });
@@ -129,6 +130,7 @@ const handleBack = () => {
         :pricing-packages="pricingPackages"
         :addons="addons"
         :maintenance="maintenance"
+        :pricing-locale="pricingLocale"
       />
     </div>
 

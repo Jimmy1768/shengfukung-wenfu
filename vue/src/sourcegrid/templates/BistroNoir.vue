@@ -15,6 +15,7 @@ const props = defineProps({
   pricingPackages: { type: Array, default: () => [] },
   addons: { type: Array, default: () => [] },
   maintenance: { type: Array, default: () => [] },
+  selectedLocale: { type: String, default: 'zh-TW' },
   lockedThemeId: { type: String, default: null }
 });
 
@@ -205,6 +206,8 @@ const venueDetails = computed(() => {
   };
 });
 
+const detailLabels = computed(() => props.copy?.home?.details?.labels ?? {});
+
 const pressQuotes = computed(() => {
   const q = props.story?.press || props.brandCopy?.press || props.copy?.home?.press || [];
   if (Array.isArray(q) && q.length) return q.slice(0, 3);
@@ -253,21 +256,25 @@ const handleContactClick = () => emit('contact');
           </p>
 
           <div class="bn-hero-cta">
-            <button type="button" class="bn-btn bn-btn--solid" @click="handleContactClick">Reserve</button>
-            <button type="button" class="bn-btn bn-btn--ghost" @click="handlePricingToggle">View tasting</button>
+            <button type="button" class="bn-btn bn-btn--solid" @click="handleContactClick">
+              {{ copy.cta?.reserve || 'Reserve' }}
+            </button>
+            <button type="button" class="bn-btn bn-btn--ghost" @click="handlePricingToggle">
+              {{ copy.cta?.viewTasting || 'View tasting' }}
+            </button>
           </div>
 
           <div class="bn-meta">
             <div class="bn-meta-item">
-              <span class="k">Hours</span>
+              <span class="k">{{ detailLabels.hours || 'Hours' }}</span>
               <span class="v">{{ venueDetails.hours }}</span>
             </div>
             <div class="bn-meta-item">
-              <span class="k">Address</span>
+              <span class="k">{{ detailLabels.address || 'Address' }}</span>
               <span class="v">{{ venueDetails.address }}</span>
             </div>
             <div class="bn-meta-item">
-              <span class="k">Dress</span>
+              <span class="k">{{ detailLabels.dress || 'Dress' }}</span>
               <span class="v">{{ venueDetails.dress }}</span>
             </div>
           </div>
@@ -397,6 +404,7 @@ const handleContactClick = () => emit('contact');
           :pricing-packages="pricingPackages"
           :addons="addons"
           :maintenance="maintenance"
+          :pricing-locale="selectedLocale"
           @back="handlePricingToggle"
         />
       </article>

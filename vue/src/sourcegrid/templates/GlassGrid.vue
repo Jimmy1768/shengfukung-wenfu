@@ -38,7 +38,8 @@ const props = defineProps({
   },
   pricingPackages: { type: Array, default: () => [] },
   addons: { type: Array, default: () => [] },
-  maintenance: { type: Array, default: () => [] }
+  maintenance: { type: Array, default: () => [] },
+  selectedLocale: { type: String, default: 'zh-TW' }
 });
 
 const heroEl = ref(null);
@@ -476,6 +477,7 @@ const handleContactClick = () => {
           :pricing-packages="pricingPackages"
           :addons="addons"
           :maintenance="maintenance"
+          :pricing-locale="selectedLocale"
           @back="handlePricingToggle"
         />
       </article>
