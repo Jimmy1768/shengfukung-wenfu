@@ -42,9 +42,10 @@ module Backend
     config.middleware.use ApiProtection::AuditMiddleware
 
     # === Custom App Metadata (Golden Template) ===============================
-    # This stores the codename for the project.
-    # The clone/rename script will replace this automatically.
-    config.x.app_codename = "initial"
+    # Exposed on config.x for convenience. Profile::Identity is the single
+    # source -- it derives the codename from the project slug, so this must
+    # never be a second literal that can drift from it.
+    config.x.app_codename = Profile::Identity.app_codename
 
     # === Locale / Timezone defaults =========================================
     # You will override or finalize later, but let's keep a clean template.

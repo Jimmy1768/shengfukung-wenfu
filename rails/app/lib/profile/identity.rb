@@ -16,17 +16,48 @@ module Profile
     # === APP CODENAME =======================================================
     #
     # Machine-friendly identifier for this project, used in:
-    # - cookie/session keys
-    # - Redis namespaces
-    # - log prefixes (if desired)
+    # - the session cookie name       (_<codename>_session)
+    # - the Redis cache namespace     (<codename>_cache)
+    # - the Redis app-state prefix    (<codename>:appstate)
     #
-    # The clone script should change this per client.
+    # Derived from the project slug in shared/app_constants/project.json so two
+    # projects cloned from this template never share a session cookie name or a
+    # Redis namespace. It used to be the literal "initial" in every clone, which
+    # meant siblings deployed on one Redis instance shared cache and app-state
+    # keys, and siblings on sibling subdomains collided on session cookies. It
+    # also looked like a real value rather than a placeholder, so nothing caught
+    # it -- it matches no search for the template's name.
     #
-
-    APP_CODENAME = "initial".freeze
+    # This file is required directly from config/application.rb, before Rails
+    # autoloading and Rails.root exist, so the shared config is read relative to
+    # __dir__ rather than through AppConstants::Project.
+    #
+    # Override with APP_CODENAME when a deployment needs a name that is not the
+    # slug (for example when renaming a project without invalidating sessions).
+    #
+    PROJECT_CONFIG_PATH = File.expand_path(
+      "../../../../shared/app_constants/project.json", __dir__
+    ).freeze
 
     def self.app_codename
-      APP_CODENAME
+      @app_codename ||= normalize_codename(configured_codename)
+    end
+
+    def self.configured_codename
+      override = ENV["APP_CODENAME"]
+      return override unless override.nil? || override.strip.empty?
+
+      begin
+        require "json"
+        JSON.parse(File.read(PROJECT_CONFIG_PATH))["slug"]
+      rescue StandardError
+        nil
+      end
+    end
+
+    def self.normalize_codename(value)
+      normalized = value.to_s.downcase.gsub(/[^a-z0-9]+/, "_").gsub(/\A_+|_+\z/, "")
+      normalized.empty? ? "app" : normalized
     end
 
     # === EMAIL IDENTITY =====================================================

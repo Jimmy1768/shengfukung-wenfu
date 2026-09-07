@@ -27,8 +27,14 @@ class RedisAppStoreTest < ActiveSupport::TestCase
     end
   end
 
+  # Derived rather than hardcoded: the codename comes from the project slug, so
+  # pinning a literal here would silently re-introduce the shared-namespace bug.
+  def prefix
+    Profile::Identity.app_codename
+  end
+
   test "namespaces appstate keys by app codename" do
-    assert_equal "initial:appstate:assistant/session", System::RedisAppStore.namespaced_key("assistant/session")
+    assert_equal "#{prefix}:appstate:assistant/session", System::RedisAppStore.namespaced_key("assistant/session")
   end
 
   test "rejects blank appstate keys" do
@@ -43,8 +49,8 @@ class RedisAppStoreTest < ActiveSupport::TestCase
       assert_equal "1", System::RedisAppStore.get("rate-limit/user-1")
     end
 
-    assert_equal [:set, "initial:appstate:rate-limit/user-1", "1", { ex: 30 }], redis.calls.first
-    assert_equal [:get, "initial:appstate:rate-limit/user-1"], redis.calls.second
+    assert_equal [:set, "#{prefix}:appstate:rate-limit/user-1", "1", { ex: 30 }], redis.calls.first
+    assert_equal [:get, "#{prefix}:appstate:rate-limit/user-1"], redis.calls.second
   end
 
   test "deletes namespaced keys through appstate client" do
@@ -52,6 +58,6 @@ class RedisAppStoreTest < ActiveSupport::TestCase
 
     System::RedisAppStore.stub(:client, redis) { assert_equal 1, System::RedisAppStore.delete("lock/import") }
 
-    assert_equal [[:del, "initial:appstate:lock/import"]], redis.calls
+    assert_equal [[:del, "#{prefix}:appstate:lock/import"]], redis.calls
   end
 end
