@@ -39,7 +39,14 @@ end
 group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
+end
 
-  # Load .env files (e.g., .env.development) into ENV for local development.
+# Must include :test. It was :development only, so .env.test was never loaded
+# and its PGDATABASE_TEST pin was inert -- the suite fell through to
+# config/database.yml's default and ran against another project's test database
+# as another project's Postgres role. Confirmed 2026-09-07:
+# db=golden_template_test user=golden_template_dev.
+group :development, :test do
+  # Load .env files (e.g., .env.development, .env.test) into ENV.
   gem "dotenv-rails"
 end

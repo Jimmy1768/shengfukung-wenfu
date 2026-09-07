@@ -60,12 +60,28 @@ module Profile
 
     # === DATA STORAGE =======================================================
     #
-    # Template defaults for database names and ActiveStorage buckets. Client
-    # deployments override the actual values via ENV files or deployment manifests.
+    # Database and bucket names derive from the project slug so two projects
+    # cloned from this template never address the same storage. Hardcoded
+    # defaults meant every clone fell back to the same Postgres databases and
+    # the same S3 bucket. Deployments still override the resolved values via ENV.
     #
     module Storage
-      DEFAULT_DB_BASE = "golden_template".freeze
-      DEFAULT_BUCKET_PREFIX = "golden-template".freeze
+      # "shengfukung-wenfu" -> "shengfukung_wenfu" for Postgres, "shengfukung-wenfu" for S3.
+      def self.db_base
+        normalize(AppConstants::Project.slug, "_", fallback: "app")
+      end
+
+      def self.bucket_prefix
+        normalize(AppConstants::Project.slug, "-", fallback: "app")
+      end
+
+      def self.normalize(value, separator, fallback:)
+        normalized = value.to_s.downcase
+          .gsub(/[^a-z0-9]+/, separator)
+          .gsub(/\A#{Regexp.escape(separator)}+|#{Regexp.escape(separator)}+\z/, "")
+
+        normalized.empty? ? fallback : normalized
+      end
 
       # Public helpers ------------------------------------------------------
       def self.postgres_url(env:)
@@ -87,13 +103,13 @@ module Profile
       def self.default_db_name(env:)
         case env.to_s
         when "production"
-          DEFAULT_DB_BASE
+          db_base
         when "development"
-          "#{DEFAULT_DB_BASE}_dev"
+          "#{db_base}_dev"
         when "test"
-          "#{DEFAULT_DB_BASE}_test"
+          "#{db_base}_test"
         else
-          "#{DEFAULT_DB_BASE}_#{env}"
+          "#{db_base}_#{env}"
         end
       end
 
@@ -110,7 +126,7 @@ module Profile
             "-#{env}"
           end
 
-        "#{DEFAULT_BUCKET_PREFIX}#{suffix}"
+        "#{bucket_prefix}#{suffix}"
       end
     end
 

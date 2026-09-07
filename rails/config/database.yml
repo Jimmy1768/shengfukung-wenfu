@@ -1,3 +1,33 @@
+# Database names derive from the project slug in shared/app_constants/project.json
+# so two projects cloned from this template never share a database. Before this,
+# every clone fell back to the template's own dev/test databases and quietly
+# wrote into the same Postgres databases as its siblings.
+#
+# Override per deployment with PGDATABASE / PGDATABASE_TEST / PGUSER, or set
+# PROJECT_SLUG to change the derived base without editing project.json.
+#
+# NOTE for this project: .env.development pins PGDATABASE and PGDATABASE_TEST to
+# shengfukung_wenfu_development (one database for dev and test, deliberately), so
+# these fallbacks are not what is actually used. Derivation yields
+# shengfukung_wenfu_dev, which differs from that name -- if the pins are ever
+# dropped, the database has to be created or the pin restored.
+<%
+  require "json"
+
+  project_slug = ENV["PROJECT_SLUG"]
+  if project_slug.nil? || project_slug.strip.empty?
+    project_slug =
+      begin
+        JSON.parse(File.read(Rails.root.join("..", "shared", "app_constants", "project.json")))["slug"]
+      rescue StandardError
+        nil
+      end
+  end
+
+  db_base = project_slug.to_s.downcase.gsub(/[^a-z0-9]+/, "_").gsub(/\A_+|_+\z/, "")
+  db_base = "app" if db_base.empty?
+%>
+
 default: &default
   adapter: postgresql
   encoding: unicode
@@ -5,16 +35,16 @@ default: &default
   timeout: 5000
   host: <%= ENV.fetch("PGHOST", "localhost") %>
   port: <%= ENV.fetch("PGPORT", 5432) %>
-  username: <%= ENV.fetch("PGUSER", "golden_template_dev") %>
+  username: <%= ENV.fetch("PGUSER", "#{db_base}_dev") %>
   password: <%= ENV["PGPASSWORD"] %>
 
 development:
   <<: *default
-  database: <%= ENV.fetch("PGDATABASE", "golden_template_dev") %>
+  database: <%= ENV.fetch("PGDATABASE", "#{db_base}_dev") %>
 
 test:
   <<: *default
-  database: <%= ENV.fetch("PGDATABASE_TEST", "golden_template_test") %>
+  database: <%= ENV.fetch("PGDATABASE_TEST", "#{db_base}_test") %>
 
 production:
   <<: *default
