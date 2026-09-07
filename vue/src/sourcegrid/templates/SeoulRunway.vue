@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
-import fittingRoomHero from '@/assets/media/clothing/clothing_fitting_area.png';
+import fittingRoomHero from '@/assets/media/clothing/clothing_fitting_area.webp';
 import PricingPanel from '../components/PricingPanel.vue';
 
 const props = defineProps({
