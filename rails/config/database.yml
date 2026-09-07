@@ -6,11 +6,9 @@
 # Override per deployment with PGDATABASE / PGDATABASE_TEST / PGUSER, or set
 # PROJECT_SLUG to change the derived base without editing project.json.
 #
-# NOTE for this project: .env.development pins PGDATABASE and PGDATABASE_TEST to
-# shengfukung_wenfu_development (one database for dev and test, deliberately), so
-# these fallbacks are not what is actually used. Derivation yields
-# shengfukung_wenfu_dev, which differs from that name -- if the pins are ever
-# dropped, the database has to be created or the pin restored.
+# These fallbacks are what this project actually uses: the local databases are
+# named shengfukung_wenfu_dev and shengfukung_wenfu_test to match, so a clone
+# works with no .env entries at all. Nothing here should need a local override.
 <%
   require "json"
 
@@ -35,7 +33,14 @@ default: &default
   timeout: 5000
   host: <%= ENV.fetch("PGHOST", "localhost") %>
   port: <%= ENV.fetch("PGPORT", 5432) %>
-  username: <%= ENV.fetch("PGUSER", "#{db_base}_dev") %>
+  # No derived default, and blank when PGUSER is unset -- exactly like password
+  # below. A database NAME can be invented; a Postgres ROLE cannot, it has to
+  # already exist. Defaulting this to "#{db_base}_dev" made every fresh clone
+  # fail with `role "..._dev" does not exist` before it could create anything.
+  # Blank, libpq falls back to the OS user, which is what owns a local
+  # development database in practice. Deployments set PGUSER explicitly
+  # (production uses templemate_admin).
+  username: <%= ENV["PGUSER"] %>
   password: <%= ENV["PGPASSWORD"] %>
 
 development:
