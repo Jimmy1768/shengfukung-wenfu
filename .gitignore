@@ -11,21 +11,24 @@ npm-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Vue (marketing) build outputs and node deps
+# Node dependencies, at any depth. This was three per-directory patterns
+# (vue/, expo/, mobile/) and the repository root was the gap they left --
+# 131 files, 16MB, including darwin-arm64 native binaries, were committed
+# and reached the Linux droplet. One pattern cannot have a gap.
+node_modules/
+
+# Vue (marketing) build outputs
 vue/dist/
-vue/node_modules/
 
 # Expo / mobile artifacts
 expo/.expo/
 expo/.expo-shared/
-expo/node_modules/
 expo/android/
 expo/ios/
 expo/web-build/
 expo/dist/
 mobile/.expo/
 mobile/.expo-shared/
-mobile/node_modules/
 mobile/android/
 mobile/ios/
 mobile/web-build/
