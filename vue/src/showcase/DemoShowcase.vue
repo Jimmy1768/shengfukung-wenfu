@@ -3,7 +3,6 @@
 import { computed, reactive, ref, watch } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { defaultBrandId, brands } from '../sourcegrid/brands';
-import { pricingContent } from '../sourcegrid/pricing';
 import { defaultTemplateId, templateRegistry } from '../sourcegrid/templates/registry';
 import translations from '../locales/translations';
 import { persistLocale, readPersistedLocale } from '../utils/localePersistence';
@@ -95,41 +94,11 @@ const brandCopyForSelected = computed(() => {
 
 const navItems = computed(() => copy.value.nav?.items ?? []);
 
-const localizedPricingPackages = computed(() => {
-  const packageCopy = copy.value.pricing.packages ?? {};
-  return pricingContent.packages.map((pkg) => {
-    const localized = packageCopy[pkg.id] ?? {};
-    return {
-      ...pkg,
-      copy: {
-        name: localized.name ?? '',
-        summary: localized.summary ?? '',
-        description: localized.description ?? '',
-        features: localized.features ?? []
-      }
-    };
-  });
-});
-
-const localizedAddons = computed(() => {
-  const addonCopy = copy.value.pricing.addons ?? {};
-  return pricingContent.addons.map((addon) => ({
-    ...addon,
-    displayName: addonCopy[addon.id] ?? addon.id
-  }));
-});
-
-const localizedMaintenance = computed(() => {
-  const maintenanceCopy = copy.value.pricing.maintenance ?? {};
-  return pricingContent.maintenance.map((plan) => {
-    const localized = maintenanceCopy[plan.id] ?? {};
-    return {
-      ...plan,
-      displayName: localized.name ?? plan.id,
-      scope: localized.scope ?? ''
-    };
-  });
-});
+// Pricing is no longer localised here. PricingDeck reads pricingContent
+// directly and merges demo.pricing overrides itself, so these three computeds
+// mapped over the price list on every locale change and their results were
+// forwarded through the template and PricingPanel into props PricingDeck
+// declares but never reads.
 
 const demoSubject = computed(() => copy.value.contact.autoReplySubject);
 const demoBodyPreview = computed(() => copy.value.contact.autoReplyBody);
@@ -409,9 +378,6 @@ watch(
       :brand="selectedBrand"
       :brand-copy="brandCopyForSelected"
       :copy="copy"
-      :pricing-packages="localizedPricingPackages"
-      :addons="localizedAddons"
-      :maintenance="localizedMaintenance"
       :available-locales="availableLocales"
       :selected-locale="selectedLocale"
       :contact-form="contactForm"
