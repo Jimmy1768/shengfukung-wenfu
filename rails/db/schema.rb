@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_31_010000) do
+ActiveRecord::Schema[7.1].define(version: 2026_09_07_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -801,12 +801,25 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_31_010000) do
     t.string "title", null: false
     t.text "body"
     t.datetime "event_date"
-    t.jsonb "photo_urls", default: [], null: false
     t.jsonb "metadata", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["temple_id", "event_date"], name: "index_gallery_entries_on_temple_and_event_date"
     t.index ["temple_id"], name: "index_temple_gallery_entries_on_temple_id"
+  end
+
+  create_table "temple_gallery_photos", force: :cascade do |t|
+    t.bigint "temple_gallery_entry_id", null: false
+    t.bigint "media_asset_id"
+    t.string "url", null: false
+    t.integer "position", default: 0, null: false
+    t.string "status", default: "active", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["media_asset_id"], name: "index_temple_gallery_photos_on_media_asset_id"
+    t.index ["status"], name: "index_temple_gallery_photos_on_status"
+    t.index ["temple_gallery_entry_id", "position"], name: "index_gallery_photos_on_entry_and_position"
+    t.index ["temple_gallery_entry_id"], name: "index_temple_gallery_photos_on_temple_gallery_entry_id"
   end
 
   create_table "temple_gatherings", force: :cascade do |t|
@@ -1159,6 +1172,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_31_010000) do
   add_foreign_key "temple_connections", "users"
   add_foreign_key "temple_events", "temples"
   add_foreign_key "temple_gallery_entries", "temples"
+  add_foreign_key "temple_gallery_photos", "media_assets"
+  add_foreign_key "temple_gallery_photos", "temple_gallery_entries"
   add_foreign_key "temple_gatherings", "temples"
   add_foreign_key "temple_news_posts", "temples"
   add_foreign_key "temple_offering_setup_drafts", "admins", column: "applied_by_admin_id"
