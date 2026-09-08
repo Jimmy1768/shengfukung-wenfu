@@ -68,19 +68,41 @@
           list sits inside the entry form and forms do not nest. Same shape as
           the hero image Remove control in admin/temples/_hero_image_slot. %>
       <ul class="gallery-photo-grid">
-        <% gallery_entry.photos.reject(&:archived?).each do |photo| %>
+        <% live_photos = gallery_entry.photos.reject(&:archived?) %>
+        <% live_photos.each_with_index do |photo, index| %>
           <li class="gallery-photo">
             <img src="<%= photo.url %>" alt="" class="gallery-photo__image" loading="lazy">
-            <button type="submit"
-              name="photo_remove[<%= photo.id %>]"
-              value="1"
-              class="btn btn-secondary gallery-photo__remove"
-              formnovalidate>
-              <%= t("admin.gallery_entries.actions.remove_photo") %>
-            </button>
+            <div class="gallery-photo__actions">
+              <%# Order is what a visitor sees, so it is edited here rather than
+                  by rewriting the URL textarea. Disabled at the ends because a
+                  control that silently does nothing is worse than one that
+                  says it cannot. %>
+              <button type="submit"
+                name="photo_move_up[<%= photo.id %>]"
+                value="1"
+                class="btn btn-secondary gallery-photo__move"
+                aria-label="<%= t("admin.gallery_entries.actions.move_up") %>"
+                <%= "disabled" if index.zero? %>
+                formnovalidate>&uarr;</button>
+              <button type="submit"
+                name="photo_move_down[<%= photo.id %>]"
+                value="1"
+                class="btn btn-secondary gallery-photo__move"
+                aria-label="<%= t("admin.gallery_entries.actions.move_down") %>"
+                <%= "disabled" if index == live_photos.size - 1 %>
+                formnovalidate>&darr;</button>
+              <button type="submit"
+                name="photo_remove[<%= photo.id %>]"
+                value="1"
+                class="btn btn-secondary gallery-photo__remove"
+                formnovalidate>
+                <%= t("admin.gallery_entries.actions.remove_photo") %>
+              </button>
+            </div>
           </li>
         <% end %>
       </ul>
+      <p class="muted"><%= t("admin.gallery_entries.hints.reorder") %></p>
       <p class="muted"><%= t("admin.gallery_entries.hints.remove_photo") %></p>
     </div>
   <% end %>

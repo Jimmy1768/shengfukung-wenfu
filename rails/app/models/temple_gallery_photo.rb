@@ -37,4 +37,37 @@ class TempleGalleryPhoto < ApplicationRecord
   def restore!
     update!(status: "active")
   end
+
+  def move_up!
+    reposition_by(-1)
+  end
+
+  def move_down!
+    reposition_by(1)
+  end
+
+  private
+
+  # Renumbers the album's live photos contiguously as it moves one of them.
+  # Positions drift apart as photos are archived and restored, so a bare
+  # increment would eventually collide or leave gaps; rewriting the whole run
+  # keeps "position" meaning what it says. Archived photos are excluded --
+  # they hold no place in the visible order.
+  #
+  # update_column deliberately: this is ordering, not an edit of the photo, so
+  # it should not fire validations or bump updated_at.
+  def reposition_by(offset)
+    siblings = temple_gallery_entry.photos.active.ordered.to_a
+    index = siblings.index { |photo| photo.id == id }
+    return false if index.nil?
+
+    target = index + offset
+    return false if target.negative? || target >= siblings.size
+
+    siblings.insert(target, siblings.delete_at(index))
+    self.class.transaction do
+      siblings.each_with_index { |photo, i| photo.update_column(:position, i) }
+    end
+    true
+  end
 end

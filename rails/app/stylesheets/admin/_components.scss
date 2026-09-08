@@ -1195,6 +1195,29 @@
   gap: var(--spacing-sm);
 }
 
+.gallery-photo__actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+}
+
+// The arrows are icons, not labels: fixed square so they do not stretch and
+// leave the Remove button no room.
+.gallery-photo__move {
+  flex: 0 0 auto;
+  min-width: 2.25rem;
+  padding-inline: var(--spacing-xs);
+}
+
+.gallery-photo__move[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gallery-photo__remove {
+  flex: 1 1 auto;
+}
+
 .gallery-photo__image {
   width: 100%;
   aspect-ratio: 4 / 3;

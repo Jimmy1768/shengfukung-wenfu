@@ -47,6 +47,7 @@ module Admin
         # so do not rely on it: keep the removal last.
         archive_removed_photos(@gallery_entry)
         restore_archived_photos(@gallery_entry)
+        reorder_photos(@gallery_entry)
       end
 
       if @gallery_entry.persisted? && @gallery_entry.errors.empty?
@@ -93,6 +94,21 @@ module Admin
       return if ids.blank?
 
       entry.photos.where(id: Array(ids.keys)).find_each(&:restore!)
+      entry.photos.reset
+    end
+
+    # One move per submit -- each button carries its own photo id, and a click
+    # submits the form, so there is never more than one. The model renumbers the
+    # whole run, so positions stay contiguous however often this is used.
+    def reorder_photos(entry)
+      if (id = params[:photo_move_up]&.keys&.first)
+        entry.photos.find_by(id:)&.move_up!
+      elsif (id = params[:photo_move_down]&.keys&.first)
+        entry.photos.find_by(id:)&.move_down!
+      else
+        return
+      end
+
       entry.photos.reset
     end
 

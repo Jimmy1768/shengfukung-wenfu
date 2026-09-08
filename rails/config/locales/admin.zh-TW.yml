@@ -1201,11 +1201,14 @@ zh-TW:
       hints:
         photo_urls: "貼上已上傳的圖片網址，每行一個。如尚未整理，可留白。"
         remove_photo: "移除後照片會立即從公開頁面消失，但仍可復原。"
+        reorder: "以上下箭頭調整照片在公開頁面的順序。"
         restore_photo: "復原後照片會重新出現在公開頁面。"
         upload_media: "可直接上傳檔案，或維持貼網址的方式。"
       actions:
         remove_photo: "移除"
         restore_photo: "復原"
+        move_up: "上移"
+        move_down: "下移"
         new: "新增回顧"
         save: "儲存"
         cancel: "取消"

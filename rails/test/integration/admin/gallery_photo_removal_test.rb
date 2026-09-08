@@ -99,6 +99,48 @@ class AdminGalleryPhotoRemovalTest < ActionDispatch::IntegrationTest
     assert_equal [@keep.url], @entry.reload.photo_urls
   end
 
+  test "the form offers move controls, disabled at each end" do
+    get edit_admin_gallery_entry_path(@entry)
+
+    assert_response :success
+    assert_includes response.body, %(name="photo_move_down[#{@keep.id}]")
+    assert_includes response.body, %(name="photo_move_up[#{@drop.id}]")
+    # first cannot move up, last cannot move down
+    assert_match %r{name="photo_move_up\[#{@keep.id}\]"[^>]*disabled}m, response.body
+    assert_match %r{name="photo_move_down\[#{@drop.id}\]"[^>]*disabled}m, response.body
+  end
+
+  test "moving a photo down changes the public order" do
+    assert_equal [@keep.url, @drop.url], @entry.photo_urls
+
+    patch admin_gallery_entry_path(@entry),
+      params: {
+        temple_gallery_entry: { title: @entry.title, photo_urls_raw: [@keep.url, @drop.url].join("\n") },
+        photo_move_down: { @keep.id.to_s => "1" }
+      }
+
+    assert_redirected_to admin_gallery_entries_path
+    assert_equal [@drop.url, @keep.url], @entry.reload.photo_urls
+  end
+
+  # Positions drift as photos are archived, so a move has to renumber rather
+  # than increment, or the order stops meaning anything.
+  test "reordering ignores archived photos and leaves positions contiguous" do
+    third = @entry.photos.create!(url: "https://example.test/third.jpg", position: 2)
+    @drop.archive!
+
+    patch admin_gallery_entry_path(@entry),
+      params: {
+        temple_gallery_entry: { title: @entry.title, photo_urls_raw: [@keep.url, third.url].join("\n") },
+        photo_move_up: { third.id.to_s => "1" }
+      }
+
+    @entry.reload
+    assert_equal [third.url, @keep.url], @entry.photo_urls
+    assert_equal [0, 1], @entry.photos.active.ordered.map(&:position)
+    assert @drop.reload.archived?, "an archived photo takes no place in the order"
+  end
+
   test "a normal save with no removal leaves both photos visible" do
     patch admin_gallery_entry_path(@entry),
       params: {
