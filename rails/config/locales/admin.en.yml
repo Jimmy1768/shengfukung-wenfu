@@ -827,9 +827,11 @@ en:
         remove_photo: "Removing hides the photo from the public page immediately. It stays recoverable."
         reorder: "Use the arrows to change the order photos appear on the public page."
         restore_photo: "Restoring puts the photo back on the public page."
+        destroy_photo: "Deleting also removes the stored file. This cannot be undone."
       actions:
         remove_photo: "Remove"
         restore_photo: "Restore"
+        destroy_photo: "Delete permanently"
         move_up: "Move up"
         move_down: "Move down"
         new: "New entry"

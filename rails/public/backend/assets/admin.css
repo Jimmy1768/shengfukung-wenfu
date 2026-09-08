@@ -3012,8 +3012,13 @@ body.admin-body--internal .admin-layout--public .admin-main {
   cursor: not-allowed;
 }
 
-.gallery-photo__remove {
+.gallery-photo__remove,
+.gallery-photo__restore {
   flex: 1 1 auto;
+}
+
+.gallery-photo__destroy {
+  flex: 0 0 auto;
 }
 
 .gallery-photo__image {

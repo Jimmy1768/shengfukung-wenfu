@@ -141,6 +141,48 @@ class AdminGalleryPhotoRemovalTest < ActionDispatch::IntegrationTest
     assert @drop.reload.archived?, "an archived photo takes no place in the order"
   end
 
+  test "Delete is offered only in the archived shelf, never beside a live photo" do
+    @drop.archive!
+
+    get edit_admin_gallery_entry_path(@entry)
+
+    assert_response :success
+    assert_includes response.body, %(name="photo_destroy[#{@drop.id}]")
+    assert_not_includes response.body, %(name="photo_destroy[#{@keep.id}]"),
+      "a live photo must not offer an irreversible control"
+  end
+
+  # The gate, asserted at the request level rather than only in the markup: not
+  # rendering a button is presentation, refusing the request is the rule.
+  test "a live photo cannot be destroyed even if the request asks" do
+    patch admin_gallery_entry_path(@entry),
+      params: {
+        temple_gallery_entry: { title: @entry.title, photo_urls_raw: [@keep.url, @drop.url].join("\n") },
+        photo_destroy: { @keep.id.to_s => "1" }
+      }
+
+    assert TempleGalleryPhoto.exists?(@keep.id),
+      "destroying must require the photo to be archived first"
+    assert_includes @entry.reload.photo_urls, @keep.url
+  end
+
+  test "destroying an archived photo removes the row and its asset" do
+    asset = @temple.media_assets.create!(role: "gallery_image", file_uid: "prod/gallery/drop.jpg")
+    @drop.update!(media_asset: asset)
+    @drop.archive!
+
+    patch admin_gallery_entry_path(@entry),
+      params: {
+        temple_gallery_entry: { title: @entry.title, photo_urls_raw: @keep.url },
+        photo_destroy: { @drop.id.to_s => "1" }
+      }
+
+    assert_redirected_to admin_gallery_entries_path
+    assert_not TempleGalleryPhoto.exists?(@drop.id)
+    assert_not MediaAsset.exists?(asset.id), "the asset row owns the object, so it goes too"
+    assert_equal [@keep.url], @entry.reload.photo_urls
+  end
+
   test "a normal save with no removal leaves both photos visible" do
     patch admin_gallery_entry_path(@entry),
       params: {

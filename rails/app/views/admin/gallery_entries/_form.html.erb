@@ -117,17 +117,36 @@
         <% archived_photos.each do |photo| %>
           <li class="gallery-photo">
             <img src="<%= photo.url %>" alt="" class="gallery-photo__image" loading="lazy">
-            <button type="submit"
-              name="photo_restore[<%= photo.id %>]"
-              value="1"
-              class="btn btn-secondary gallery-photo__restore"
-              formnovalidate>
-              <%= t("admin.gallery_entries.actions.restore_photo") %>
-            </button>
+            <div class="gallery-photo__actions">
+              <button type="submit"
+                name="photo_restore[<%= photo.id %>]"
+                value="1"
+                class="btn btn-secondary gallery-photo__restore"
+                formnovalidate>
+                <%= t("admin.gallery_entries.actions.restore_photo") %>
+              </button>
+              <%# Deleting is offered only here, never beside a live photo. The
+                  archive is the gate: an operator has to have taken the photo
+                  down, and seen it stay down, before the file can be reclaimed.
+                  Unlike everything else on this page, this one cannot be undone.
+
+                  No data-confirm: this admin layout loads no JavaScript, so the
+                  attribute the album Delete carries is a no-op and a dialog here
+                  would be theatre. Archive-then-delete is the confirmation --
+                  two deliberate acts, separated by seeing the photo disappear. %>
+              <button type="submit"
+                name="photo_destroy[<%= photo.id %>]"
+                value="1"
+                class="btn btn-danger gallery-photo__destroy"
+                formnovalidate>
+                <%= t("admin.gallery_entries.actions.destroy_photo") %>
+              </button>
+            </div>
           </li>
         <% end %>
       </ul>
       <p class="muted"><%= t("admin.gallery_entries.hints.restore_photo") %></p>
+      <p class="muted"><%= t("admin.gallery_entries.hints.destroy_photo") %></p>
     </details>
   <% end %>
 

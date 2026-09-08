@@ -1203,10 +1203,12 @@ zh-TW:
         remove_photo: "移除後照片會立即從公開頁面消失，但仍可復原。"
         reorder: "以上下箭頭調整照片在公開頁面的順序。"
         restore_photo: "復原後照片會重新出現在公開頁面。"
+        destroy_photo: "永久刪除會一併移除雲端檔案，無法復原。"
         upload_media: "可直接上傳檔案，或維持貼網址的方式。"
       actions:
         remove_photo: "移除"
         restore_photo: "復原"
+        destroy_photo: "永久刪除"
         move_up: "上移"
         move_down: "下移"
         new: "新增回顧"

@@ -1214,8 +1214,15 @@
   cursor: not-allowed;
 }
 
-.gallery-photo__remove {
+.gallery-photo__remove,
+.gallery-photo__restore {
   flex: 1 1 auto;
+}
+
+// The only irreversible control in the gallery. It gets the danger treatment so
+// it does not read as a peer of Restore beside it.
+.gallery-photo__destroy {
+  flex: 0 0 auto;
 }
 
 .gallery-photo__image {

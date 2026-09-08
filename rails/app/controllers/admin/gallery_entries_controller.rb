@@ -48,6 +48,7 @@ module Admin
         archive_removed_photos(@gallery_entry)
         restore_archived_photos(@gallery_entry)
         reorder_photos(@gallery_entry)
+        destroy_archived_photos(@gallery_entry)
       end
 
       if @gallery_entry.persisted? && @gallery_entry.errors.empty?
@@ -109,6 +110,25 @@ module Admin
         return
       end
 
+      entry.photos.reset
+    end
+
+    # The only irreversible operation here, so the scope is narrowed twice: the
+    # photo must belong to this entry, and it must already be archived. The
+    # archived scope is the gate itself -- a live photo cannot be destroyed by
+    # any request, however it is crafted, without being taken down first.
+    #
+    # Destroying the photo also destroys its MediaAsset, whose after_destroy_commit
+    # reclaims the S3 object. A pasted URL has no asset and nothing to reclaim.
+    def destroy_archived_photos(entry)
+      ids = params[:photo_destroy]
+      return if ids.blank?
+
+      entry.photos.archived.where(id: Array(ids.keys)).find_each do |photo|
+        asset = photo.media_asset
+        photo.destroy!
+        asset&.destroy!
+      end
       entry.photos.reset
     end
 
