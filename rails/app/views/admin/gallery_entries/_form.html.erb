@@ -85,6 +85,30 @@
     </div>
   <% end %>
 
+  <% archived_photos = gallery_entry.persisted? ? gallery_entry.photos.select(&:archived?) : [] %>
+  <% if archived_photos.any? %>
+    <details class="field gallery-archived">
+      <%# Collapsed by default: an archived photo is out of the way, not gone,
+          and the shelf should not compete with the live set above it. %>
+      <summary><%= t("admin.gallery_entries.fields.archived_photos", count: archived_photos.size) %></summary>
+      <ul class="gallery-photo-grid gallery-photo-grid--archived">
+        <% archived_photos.each do |photo| %>
+          <li class="gallery-photo">
+            <img src="<%= photo.url %>" alt="" class="gallery-photo__image" loading="lazy">
+            <button type="submit"
+              name="photo_restore[<%= photo.id %>]"
+              value="1"
+              class="btn btn-secondary gallery-photo__restore"
+              formnovalidate>
+              <%= t("admin.gallery_entries.actions.restore_photo") %>
+            </button>
+          </li>
+        <% end %>
+      </ul>
+      <p class="muted"><%= t("admin.gallery_entries.hints.restore_photo") %></p>
+    </details>
+  <% end %>
+
   <div class="field">
     <%= form.label :photo_urls_raw, t("admin.gallery_entries.fields.photo_urls") %>
     <%= text_area_tag "temple_gallery_entry[photo_urls_raw]",

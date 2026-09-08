@@ -46,6 +46,7 @@ module Admin
         # already holds it, so autosave writes nothing back. That is incidental,
         # so do not rely on it: keep the removal last.
         archive_removed_photos(@gallery_entry)
+        restore_archived_photos(@gallery_entry)
       end
 
       if @gallery_entry.persisted? && @gallery_entry.errors.empty?
@@ -80,6 +81,18 @@ module Admin
       return if ids.blank?
 
       entry.photos.where(id: Array(ids.keys)).find_each(&:archive!)
+      entry.photos.reset
+    end
+
+    # Puts an archived photo back on the public page. The counterpart to
+    # archive_removed_photos -- archive is only meaningfully reversible if there
+    # is a way back, and without this an admin who removed a photo had no way to
+    # undo it.
+    def restore_archived_photos(entry)
+      ids = params[:photo_restore]
+      return if ids.blank?
+
+      entry.photos.where(id: Array(ids.keys)).find_each(&:restore!)
       entry.photos.reset
     end
 

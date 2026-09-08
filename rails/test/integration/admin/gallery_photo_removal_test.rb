@@ -59,6 +59,46 @@ class AdminGalleryPhotoRemovalTest < ActionDispatch::IntegrationTest
     assert_not_includes @entry.reload.photo_urls, @drop.url
   end
 
+  test "an archived photo appears in the archived shelf with a Restore control" do
+    @drop.archive!
+
+    get edit_admin_gallery_entry_path(@entry)
+
+    assert_response :success
+    assert_includes response.body, %(name="photo_restore[#{@drop.id}]")
+    assert_not_includes response.body, %(name="photo_remove[#{@drop.id}]"),
+      "an archived photo belongs in the shelf, not in the live set"
+  end
+
+  test "restoring puts the photo back on the public page" do
+    @drop.archive!
+
+    patch admin_gallery_entry_path(@entry),
+      params: {
+        temple_gallery_entry: { title: @entry.title, photo_urls_raw: @keep.url },
+        photo_restore: { @drop.id.to_s => "1" }
+      }
+
+    assert_redirected_to admin_gallery_entries_path
+    assert_includes @entry.reload.photo_urls, @drop.url
+    assert_not @drop.reload.archived?
+  end
+
+  # The admin textarea lists only live photos, so a plain save presents the
+  # archived photo as absent. It must not be destroyed by that.
+  test "an archived photo survives a later save that does not mention it" do
+    @drop.archive!
+
+    patch admin_gallery_entry_path(@entry),
+      params: { temple_gallery_entry: { title: "later edit", photo_urls_raw: @keep.url } }
+
+    assert_redirected_to admin_gallery_entries_path
+    assert TempleGalleryPhoto.exists?(@drop.id),
+      "archive is only reversible if the row survives ordinary saves"
+    assert @drop.reload.archived?
+    assert_equal [@keep.url], @entry.reload.photo_urls
+  end
+
   test "a normal save with no removal leaves both photos visible" do
     patch admin_gallery_entry_path(@entry),
       params: {

@@ -820,12 +820,15 @@ en:
         media_image: "Photo"
         media_video: "Video"
         current_photos: "Current photos"
+        archived_photos: "Removed photos (%{count})"
       hints:
         photo_urls: "Paste hosted image URLs, one per line. Leave blank if not available."
         upload_media: "Upload files directly or keep pasting external links as a fallback."
         remove_photo: "Removing hides the photo from the public page immediately. It stays recoverable."
+        restore_photo: "Restoring puts the photo back on the public page."
       actions:
         remove_photo: "Remove"
+        restore_photo: "Restore"
         new: "New entry"
         save: "Save"
         cancel: "Cancel"

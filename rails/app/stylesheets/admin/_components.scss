@@ -1203,6 +1203,18 @@
   border: 1px solid var(--border);
 }
 
+// The archived shelf sits below the live set, collapsed. Dimmed so it reads as
+// out of the way rather than as a second gallery.
+.gallery-archived > summary {
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.gallery-photo-grid--archived .gallery-photo__image {
+  opacity: 0.55;
+}
+
 .hero-image-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

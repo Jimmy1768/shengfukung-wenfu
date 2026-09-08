@@ -28,14 +28,18 @@ class TempleGalleryEntry < ApplicationRecord
   # media_asset link where the URL is unchanged. Order is the order given.
   def photo_urls=(urls)
     wanted = Array(urls).map { |u| u.to_s.strip }.reject(&:empty?)
-    existing = photos.index_by(&:url)
+    # Archived photos are deliberately out of scope. The list this writes from
+    # is the admin textarea, which shows only what is live, so treating an
+    # archived photo as "absent from the list" destroyed it on the very next
+    # save -- which would make Restore useless and archive irreversible.
+    live = photos.reject(&:archived?)
+    existing = live.index_by(&:url)
 
-    photos.each { |photo| photo.mark_for_destruction unless wanted.include?(photo.url) }
+    live.each { |photo| photo.mark_for_destruction unless wanted.include?(photo.url) }
 
     wanted.each_with_index do |url, index|
       if (photo = existing[url])
         photo.position = index
-        photo.status = "active"
       else
         photos.build(url:, position: index)
       end

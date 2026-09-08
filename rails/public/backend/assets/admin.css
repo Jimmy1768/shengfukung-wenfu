@@ -3003,6 +3003,16 @@ body.admin-body--internal .admin-layout--public .admin-main {
   border: 1px solid var(--border);
 }
 
+.gallery-archived > summary {
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.gallery-photo-grid--archived .gallery-photo__image {
+  opacity: 0.55;
+}
+
 .hero-image-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
