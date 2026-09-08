@@ -183,6 +183,29 @@ class AdminGalleryPhotoRemovalTest < ActionDispatch::IntegrationTest
     assert_equal [@keep.url], @entry.reload.photo_urls
   end
 
+  # Album deletion destroys every photo and reclaims every file at once. The
+  # control was a link_to with method: :delete, which needs rails-ujs -- absent
+  # here, so the confirmation modal fired and then the browser followed the href
+  # as a GET to #show and 404ed. Deleting an album had never worked.
+  test "the index deletes through a real form, not an inert link" do
+    get admin_gallery_entries_path
+
+    assert_response :success
+    assert_match %r{<form[^>]*action="#{Regexp.escape(admin_gallery_entry_path(@entry))}"}, response.body
+    assert_includes response.body, %(name="_method" value="delete")
+    assert_includes response.body, I18n.t("admin.gallery_entries.confirmations.delete")
+  end
+
+  test "deleting an album destroys it and its photos" do
+    assert_difference -> { TempleGalleryEntry.count }, -1 do
+      assert_difference -> { TempleGalleryPhoto.count }, -2 do
+        delete admin_gallery_entry_path(@entry)
+      end
+    end
+
+    assert_redirected_to admin_gallery_entries_path
+  end
+
   test "a normal save with no removal leaves both photos visible" do
     patch admin_gallery_entry_path(@entry),
       params: {

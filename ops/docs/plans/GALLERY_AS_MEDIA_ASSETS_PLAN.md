@@ -173,15 +173,26 @@ request is crafted.
    live photos -- so an archived photo looked absent and was destroyed on the
    next ordinary save. Archive was reversible only until someone pressed Save.
    Fixed in `0d5e4c7`; archived rows are outside that setter's scope entirely.
-2. `data-confirm` does nothing in this admin. The layout loads no JavaScript, so
-   the attribute the album Delete carries has never fired. No confirm dialog was
-   added for photo deletion; archive-then-delete is the confirmation instead.
+2. **A claim recorded here on 2026-09-08 was wrong and is corrected.** It said
+   `data-confirm` does nothing because the admin loads no JavaScript. It does
+   work: `layouts/admin.html.erb` renders `shared/confirmation_modal` and
+   `shared/modal_script`, which bind `data-confirm` for links and form submits
+   alike. The check that produced the false claim grepped the layout for
+   `<script>` without following the partials it renders. The photo Delete had
+   its confirmation removed on that basis and has since had it restored.
 
-**Still open, and now visible:** deleting an *album* reclaims every one of its
-photos' objects through `purge_media_assets`, with no archive gate and a
-`data-confirm` that does not work. Per-photo deletion is careful; album deletion
-is not. That asymmetry is a decision for the Director, not an oversight to fix
-quietly.
+   The real defect was next to it: album deletion used `link_to ... method:
+   :delete`, which needs rails-ujs. The modal fired, the operator confirmed,
+   and the browser then followed the href as a GET to `#show` -- 404. **Deleting
+   an album had never worked.** Fixed with `button_to`, which emits a real form
+   carrying `_method=delete`.
+
+**Album deletion, resolved 2026-09-08.** It now works and it confirms. The
+asymmetry with per-photo deletion is deliberate and stays: a photo must be
+archived before it can be destroyed, while an album is destroyed in one
+confirmed step. An album is a thing the operator created and can see whole; a
+photo inside one is easy to remove by accident. Deleting an album does reclaim
+every photo's stored file, which is why the confirmation is not decoration.
 
 ## Phases
 

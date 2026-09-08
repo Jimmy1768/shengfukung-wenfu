@@ -130,14 +130,17 @@
                   down, and seen it stay down, before the file can be reclaimed.
                   Unlike everything else on this page, this one cannot be undone.
 
-                  No data-confirm: this admin layout loads no JavaScript, so the
-                  attribute the album Delete carries is a no-op and a dialog here
-                  would be theatre. Archive-then-delete is the confirmation --
-                  two deliberate acts, separated by seeing the photo disappear. %>
+                  data-confirm is bound by shared/modal_script for form submits,
+                  including the submitter's own attribute -- so the dialog does
+                  appear. An earlier version of this comment claimed otherwise
+                  and dropped the attribute; that was wrong, and the check that
+                  found it was grepping the layout for <script> without following
+                  the partials it renders. %>
               <button type="submit"
                 name="photo_destroy[<%= photo.id %>]"
                 value="1"
                 class="btn btn-danger gallery-photo__destroy"
+                data-confirm="<%= t("admin.gallery_entries.hints.destroy_photo") %>"
                 formnovalidate>
                 <%= t("admin.gallery_entries.actions.destroy_photo") %>
               </button>

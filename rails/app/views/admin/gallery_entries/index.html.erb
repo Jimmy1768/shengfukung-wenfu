@@ -28,8 +28,21 @@
                 <td class="table-actions">
                   <div class="table-actions__buttons">
                     <%= link_to t("admin.gallery_entries.actions.edit"), edit_admin_gallery_entry_path(entry), class: "btn btn-ghost btn-small" %>
-                    <%= link_to t("admin.gallery_entries.actions.delete"), admin_gallery_entry_path(entry),
+                    <%# button_to, not link_to with method: :delete. This admin
+                        has no rails-ujs, so method: on a link was inert: the
+                        confirmation modal fired, and then the browser followed
+                        the href as a GET to #show, which 404ed. Deleting an
+                        album has therefore never worked. button_to emits a real
+                        form with _method=delete, which needs no JavaScript.
+
+                        data-confirm does work here -- shared/modal_script binds
+                        it for links and form submits alike -- and it matters
+                        more now than it did: since d3f06a6 this destroys every
+                        photo's stored file too. %>
+                    <%= button_to t("admin.gallery_entries.actions.delete"),
+                      admin_gallery_entry_path(entry),
                       method: :delete,
+                      form_class: "table-actions__form",
                       data: { confirm: t("admin.gallery_entries.confirmations.delete") },
                       class: "btn btn-ghost btn-small btn-danger" %>
                   </div>

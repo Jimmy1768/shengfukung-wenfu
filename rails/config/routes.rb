@@ -155,7 +155,7 @@ Rails.application.routes.draw do
       end
     end
     resources :news_posts
-    resources :gallery_entries
+    resources :gallery_entries, except: :show
     resources :media_uploads, only: :create
     get "/archives", to: "archives#index", as: :archives
     get "/archives/registrations", to: "archives#registrations_export", defaults: { format: :csv }, as: :archive_registrations_export
