@@ -61,6 +61,30 @@
       id: "gallery-uploaded-assets" %>
   </div>
 
+  <% if gallery_entry.persisted? && gallery_entry.photos.any? { |photo| !photo.archived? } %>
+    <div class="field">
+      <label><%= t("admin.gallery_entries.fields.current_photos") %></label>
+      <%# Submit buttons carrying a named param, not nested forms -- the photo
+          list sits inside the entry form and forms do not nest. Same shape as
+          the hero image Remove control in admin/temples/_hero_image_slot. %>
+      <ul class="gallery-photo-grid">
+        <% gallery_entry.photos.reject(&:archived?).each do |photo| %>
+          <li class="gallery-photo">
+            <img src="<%= photo.url %>" alt="" class="gallery-photo__image" loading="lazy">
+            <button type="submit"
+              name="photo_remove[<%= photo.id %>]"
+              value="1"
+              class="btn btn-secondary gallery-photo__remove"
+              formnovalidate>
+              <%= t("admin.gallery_entries.actions.remove_photo") %>
+            </button>
+          </li>
+        <% end %>
+      </ul>
+      <p class="muted"><%= t("admin.gallery_entries.hints.remove_photo") %></p>
+    </div>
+  <% end %>
+
   <div class="field">
     <%= form.label :photo_urls_raw, t("admin.gallery_entries.fields.photo_urls") %>
     <%= text_area_tag "temple_gallery_entry[photo_urls_raw]",

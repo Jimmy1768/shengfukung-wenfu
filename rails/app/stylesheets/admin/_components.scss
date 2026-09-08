@@ -1177,6 +1177,32 @@
   margin-top: var(--spacing-xl);
 }
 
+// Gallery photos, each with its own Remove control. Mirrors .hero-image-grid
+// rather than inventing a second layout language for the same idea: a set of
+// images an admin manages one at a time.
+.gallery-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  padding: 0;
+  list-style: none;
+}
+
+.gallery-photo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.gallery-photo__image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
 .hero-image-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

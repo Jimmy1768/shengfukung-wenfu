@@ -35,6 +35,20 @@ module Admin
       assign_photo_urls(@gallery_entry)
 
       if @gallery_entry.save
+        # Archived, not destroyed: the photo stops rendering immediately and
+        # stays recoverable, which is the gate that makes reclaiming its S3
+        # object safe later.
+        #
+        # Runs after the save as the safer order, not because it is currently
+        # load-bearing -- verified by moving it before the save, which changes
+        # nothing today. The submitted URL list still contains the removed
+        # photo, but photo_urls= only assigns status "active" to a record that
+        # already holds it, so autosave writes nothing back. That is incidental,
+        # so do not rely on it: keep the removal last.
+        archive_removed_photos(@gallery_entry)
+      end
+
+      if @gallery_entry.persisted? && @gallery_entry.errors.empty?
         cleanup_gallery_assets
         invalidate_gallery_cache!
         redirect_to admin_gallery_entries_path, notice: t("admin.gallery_entries.notices.updated")
@@ -59,6 +73,14 @@ module Admin
       permitted = params.require(:temple_gallery_entry).permit(:title, :body, :event_date)
       permitted[:event_date] = permitted[:event_date].presence
       permitted
+    end
+
+    def archive_removed_photos(entry)
+      ids = params[:photo_remove]
+      return if ids.blank?
+
+      entry.photos.where(id: Array(ids.keys)).find_each(&:archive!)
+      entry.photos.reset
     end
 
     def assign_photo_urls(entry)
