@@ -1,10 +1,14 @@
 # Media Asset Removal And Orphan Reclamation Plan
 
 Status: **Phase 0 complete 2026-09-05. Phase 1 implemented 2026-09-02**
-(Director authorized, chose to keep the MediaAsset row). Phase 2 not
-authorized. Two separable pieces of work with
-different risk profiles; Phase 1 is additive and reversible, Phase 2 can
-permanently destroy customer files and is deliberately gated behind a dry run.
+(Director authorized, chose to keep the MediaAsset row). **Phase 2's premise
+changed 2026-09-08** -- S3 objects are now reclaimed when their MediaAsset row
+is destroyed, so the sweep covers historical orphans rather than an ongoing
+leak; see the scope note on Phase 2. Phase 2 remains unauthorized.
+
+Two separable pieces of work with different risk profiles; Phase 1 is additive
+and reversible, Phase 2 can permanently destroy customer files and is
+deliberately gated behind a dry run.
 
 Owner: Wenfu Planning / Director
 
@@ -322,6 +326,29 @@ would have rewritten those rows to `prod/https://placehold.co/...`.
 
 Can permanently destroy customer files. Not to be authorized in the same breath
 as Phase 1.
+
+### Scope narrowed 2026-09-08: new orphans are no longer being created
+
+This phase was written when **nothing in this application had ever deleted an
+S3 object**, so every removed image leaked and a sweep was the only way to get
+any of them back. `d3f06a6` changed that: `MediaAsset#after_destroy_commit`
+reclaims the object when the row goes, guarded against URL-valued `file_uid`s
+and against objects a sibling row still references.
+
+So the sweep now addresses **history, not an ongoing leak**. Two consequences:
+
+- Its urgency dropped. Every gallery photo deleted from here on reclaims itself,
+  and destroying an album reclaims its photos' objects too.
+- Its target set is knowable and finite: objects orphaned before 2026-09-08,
+  plus anything a future code path drops without going through `MediaAsset`.
+
+Step 2a's report is still the right first move and is still unauthorized. What
+changed is that the report should now be read as an inventory of past damage
+rather than a running total, and 2b's deletion set should be small.
+
+Hero images and gathering heroes still destroy `MediaAsset` rows through their
+own paths, so they inherit the reclamation automatically. That was not designed
+here -- it falls out of putting the hook on the row that owns the object.
 
 **Step 2a, report only.** `Maintenance::CleanupWorker` (already stubbed for
 exactly this, already fanned out to by `NightlyCleanupJob`) lists objects under

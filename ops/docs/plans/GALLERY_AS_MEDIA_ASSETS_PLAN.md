@@ -1,6 +1,12 @@
 # Gallery As Media Assets
 
-Status: **proposed, nothing authorized.** Written 2026-09-03.
+Status: **implemented and deployed 2026-09-07/08, by a different design than
+this document proposed.** Written 2026-09-03. The gallery now supports remove,
+restore, reorder and permanent delete, and deleting reclaims the S3 object.
+
+**Read the divergence section before trusting the phases below.** They are kept
+as written because the reasoning still explains why the work was needed, but
+they are not what was built.
 
 Owner: Wenfu Planning / Director
 
@@ -117,6 +123,66 @@ control is archive; delete appears solely in the archived list, beside
 Restore — and the `×` glyph should not be reused for archive, since on the
 page it came from it means delete.
 
+## What was actually built, and how it diverged
+
+Shipped in `47bbcee`, `c7785ca`, `0d5e4c7`, `795124a`, `d3f06a6`.
+
+**The central decision this plan got wrong: where a photo's identity lives.**
+The phases below put `status`, `position` and `storage_kind` on `media_assets`.
+What shipped introduced `temple_gallery_photos` instead -- one row per photo in
+one album, holding its url, its `position`, its `status`, and a nullable
+`media_asset_id`.
+
+That was the better fit for a reason the plan did not see. The problem to solve
+was a photo's identity *within an album* -- which album, what order, shown or
+hidden. Those are properties of the placement, not of the file. Putting them on
+`media_assets` would have given every hero image a `position` and a `status`
+that mean nothing, and Phase 1 admits as much when it says the change "touches"
+hero images. A join row keeps the file record about the file.
+
+Consequences of that choice:
+
+- **Phase 1 was not done and is not needed for the gallery.** `storage_kind`,
+  `file_url` and `source_key` were never added; `file_uid` is still the storage
+  key and `file_uid_is_a_storage_key` still guards it. The URL/upload ambiguity
+  the plan wanted to fix is real, but it is a `media_assets` concern, not a
+  gallery one, and the gallery no longer needs it resolved to work.
+- **`photo_urls` survives as a method, not a column.** The column was dropped.
+  `TempleGalleryEntry#photo_urls` reads the live photo rows, so the nine
+  existing consumers -- admin views, the account portal, both APIs and
+  `Archive.vue` -- were not touched. There is one writer for one fact.
+- **Phase 4's migration did not need writing.** It anticipated matching
+  `photo_urls` entries to `MediaAsset` rows by URL. Production held 3 albums and
+  5 photos, all `placehold.co` seed placeholders, none matching any asset. The
+  migration backfills rows pairing the two old arrays by index and leaves
+  `media_asset_id` null on a mismatch, which is all the real data needed.
+- **Phase 5 did not need a new page.** The controls went into the existing entry
+  form as submit buttons carrying named params, matching the hero-image Remove.
+  The admin loads no JavaScript, so this also rules out drag-to-reorder; ↑ and ↓
+  buttons do it instead.
+
+**What matched the plan.** Archive as the reversible step, delete reachable only
+from the archived shelf, and the sibling-reference guard on reclamation are all
+as ruled and as described. The deletion gate is enforced in the controller
+scope, not by omitting a button, so a live photo cannot be destroyed however the
+request is crafted.
+
+**Two bugs found while building, both worth knowing:**
+
+1. `photo_urls=` rebuilt the whole set from the admin textarea, which lists only
+   live photos -- so an archived photo looked absent and was destroyed on the
+   next ordinary save. Archive was reversible only until someone pressed Save.
+   Fixed in `0d5e4c7`; archived rows are outside that setter's scope entirely.
+2. `data-confirm` does nothing in this admin. The layout loads no JavaScript, so
+   the attribute the album Delete carries has never fired. No confirm dialog was
+   added for photo deletion; archive-then-delete is the confirmation instead.
+
+**Still open, and now visible:** deleting an *album* reclaims every one of its
+photos' objects through `purge_media_assets`, with no archive gate and a
+`data-confirm` that does not work. Per-photo deletion is careful; album deletion
+is not. That asymmetry is a decision for the Director, not an oversight to fix
+quietly.
+
 ## Phases
 
 Nothing here is authorized. Each phase is independently shippable.
@@ -176,13 +242,18 @@ form, and the list outside both so `button_to` works without nesting.
   `metadata["hero_asset_id"]` and destroys its asset. Aligning it is worth
   doing and is not this plan.
 
-## Open questions for the Director
+## Open questions — answered 2026-09-07
 
-1. Does the gallery keep `photo_urls` as a derived cache for rendering, the way
-   hero images keep their map, or does it read assets directly?
-2. Archived photos: visible only in the admin, or does an archived photo
-   disappear from the public gallery immediately? (In combatives, archived is
-   simply not `active`, so it stops rendering.)
-3. Phase 4's migration will find `photo_urls` entries that match no
-   `MediaAsset` — pasted external URLs, most likely. Do those become
-   `external_url` assets, or stay as they are?
+1. **Derived cache or read directly?** Reads directly. `photo_urls` is a method
+   over the photo rows and the column is gone, so there is no second copy to
+   drift. The hero-image analogy did not hold: eight fixed named slots suit a
+   map, an ordered growing list suits a table.
+2. **Do archived photos disappear from the public gallery?** Yes, immediately.
+   Archive is both the reversible step and the gate on deletion, so it has to
+   take the photo down -- otherwise an operator cannot remove a bad photo
+   without destroying it, which is the trap the gate exists to avoid.
+3. **What about `photo_urls` entries matching no `MediaAsset`?** Moot in
+   practice. All five production photos were `placehold.co` seed placeholders
+   matching nothing, so no URL-matching migration was written. The backfill
+   pairs the two old arrays by index and leaves `media_asset_id` null when they
+   disagree, rather than guessing.
