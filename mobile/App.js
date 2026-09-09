@@ -82,7 +82,7 @@ function AppBody() {
   const [startup, setStartup] = useState(true); const [signedIn, setSignedIn] = useState(false); const [screen, setScreen] = useState('home');
   const [locale, setLocale] = useState('zh-TW'); const [dark, setDark] = useState(false); const [binding, setBinding] = useState(initialBinding()); const [data, setData] = useState(adapter.snapshot()); const [collections, setCollections] = useState('idle');
   const [email, setEmail] = useState(isReleaseConfig(clientConfig) ? '' : 'member@example.test'); const [password, setPassword] = useState(isReleaseConfig(clientConfig) ? '' : 'templemate-demo'); const [signup, setSignup] = useState({ name: '', email: '', password: '' }); const [recoveryEmail, setRecoveryEmail] = useState('');
-  const [profileForm, setProfileForm] = useState({ english_name: '', native_name: '', phone: '', city: '' }); const [dependent, setDependent] = useState({ id: null, name: '', relationship: '家人' }); const [registration, setRegistration] = useState(null);
+  const [profileForm, setProfileForm] = useState({ english_name: '', native_name: '', phone: '', city: '' }); const [dependent, setDependent] = useState({ id: null, name: '', relationship: '家人' }); const [registration, setRegistration] = useState(null); const [album, setAlbum] = useState(null);
   const [supportMessage, setSupportMessage] = useState(''); const [closureConfirmation, setClosureConfirmation] = useState(''); const [pending, setPending] = useState(false); const [feedback, setFeedback] = useState(emptyFeedback());
   const [oauthState, setOauthState] = useState(oauthController.snapshot()); const [cameraOpen, setCameraOpen] = useState(false);
   // The server is authoritative for the temple's display name. Bootstrap
@@ -96,14 +96,14 @@ function AppBody() {
   const t = copy[locale]; const palette = paletteFor(dark); const loadingText = isReleaseConfig(clientConfig) ? t.loadingRelease : t.loading;
   const showError = (message, owner = screen) => setFeedback(errorFeedback(message, owner));
   const dismissError = () => setFeedback(current => ({ ...current, error: null }));
-  const navigate = destination => { setFeedback(current => feedbackForNavigation(current, destination)); setScreen(destination); };
+  const navigate = destination => { setFeedback(current => feedbackForNavigation(current, destination)); setAlbum(null); setScreen(destination); };
   const error = feedback.error?.message; const notice = feedback.notice ? t[feedback.notice.key] : null;
 
   useEffect(() => {
     const timer = setTimeout(() => setStartup(false), 180); const resume = AppState.addEventListener('change', value => { if (value === 'active') setFeedback(emptyFeedback()); });
-    const back = BackHandler.addEventListener('hardwareBackPress', () => { const next = resolveHardwareBack({ screen, cameraOpen }); if (!next.handled) return false; setCameraOpen(next.cameraOpen); if (next.screen !== screen) navigate(next.screen); return true; });
+    const back = BackHandler.addEventListener('hardwareBackPress', () => { const next = resolveHardwareBack({ screen, cameraOpen, albumOpen: Boolean(album) }); if (!next.handled) return false; setCameraOpen(next.cameraOpen); setAlbum(null); if (next.screen !== screen) navigate(next.screen); return true; });
     return () => { clearTimeout(timer); resume.remove(); back.remove(); };
-  }, [screen, cameraOpen]);
+  }, [screen, cameraOpen, album]);
   useEffect(() => {
     let mounted = true;
     if (clientConfig.mode !== 'real') { setStartup(false); return () => { mounted = false; }; }
@@ -213,7 +213,7 @@ function AppBody() {
     finally { setPending(false); }
   };
   const updatePreference = async next => { const previous = { locale, dark }; const payload = { ...(next.locale ? { locale: next.locale } : {}), ...(next.theme ? { mobile_theme_id: next.theme } : {}) }; const ok = await run(async () => adapter.updatePreferences(payload)); if (ok) { if (next.locale) { setFeedback(emptyFeedback()); setLocale(next.locale); } if (next.theme) setDark(next.theme === 'dark'); } else { setLocale(previous.locale); setDark(previous.dark); } };
-  const shared = { t, palette, locale, setLocale, dark, setDark, screen, setScreen: navigate, data, setData, binding, setBinding, profileForm, setProfileForm, dependent, setDependent, registration, setRegistration, supportMessage, setSupportMessage, closureConfirmation, setClosureConfirmation, pending, error, setError: message => message ? showError(message) : dismissError(), notice, run, signOut, onUnbindTemple, collections, loadingText, updatePreference, oauthState, cameraOpen, setCameraOpen };
+  const shared = { t, palette, locale, setLocale, dark, setDark, screen, setScreen: navigate, data, setData, binding, setBinding, profileForm, setProfileForm, dependent, setDependent, registration, setRegistration, album, setAlbum, supportMessage, setSupportMessage, closureConfirmation, setClosureConfirmation, pending, error, setError: message => message ? showError(message) : dismissError(), notice, run, signOut, onUnbindTemple, collections, loadingText, updatePreference, oauthState, cameraOpen, setCameraOpen };
   if (startup) return <Shell palette={palette}><View style={styles.center}><Text style={[styles.brand, { color: palette.text }]}>{t.appName}</Text><Text style={[styles.muted, { color: palette.textMuted }]}>{loadingText}</Text></View></Shell>;
   if (!signedIn) return oauthState.phase === 'account_resolution' ? <OAuthResolution {...shared} onSubmit={submitResolution} /> : <SignedOut {...shared} {...{ email, setEmail, password, setPassword, signup, setSignup, recoveryEmail, setRecoveryEmail, signIn, setSignedIn, beginOAuth }} />;
   if (!activePresentationTenant(binding)) return <TenantSetupGate {...shared} />;
@@ -263,7 +263,7 @@ function AccountSurface(props) {
   // render where collections === 'loading'. It never fired because an unbound
   // release build stopped at TenantSetupGate instead of reaching this surface;
   // making the temple survive a restart removed the thing that was hiding it.
-  const { screen, t, palette, data, binding, setBinding, profileForm, setProfileForm, dependent, setDependent, registration, setRegistration, supportMessage, setSupportMessage, closureConfirmation, setClosureConfirmation, pending, setScreen, run, collections, loadingText, onUnbindTemple } = props;
+  const { screen, t, palette, data, binding, setBinding, profileForm, setProfileForm, dependent, setDependent, registration, setRegistration, album, setAlbum, supportMessage, setSupportMessage, closureConfirmation, setClosureConfirmation, pending, setScreen, run, collections, loadingText, onUnbindTemple } = props;
   if (screen === 'home') return <><Section title={t.account} palette={palette}><Text style={[styles.body, { color: palette.text }]}>{t.welcome}{data.profile.name}</Text><Text style={[styles.muted, { color: palette.textMuted }]}>{data.registrations.length} {t.registrations} · {data.dependents.length} {t.dependents}</Text></Section><Section title={t.templeConnection} palette={palette}><Text style={[styles.body, { color: palette.text }]}>{activePresentationTenant(binding)?.name || t.notConnected}</Text></Section><Section title={t.certificates} palette={palette}>{collections === 'loading' && <Text style={[styles.muted, { color: palette.textMuted }]}>{loadingText}</Text>}{collections === 'failed' && <Notice palette={palette} tone="error">{t.collectionFailed}</Notice>}{data.certificates.length ? data.certificates.map(item => <Text key={item.id} style={[styles.body, { color: palette.text }]}>{item.certificateNumber || item.certificate_number || item.offering?.title || t.certificateFixture}</Text>) : <Text style={[styles.muted, { color: palette.textMuted }]}>{t.emptyCertificates}</Text>}</Section></>;
   if (screen === 'profile') {
     // The four fields NativeProfileController permits, matching the web form
@@ -292,7 +292,12 @@ function AccountSurface(props) {
   // an offering dropped you below every registration you already had.
   if (screen === 'registrations' && registration) return <Section title={t.registrations} palette={palette}><RegistrationForm {...{ t, palette, registration, setRegistration, data, pending, run, setScreen }} onSave={registrationSave} /></Section>;
   if (screen === 'registrations') return <Section title={t.registrations} palette={palette}>{collections === 'loading' && <Text style={[styles.muted, { color: palette.textMuted }]}>{loadingText}</Text>}{data.registrations.length === 0 && <Text style={[styles.muted, { color: palette.textMuted }]}>{t.emptyRegistrations}</Text>}{data.registrations.map(item => <ListCard key={item.id} palette={palette} title={`${item.offering.title} · ${item.registrantName}`} caption={registrationCaption(t, item)} disabled={item.readOnly} onPress={async () => { if (item.readOnly) return; let edit; const ok = await run(async () => { edit = await adapter.editRegistration(item.id); return null; }); if (ok) { const record = edit.registration || item; setRegistration({ ...preparedRegistration({ offering: record.offering || item.offering, registration: record, registrants: edit.registrants || [], snapshot: data }), id: item.id }); } }} />)}{!registration && <><Text style={[styles.muted, { color: palette.textMuted }]}>{t.registrationDiscoverHint}</Text><Button label={t.discoverOfferings} palette={palette} onPress={() => setScreen('discover')} /></>}</Section>;
-  if (screen === 'discover') { const offerings = offeringCatalog(data); const start = async offering => { let prepared; const ok = await run(async () => { prepared = await adapter.newRegistration({ offering: offering.slug, accountAction: offering.account_action }); return null; }); if (ok) { if (prepared.can_register === false) { setRegistration(null); setScreen('registrations'); setFeedback(noticeFeedback('alreadyRegistered', 'registrations')); return; } setRegistration(preparedRegistration({ offering: prepared.offering, registration: prepared.registration, registrants: prepared.registrants, snapshot: data })); setScreen('registrations'); } }; return <><Section title={t.activity} palette={palette}><OfferingList items={offerings.filter(item => item.account_action === 'event' || item.account_action === 'gathering')} palette={palette} t={t} onSelect={start} /></Section><Section title={t.services} palette={palette}><OfferingList items={offerings.filter(item => item.account_action === 'service')} palette={palette} t={t} onSelect={start} /></Section><GallerySection title={t.gallery} items={data.gallery} palette={palette} t={t} empty={t.emptyCollection} /></>; }
+  if (screen === 'discover') { const offerings = offeringCatalog(data); const start = async offering => { let prepared; const ok = await run(async () => { prepared = await adapter.newRegistration({ offering: offering.slug, accountAction: offering.account_action }); return null; }); if (ok) { if (prepared.can_register === false) { setRegistration(null); setScreen('registrations'); setFeedback(noticeFeedback('alreadyRegistered', 'registrations')); return; } setRegistration(preparedRegistration({ offering: prepared.offering, registration: prepared.registration, registrants: prepared.registrants, snapshot: data })); setScreen('registrations'); } }; return <><Section title={t.activity} palette={palette}><OfferingList items={offerings.filter(item => item.account_action === 'event' || item.account_action === 'gathering')} palette={palette} t={t} onSelect={start} /></Section><Section title={t.services} palette={palette}><OfferingList items={offerings.filter(item => item.account_action === 'service')} palette={palette} t={t} onSelect={start} /></Section></>; }
+  // Gallery is its own screen, and an album is a step inside it. Two levels,
+  // because a temple album runs to twenty photos or more: the list shows one
+  // cover each, and only the album a patron actually opened loads its own.
+  if (screen === 'gallery' && album) return <AlbumScreen {...{ t, palette, album, onBack: () => setAlbum(null) }} />;
+  if (screen === 'gallery') return <Section title={t.gallery} palette={palette}>{collections === 'loading' && <Text style={[styles.muted, { color: palette.textMuted }]}>{loadingText}</Text>}{data.gallery.length === 0 && collections !== 'loading' && <Text style={[styles.muted, { color: palette.textMuted }]}>{t.emptyCollection}</Text>}{data.gallery.map(item => <AlbumCard key={item.id} palette={palette} album={item} caption={albumCaption(t, item)} onPress={() => setAlbum(item)} />)}</Section>;
   if (screen === 'settings') return <Section title={t.settings} palette={palette}><Preferences {...props} /><Text style={[styles.subhead, { color: palette.text }]}>{t.privacyHelp}</Text><Text style={[styles.muted, { color: palette.textMuted }]}>{t.assistanceDescription}</Text><Button label={t.assistance} palette={palette} tone="secondary" onPress={() => setScreen('assistance')} /><Button label={t.privacyRequest} palette={palette} tone="secondary" onPress={() => setScreen('privacy')} /><Button label={t.closeAccount} palette={palette} tone="danger" onPress={() => setScreen('closure')} /><Text style={[styles.subhead, { color: palette.text }]}>{t.templeConnection}</Text><Text style={[styles.muted, { color: palette.textMuted }]}>{activePresentationTenant(binding)?.name}</Text>{binding.state === 'bound' && <Button label={t.unbindTemple} palette={palette} tone="secondary" onPress={onUnbindTemple} />}</Section>;
   if (screen === 'assistance') return <Section title={t.assistance} palette={palette}><Notice palette={palette} tone="info">{t.assistanceDestination}</Notice><FormInput label={t.message} value={supportMessage} onChangeText={setSupportMessage} maxLength={280} palette={palette} /><Text style={[styles.muted, { color: palette.textMuted }]}>{supportMessage.length}/280</Text><Button label={t.send} palette={palette} onPress={async () => { const ok = await run(() => adapter.submitAssistance({ channel: 'profile', message: supportMessage }), { noticeOwner: 'settings', noticeKey: result => result?.outcome === 'duplicate' ? 'assistanceDuplicate' : result?.assistance?.outcome === 'fixture' ? 'assistanceFixtureSubmitted' : 'assistanceCreated' }); if (ok) setScreen('settings'); }} /><Button label={t.back} palette={palette} tone="secondary" onPress={() => setScreen('settings')} /></Section>;
   if (screen === 'privacy') return <Section title={t.privacyRequest} palette={palette}><Button label={t.exportData} palette={palette} onPress={() => run(() => adapter.requestPrivacy({ kind: 'export' }))} /><Button label={t.deletionRequest} palette={palette} tone="danger" onPress={() => run(() => adapter.requestPrivacy({ kind: 'deletion' }))} /><Button label={t.back} palette={palette} tone="secondary" onPress={() => setScreen('settings')} /></Section>;
@@ -319,47 +324,54 @@ function OfferingList({ items, palette, t, onSelect }) { return items.length ? i
 function RegistrationForm({ t, palette, registration, setRegistration, pending, setScreen, onSave }) { const { offering, registrants } = registration; const change = key => value => setRegistration({ ...registration, registration: { ...registration.registration, [key]: value } }); return <View style={styles.preferences}><Text style={[styles.subhead, { color: palette.text }]}>{offering.title}</Text><Text style={[styles.muted, { color: palette.textMuted }]}>{formatMoney(offering.price_cents, offering.currency)}</Text><Text style={[styles.label, { color: palette.text }]}>{t.registrant}</Text>{registrants.map(choice => <Button key={`${choice.scope}-${choice.id}`} label={choice.label} palette={palette} tone={registration.registration.registrant_scope === choice.scope && (choice.scope === 'self' || String(registration.registration.dependent_id) === String(choice.id)) ? 'primary' : 'secondary'} onPress={() => setRegistration(selectRegistrant(registration, choice))} />)}<FormInput label={t.quantity} value={quantityInputValue(registration.registration.quantity)} onChangeText={change('quantity')} palette={palette} /><FormInput label={t.contactName} value={registration.registration.contact_name || ''} onChangeText={change('contact_name')} palette={palette} /><FormInput label={t.phone} value={registration.registration.contact_phone || ''} onChangeText={change('contact_phone')} palette={palette} /><FormInput label={t.email} value={registration.registration.contact_email || ''} onChangeText={change('contact_email')} autoCapitalize="none" palette={palette} /><FormInput label={t.householdNotes} value={registration.registration.household_notes || ''} onChangeText={change('household_notes')} palette={palette} /><FormInput label={t.arrivalWindow} value={registration.registration.arrival_window || ''} onChangeText={change('arrival_window')} palette={palette} /><FormInput label={t.ceremonyNotes} value={registration.registration.ceremony_notes || ''} onChangeText={change('ceremony_notes')} palette={palette} /><Button label={registration.id ? t.update : t.createRegistration} palette={palette} disabled={pending} onPress={onSave} /><Button label={t.cancel} palette={palette} tone="secondary" onPress={() => { setRegistration(null); setScreen('registrations'); }} /></View>; }
 function formatMoney(amount, currency) { return currency === 'TWD' ? `NT$${(Number(amount || 0) / 100).toLocaleString('en-US')}` : `${currency || ''} ${Number(amount || 0).toLocaleString()}`.trim(); }
 function ListCard({ palette, title, caption, onPress, disabled }) { return <Pressable accessibilityRole="button" accessibilityState={{ disabled: Boolean(disabled) }} disabled={disabled} onPress={onPress} style={[styles.listCard, { backgroundColor: palette.inset, borderColor: palette.border }, disabled && styles.disabled]}><Text style={[styles.body, { color: palette.text }]}>{title}</Text>{caption && <Text style={[styles.muted, { color: palette.textMuted }]}>{caption}</Text>}</Pressable>; }
-// An album rendered as a single line of text -- title and date -- with the
-// photos it exists to show nowhere on screen, and nothing to tap. photo_urls
-// was in the payload the whole time (native_resources#galleries sends it for
-// both the list and the detail), so the album was viewable everywhere but here.
-//
-// Tapping an album opens its strip in place rather than pushing a screen: the
-// navigation state here is a single `screen` string with no stack, and one more
-// screen for one more list would be the larger change.
-function GallerySection({ title, items, palette, t, empty }) {
-  const [openId, setOpenId] = useState(null);
+// The album list: one card per album, its own first photo as the cover. This
+// was a line of text at the bottom of Explore -- title and date, no photos, and
+// item.date, a field this payload does not have, so even the date was blank.
+function AlbumCard({ palette, album, caption, onPress }) {
+  const cover = (album.photo_urls || [])[0];
+  return <Pressable accessibilityRole="button" accessibilityLabel={album.title} onPress={onPress} style={[styles.albumCard, { backgroundColor: palette.inset, borderColor: palette.border }]}>
+    {cover ? <Image source={{ uri: cover }} style={styles.albumCover} resizeMode="cover" /> : null}
+    <View style={styles.albumCardCopy}>
+      <Text style={[styles.body, { color: palette.text }]}>{album.title}</Text>
+      <Text style={[styles.muted, { color: palette.textMuted }]}>{caption}</Text>
+    </View>
+  </Pressable>;
+}
+// event_date, not date: the field the old text row read never existed on this
+// payload. Sliced rather than parsed, because a Date would shift the day
+// across timezones.
+function albumCaption(t, item) {
+  const count = (item.photo_urls || []).length;
+  return [String(item.event_date || '').slice(0, 10), count ? `${count} ${t.photos}` : t.emptyAlbum].filter(Boolean).join(' · ');
+}
+// One album, as a contact sheet. Thumbnails rather than full-width images:
+// twenty photos down a phone screen is a scroll, not an album, and the point
+// here is to find the one worth opening.
+function AlbumScreen({ t, palette, album, onBack }) {
   const [viewer, setViewer] = useState(null);
-  return <Section title={title} palette={palette}>
-    {items.length ? items.map(item => {
-      const photos = item.photo_urls || [];
-      const open = String(openId) === String(item.id);
-      return <View key={item.id} style={styles.preferences}>
-        <ListCard palette={palette} title={item.title} caption={albumCaption(t, item, photos)} onPress={() => setOpenId(open ? null : item.id)} />
-        {open && (photos.length
-          ? <View style={styles.galleryStrip}>{photos.map((uri, index) => <Pressable key={`${item.id}-${index}`} accessibilityRole="imagebutton" accessibilityLabel={`${item.title} ${index + 1}`} onPress={() => setViewer({ photos, index, title: item.title })} style={styles.galleryThumb}><Image source={{ uri }} style={styles.galleryThumbImage} resizeMode="cover" /></Pressable>)}</View>
-          : <Text style={[styles.muted, { color: palette.textMuted }]}>{t.emptyAlbum}</Text>)}
-      </View>;
-    }) : <Text style={[styles.muted, { color: palette.textMuted }]}>{empty}</Text>}
-    <PhotoViewer viewer={viewer} palette={palette} t={t} onChange={setViewer} onClose={() => setViewer(null)} />
+  const photos = album.photo_urls || [];
+  return <Section title={album.title} palette={palette}>
+    <Text style={[styles.muted, { color: palette.textMuted }]}>{albumCaption(t, album)}</Text>
+    {album.body ? <Text style={[styles.body, { color: palette.text }]}>{album.body}</Text> : null}
+    {photos.length
+      ? <View style={styles.galleryStrip}>{photos.map((uri, index) => <Pressable key={`${album.id}-${index}`} accessibilityRole="imagebutton" accessibilityLabel={`${album.title} ${index + 1}`} onPress={() => setViewer({ index })} style={styles.galleryThumb}><Image source={{ uri }} style={styles.galleryThumbImage} resizeMode="cover" /></Pressable>)}</View>
+      : <Text style={[styles.muted, { color: palette.textMuted }]}>{t.emptyAlbum}</Text>}
+    <Button label={t.backToAlbums} palette={palette} tone="secondary" onPress={onBack} />
+    <PhotoViewer viewer={viewer} photos={photos} title={album.title} palette={palette} t={t} onChange={setViewer} onClose={() => setViewer(null)} />
   </Section>;
 }
-// event_date, not date: the field DataSection read never existed on this
-// payload, so the date it meant to show was always undefined. Sliced rather
-// than parsed, because a Date would shift the day across timezones.
-function albumCaption(t, item, photos) { return [String(item.event_date || '').slice(0, 10), photos.length ? `${photos.length} ${t.photos}` : t.emptyAlbum].filter(Boolean).join(' · '); }
-// Contained, not cropped: the strip crops to a square so the album reads as a
-// set, and the whole point of opening one is to see the photo as it was taken.
-// onRequestClose is what makes Android hardware back close the photo instead of
-// leaving the screen underneath it.
-function PhotoViewer({ viewer, palette, t, onChange, onClose }) {
+// Contained, not cropped: the contact sheet crops to a square so the album can
+// be scanned, and the whole point of opening one is to see it as it was taken.
+// onRequestClose is what makes Android back close the photo instead of leaving
+// the album underneath it.
+function PhotoViewer({ viewer, photos, title, palette, t, onChange, onClose }) {
   if (!viewer) return null;
-  const total = viewer.photos.length;
-  const step = offset => onChange({ ...viewer, index: (viewer.index + offset + total) % total });
+  const total = photos.length;
+  const step = offset => onChange({ index: (viewer.index + offset + total) % total });
   return <Modal visible transparent animationType="fade" onRequestClose={onClose}>
     <View style={styles.photoViewer}>
-      <Image source={{ uri: viewer.photos[viewer.index] }} style={styles.photoViewerImage} resizeMode="contain" />
-      <Text style={styles.photoViewerCaption}>{`${viewer.title} · ${viewer.index + 1}/${total}`}</Text>
+      <Image source={{ uri: photos[viewer.index] }} style={styles.photoViewerImage} resizeMode="contain" />
+      <Text style={styles.photoViewerCaption}>{`${title} · ${viewer.index + 1}/${total}`}</Text>
       <View style={styles.photoViewerBar}>
         {total > 1 && <Button label={t.previousPhoto} palette={palette} tone="secondary" onPress={() => step(-1)} />}
         <Button label={t.closePhoto} palette={palette} onPress={onClose} />
@@ -369,7 +381,7 @@ function PhotoViewer({ viewer, palette, t, onChange, onClose }) {
   </Modal>;
 }
 
-const styles = StyleSheet.create({ safe: { flex: 1 }, fill: { flex: 1 }, center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, padding: 24 }, auth: { padding: 24, gap: 14, flexGrow: 1, justifyContent: 'center' }, header: { minHeight: 78, paddingHorizontal: 18, paddingVertical: 12, borderBottomWidth: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 }, headerCopy: { flex: 1 }, headerUtilities: { flexDirection: 'row', gap: 8 }, brand: { fontSize: 34, fontWeight: '900', letterSpacing: -0.6 }, brandSmall: { fontSize: 22, fontWeight: '900' }, lead: { fontSize: 17, fontWeight: '700' }, muted: { fontSize: 14, lineHeight: 20 }, body: { fontSize: 16, lineHeight: 23 }, label: { fontSize: 14, fontWeight: '800' }, subhead: { fontSize: 16, fontWeight: '800', marginTop: 4 }, navigationShell: { flexGrow: 0, borderBottomWidth: 1 }, navigation: { flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 12 }, navItem: { minHeight: 40, paddingHorizontal: 12, justifyContent: 'center', borderRadius: 20, borderWidth: 1 }, content: { padding: 16, gap: 14, paddingBottom: 32 }, listCard: { padding: 13, gap: 4, borderWidth: 1, borderRadius: 12 }, choiceRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' }, preferences: { gap: 9 }, offeringImage: { width: '100%', height: 132, borderRadius: 12 }, galleryStrip: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 }, galleryThumb: { width: 96, height: 96, borderRadius: 10, overflow: 'hidden' }, galleryThumbImage: { width: '100%', height: '100%' }, photoViewer: { flex: 1, backgroundColor: 'rgba(0,0,0,0.92)', alignItems: 'center', justifyContent: 'center', gap: 14, padding: 18 }, photoViewerImage: { width: '100%', flex: 1 }, photoViewerCaption: { color: '#f4f4f5', fontSize: 14 }, photoViewerBar: { flexDirection: 'row', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }, disabled: { opacity: 0.52 } });
+const styles = StyleSheet.create({ safe: { flex: 1 }, fill: { flex: 1 }, center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, padding: 24 }, auth: { padding: 24, gap: 14, flexGrow: 1, justifyContent: 'center' }, header: { minHeight: 78, paddingHorizontal: 18, paddingVertical: 12, borderBottomWidth: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 }, headerCopy: { flex: 1 }, headerUtilities: { flexDirection: 'row', gap: 8 }, brand: { fontSize: 34, fontWeight: '900', letterSpacing: -0.6 }, brandSmall: { fontSize: 22, fontWeight: '900' }, lead: { fontSize: 17, fontWeight: '700' }, muted: { fontSize: 14, lineHeight: 20 }, body: { fontSize: 16, lineHeight: 23 }, label: { fontSize: 14, fontWeight: '800' }, subhead: { fontSize: 16, fontWeight: '800', marginTop: 4 }, navigationShell: { flexGrow: 0, borderBottomWidth: 1 }, navigation: { flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 12 }, navItem: { minHeight: 40, paddingHorizontal: 12, justifyContent: 'center', borderRadius: 20, borderWidth: 1 }, content: { padding: 16, gap: 14, paddingBottom: 32 }, listCard: { padding: 13, gap: 4, borderWidth: 1, borderRadius: 12 }, choiceRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' }, preferences: { gap: 9 }, offeringImage: { width: '100%', height: 132, borderRadius: 12 }, albumCard: { borderWidth: 1, borderRadius: 12, overflow: 'hidden' }, albumCover: { width: '100%', height: 148 }, albumCardCopy: { padding: 13, gap: 4 }, galleryStrip: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 }, galleryThumb: { width: 96, height: 96, borderRadius: 10, overflow: 'hidden' }, galleryThumbImage: { width: '100%', height: '100%' }, photoViewer: { flex: 1, backgroundColor: 'rgba(0,0,0,0.92)', alignItems: 'center', justifyContent: 'center', gap: 14, padding: 18 }, photoViewerImage: { width: '100%', flex: 1 }, photoViewerCaption: { color: '#f4f4f5', fontSize: 14 }, photoViewerBar: { flexDirection: 'row', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }, disabled: { opacity: 0.52 } });
 
 // The boot guard covers module scope only. This covers everything after it --
 // a throw during render, or in a lifecycle -- which is where the 2026-09-04

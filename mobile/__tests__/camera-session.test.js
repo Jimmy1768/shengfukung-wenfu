@@ -15,9 +15,19 @@ const templeTransport = async () => ({ ok: true, body: { temple: { slug: config.
 const realScan = payload => scanCameraPayload({ payload, config, transport: templeTransport });
 
 test('active camera Back is consumed and closes only the scanner to home', () => {
-  assert.deepEqual(resolveHardwareBack({ screen: 'home', cameraOpen: true }), { handled: true, screen: 'home', cameraOpen: false });
-  assert.deepEqual(resolveHardwareBack({ screen: 'settings', cameraOpen: false }), { handled: true, screen: 'home', cameraOpen: false });
-  assert.deepEqual(resolveHardwareBack({ screen: 'home', cameraOpen: false }), { handled: false, screen: 'home', cameraOpen: false });
+  assert.deepEqual(resolveHardwareBack({ screen: 'home', cameraOpen: true }), { handled: true, screen: 'home', cameraOpen: false, albumOpen: false });
+  assert.deepEqual(resolveHardwareBack({ screen: 'settings', cameraOpen: false }), { handled: true, screen: 'home', cameraOpen: false, albumOpen: false });
+  assert.deepEqual(resolveHardwareBack({ screen: 'home', cameraOpen: false }), { handled: false, screen: 'home', cameraOpen: false, albumOpen: false });
+});
+
+// An album is a step inside the gallery, so Back returns to the album list.
+// Sending it home instead meant opening a second album took three taps.
+test('Back closes an open album and stays on the gallery', () => {
+  assert.deepEqual(resolveHardwareBack({ screen: 'gallery', cameraOpen: false, albumOpen: true }), { handled: true, screen: 'gallery', cameraOpen: false, albumOpen: false });
+  assert.deepEqual(resolveHardwareBack({ screen: 'gallery', cameraOpen: false, albumOpen: false }), { handled: true, screen: 'home', cameraOpen: false, albumOpen: false },
+    'with no album open the gallery behaves like any other screen');
+  assert.deepEqual(resolveHardwareBack({ screen: 'gallery', cameraOpen: true, albumOpen: true }), { handled: true, screen: 'home', cameraOpen: false, albumOpen: false },
+    'the scanner sits over everything, so it wins');
 });
 
 test('camera permission states keep preview closed until a user-initiated granted state', () => {

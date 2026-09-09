@@ -3,10 +3,11 @@ const assert = require('node:assert/strict');
 const { accountMenu, isAccountScreen, isBoundPresentation, isPaidFixtureReadOnly, safeBoundScreen, visibleLocale, visibleTheme } = require('../app/account/screen_model');
 
 test('the account screen model admits only account screens', () => {
-  for (const screen of ['home', 'profile', 'dependents', 'registrations', 'discover', 'settings', 'signup', 'recovery', 'assistance', 'privacy', 'closure', 'connection']) assert.equal(isAccountScreen(screen), true);
+  for (const screen of ['home', 'profile', 'dependents', 'registrations', 'discover', 'gallery', 'settings', 'signup', 'recovery', 'assistance', 'privacy', 'closure', 'connection']) assert.equal(isAccountScreen(screen), true);
   assert.equal(isAccountScreen('contact'), false);
   assert.equal(isAccountScreen('admin'), false);
-  assert.deepEqual(accountMenu(), ['home', 'profile', 'dependents', 'registrations', 'discover']);
+  assert.deepEqual(accountMenu(), ['home', 'profile', 'dependents', 'registrations', 'discover', 'gallery'],
+    'the gallery is its own destination, not a tail on the offering catalogue');
   assert.equal(isPaidFixtureReadOnly({ readOnly: true }), true);
   assert.equal(isPaidFixtureReadOnly({ readOnly: false }), false);
   assert.equal(isBoundPresentation({ state: 'unbound' }), false);

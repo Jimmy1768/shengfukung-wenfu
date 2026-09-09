@@ -1,9 +1,13 @@
 const ACCOUNT_SCREENS = Object.freeze([
-  'home', 'profile', 'dependents', 'registrations', 'discover', 'settings',
+  'home', 'profile', 'dependents', 'registrations', 'discover', 'gallery', 'settings',
   'signup', 'recovery', 'assistance', 'privacy', 'closure', 'connection'
 ]);
 
-const accountMenu = () => ['home', 'profile', 'dependents', 'registrations', 'discover'];
+// Gallery is its own destination. It used to be rendered at the bottom of
+// Explore, so one screen held every offering a patron could register for and
+// the temple's photo albums -- two unrelated things, with the albums reachable
+// only by scrolling past the whole catalogue.
+const accountMenu = () => ['home', 'profile', 'dependents', 'registrations', 'discover', 'gallery'];
 const isAccountScreen = screen => ACCOUNT_SCREENS.includes(screen);
 const isPaidFixtureReadOnly = registration => Boolean(registration?.readOnly);
 const visibleTheme = dark => dark ? 'dark' : 'light';

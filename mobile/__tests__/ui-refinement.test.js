@@ -39,22 +39,28 @@ test('presentation uses generated token authority and a single-line native busin
   assert.match(primitives, /accessibilityRole="alert"/);
 });
 
-// The album was visible on every surface except the one it was tapped on: the
-// gallery rendered as a line of text, and photo_urls -- which the API has always
-// sent -- was never read. It also read item.date, a field this payload does not
-// have, so the date it meant to show was always undefined.
-test('an album opens its photos rather than rendering as a line of text', () => {
+// The gallery lived at the bottom of Explore, rendered as one line of text per
+// album -- so one screen held every offering a patron could register for AND
+// the temple's photos, and the photos were only reachable by scrolling past
+// the whole catalogue. photo_urls has been in the payload throughout.
+test('the gallery is its own screen, and an album is its own step inside it', () => {
   const app = read('App.js');
   const copy = read('app/ui/copy.js');
-  assert.match(app, /<GallerySection title=\{t\.gallery\}/);
-  assert.equal(/<DataSection|function DataSection/.test(app), false, 'the text-only section had one caller and is gone');
-  assert.match(app, /item\.photo_urls \|\| \[\]/);
-  assert.match(app, /setViewer\(\{ photos, index, title: item\.title \}\)/);
+  assert.equal(app.includes('<GallerySection'), false, 'the gallery no longer rides along on Explore');
+  assert.equal(/screen === 'discover'[\s\S]{0,1200}data\.gallery/.test(app), false,
+    'Explore is the offering catalogue only');
+  assert.match(app, /if \(screen === 'gallery' && album\) return <AlbumScreen/);
+  assert.match(app, /if \(screen === 'gallery'\) return <Section title=\{t\.gallery\}/);
+  assert.match(app, /data\.gallery\.map\(item => <AlbumCard/, 'the list shows albums, not photos');
+  assert.match(app, /const cover = \(album\.photo_urls \|\| \[\]\)\[0\]/, 'one cover per album');
+  assert.match(app, /onPress=\{\(\) => setAlbum\(item\)\}/);
   assert.match(app, /onRequestClose=\{onClose\}/, 'Android back closes the photo, not the screen');
-  assert.match(app, /resizeMode="contain"/, 'the opened photo is shown whole, not cropped like the strip');
+  assert.match(app, /resizeMode="contain"/, 'the opened photo is shown whole, not cropped like the sheet');
+  assert.match(app, /setAlbum\(null\); setScreen\(destination\)/, 'a tab press lands on the album list');
+  assert.match(app, /albumOpen: Boolean\(album\)/);
   assert.match(app, /item\.event_date/);
-  assert.equal(/albumCaption[\s\S]{0,200}item\.date\b/.test(app), false, 'item.date does not exist on this payload');
-  for (const key of ['photos:', 'emptyAlbum:', 'closePhoto:', 'previousPhoto:', 'nextPhoto:']) {
+  assert.equal(/albumCaption[\s\S]{0,240}item\.date\b/.test(app), false, 'item.date does not exist on this payload');
+  for (const key of ['photos:', 'emptyAlbum:', 'closePhoto:', 'previousPhoto:', 'nextPhoto:', 'backToAlbums:']) {
     assert.equal((copy.match(new RegExp(`\\b${key}`, 'g')) || []).length, 2, `${key} needs both locales`);
   }
 });
