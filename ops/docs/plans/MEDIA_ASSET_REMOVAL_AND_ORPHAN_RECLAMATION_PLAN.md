@@ -327,7 +327,16 @@ would have rewritten those rows to `prod/https://placehold.co/...`.
 Can permanently destroy customer files. Not to be authorized in the same breath
 as Phase 1.
 
-### Scope narrowed 2026-09-08: new orphans are no longer being created
+### Scope narrowed 2026-09-08, and the claim corrected 2026-09-09
+
+The heading below originally read "new orphans are no longer being created". It
+was premature. `d3f06a6` gave `MediaAsset` the hook, but until `572e599` an
+uploaded gallery photo was never linked to its asset, so deleting one reclaimed
+nothing -- the reclamation was inert on the only path a temple admin uses. No
+real photos were uploaded in that window, so nothing was actually leaked, but
+the statement was wrong for two days and a reader would have trusted it.
+
+### New orphans are no longer being created
 
 This phase was written when **nothing in this application had ever deleted an
 S3 object**, so every removed image leaked and a sweep was the only way to get

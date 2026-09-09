@@ -26,14 +26,13 @@
     <%= form.date_field :event_date %>
   </div>
 
-  <% asset_lookup = gallery_entry.temple.media_assets.where(id: gallery_entry.media_asset_ids).index_by(&:id) if gallery_entry.temple && gallery_entry.media_asset_ids.any? %>
-  <% asset_payload = if asset_lookup.present?
-      gallery_entry.media_asset_ids.filter_map do |asset_id|
-        asset = asset_lookup[asset_id.to_i]
-        asset.present? ? { id: asset.id, url: asset.url } : nil
-      end
-    else
-      []
+  <%# Built from the photo rows, which own the photo-to-asset link. This read
+      metadata["media_asset_ids"] until 572e599 moved that link onto the rows --
+      nothing writes that array any more, so for any album created since it was
+      permanently empty and the block was reading a dead concept. The url here
+      is the photo's own, which is what apply_uploaded_assets matches on. %>
+  <% asset_payload = gallery_entry.photos.filter_map do |photo|
+      { id: photo.media_asset_id, url: photo.url } if photo.media_asset_id
     end %>
 
   <div class="field">

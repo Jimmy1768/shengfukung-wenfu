@@ -51,12 +51,14 @@ class TempleGalleryEntry < ApplicationRecord
     super || created_at
   end
 
+  # Read-only, and legacy. temple_gallery_photos.media_asset_id owns the link
+  # between a photo and its stored file; nothing has written this array since
+  # 572e599. It survives only so that albums predating that migration, whose
+  # link exists nowhere else, still release their files when destroyed --
+  # purge_media_assets is its one remaining reader. The writer was removed
+  # rather than left to tempt a second source of truth back into existence.
   def media_asset_ids
     metadata_value("media_asset_ids") || []
-  end
-
-  def media_asset_ids=(ids)
-    write_metadata_value("media_asset_ids", Array(ids).map(&:to_s))
   end
 
   private
@@ -65,21 +67,13 @@ class TempleGalleryEntry < ApplicationRecord
     (metadata || {}).with_indifferent_access[key]
   end
 
-  def write_metadata_value(key, value)
-    data = (metadata || {}).with_indifferent_access
-    if value.present?
-      data[key] = value
-    else
-      data.delete(key)
-    end
-    self.metadata = data
-  end
-
-  # Destroys the MediaAsset rows an album owned. Note this still does not remove
-  # the S3 objects -- MediaAsset has no such hook yet. What changed is that each
-  # photo now records its own media_asset_id, so the objects are identifiable
-  # rather than orphaned beyond recovery, which is the precondition for
-  # reclaiming them once archive/delete exists.
+  # Destroys the MediaAsset rows an album owned, which since d3f06a6 also deletes
+  # their S3 objects through MediaAsset#after_destroy_commit. Deleting an album
+  # is therefore genuinely destructive, and is confirmed before it runs.
+  #
+  # An earlier version of this comment said the objects were left behind because
+  # MediaAsset had no such hook. That was true when written and stopped being
+  # true one commit later.
   def purge_media_assets
     ids = (@asset_ids_before_destroy.to_a + media_asset_ids).uniq
     return if ids.empty?

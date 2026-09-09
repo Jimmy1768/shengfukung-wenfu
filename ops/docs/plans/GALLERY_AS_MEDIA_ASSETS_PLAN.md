@@ -167,7 +167,7 @@ as ruled and as described. The deletion gate is enforced in the controller
 scope, not by omitting a button, so a live photo cannot be destroyed however the
 request is crafted.
 
-**Two bugs found while building, both worth knowing:**
+**Four bugs found, two of them only by a scan after the work looked done:**
 
 1. `photo_urls=` rebuilt the whole set from the admin textarea, which lists only
    live photos -- so an archived photo looked absent and was destroyed on the
@@ -186,6 +186,50 @@ request is crafted.
    and the browser then followed the href as a GET to `#show` -- 404. **Deleting
    an album had never worked.** Fixed with `button_to`, which emits a real form
    carrying `_method=delete`.
+
+### The readiness scan, 2026-09-09
+
+The Director asked for one before a staff trial, on the grounds that missing the
+first defect suggested the area was brittle. It was, and the scan found a worse
+defect than the one it was called for. Method: enumerate every path that
+destroys a `MediaAsset` -- there are five, and since `d3f06a6` every one of them
+deletes an S3 object -- then exercise each against the real controller rather
+than reading it.
+
+3. **Uploads never linked to their photo row.** `apply_uploaded_assets` wrote
+   only `metadata["media_asset_ids"]`, so a newly uploaded photo had
+   `media_asset_id` nil and permanent Delete reclaimed nothing. Phase 3 was
+   inert on the one path that matters -- real uploads -- while passing its tests.
+
+4. **Archiving a photo released its file on the next ordinary save.** Detachment
+   was computed by matching URL strings against the admin textarea, which lists
+   live photos only, so an archived photo read as absent: asset destroyed,
+   object deleted, row left in the shelf still offering Restore. Measured before
+   the fix:
+
+   ```text
+   archived photo row survives: true
+   its asset survives:          false
+   S3 deletes attempted:        ["dev/g/arch2.jpg"]
+   ```
+
+Both are the same shape as everything else in this repo's history: **one concept
+in two places.** The photo-to-asset link lived in the legacy metadata array and
+on the photo rows, and the logic read the array. `572e599` gives the row sole
+ownership; an asset is released only when no row of the entry claims it,
+archived rows included.
+
+**Why a green suite did not catch either.** Every test written during the build
+set `media_asset` by hand. They asserted the author's assumption rather than the
+system's behaviour, so the upload path -- the only path a temple admin actually
+uses -- was never executed. The tests added with the fix post the real form
+payload instead. That distinction is the transferable lesson here, more than any
+of the four bugs.
+
+**Checked and deliberately not changed:** clearing a gathering hero also
+reclaims its file. A blank `hero_asset_id` means the admin cleared it and there
+is no recoverable state to protect, so that is a completed removal rather than
+the archive case.
 
 **Album deletion, resolved 2026-09-08.** It now works and it confirms. The
 asymmetry with per-photo deletion is deliberate and stays: a photo must be
