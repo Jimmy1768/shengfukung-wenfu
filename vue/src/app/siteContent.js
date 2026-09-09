@@ -128,6 +128,18 @@ export function useTempleEvent(slugRef) {
   });
 }
 
+// An album's own page reads from the same loaded list rather than fetching one
+// entry: /api/v1/temple/archive returns every entry with its photo_urls, so
+// there is nothing a per-entry request would add. Ids are compared as strings
+// because a route param always is one.
+export function useTempleArchiveEntry(idRef) {
+  return computed(() => {
+    const id = (typeof idRef === 'string' ? idRef : idRef?.value)?.toString();
+    if (!id) return null;
+    return (state.archive || []).find((entry) => String(entry.id) === id) || null;
+  });
+}
+
 // The server resolves the chain -- TempleSerializer#hero_images_payload sends
 // Temple#hero_images_with_fallback, i.e. an already-complete map with the floor
 // applied. This used to re-run tab -> home -> placeholder-filter on top of that

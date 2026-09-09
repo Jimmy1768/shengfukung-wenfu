@@ -4,6 +4,7 @@ import About from './pages/About.vue';
 import Events from './pages/Events.vue';
 import EventShow from './pages/EventShow.vue';
 import Archive from './pages/Archive.vue';
+import ArchiveAlbum from './pages/ArchiveAlbum.vue';
 import News from './pages/News.vue';
 import Services from './pages/Services.vue';
 import Contact from './pages/Contact.vue';
@@ -21,6 +22,7 @@ export function createClassicRoute() {
       { path: 'events', name: 'events', component: Events, meta: { title: '活動資訊' } },
       { path: 'events/:slug', name: 'event', component: EventShow, meta: { title: '活動資訊詳情' } },
       { path: 'archive', name: 'archive', component: Archive, meta: { title: '活動回顧' } },
+      { path: 'archive/:id', name: 'archive-album', component: ArchiveAlbum, meta: { title: '活動相簿' } },
       { path: 'news', name: 'news', component: News, meta: { title: '最新消息' } },
       { path: 'services', name: 'services', component: Services, meta: { title: '祈福服務' } },
       { path: 'contact', name: 'contact', component: Contact, meta: { title: '聯絡 / 交通' } }
