@@ -26,6 +26,7 @@ Store Connect, never from inference off `versioning.js`.
 | `4c774de9-1cb6-499b-81ef-8b2b5968b192` | 2026-09-05 | `testflight` | 1.0.0 | android, ios | `de6bc98` |
 | `b8f71bc2-e129-499d-b7cc-af3cb0907e19` | 2026-09-05 | `testflight` | 1.0.0 | android, ios | `b4af067` |
 | `68336027-831c-4d46-ac88-1294c427acfd` | 2026-09-09 | `testflight` | 1.0.0 | android, ios | `05b7154` |
+| `646240e2-f2e5-46ea-88ed-989cd4fa37e9` | 2026-09-09 | `testflight` | 1.0.0 | android, ios | `6ddf4aa` |
 
 Message: "profile parity, OAuth prefill, remembered temple, demo tenant name".
 Published by the Director from `release-1.0.0`, the first publish under the
@@ -181,6 +182,51 @@ this receipt does not claim it.
 
 Trailing `*` on the commit is the untracked `.claude/` directory again; nothing
 under `mobile/` differed, so the bundle matches `05b7154` exactly.
+
+### 2026-09-09: the same album, built the second time as it was asked for
+
+`6ddf4aa` follows `05b7154` on the same report, because the first attempt
+answered the symptom instead of the request. The Director had asked for an
+album page; what shipped made the photos openable where they already were. His
+correction: "the central problem is, as i said, it needs to go to an album
+page. so it's missing a link, and a dedicated page."
+
+Two faults, one on each surface, both structural rather than visual.
+
+- **The app had no Gallery screen.** The albums lived at the bottom of Explore,
+  under every offering a patron could register for -- two unrelated things on
+  one screen, the albums reachable only by scrolling past the whole catalogue.
+  `05b7154` had then made each album expand in place, so a twenty-photo album
+  unrolled inside the offering list. The Director: "i don't want to load all 20
+  photos into the app screen."
+- **The website had no album page.** `/archive` rendered every photo of every
+  album inline, so a visitor scrolled past dozens of crops and could not reach
+  an album as a thing in itself.
+
+Gallery is now its own menu destination, listing albums with one cover each;
+opening one shows that album alone, and only that album loads its photos.
+`/archive` is an index of album cards linking to `/archive/:id`, a contact
+sheet for that album. The lightbox from `05b7154` survives on both, moved to
+where an album is actually being viewed.
+
+Android back closes an open album back to the list rather than jumping home --
+without it, opening a second album took three taps -- and any tab press clears
+the selection so the Gallery tab always lands on the list. Each of the four
+navigation guards was mutation-checked.
+
+**Lesson, and it is not a new one.** The report named the missing thing --
+a link and a page -- and the first fix treated it as a rendering gap. Reading
+the request as a symptom to be relieved rather than a design to be built cost
+a full publish cycle, and the Director had to say the same thing twice.
+
+Website verified on production against his own albums before this publish:
+three index cards with covers, dates and counts; `/archive/11` opens two S3
+photos; `/archive/999` says not found. Verification of the app half is the
+Director's on the Pixel, per the 2026-09-04 lesson; this receipt does not
+claim it.
+
+Trailing `*` on the commit is the untracked `.claude/` directory again; nothing
+under `mobile/` differed, so the bundle matches `6ddf4aa` exactly.
 
 ## Working lanes (Director, 2026-08-31)
 
