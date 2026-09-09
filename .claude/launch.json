@@ -1,0 +1,32 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "wenfu-local",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-lc",
+        "cd rails && PATH=/Users/jimmy1768/.rbenv/versions/3.2.3/bin:$PATH /Users/jimmy1768/.rbenv/versions/3.2.3/bin/bundle exec rails server -p 4001"
+      ],
+      "port": 4001
+    },
+    {
+      "name": "templemate-dev-client",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-lc",
+        "cd mobile && TEMPLEMATE_CLIENT_MODE=real TEMPLEMATE_LOCAL_API_BASE_URL=http://localhost:4001 TEMPLEMATE_LOCAL_TENANT_SLUG=shengfukung-wenfu npx expo start --dev-client --port 8081"
+      ],
+      "port": 8081
+    },
+    {
+      "name": "wenfu-vue",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-lc",
+        "cd vue && npx vite --port 5174"
+      ],
+      "port": 5174
+    }
+  ]
+}
