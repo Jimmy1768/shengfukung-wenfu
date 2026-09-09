@@ -25,6 +25,7 @@ Store Connect, never from inference off `versioning.js`.
 | `1f1dd0ec-31a2-4f58-82ed-294b99ddf04c` | 2026-09-04 | `testflight` | 1.0.0 | android, ios | `c7a8d0a` |
 | `4c774de9-1cb6-499b-81ef-8b2b5968b192` | 2026-09-05 | `testflight` | 1.0.0 | android, ios | `de6bc98` |
 | `b8f71bc2-e129-499d-b7cc-af3cb0907e19` | 2026-09-05 | `testflight` | 1.0.0 | android, ios | `b4af067` |
+| `68336027-831c-4d46-ac88-1294c427acfd` | 2026-09-09 | `testflight` | 1.0.0 | android, ios | `05b7154` |
 
 Message: "profile parity, OAuth prefill, remembered temple, demo tenant name".
 Published by the Director from `release-1.0.0`, the first publish under the
@@ -142,6 +143,44 @@ against the temple binding.
 
 Trailing `*` on the commit is the untracked `.claude/` directory again; nothing
 under `mobile/` differed, so the bundle matches `b4af067` exactly.
+
+### 2026-09-09: an album you could see but not open
+
+`05b7154`. The Director uploaded the first real gallery album through the admin
+console and reported the same defect on both surfaces: the album was visible in
+the app and on the website, with no way to open it and look at the photos.
+
+Same shape on each, and neither was a data problem. `photo_urls` has been in
+the native payload all along -- `native_resources#galleries` sends it for both
+the list and the detail -- and the website already had the URLs in hand. What
+was missing was the rendering. In the app, `DataSection` drew a gallery entry
+as one line of text and had exactly one caller. On the website, the photos were
+90px `object-fit: cover` thumbnails with no click handler, so every picture
+arrived cropped with no way to see it whole.
+
+Both now open a photo full-size, contained rather than cropped, with wrapping
+prev/next. The app expands the album in place rather than pushing a screen,
+because navigation there is a single `screen` string with no stack; Android
+back closes the photo through `onRequestClose` instead of leaving the screen.
+The website locks the body while the overlay is up, so a wheel scroll behind it
+cannot silently move the page underneath.
+
+`DataSection` also read `item.date`, a field this payload does not have, so the
+date it meant to show was always undefined. It is `event_date`, and it is
+sliced rather than parsed so a `Date` cannot shift the day across timezones.
+
+**Shipped in two halves again, website first.** `bin/deploy_vue` ran the same
+day and the site was verified against the Director's own album on production --
+the live bundle is the one the droplet built, and 中秋祈福活動（1／2）opens with
+its S3 image. No restart: no Rails code, no migration, no Gemfile change.
+
+Each of the three new app guards was mutation-checked -- reintroducing the
+defect fails the test -- so none is passing for the wrong reason. Verification
+of the app half is the Director's on the Pixel, per the 2026-09-04 lesson;
+this receipt does not claim it.
+
+Trailing `*` on the commit is the untracked `.claude/` directory again; nothing
+under `mobile/` differed, so the bundle matches `05b7154` exactly.
 
 ## Working lanes (Director, 2026-08-31)
 
