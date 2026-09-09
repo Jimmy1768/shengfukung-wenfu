@@ -54,7 +54,7 @@ module Admin
       if @gallery_entry.persisted? && @gallery_entry.errors.empty?
         cleanup_gallery_assets
         invalidate_gallery_cache!
-        redirect_to admin_gallery_entries_path, notice: t("admin.gallery_entries.notices.updated")
+        redirect_after_update
       else
         render :edit, status: :unprocessable_entity
       end
@@ -76,6 +76,34 @@ module Admin
       permitted = params.require(:temple_gallery_entry).permit(:title, :body, :event_date)
       permitted[:event_date] = permitted[:event_date].presence
       permitted
+    end
+
+    # Which control was pressed decides where the admin lands. Every submit on
+    # this form used to end at the album list, the photo controls included, so
+    # moving one photo up navigated out of the album being arranged -- putting
+    # twenty photos in order meant twenty trips back into the form. Only Save
+    # means "done with this album".
+    #
+    # Keyed by the parameter each button carries, so a new photo control cannot
+    # quietly inherit the Save destination: it has no entry here and would fail
+    # the test that covers this.
+    PHOTO_ACTION_ANCHORS = {
+      "photo_move_up" => %w[moved album-photos],
+      "photo_move_down" => %w[moved album-photos],
+      "photo_remove" => %w[removed album-photos],
+      "photo_restore" => %w[restored album-archived],
+      "photo_destroy" => %w[destroyed album-archived]
+    }.freeze
+
+    def redirect_after_update
+      outcome, anchor = PHOTO_ACTION_ANCHORS.find { |param, _| params[param].present? }&.last
+
+      if outcome
+        redirect_to edit_admin_gallery_entry_path(@gallery_entry, anchor:),
+          notice: t("admin.gallery_entries.notices.photo_#{outcome}")
+      else
+        redirect_to admin_gallery_entries_path, notice: t("admin.gallery_entries.notices.updated")
+      end
     end
 
     def archive_removed_photos(entry)

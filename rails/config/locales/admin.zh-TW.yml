@@ -1220,6 +1220,10 @@ zh-TW:
         created: "活動回顧已建立。"
         updated: "活動回顧已更新。"
         deleted: "活動回顧已刪除。"
+        photo_moved: "照片順序已更新。"
+        photo_removed: "照片已移除，可在封存區還原。"
+        photo_restored: "照片已還原。"
+        photo_destroyed: "照片已永久刪除，檔案一併移除。"
       confirmations:
         delete: "確定要刪除這筆活動回顧嗎？"
       form:

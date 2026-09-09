@@ -61,7 +61,10 @@
   </div>
 
   <% if gallery_entry.persisted? && gallery_entry.photos.any? { |photo| !photo.archived? } %>
-    <div class="field">
+    <%# The id is the redirect target for the photo controls below. Without it
+        every move landed the admin at the top of the form, scrolling back down
+        to the grid after each one. %>
+    <div class="field" id="album-photos">
       <label><%= t("admin.gallery_entries.fields.current_photos") %></label>
       <%# Submit buttons carrying a named param, not nested forms -- the photo
           list sits inside the entry form and forms do not nest. Same shape as
@@ -108,7 +111,7 @@
 
   <% archived_photos = gallery_entry.persisted? ? gallery_entry.photos.select(&:archived?) : [] %>
   <% if archived_photos.any? %>
-    <details class="field gallery-archived">
+    <details class="field gallery-archived" id="album-archived">
       <%# Collapsed by default: an archived photo is out of the way, not gone,
           and the shelf should not compete with the live set above it. %>
       <summary><%= t("admin.gallery_entries.fields.archived_photos", count: archived_photos.size) %></summary>

@@ -38,7 +38,7 @@ class AdminGalleryPhotoRemovalTest < ActionDispatch::IntegrationTest
         photo_remove: { @drop.id.to_s => "1" }
       }
 
-    assert_redirected_to admin_gallery_entries_path
+    assert_redirected_to edit_admin_gallery_entry_path(@entry, anchor: "album-photos")
     assert_equal [@keep.url], @entry.reload.photo_urls, "the removed photo must stop rendering"
     assert TempleGalleryPhoto.exists?(@drop.id), "removal is reversible, so the row must survive"
     assert @drop.reload.archived?
@@ -79,7 +79,7 @@ class AdminGalleryPhotoRemovalTest < ActionDispatch::IntegrationTest
         photo_restore: { @drop.id.to_s => "1" }
       }
 
-    assert_redirected_to admin_gallery_entries_path
+    assert_redirected_to edit_admin_gallery_entry_path(@entry, anchor: "album-archived")
     assert_includes @entry.reload.photo_urls, @drop.url
     assert_not @drop.reload.archived?
   end
@@ -119,7 +119,7 @@ class AdminGalleryPhotoRemovalTest < ActionDispatch::IntegrationTest
         photo_move_down: { @keep.id.to_s => "1" }
       }
 
-    assert_redirected_to admin_gallery_entries_path
+    assert_redirected_to edit_admin_gallery_entry_path(@entry, anchor: "album-photos")
     assert_equal [@drop.url, @keep.url], @entry.reload.photo_urls
   end
 
@@ -177,7 +177,7 @@ class AdminGalleryPhotoRemovalTest < ActionDispatch::IntegrationTest
         photo_destroy: { @drop.id.to_s => "1" }
       }
 
-    assert_redirected_to admin_gallery_entries_path
+    assert_redirected_to edit_admin_gallery_entry_path(@entry, anchor: "album-archived")
     assert_not TempleGalleryPhoto.exists?(@drop.id)
     assert_not MediaAsset.exists?(asset.id), "the asset row owns the object, so it goes too"
     assert_equal [@keep.url], @entry.reload.photo_urls
@@ -204,6 +204,67 @@ class AdminGalleryPhotoRemovalTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to admin_gallery_entries_path
+  end
+
+  # Reported after the album pages shipped: pressing the up or down arrow moved
+  # the photo and then navigated the admin out of the album, back to the gallery
+  # list. Every control on this form shared the Save destination, so arranging
+  # twenty photos meant twenty trips back into the form. Save finishes editing;
+  # the photo controls do not.
+  #
+  # A fresh album per control, because these share no state and juggling one
+  # album between them tripped over an unrelated rule: a live photo left out of
+  # the submitted URL list is removed, by design.
+  test "every photo control stays on the album, and only Save leaves it" do
+    {
+      photo_move_up: "album-photos",
+      photo_move_down: "album-photos",
+      photo_remove: "album-photos",
+      photo_restore: "album-archived",
+      photo_destroy: "album-archived"
+    }.each do |control, anchor|
+      entry = @temple.temple_gallery_entries.create!(title: "相簿 #{control}")
+      first = entry.photos.create!(url: "https://example.test/#{control}-1.jpg", position: 0)
+      second = entry.photos.create!(url: "https://example.test/#{control}-2.jpg", position: 1)
+      target = %i[photo_restore photo_destroy].include?(control) ? second.tap(&:archive!) : first
+
+      patch admin_gallery_entry_path(entry),
+        params: {
+          temple_gallery_entry: {
+            title: entry.title,
+            photo_urls_raw: entry.reload.photo_urls.join("\n")
+          },
+          control => { target.id.to_s => "1" }
+        }
+
+      assert_redirected_to edit_admin_gallery_entry_path(entry, anchor:),
+        "#{control} navigated the admin out of the album"
+      assert_not_nil flash[:notice], "#{control} said nothing about what it did"
+    end
+  end
+
+  # The anchors are only worth having if the form carries them; without these
+  # ids the redirect lands at the top of the page and the admin scrolls back
+  # down to the grid after every move.
+  test "the form carries the anchors the photo controls redirect to" do
+    @drop.archive!
+
+    get edit_admin_gallery_entry_path(@entry)
+
+    assert_response :success
+    assert_includes response.body, %(id="album-photos")
+    assert_includes response.body, %(id="album-archived")
+  end
+
+  # A new photo control added to the form must be given a destination, rather
+  # than silently inheriting Save's and navigating out again.
+  test "every photo parameter the form submits has a redirect destination" do
+    get edit_admin_gallery_entry_path(@entry)
+    submitted = response.body.scan(/name="(photo_[a-z_]+)\[/).flatten.uniq
+
+    assert_equal [], submitted - Admin::GalleryEntriesController::PHOTO_ACTION_ANCHORS.keys,
+      "a photo control on the form has no entry in PHOTO_ACTION_ANCHORS"
+    assert_includes submitted, "photo_move_up", "the form should be rendering photo controls at all"
   end
 
   test "a normal save with no removal leaves both photos visible" do

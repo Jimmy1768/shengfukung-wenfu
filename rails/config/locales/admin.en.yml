@@ -843,6 +843,10 @@ en:
         created: "Gallery entry created."
         updated: "Gallery entry updated."
         deleted: "Gallery entry deleted."
+        photo_moved: "Photo order updated."
+        photo_removed: "Photo removed. You can restore it from the archive."
+        photo_restored: "Photo restored."
+        photo_destroyed: "Photo permanently deleted, and its file with it."
       confirmations:
         delete: "Delete this gallery entry?"
       form:
