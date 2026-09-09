@@ -14,6 +14,7 @@ class TempleGalleryEntry < ApplicationRecord
 
   validates :title, presence: true
 
+  before_destroy :capture_asset_ids_for_purge, prepend: true
   after_destroy :purge_media_assets
 
   # Kept as a method so the nine existing read sites -- admin views, the account
@@ -80,9 +81,17 @@ class TempleGalleryEntry < ApplicationRecord
   # rather than orphaned beyond recovery, which is the precondition for
   # reclaiming them once archive/delete exists.
   def purge_media_assets
-    ids = (photos.filter_map(&:media_asset_id) + media_asset_ids).uniq
+    ids = (@asset_ids_before_destroy.to_a + media_asset_ids).uniq
     return if ids.empty?
 
     MediaAsset.where(id: ids, temple_id: temple_id).destroy_all
+  end
+
+  # Captured before dependent: :destroy removes the rows, because after_destroy
+  # runs too late to read them. media_asset_ids is still consulted alongside so
+  # that albums predating temple_gallery_photos, whose link lives only in that
+  # legacy array, still release their files.
+  def capture_asset_ids_for_purge
+    @asset_ids_before_destroy = photos.filter_map(&:media_asset_id)
   end
 end

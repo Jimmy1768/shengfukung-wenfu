@@ -155,12 +155,25 @@ module Admin
       []
     end
 
+    # Links each uploaded file to the photo row that shows it, and reports which
+    # uploads ended up attached to nothing.
+    #
+    # This used to keep the link in entry.metadata["media_asset_ids"] and work
+    # out what to detach by matching URL strings against the textarea. That was
+    # wrong once photos became rows and deletion became real: the textarea lists
+    # only live photos, so **archiving a photo made its asset look detached, and
+    # the next ordinary save destroyed it and deleted the file** -- while the row
+    # stayed in the archived shelf still offering Restore. Verified before the
+    # fix; the S3 delete was genuinely called.
+    #
+    # The photo row owns the link now. An asset is detached only when no photo of
+    # this entry references it, archived ones included, so the only way to
+    # release a file is to destroy the photo that holds it.
     def apply_uploaded_assets(entry, urls)
       payload = uploaded_assets_payload
-      previous_ids = entry.media_asset_ids
-      return if payload.empty? && previous_ids.empty?
+      return if payload.empty? && entry.photos.none?
 
-      asset_ids = payload.map { |item| item["id"] }.compact
+      asset_ids = payload.filter_map { |item| item["id"] }
       records = current_temple.media_assets.where(id: asset_ids).index_by { |asset| asset.id.to_s }
       url_to_asset = {}
       payload.each do |item|
@@ -170,12 +183,21 @@ module Admin
         url_to_asset[item["url"]] = asset.id
       end
 
-      used_ids = urls.map { |url| url_to_asset[url]&.to_s }.compact
-      entry.media_asset_ids = used_ids
+      entry.photos.each do |photo|
+        next if photo.marked_for_destruction?
 
-      removed_ids = previous_ids.map(&:to_s) - used_ids
-      unused_ids = (url_to_asset.values.map(&:to_s) - used_ids)
-      @detached_gallery_asset_ids.concat(removed_ids + unused_ids)
+        asset_id = url_to_asset[photo.url]
+        photo.media_asset_id = asset_id if asset_id
+      end
+
+      # Surviving rows of any status keep their asset. Anything uploaded in this
+      # submit that no row claims -- an image added then removed before saving --
+      # is genuinely orphaned and is released.
+      claimed = entry.photos.reject(&:marked_for_destruction?).filter_map(&:media_asset_id).map(&:to_s)
+      dropped = entry.photos.select(&:marked_for_destruction?).filter_map(&:media_asset_id).map(&:to_s)
+      unclaimed = url_to_asset.values.map(&:to_s) - claimed
+
+      @detached_gallery_asset_ids.concat(dropped + unclaimed)
     end
 
     def reset_gallery_asset_tracking
