@@ -39,6 +39,26 @@ test('presentation uses generated token authority and a single-line native busin
   assert.match(primitives, /accessibilityRole="alert"/);
 });
 
+// The album was visible on every surface except the one it was tapped on: the
+// gallery rendered as a line of text, and photo_urls -- which the API has always
+// sent -- was never read. It also read item.date, a field this payload does not
+// have, so the date it meant to show was always undefined.
+test('an album opens its photos rather than rendering as a line of text', () => {
+  const app = read('App.js');
+  const copy = read('app/ui/copy.js');
+  assert.match(app, /<GallerySection title=\{t\.gallery\}/);
+  assert.equal(/<DataSection|function DataSection/.test(app), false, 'the text-only section had one caller and is gone');
+  assert.match(app, /item\.photo_urls \|\| \[\]/);
+  assert.match(app, /setViewer\(\{ photos, index, title: item\.title \}\)/);
+  assert.match(app, /onRequestClose=\{onClose\}/, 'Android back closes the photo, not the screen');
+  assert.match(app, /resizeMode="contain"/, 'the opened photo is shown whole, not cropped like the strip');
+  assert.match(app, /item\.event_date/);
+  assert.equal(/albumCaption[\s\S]{0,200}item\.date\b/.test(app), false, 'item.date does not exist on this payload');
+  for (const key of ['photos:', 'emptyAlbum:', 'closePhoto:', 'previousPhoto:', 'nextPhoto:']) {
+    assert.equal((copy.match(new RegExp(`\\b${key}`, 'g')) || []).length, 2, `${key} needs both locales`);
+  }
+});
+
 test('bound header places Settings beside Sign out while the unbound gate exposes Sign out only', () => {
   const app = read('App.js');
   assert.match(app, /onSettings=\{\(\) => navigate\('settings'\)\}/);
