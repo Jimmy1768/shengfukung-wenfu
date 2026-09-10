@@ -49,7 +49,7 @@ disagreement is worth reporting.
   through: a Control works from a spec the Director approved, not from
   Planning's permission. Keeping Planning out of the chain is deliberate — it
   is where the Director thinks, and a mandatory link locks it up.
-- **Control** — executes bounded packets from Planning. Reports at terminal
+- **Control** — executes bounded assignments from Planning. Reports at terminal
   states: done, or blocked.
 
 ## Authority
@@ -103,8 +103,8 @@ stuck, misaligned, or repeatedly failing work; independent review; and second
 opinion.
 
 Recovery replies `ADVICE` to the requester only, pointing at a file under
-`advice/<repo>/` with its digest. Planning may copy that advice into this
-repository's handoffs and commit it as guidance.
+`advice/<repo>/` when the analysis is long enough to be a document. That
+file is Recovery's own work product in the workspace, not an archived message.
 
 Recovery's conclusion is evidence and advice, not authority, and it is never an
 implicit acceptance gate — no session makes it one by citing it. Recovery is
@@ -131,8 +131,8 @@ message that announces its target fails safely.
 
 ## Message header
 
-Every protocol message opens with this block and at most one short paragraph.
-Packets are files; messages are pointers with digests.
+Every protocol message opens with this block and then says what it has to
+say. The message carries its own content; there is no file to point at.
 
 ```
 claude-thread/1.3
@@ -143,8 +143,6 @@ from_session_id: <local_...>
 from_title: <canonical title>
 to_title: <canonical title>
 repo: <registry repo or workspace>
-packet_path: <absolute path or ->
-packet_sha256: <64 hex or ->
 plan_ref: <repository-relative plan path or ->
 plan_criteria_sha256: <pin of the immutable criteria slice or ->
 base_commit: <40 hex or ->
@@ -155,9 +153,9 @@ reply_required: <ACK | TERMINAL | ANSWER | ADVICE | DECISION | none>
 `message_ref` is sender-generated and unique per sender; `in_reply_to` chains
 replies, and also chains a correction to what it corrects, so a chain of
 messages reconstructs a conversation without anything outside it.
-`packet_sha256` covers the packet file's bytes and the receiver recomputes it
-before reading further. `plan_criteria_sha256` is recomputed from the plan file
-in the receiver's own checkout.
+`plan_criteria_sha256` is recomputed from the plan file in the receiver's own
+checkout: it catches a plan that reads differently in the two checkouts, which
+is the one thing the sender cannot see.
 
 ## Allowed traffic
 
@@ -199,102 +197,100 @@ through Handler. Strategy chooses, and says which it is.
 
 A cross-repository spec and its reply follow the same chain in both
 directions — Planning to Handler to a foreign Control, and the gap or the
-terminal packet back the same way. A Control never replies about a foreign
-spec to its own Planning, which never saw it and has no context to answer.
+`TERMINAL` back the same way. A Control never replies about a foreign spec
+to its own Planning, which never saw it and has no context to answer.
 
-- `ASSIGNMENT` points at an assignment packet and requires `ACK` or `BLOCKED`
-  before work starts.
+- `ASSIGNMENT` states the scope and requires `ACK` or `BLOCKED` before work
+  starts.
 - `ACK` accepts the stated scope. `BLOCKED` names one reason code:
-  `digest_mismatch`, `plan_pin_mismatch`, `scope_exceeds_permissions`, `busy`,
-  `unknown_sender_lane`, `packet_unreadable`, `decision_required`.
-- `TERMINAL` points at a terminal packet with state `done` or `blocked`.
+  `base_mismatch`, `plan_pin_mismatch`, `scope_exceeds_permissions`, `busy`,
+  `unknown_sender_lane`, `decision_required`.
+- `TERMINAL` reports state `done` or `blocked`.
 - `QUESTION` is one bounded clarification the plan already determines. A
   question that would change scope is `BLOCKED decision_required` instead, and
   Planning takes it to the Director.
-- `ASSIST` points at an assist packet; `ADVICE` points at an advice file with
-  its digest. Planning may copy advice into its repository and commit it as
-  guidance.
+- `ASSIST` carries the material to inspect; `ADVICE` carries the finding.
+  Advice is evidence, never an acceptance gate.
 - `CROSS_REPO` carries a request from one Planning. `DECISION` carries the
   Director's or Strategy's cross-repository decision to the affected Planning.
   Planning never sends to another repository's session directly.
 - `REFRESH` announces a replaced session's new ID and title, once.
 - `NOTICE` is informational: no action, no reply.
 
-## Packets
+## What a message carries
 
-A packet is a file. The message points at it and carries its digest, so the
-receiver can prove it read exactly what was sent. Where packets live is stated
-in each context file, because the path differs between a repository and the
-workspace; the rule does not.
+A message carries its own content. There is no separate file and no digest over
+it, because there is nothing in between the two sessions: the receiver read
+exactly what the sender sent. Earlier versions moved text through tracked files
+and verified them by digest — that was a workaround for sessions that had no
+way to reach each other, and it has not been true since the cutover.
 
-A sent packet is a record of what was sent. Its bytes do not change afterwards
-— the message that pointed at it carries its digest, so correcting one means
-sending a new message that supersedes it, never editing the old file.
-
-**Stratification.** The record of an action is written into the record-keeping
-of the actor *after* the one that performed it, and never into the object it
-records. Where two lanes would write one object, the later one owns it.
-
-Everything below follows from that, and a new collision is caught by reading
-the rule rather than by tripping over it.
-
-- **A Control writes its terminal packet outside the repository** — its
-  scratchpad — and sends the absolute path and digest. Planning verifies it,
-  copies it into `ops/docs/handoffs/`, and commits it with the acceptance.
-  Inside the repository the packet would be one of the changed paths it must
-  list a digest for, and writing that number in changes the file it describes,
-  so no correct value exists. It also leaves the worktree dirty for the next
-  assignment's base check, which requires a clean tree.
-
-Planning terminates the chain because its acceptance is final: there is no
-later actor for it to report to.
+A sent message is not edited afterwards, because it cannot be. A correction is
+a new message chained to what it corrects by `in_reply_to`.
 
 A send returns a tool result and a `message_id` to the sender only; a receiver
 can know neither. `message_ref` is what joins the two sides, which is why it is
 sender-generated and unique.
 
-Assignment packet: plan reference and the immutable criteria copied verbatim
-with their pin; base branch, commit and tree; owned and forbidden paths, exact
-and exhaustive; required checks as exact commands with expected exit codes;
-forbidden actions for this packet, restated even where the lane already denies
-them; the evidence the terminal packet must carry; and the implementer
-instruction — model, effort, whether implementers may run in parallel on
-disjoint paths, and whether each gets its own worktree.
+**Assignment.** Plan reference and the immutable criteria copied verbatim with
+their pin; base branch, commit and tree; owned and forbidden paths, exact and
+exhaustive; required checks as exact commands with expected exit codes;
+forbidden actions for this assignment, restated even where the lane already
+denies them; and the implementer instruction — model, effort, whether
+implementers may run in parallel on disjoint paths, and whether each gets its
+own worktree.
 
-Terminal packet: state `done` or `blocked`; base and result branch, commit and
-tree; changed paths with a per-file digest of the result content; for each
-required check the exact command, exit code, digest of captured output and its
-log path; every assertion tagged Observed or Inference; which implementers ran,
-what Control corrected, and what Control refused to decide; blockers and what
-was not done; and what Control re-ran itself before sending.
+**Terminal.** State `done` or `blocked`; base and result branch, commit and
+tree; the changed paths; for each required check the exact command and the exit
+code it gave; every assertion tagged Observed or Inference; which implementers
+ran, what Control corrected, and what Control refused to decide; blockers and
+what was not done; and what Control re-ran itself before sending.
 
-Assist packet: repository, base commit and tree, and the exact material to
+Do not restate what the commit already proves. The tree hash covers every
+changed byte, so a per-file digest list is a hand-typed copy of the commit
+object that can only drift from it. Planning reads the commit.
+
+**Assist.** Repository, base commit and tree, and the exact material to
 inspect; observed evidence, tagged; what was tried and the exact unresolved
 question; and the constraints the answer must respect.
 
-Cross-repository packet: source and affected repositories by registry name; the
+**Cross-repository.** Source and affected repositories by registry name; the
 exact decision requested with its evidence, tagged; and what each affected
 Planning would need to change, as a proposal only.
 
+## Stratification
+
+The record of an action is written into the record-keeping of the actor *after*
+the one that performed it, and never into the object it records. Where two
+lanes would write one object, the later one owns it.
+
+Planning terminates the chain because its acceptance is final: there is no
+later actor for it to report to.
+
+So a Control writes nothing into the repository's records. It reports, and
+Planning records the acceptance in the commit that lands the work. A Control
+writing its own result into the repository would be describing a file it is in
+the middle of changing, and would leave the worktree dirty for the next
+assignment's base check, which requires a clean tree.
+
 ## Sending
 
-1. Write the packet; compute its digest.
-2. Resolve the target by canonical title and cwd through `list_sessions`, using
+1. Resolve the target by canonical title and cwd through `list_sessions`, using
    the registry for repository titles. Zero matches or several: stop and
    surface it to the Director rather than guessing.
-3. Send the header and one paragraph.
-4. Note the tool result: `delivered`, `queued`, or the error text.
-5. `queued` is normal — do not resend. Surface an error to the Director after
+2. Send the header and the content.
+3. Note the tool result: `delivered`, `queued`, or the error text.
+4. `queued` is normal — do not resend. Surface an error to the Director after
    one retry. No silent retry loop.
-6. Do not assume the receiver has started. State is known from replies.
+5. Do not assume the receiver has started. State is known from replies.
 
 ## Receiving
 
 1. Confirm the first line is `claude-thread/1.3`. Anything else is an ordinary
    teammate note with no protocol action.
 2. Check sender lane and type against the traffic table.
-3. Read the packet and recompute its digest; a mismatch is `BLOCKED
-   digest_mismatch`.
+3. Verify the base in this checkout: `git status --porcelain` empty, and the
+   tree matching `base_tree`. A mismatch is `BLOCKED base_mismatch`.
 4. Where a plan is referenced, recompute its pin from the plan in this
    checkout; a mismatch is `BLOCKED plan_pin_mismatch`.
 5. Check the required actions against this session's own permission rules.
@@ -309,21 +305,23 @@ Planning would need to change, as a proposal only.
    Otherwise a lane that pins its base exactly as instructed is governed by
    whatever the rulebook said at that commit, and refusing to move the base —
    which is correct — is what creates the exposure.
-8. Write the terminal packet outside the repository, self-verify, and send its
-   path and digest.
+8. Report the result in a `TERMINAL`. Write nothing into the repository's
+   records.
 
-## Verifying a terminal packet
+## Verifying a `TERMINAL`
 
 Planning acts only when a `TERMINAL` arrives, and accepts nothing from the
 message itself:
 
-1. `git rev-parse` the result commit and tree.
-2. `git show --stat`, and recompute the digest of each changed path.
-3. Re-run each required check, or verify the log's digest against the packet
-   and read the log.
-4. Record `accepted` or `rejected` in the commit that lands the work, and
-   commit the terminal packet in that same commit. A rejection becomes a new
-   `ASSIGNMENT` naming the specific defect — never an edit by Planning.
+1. `git rev-parse` the result commit and tree, and compare both to what the
+   message stated.
+2. `git show --stat`. Every changed path must be inside the owned paths; one
+   outside is a rejection whatever the checks say.
+3. Re-run each required check. Re-running *is* the verification — a Control's
+   report of a check is the claim being tested, not evidence for it.
+4. Record `accepted` or `rejected` in the commit that lands the work. A
+   rejection becomes a new `ASSIGNMENT` naming the specific defect — never an
+   edit by Planning.
 
 What happens after acceptance — merging, pushing, deploying — is change
 discipline, not coordination.
@@ -344,8 +342,8 @@ discipline, not coordination.
 ## Permissions
 
 Where a lane may write is part of coordination, not a repository detail: it is
-what makes "send me a packet" mean something. Two rules first, then how the
-rules themselves behave.
+what makes "these are your owned paths" mean something. Two rules first, then
+how the rules themselves behave.
 
 **A lane never writes its own permission file.** A gate evaluated by the same
 inference that wants past it returns clean by construction. Profiles are the
@@ -453,7 +451,7 @@ When the other Control lands work, a branch in progress falls behind. Where
 Control has `git merge`, it merges `main` into its own branch to catch up.
 Where it does not, it does not need to: an assignment names exact owned paths,
 so two branches in flight do not touch the same files, and the next assignment
-starts from a fresh base the packet names.
+starts from a fresh base it names.
 
 ## Plan docs and release branches
 
@@ -508,13 +506,14 @@ once into results alongside claims that are true now.
 Fix dangling links when you delete. A prose mention that something was
 retired is fine; a link to a file that no longer exists is not.
 
-### Sent packets are not pruned
+### Messages are not documents
 
-A plan doc is deleted once distilled. A **sent packet is not** — the message
-that pointed at it carries its digest, so editing one to tidy a path it
-mentions invalidates the proof of what was sent. Correction is a new message
-that supersedes the old, chained by `in_reply_to`; the superseded file stays
-exactly as it was.
+Nothing sent between sessions is filed in the repository. A message is
+transport: it exists in the thread, and the thread is where it is read back.
+The repository holds work, and the documents a lane authors as its own product
+— not an archive of what was said about the work. A ruling that has to outlive
+its thread is not a message to keep; it is an edit to this file or to the
+context file, and if it was never made there it is not in force.
 
 ## Databases
 
