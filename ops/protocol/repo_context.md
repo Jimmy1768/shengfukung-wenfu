@@ -1,32 +1,20 @@
 # Shengfukung Wenfu — Repo Context
 
-Local, repo-specific product/runtime and builder-procedure context for this
-repository only. It does not apply to any other repository and is not copied
-into other repositories. Both `AGENTS.md` (Codex) and `CLAUDE.md` (Claude
-Code) reference this single file as their shared repo-context source — edit
-it here once, not per-IDE-file.
+Product/runtime and builder-procedure context for this repository only. It does
+not apply to any other repository and is not copied into another. `CLAUDE.md`
+and `ops/protocol/claude_work_mode.md` are identical everywhere; everything
+that is true here and nowhere else belongs in this file.
 
-Work Mode (Codex Work Mode, Claude Work Mode) governs builder coordination
-only; it does not define or change Wenfu product/runtime phase integrity —
-temple, patron/account, offering and registration, payment (ECPay),
-deployment, or other product/runtime lifecycle semantics — those live in
-this file.
-
-**Codex Work Mode status: retired.** This repository is now Claude-exclusive
-(see `ops/protocol/claude_work_mode.md`); no other agent shares this working
-tree. The Codex Work Mode source map, deterministic contract, and
-current-snapshot files were deleted on 2026-08-23 rather than archived —
-retained governance records for a system no longer in use are read by nobody
-and returned by every search, which makes them a liability rather than
-evidence. They remain recoverable from git history; the deleting commit
-names each file.
+The work mode governs builder coordination only. It does not define or change
+Wenfu product/runtime phase integrity — temple, patron/account, offering and
+registration, payment (ECPay), deployment, or other product/runtime lifecycle
+semantics. Those live here.
 
 ## Domain And Tenancy Architecture
 
-Recurring source of confusion (Codex, and this session too) worth
-getting right once: **the Rails backend and the TempleMate mobile app
-are centralized and legitimately multi-tenant — the Vue frontend is
-not.**
+Recurring source of confusion, worth getting right once: **the Rails
+backend and the TempleMate mobile app are centralized and legitimately
+multi-tenant — the Vue frontend is not.**
 
 - Rails (backend/database) and TempleMate (`mobile/`) are shared,
   single deployments serving every client/temple. A `temples` table
@@ -68,12 +56,9 @@ not.**
 
 ## Control Track Assignment
 
-Both Codex Work Mode and Claude Work Mode use a domain-owned Control split
-in this repo, not a hand-agnostic one — inherited from how the work has
-actually run so far (Track A / Track B in
-`ops/docs/handoffs/2026-08-17-account-admin-personal-and-offering-data-alignment-control-a.md`
-and
-`ops/docs/handoffs/2026-08-17-templemate-production-runtime-eas-ota-source-control-b.md`):
+The work mode's Control A/B are hand-agnostic by default — packet owns the
+branch, either hand can pick one up. This repository keeps them specialized by
+domain instead, inherited from how the work has actually run:
 
 - **Control A** owns Rails / account / admin / offering-data work.
 - **Control B** owns TempleMate / EAS / TestFlight / OTA / native OAuth /
@@ -81,11 +66,9 @@ and
 - The two stay independent; cross-track coordination routes through
   Planning, not Control-to-Control.
 
-This is an operating convention for this repo, not a Claude Work Mode rule —
-`ops/protocol/claude_work_mode.md`'s Control A/B are hand-agnostic by
-default (packet-owns-branch, either hand can pick one up). Wenfu just keeps
-them specialized because the domain split is already real and keeping each
-Control's accumulated context focused by domain is useful on its own merits.
+This is an operating convention for this repository, not a work-mode rule.
+Wenfu keeps the split because the domain division is already real, and each
+Control's accumulated context stays more useful when it is focused.
 
 ## Mobile/Expo Reference Pattern
 
@@ -110,8 +93,7 @@ silently fell through to the development identity. Both fixed by
 matching DojoMate-Expo's actual proven pattern exactly — literal-string
 `runtimeVersion` pinned to `versioning.appVersion`, and the OTA script
 injecting each lane's `BUILD_MODE` itself rather than trusting the
-caller's shell. Full record:
-`ops/docs/handoffs/2026-08-20-ota-runtimeversion-buildmode-fix-planning.md`.
+caller's shell.
 
 ## QA Dummy Admin Account
 
@@ -144,21 +126,6 @@ OperatorKit is a separate product with its own kernel semantics: copying its
 sources here would create a second, drifting copy of definitions that only
 OperatorKit owns. No other OperatorKit source, local path, product/runtime
 rule, or repository content may be copied here.
-
-## Wenfu Authority And Terminology
-
-Ordinary repository work routes `Planning -> authoritative Control A/B -> one
-ephemeral Implementer`. Strategy owns only task-lifecycle actions and
-cross-repository routing. Cross-repository contract, architecture,
-sequencing, and authority questions route `Planning -> Strategy -> affected
-Planning`; Controls do not coordinate that work directly. A persistent
-Handoff is an exceptional, recorded-reason, one-packet continuity mechanism.
-
-Planning owns accepted plans and criteria. Control owns the bounded
-implementation packet, repository integration, and acceptance decision.
-Implementers edit only packet-owned paths, run the required checks, and
-return evidence directly to Control. When durable evidence exists, chat
-points to its absolute repository path.
 
 ## Safety, Phase, And Product Boundaries
 
