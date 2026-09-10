@@ -153,10 +153,11 @@ reply_required: <ACK | TERMINAL | ANSWER | ADVICE | DECISION | none>
 ```
 
 `message_ref` is sender-generated and unique per sender; `in_reply_to` chains
-replies, and also chains a correction to what it corrects, so ledgers alone
-reconstruct a conversation. `packet_sha256` covers the packet file's bytes and
-the receiver recomputes it before reading further. `plan_criteria_sha256` is
-recomputed from the plan file in the receiver's own checkout.
+replies, and also chains a correction to what it corrects, so a chain of
+messages reconstructs a conversation without anything outside it.
+`packet_sha256` covers the packet file's bytes and the receiver recomputes it
+before reading further. `plan_criteria_sha256` is recomputed from the plan file
+in the receiver's own checkout.
 
 ## Allowed traffic
 
@@ -226,9 +227,9 @@ receiver can prove it read exactly what was sent. Where packets live is stated
 in each context file, because the path differs between a repository and the
 workspace; the rule does not.
 
-A sent packet is a record of what was sent. Its bytes do not change afterwards,
-because a ledger cites its digest — correcting one means sending a new message
-that supersedes it, never editing the old file.
+A sent packet is a record of what was sent. Its bytes do not change afterwards
+— the message that pointed at it carries its digest, so correcting one means
+sending a new message that supersedes it, never editing the old file.
 
 **Stratification.** The record of an action is written into the record-keeping
 of the actor *after* the one that performed it, and never into the object it
@@ -244,22 +245,13 @@ the rule rather than by tripping over it.
   list a digest for, and writing that number in changes the file it describes,
   so no correct value exists. It also leaves the worktree dirty for the next
   assignment's base check, which requires a clean tree.
-- **A repository has one ledger and Planning writes it.** A Control appends
-  nothing. Otherwise two lanes append one tracked file from two working trees —
-  Control's uncommitted on its branch, Planning's committed on `main` — and the
-  next move of either tree is a conflict. It also puts the checklist at odds
-  with "owned paths, exact and exhaustive": a packet that forbids every other
-  path forbids the ledger, and a Control that obeys the packet disobeys the
-  checklist.
 
 Planning terminates the chain because its acceptance is final: there is no
-later actor for it to report to. That is the same shape the ledger already had,
-which is why the ledger never hit this and the packet did.
+later actor for it to report to.
 
-Every ledger line records the timestamp, type, `message_ref`, `in_reply_to`,
-counterpart session ID, and — for a send — the tool result and `message_id`. A
-receiver can know neither of those, so a received line carries `message_ref`
-alone; that is what joins the two ledgers.
+A send returns a tool result and a `message_id` to the sender only; a receiver
+can know neither. `message_ref` is what joins the two sides, which is why it is
+sender-generated and unique.
 
 Assignment packet: plan reference and the immutable criteria copied verbatim
 with their pin; base branch, commit and tree; owned and forbidden paths, exact
@@ -291,7 +283,7 @@ Planning would need to change, as a proposal only.
    the registry for repository titles. Zero matches or several: stop and
    surface it to the Director rather than guessing.
 3. Send the header and one paragraph.
-4. Append the ledger line with the tool result and `message_id`.
+4. Note the tool result: `delivered`, `queued`, or the error text.
 5. `queued` is normal — do not resend. Surface an error to the Director after
    one retry. No silent retry loop.
 6. Do not assume the receiver has started. State is known from replies.
@@ -318,8 +310,7 @@ Planning would need to change, as a proposal only.
    whatever the rulebook said at that commit, and refusing to move the base —
    which is correct — is what creates the exposure.
 8. Write the terminal packet outside the repository, self-verify, and send its
-   path and digest. Do not append a ledger; the repository has one and Planning
-   writes it.
+   path and digest.
 
 ## Verifying a terminal packet
 
@@ -330,9 +321,9 @@ message itself:
 2. `git show --stat`, and recompute the digest of each changed path.
 3. Re-run each required check, or verify the log's digest against the packet
    and read the log.
-4. Append `accepted` or `rejected` to the ledger, and commit the terminal
-   packet in the same commit. A rejection becomes a new `ASSIGNMENT` naming the
-   specific defect — never an edit by Planning.
+4. Record `accepted` or `rejected` in the commit that lands the work, and
+   commit the terminal packet in that same commit. A rejection becomes a new
+   `ASSIGNMENT` naming the specific defect — never an edit by Planning.
 
 What happens after acceptance — merging, pushing, deploying — is change
 discipline, not coordination.
@@ -417,7 +408,7 @@ can move a session from outside, and the session itself needs no replacement.
 This is the answer to almost everything Thread Refresh was reached for.
 
 The `REFRESH` message type stays. When the Director does replace a session, the
-successor announces its new id and title once, so the ledgers connect.
+successor announces its new id and title once.
 
 ## Merging
 
@@ -517,15 +508,13 @@ once into results alongside claims that are true now.
 Fix dangling links when you delete. A prose mention that something was
 retired is fine; a link to a file that no longer exists is not.
 
-### Packets and ledgers are not pruned
+### Sent packets are not pruned
 
-A plan doc is deleted once distilled. A **sent packet is not** — a ledger cites
-it by SHA-256, so deleting one leaves a ledger line pointing at nothing, and
-editing one to tidy a path it mentions invalidates the digest that proves what
-was sent. Correction is a new message that supersedes the old, chained by
-`in_reply_to`; the superseded file stays exactly as it was. Ledgers are
-append-only: a line is never rewritten, including to fix it — a later line
-corrects an earlier one.
+A plan doc is deleted once distilled. A **sent packet is not** — the message
+that pointed at it carries its digest, so editing one to tidy a path it
+mentions invalidates the proof of what was sent. Correction is a new message
+that supersedes the old, chained by `in_reply_to`; the superseded file stays
+exactly as it was.
 
 ## Databases
 
