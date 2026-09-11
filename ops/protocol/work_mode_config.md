@@ -129,29 +129,39 @@ or two lines from where you looked. A listing you capped at four has told you
 about the cap. Before reporting an absence, change the query and look again.
 
 **A check that cannot fail is not evidence.** That query is the narrow case;
-this is the class. Some checks return the same answer whatever is true:
-`grep … | sed … && echo FOUND` always prints FOUND, because a pipeline's exit
-status is the last command's and `sed` returns zero whatever it read. A digest
-you supplied and got back matches by construction — it tells you the file has
-not changed since you hashed it, not that it is the file the sender meant.
-Neither was built so it could fail, so neither can return the answer you want.
+this is the class. **The test is what result would have contradicted it** — if
+nothing could have, you have a statement rather than a measurement, and a check
+with nothing to disagree with is unfalsifiable rather than correct. Two
+instances: `grep … | sed … && echo FOUND` always prints FOUND, because a
+pipeline's exit status is the last command's and `sed` returns zero whatever it
+read; and a digest you supplied and got back matches by construction, telling
+you the file has not changed since you hashed it rather than that it is the
+file the sender meant. Neither was built so it could come out the other way.
+Where a constructed check does contradict a passing suite, suspect the check.
 
-**The test is what result would have contradicted it.** If nothing could have,
-you have a statement rather than a measurement. A check with nothing to
-disagree with is unfalsifiable, not correct — and where one does contradict a
-passing suite, suspect the check.
-
-**A reported check also displaces the evidence beside it.** A script printed
-`applies cleanly` on the same screen as `error: patch does not apply`, and
-`passwordless sudo available` directly beneath `sudo: a password is required`.
-The true answer was one line up both times. What did the damage was not the
-wrong check but the confident summary of it, because the summary is what gets
-read.
-
-**So a digest confirms stability and a description confirms identity.** Compute
+**A digest confirms stability and a description confirms identity.** Compute
 the digest from your own copy, and read the sender's description of what
-changed against the diff. Only the pair is worth anything, and on the rounds
-where it failed it was always the description half that was short.
+changed against the diff. Only the pair is worth anything: one repository
+caught a real mismatch on the digest alone, where the description was accurate
+and could not have caught it, and two caught defects on the description alone,
+where the digests matched cleanly. Neither half has a better record than the
+other.
+
+**A summary displaces the evidence it stands on.** A script printed `applies
+cleanly` on the same screen as `error: patch does not apply`, and `passwordless
+sudo available` directly beneath `sudo: a password is required`. The true
+answer was one line up both times. This is not that summaries are wrong — it is
+that they are read last and remembered first, so a confident one survives the
+output contradicting it. **A correct check has the same property:** `all 58
+assets resolved 200` displaces the 58 lines above it whether or not it could
+have failed.
+
+It goes one step further where the reader is a person: a reported check
+displaces the evidence beside it, and a reported conclusion displaces the
+check. *Verified three ways*, where the three were one query run three times,
+reaches a decision intact because nothing in the sentence shows the difference.
+Print the value you computed beside the value you expected, rather than
+`match`.
 
 Phases in a plan doc are organization, not gates. An accepted plan is accepted
 whole.
