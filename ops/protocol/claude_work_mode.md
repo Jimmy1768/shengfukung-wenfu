@@ -11,11 +11,12 @@ Change discipline — branching, merging, committing, promotion, documents — i
 not here. That is work a single session would need alone, and where it lives is
 not settled.
 
-**A machine-checked invariant outranks this file.** Where a repository's
-context file cites a machine-checked invariants file — a `*_product_safety.yml`,
-say — those invariants bind here exactly as they bind any other lane. A failing
-test is not advisory. Where this file appears to disagree with one, the
-invariant wins, and the disagreement is worth reporting.
+**A machine-checked invariant outranks this file.** Where a repository names a
+machine-checked invariants file — a `*_product_safety.yml`, a boundary ratchet,
+whatever it keeps — those invariants bind here exactly as they bind any other
+lane. A failing test is not advisory. Where this file appears to disagree with
+one, the invariant wins, and the disagreement is worth reporting. It does not
+matter which file points at it; what binds is the check, not the pointer.
 
 ## 1. Lanes
 
@@ -77,6 +78,17 @@ not the recipient to relay rather than act.
 **3.4** `queued` is normal. Do not resend. Surface an error after one retry.
 
 **3.5** Do not assume the receiver has started. State is known from replies.
+
+**3.6** Two address spaces exist and they do not share names. `list_sessions`
+returns canonical titles and session ids. The peer list returns socket names
+like `anthropic-93` or `operator-kit-61`, which resolve in no `list_sessions`
+lookup and are not lane titles.
+
+**3.7** Identify a sender by the `from_session_id` its message carried,
+resolved through `list_sessions` — never by the name the peer list shows, and
+never by title alone. Reply to that session id. A legitimate sender is
+unresolvable by socket name, so refusing one on that ground is a false refusal:
+it has already happened between a Planning session and its own Control.
 
 ## 4. Message types
 

@@ -11,14 +11,24 @@ What applies to one repository and not another is in `repo_context.md`.
 **Commit with an explicit pathspec. Never `git add -A`.** `git commit` takes
 the whole index rather than the paths you had in mind, so a file staged by
 someone else rides into your commit under a message describing something else.
-Check the index before committing.
+Check with `git diff --cached` before committing that the index holds your
+paths and nothing else.
 
 Commit your own work. Do not commit someone else's, and do not wait on them to
 commit yours.
 
-**When committing a rename, name both paths.** `git mv` stages a deletion and
-an addition. A pathspec naming only the new path commits the addition and
-leaves the deletion staged, so both files sit in `HEAD` together.
+**The pathspec has two holes, and both appear only when a file enters or leaves
+the tree rather than changing in place.**
+
+- **A rename needs both paths named.** `git mv` stages a deletion and an
+  addition; naming only the new path commits the addition and leaves the
+  deletion staged, so both files sit in `HEAD` together.
+- **A new file needs `git add <path>` first.** `git commit <pathspec>` cannot
+  name a file git does not know about — it fails with *pathspec did not match
+  any file(s) known to git*.
+
+Hitting either under time pressure is what makes `git add -A` look like the way
+out, which is the thing this rule exists to prevent.
 
 ## Branches
 
@@ -99,11 +109,24 @@ a conclusion I reached moments ago?
 **A finding that implies work elsewhere is reported, never acted on.** The tell
 is that nobody asked for the second thing.
 
+**Not yours to touch and safe to leave are two different findings.** Declining
+to act settles the first and says nothing about the second, but a report that
+gives only the decline reads as though it settled both. When you leave
+something alone, say what it is as well as why you left it — and if you have
+not looked closely enough to say, report that instead of implying it is
+ordinary.
+
 **State read at two moments is not one observation.** Reporting a commit read
 at the start of a turn alongside a digest read at the end presents as fact
 something that was never true at either moment. When you report what a
 repository or another session holds, read it in one pass, and say when you read
 it.
+
+**A negative result from a query you constructed is evidence about the query
+first.** A grep that returns nothing has told you the pattern did not match, not
+that the thing is absent — it may be wrapped across a line, spelled differently,
+or two lines from where you looked. A listing you capped at four has told you
+about the cap. Before reporting an absence, change the query and look again.
 
 Phases in a plan doc are organization, not gates. An accepted plan is accepted
 whole.
