@@ -4,7 +4,7 @@ Business/product decision, not a technical or authority boundary — this file
 exists so a future session doesn't regress and propose acquiring
 `templemate.com` (or similar) as a to-do item. The technical domain/tenancy
 architecture this decision plugs into lives in
-`ops/protocol/shengfukung_wenfu_context.md`'s "Domain And Tenancy
+`ops/protocol/repo_context.md`'s "Domain And Tenancy
 Architecture" section; this file explains *why*, that file states *what*.
 
 ## The decision (2026-08-28)

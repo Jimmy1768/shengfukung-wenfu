@@ -108,7 +108,7 @@ deleted. These were decided 2026-06-13 and recorded nowhere else.
 
 - **ECPay is the default online payment method for Taiwan temples.** Provider
   changes in production stay gated by the authorization boundary in
-  `ops/protocol/shengfukung_wenfu_context.md`.
+  `ops/protocol/repo_context.md`.
 - **Cash is an admin-attested receipt event, not an externally controlled
   one.** The system trusts the admin pressing *Received* and audits it:
   admin identity and timestamp are preserved. Nothing outside the product

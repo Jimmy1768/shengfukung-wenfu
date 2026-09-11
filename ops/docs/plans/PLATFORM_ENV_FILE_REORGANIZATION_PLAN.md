@@ -28,7 +28,7 @@ on-disk directory), not the single-file change originally scoped.
 The Rails backend's production env file is named `shengfukung-wenfu-env`
 — scoped to look like it belongs to one temple tenant, when it's
 actually the centralized platform config serving every temple through
-this backend (per `ops/protocol/shengfukung_wenfu_context.md`'s
+this backend (per `ops/protocol/repo_context.md`'s
 "Domain And Tenancy Architecture" section). Still worth fixing, but as
 its own deliberately-scoped project-slug migration, not squeezed in
 alongside an unrelated OAuth fix.
