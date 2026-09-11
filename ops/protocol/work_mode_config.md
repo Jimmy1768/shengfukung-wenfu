@@ -116,14 +116,6 @@ something alone, say what it is as well as why you left it — and if you have
 not looked closely enough to say, report that instead of implying it is
 ordinary.
 
-**A digest that came back to you proves stability, not identity.** If the
-number you are checking against is the number you supplied, a match tells you
-the file has not changed since you hashed it — not that it is the file the
-sender meant. A wrong version would match just as cleanly. Compute it from your
-own copy, and corroborate identity separately: a description of what changed,
-read against the diff. The digest confirms one, the description the other, and
-only the pair is worth anything.
-
 **State read at two moments is not one observation.** Reporting a commit read
 at the start of a turn alongside a digest read at the end presents as fact
 something that was never true at either moment. When you report what a
@@ -136,13 +128,30 @@ that the thing is absent — it may be wrapped across a line, spelled differentl
 or two lines from where you looked. A listing you capped at four has told you
 about the cap. Before reporting an absence, change the query and look again.
 
-**A positive result is evidence about the query too, and it is the worse
-direction.** A false absence sends you looking again; a false presence stops
-you and has you report a problem that does not exist. `grep … | sed … && echo
-FOUND` always prints FOUND, because a pipeline's exit status is the last
-command's and `sed` returns zero whatever it read — a test built so it could
-only pass. Where a constructed check contradicts a passing suite, suspect the
-check.
+**A check that cannot fail is not evidence.** That query is the narrow case;
+this is the class. Some checks return the same answer whatever is true:
+`grep … | sed … && echo FOUND` always prints FOUND, because a pipeline's exit
+status is the last command's and `sed` returns zero whatever it read. A digest
+you supplied and got back matches by construction — it tells you the file has
+not changed since you hashed it, not that it is the file the sender meant.
+Neither was built so it could fail, so neither can return the answer you want.
+
+**The test is what result would have contradicted it.** If nothing could have,
+you have a statement rather than a measurement. A check with nothing to
+disagree with is unfalsifiable, not correct — and where one does contradict a
+passing suite, suspect the check.
+
+**A reported check also displaces the evidence beside it.** A script printed
+`applies cleanly` on the same screen as `error: patch does not apply`, and
+`passwordless sudo available` directly beneath `sudo: a password is required`.
+The true answer was one line up both times. What did the damage was not the
+wrong check but the confident summary of it, because the summary is what gets
+read.
+
+**So a digest confirms stability and a description confirms identity.** Compute
+the digest from your own copy, and read the sender's description of what
+changed against the diff. Only the pair is worth anything, and on the rounds
+where it failed it was always the description half that was short.
 
 Phases in a plan doc are organization, not gates. An accepted plan is accepted
 whole.
