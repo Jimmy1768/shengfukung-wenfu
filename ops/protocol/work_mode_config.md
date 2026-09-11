@@ -158,7 +158,10 @@ have failed.
 
 It goes one step further where the reader is a person: a reported check
 displaces the evidence beside it, and a reported conclusion displaces the
-check.
+check. *Verified three ways*, where the three were one query run three
+times, reaches a decision intact because nothing in the sentence shows the
+difference. Print the value you computed beside the value you expected, rather
+than `match`.
 
 **A claim gains confidence as it is relayed, and nothing in the relay marks
 it.** Each retelling drops the hedge, the sample and the attribution, and each
@@ -177,10 +180,7 @@ anything.
 So: say what a claim rests on when you pass it on, and how far it reaches. A
 count from one repository is a count from one repository. And when a claim
 arrives without that, ask for it rather than relaying it onward — the sender
-may be the only one who knows, and may have stopped knowing. *Verified three ways*, where the three were one query run three times,
-reaches a decision intact because nothing in the sentence shows the difference.
-Print the value you computed beside the value you expected, rather than
-`match`.
+may be the only one who knows, and may have stopped knowing.
 
 Phases in a plan doc are organization, not gates. An accepted plan is accepted
 whole.
