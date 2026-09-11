@@ -247,10 +247,15 @@ enforced in auto mode. Commands matching no rule are not.
 of `allow` prevents nothing in a lane that does not prompt.
 
 **10.6** Two settings surfaces apply at once: the profile in the session's own
-directory, and an untracked `settings.local.json` at the git toplevel, where
-"always allow" decisions persist as exact command strings. The second is
-gitignored and unreviewed, and it accumulates `git -C` forms that 10.2 says
-match no deny rule. Read both before concluding what a lane may do.
+directory, and an untracked `settings.local.json` at the git toplevel. The
+second is gitignored and unreviewed, and it accumulates **exact command
+strings** rather than rules — specific paths, specific commit SHAs, specific
+format arguments — including `git -C` forms that 10.2 says match no deny rule.
+Read both before concluding what a lane may do.
+
+Something writes those entries when a command is approved. What does it, and
+under which mode, has not been established: a session sees the file, never the
+interface. Do not describe that mechanism from inside one.
 
 **10.7** Where several sessions share one directory they share both files.
 Per-lane profiles do not exist there.
@@ -265,3 +270,10 @@ move a session from outside.
 
 **10.10** Ephemeral implementers default to Sonnet. Escalate a specific failing
 task, not pre-emptively.
+
+**10.11** A `deny` beats a more general `allow` for the same command, and
+refuses outright rather than falling through to a prompt — so a denied action
+never arrives as something a lane could approve. Observed 2026-09-11 in a lane
+allowing `Bash(git push:*)` and denying `Bash(git push -f:*)`: refused before
+the command reached git. The reverse ordering, a specific `allow` beneath a
+general `deny`, is a different comparison and has not been tested.
