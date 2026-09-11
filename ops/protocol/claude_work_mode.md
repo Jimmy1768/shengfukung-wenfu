@@ -63,6 +63,15 @@ did not write it.
 sent ahead of the copy describes a file the receiver does not have yet, and one
 sent before a later revision describes a file that has already been replaced.
 
+**2.8a** Send a digest for **every** file you copied, to **every** repository
+you copied into — including the ones you are asking nothing from, and including
+files you did not mention. A receiver holding an unannounced modification
+cannot tell in flight from forgotten, and a lane deciding for itself which
+unverified files are probably fine is correct only by accident. Describe what
+each file gained, not only the part you had in mind: the count that drifts is
+yours, and the receiver has no way to check a description against a message
+that never arrived.
+
 ## 3. Addressing
 
 **3.1** Resolve the target by canonical title and cwd through `list_sessions`,
@@ -229,6 +238,14 @@ Recovery's own work product, not an archived message.
 Verified behaviour of the harness. Not rules — what you need in order to read a
 permission file correctly, or to understand why one did not fire.
 
+**Nothing enters this section without a vantage point.** Before writing
+anything here, ask what position the observation would have required and
+whether a session occupies it. A session sees files, tool results and its own
+context; it never sees the interface, the mode picker, or what a click does.
+A claim about those has no target to check, so following it reveals nothing —
+and the heading above it supplies a confidence the sentence has not earned.
+That is worse than a wrong pointer, which at least announces itself.
+
 **10.1** `Bash(<prefix>:*)` matches on leading tokens, token-bounded:
 `git merge:*` does not match `git merge-base`.
 
@@ -268,8 +285,11 @@ it silently disables any other.
 paths and project settings together. It takes no session id, so nothing can
 move a session from outside.
 
-**10.10** Ephemeral implementers default to Sonnet. Escalate a specific failing
-task, not pre-emptively.
+**10.10** *Policy, not harness behaviour — the Director's, and a lane may
+reason against it where the work argues otherwise.* Ephemeral implementers
+default to Sonnet, and escalation is for a specific failing task rather than
+pre-emptive. A Control answering "implementer: none" because the work is
+reading and grepping is exercising that judgement, not breaching a rule.
 
 **10.11** A `deny` beats a more general `allow` for the same command, and
 refuses outright rather than falling through to a prompt — so a denied action

@@ -116,6 +116,14 @@ something alone, say what it is as well as why you left it — and if you have
 not looked closely enough to say, report that instead of implying it is
 ordinary.
 
+**A digest that came back to you proves stability, not identity.** If the
+number you are checking against is the number you supplied, a match tells you
+the file has not changed since you hashed it — not that it is the file the
+sender meant. A wrong version would match just as cleanly. Compute it from your
+own copy, and corroborate identity separately: a description of what changed,
+read against the diff. The digest confirms one, the description the other, and
+only the pair is worth anything.
+
 **State read at two moments is not one observation.** Reporting a commit read
 at the start of a turn alongside a digest read at the end presents as fact
 something that was never true at either moment. When you report what a
@@ -127,6 +135,14 @@ first.** A grep that returns nothing has told you the pattern did not match, not
 that the thing is absent — it may be wrapped across a line, spelled differently,
 or two lines from where you looked. A listing you capped at four has told you
 about the cap. Before reporting an absence, change the query and look again.
+
+**A positive result is evidence about the query too, and it is the worse
+direction.** A false absence sends you looking again; a false presence stops
+you and has you report a problem that does not exist. `grep … | sed … && echo
+FOUND` always prints FOUND, because a pipeline's exit status is the last
+command's and `sed` returns zero whatever it read — a test built so it could
+only pass. Where a constructed check contradicts a passing suite, suspect the
+check.
 
 Phases in a plan doc are organization, not gates. An accepted plan is accepted
 whole.
