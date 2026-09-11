@@ -11,6 +11,12 @@ Change discipline — branching, merging, committing, promotion, documents — i
 not here. That is work a single session would need alone, and where it lives is
 not settled.
 
+**A machine-checked invariant outranks this file.** Where a repository's
+context file cites a machine-checked invariants file — a `*_product_safety.yml`,
+say — those invariants bind here exactly as they bind any other lane. A failing
+test is not advisory. Where this file appears to disagree with one, the
+invariant wins, and the disagreement is worth reporting.
+
 ## 1. Lanes
 
 | lane | does | does not |
@@ -51,6 +57,10 @@ is stated in `~/Command/registry.md` and inferred from nothing else.
 **2.7** A file written into a repository by a workspace lane is committed by
 that repository's Planning. The writer cannot commit there; the lane that can
 did not write it.
+
+**2.8** Put the file in place before sending its digest, never after. A digest
+sent ahead of the copy describes a file the receiver does not have yet, and one
+sent before a later revision describes a file that has already been replaced.
 
 ## 3. Addressing
 

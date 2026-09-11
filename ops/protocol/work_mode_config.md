@@ -16,6 +16,10 @@ Check the index before committing.
 Commit your own work. Do not commit someone else's, and do not wait on them to
 commit yours.
 
+**When committing a rename, name both paths.** `git mv` stages a deletion and
+an addition. A pathspec naming only the new path commits the addition and
+leaves the deletion staged, so both files sit in `HEAD` together.
+
 ## Branches
 
 Each task gets its own branch, cut from `main` at a named commit:
@@ -59,6 +63,11 @@ failure came from.
 A normal task does not touch production. If a task requires production access,
 it is different work: say so and stop.
 
+**Production is remote.** A production branch is checked out on its server, not
+on this machine, and nothing is served locally. A local checkout sitting on a
+production branch is serving nothing, so moving it costs nothing — the live
+deployment is untouched either way.
+
 ## Before editing a contract-tested file
 
 Some files are pinned by tests — an exact phrase asserted, or a digest in a
@@ -72,6 +81,11 @@ Not just test directories. Digest pins live in manifests outside the test tree,
 so a test-only search finds the spec and misses the manifest. Regenerate
 digests last.
 
+**A file that is copied into several repositories is pinned from all of them.**
+Searching the repository you are standing in finds nothing, because the
+assertion lives in one of the others. Search every repository that holds a copy
+before editing one.
+
 ## Scope
 
 Autonomy is granted for a **kind of work**, not a list of permitted actions.
@@ -84,6 +98,12 @@ a conclusion I reached moments ago?
 
 **A finding that implies work elsewhere is reported, never acted on.** The tell
 is that nobody asked for the second thing.
+
+**State read at two moments is not one observation.** Reporting a commit read
+at the start of a turn alongside a digest read at the end presents as fact
+something that was never true at either moment. When you report what a
+repository or another session holds, read it in one pass, and say when you read
+it.
 
 Phases in a plan doc are organization, not gates. An accepted plan is accepted
 whole.
