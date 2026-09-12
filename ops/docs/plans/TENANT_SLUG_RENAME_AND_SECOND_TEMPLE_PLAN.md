@@ -155,6 +155,43 @@ one `vue_dir` line, one reload, in a window where nginx is already being
 touched. Doing it on its own means a production nginx edit for no functional
 gain.
 
+## Deferred — renaming the auth tenant to `templemate`
+
+Not this plan, not this repository, and worth doing. Raised by the Director
+2026-09-12: "since this is just a slug, would it be less confusing, if we used
+another value? like 'templemate'."
+
+It would be less confusing, for the reason this document needed three sections
+to explain: `shengfukung` names an app after that app's first customer, and the
+Director plans many more apps on the same auth service. `templemate` names what
+the value actually identifies.
+
+Already recorded, and not a new idea.
+`ops/docs/plans/CENTRAL_AUTH_TENANT_REGISTRATION_PLAN.md:15-18` logged it on
+2026-08-19 as "cleaner/more robust tenant organization in the central auth
+service itself, since the Director plans many more apps to register there over
+time. This is `sourcegrid-labs`'s own system — out of this repo's authority to
+change directly."
+
+What moves with it, so nobody mistakes it for a string edit:
+
+- the row in `auth_tenants`, in the central auth service;
+- its entries in `auth_tenant_redirect_uris`, re-registered exactly — including
+  the native `templemate://oauth/complete` and **the two web OAuth callbacks**,
+  which sit on this same tenant, so web and native sign-in move together;
+- possibly the machine credentials tied to the tenant;
+- then `AUTH_TENANT_SLUG` in every `/etc/default/<slug>-env` on the droplet.
+
+Sequencing belongs to SourceGrid Planning. This repository has never mutated
+that system and does not start here.
+
+**The cheapest moment is the earliest one, and it is shrinking.** Today one env
+file carries the value. Each temple onboarded adds another, and each is a `sudo`
+edit on the droplet: one file now, three after the demo rename and the real
+temple. If it is done, doing it while `/etc/default/` is already open for the
+rename saves a second trip — different lines in the same file, and one test
+covers both: sign in with Google on TestFlight.
+
 ## Not this plan
 
 Renaming the repository to `templemate-core`. That would drag
