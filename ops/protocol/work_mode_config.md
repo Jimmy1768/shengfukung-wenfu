@@ -30,6 +30,21 @@ the tree rather than changing in place.**
 Hitting either under time pressure is what makes `git add -A` look like the way
 out, which is the thing this rule exists to prevent.
 
+## The work cycle
+
+A Control implements on its own branch, in its own worktree. It merges that
+branch into `main`. `main` is pushed to the droplet and tested on staging. Once
+staging passes, the work is promoted to the production branch.
+
+That is the cycle in every repository. Only the names differ — the production
+branch is `release/current` in most, `dispatch` for apprelay's runtime line,
+`release-x.x.x` where a shipped version matters — and each repository's
+`repo_context.md` names its own.
+
+Everything below is detail on the steps. Where a repository's layout or
+permissions stop a step happening, the layout or the permissions are wrong, not
+the step.
+
 ## Branches
 
 Each task gets its own branch, cut from `main` at a named commit:
@@ -181,6 +196,42 @@ So: say what a claim rests on when you pass it on, and how far it reaches. A
 count from one repository is a count from one repository. And when a claim
 arrives without that, ask for it rather than relaying it onward — the sender
 may be the only one who knows, and may have stopped knowing.
+
+**Sending the instrument instead of the number does not fix this. An instrument
+is a claim that takes longer to disagree with.** It removes the reteller's step
+and does nothing about the sender's: a probe that cannot see part of what it
+counts produces a wrong number with more ceremony than a wrong number usually
+gets.
+
+**When two derivations disagree, run the other party's instrument on your own
+inputs.** An independent derivation tells you the numbers differ. It does not
+tell you which of you is wrong, and the likeliest explanations — different
+inputs, or a defective instrument — point opposite ways. Reproducing the other
+party's figure from your own data isolates the instrument; failing to
+reproduce it isolates the inputs.
+
+A lane did exactly this tonight: told to reproduce a count of 30 before acting,
+it derived 32 independently, then ran the sender's probe against its own tree
+and reproduced 30 exactly. That third step is what established the probe was
+blind to nineteen entries rather than the trees differing. Two runs would have
+left both explanations open.
+
+This applies to tools as much as to counts. `awk` on this machine measures
+bytes; a line holding three em-dashes reads as 81 with `awk` and 79 with a
+character-aware reader. Two lanes reported a file as over-width and both were
+measuring the counter. The second implementation was worth more than the first
+because it could disagree with it.
+
+**An instrument can answer a question next to the one you asked, and the
+output looks correct either way.** `awk length()` returns bytes where width was
+wanted. A diff's `@@ -a,b +c,d @@` returns the hunk's span including its context
+lines where the added range was wanted: a lane read 197 from it and the
+additions began at 200, having read the diff correctly and the field wrongly.
+Neither tool is defective and neither number reads as wrong, because each is
+right for the question its tool was built to answer. So state what the
+instrument measures in the same sentence as what you wanted measured. Where the
+two differ the closing flag usually exists — `-U0` on the diff, a
+character-aware reader for width.
 
 Phases in a plan doc are organization, not gates. An accepted plan is accepted
 whole.
