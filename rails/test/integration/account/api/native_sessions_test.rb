@@ -181,6 +181,26 @@ class NativeAccountSessionsTest < ActionDispatch::IntegrationTest
     assert_equal "tenant_required", response.parsed_body.fetch("code")
   end
 
+  # The contract mobile/app/tenant/scanner.js depends on, asserted here so the
+  # two surfaces cannot drift apart silently.
+  #
+  # The scanner is not authenticated -- it runs before a temple is loaded and
+  # is handed no session -- so it has to tell "this slug is a temple" from
+  # "this slug is nothing" without a token. Temple resolution runs before
+  # authentication, which is exactly what makes that possible: an unknown slug
+  # is refused at the first filter, a real one gets as far as the second.
+  test "an unauthenticated native call distinguishes a real temple from an unknown one" do
+    get "/api/v1/account/native/bootstrap", params: { temple_slug: @temple.slug }
+    assert_response :unauthorized
+    assert_equal "session_invalid", response.parsed_body.fetch("code"),
+      "a real temple must get past resolution and fail on the token instead"
+
+    get "/api/v1/account/native/bootstrap", params: { temple_slug: "no-such-temple" }
+    assert_response :not_found
+    assert_equal "tenant_not_found", response.parsed_body.fetch("code"),
+      "an unknown slug must be refused before authentication is even considered"
+  end
+
   private
 
   def native_login

@@ -82,6 +82,19 @@ test('a scan loads the temple the code names, and only once the server confirms 
   assert.equal(unknown.state, 'binding_failed');
   assert.equal(unknown.error, 'temple_validation_failed');
 
+  // The real release path: the scanner is not authenticated, so the backend
+  // confirms the temple exists and declines to say more. That is a load.
+  const unauthenticated = await scanCameraPayload({ payload: linkFor('second-temple'), config, transport: async () => ({ ok: false, status: 401, body: { code: 'session_invalid' } }) });
+  assert.deepEqual(unauthenticated, { state: 'bound', tenant: { id: 'second-temple', name: '' }, error: null, source: 'qr' },
+    'a confirmed temple loads without a name; the app shows its own until one arrives');
+
+  // Only those two answers mean anything. Anything else is refused rather than
+  // read as confirmation.
+  for (const bad of [{ ok: false, status: 500, body: {} }, { ok: false, status: 503, body: { code: 'native_oauth_unavailable' } }]) {
+    const result = await scanCameraPayload({ payload: linkFor('second-temple'), config, transport: async () => bad });
+    assert.equal(result.state, 'binding_failed', `status ${bad.status} must not count as confirmation`);
+  }
+
   const unreachable = await scanCameraPayload({ payload: linkFor('shengfukung-wenfu'), config, transport: async () => { throw new Error('offline'); } });
   assert.equal(unreachable.state, 'binding_failed');
 });
@@ -107,7 +120,11 @@ test('release bindings persist only server-derived trusted data, for whichever t
 
   // Still only a scan, and still only with a server-supplied name.
   await assert.rejects(bindings.save({ ...binding, source: 'link' }), 'only a QR scan may load a temple');
-  await assert.rejects(bindings.save({ ...binding, tenant: { id: 'shengfukung-wenfu', name: '' } }), 'a nameless temple is not server-derived');
+  await assert.rejects(bindings.save({ ...binding, tenant: { id: '', name: 'No Identity' } }), 'a temple with no slug is not a temple');
+
+  const nameless = { state: 'bound', tenant: { id: 'third-temple', name: '' }, error: null, source: 'qr' };
+  await bindings.save(nameless);
+  assert.deepEqual(await bindings.load(), nameless, 'a confirmed temple persists before its name is known');
 
   values.set(key, JSON.stringify({ ...binding, source: 'link' }));
   assert.equal(await bindings.load(), null, 'untrusted stored data is discarded');

@@ -12,7 +12,7 @@ const refused = error => ({ state: 'binding_failed', tenant: null, error, source
 // One path. The code must come from the platform origin, and the temple it
 // names must be confirmed by the server before anything loads. The code's own
 // claim never wins: it supplies a slug, and the server decides whether that
-// slug is a temple and what it is called.
+// slug is a temple at all.
 const scanCameraPayload = async ({ payload, config, transport }) => {
   const parsed = parseProductionConnectionLink(payload);
   if (!parsed.ok) return refused(parsed.reason);
@@ -22,19 +22,35 @@ const scanCameraPayload = async ({ payload, config, transport }) => {
       url: `${config.apiBaseUrl}${verificationPath}?temple_slug=${encodeURIComponent(parsed.slug)}`,
       headers: { Accept: 'application/json' }
     });
-    // A slug the server does not recognise is refused outright, and this is the
-    // only signal that decides it. tenant_not_found is returned before any
-    // authentication runs, so it is reachable whatever the session state.
-    if (response?.status === 404 || response?.body?.code === 'tenant_not_found') return refused('temple_validation_failed');
+    const code = response?.body?.code;
+    // The temple is resolved before the request is authenticated, so the answer
+    // to "is this slug a temple?" arrives whether or not a token was sent:
+    // tenant_not_found when it is not, session_invalid when it is and the call
+    // simply carried no credentials. Those are the only two outcomes that mean
+    // anything here, so anything else -- a 500, an unparseable body, an
+    // unexpected code -- is refused rather than read as confirmation.
+    if (response?.status === 404 || code === 'tenant_not_found') return refused('temple_validation_failed');
+
     const temple = response?.body?.temple;
     const id = String(temple?.slug || '').trim();
     const name = String(temple?.name || '').trim();
-    // The answer must be about the temple that was asked for. A server replying
-    // with a different temple is refused rather than followed -- that mismatch
-    // is precisely what went unnoticed when the client trusted the origin to
-    // describe itself.
-    if (!response?.ok || !id || !name || id !== parsed.slug) return refused('temple_validation_failed');
-    return { state: 'bound', tenant: { id, name }, error: null, source: 'qr' };
+
+    if (response?.ok) {
+      // An authenticated caller gets the temple itself. The answer must be
+      // about the temple that was asked for; a server describing a different
+      // one is refused rather than followed, which is the failure the old
+      // code could not see when it trusted the origin to describe itself.
+      if (!id || id !== parsed.slug) return refused('temple_validation_failed');
+      return { state: 'bound', tenant: { id, name }, error: null, source: 'qr' };
+    }
+
+    // Confirmed, unauthenticated. There is no temple name in this answer and
+    // none is needed: a temple that has not loaded yet has nothing to display,
+    // and the app shows its own name until one does.
+    if (response?.status === 401 || code === 'session_invalid') {
+      return { state: 'bound', tenant: { id: parsed.slug, name: '' }, error: null, source: 'qr' };
+    }
+    return refused('temple_validation_failed');
   } catch (_) { return refused('temple_validation_failed'); }
 };
 

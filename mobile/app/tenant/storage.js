@@ -15,7 +15,12 @@ const normalizedBinding = (binding, config) => {
   // compare against, and that was the mechanism that pinned a build to a single
   // temple. What makes a stored binding trustworthy is that it was produced by
   // a scan the server confirmed (source 'qr'), not that it matches a constant.
-  if (!id || !name) return null;
+  //
+  // The slug is the identity and is required. The display name is not: the
+  // server confirms a slug without being asked who is calling, and does not
+  // hand out a name to an unauthenticated caller. A temple with no name yet is
+  // a temple that has not loaded; the app shows its own name until it has.
+  if (!id) return null;
   return { state: 'bound', tenant: { id, name }, error: null, source: 'qr' };
 };
 
