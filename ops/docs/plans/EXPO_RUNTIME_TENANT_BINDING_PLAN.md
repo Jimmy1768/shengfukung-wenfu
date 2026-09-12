@@ -19,6 +19,17 @@ requirement.
   and load it. keep it simple."
 - **D7** "verify the slug against backend, use path segment"
 
+- **D8** "no, signing does not require a temple. we designed 2 'gates' on
+  purpose. signing in with no temple, only shows the scanner page."
+- **D9** "not only first-time patron will be temple-less. a user can unload a
+  temple at anytime. then scan another temple." Temple-less is a steady state.
+- **D10** "Oauth vs email is the wrong framing. We write the app so it can log
+  in. This is not hard. if there's no temple slug, it goes to the scanner
+  screen. don't overly complicate it. we're massively simplifying the app. it's
+  the easier direction."
+- **D11** "8-11, what i wanted was created. there's a few defects. dummy vs real
+  client, and slug became hardcoded. we need to fix these 2 defects."
+
 Withdrawn by the Director: any stale-binding behaviour. "a temple is loaded in,
 and is saved in async storage. it persists after reload of the app, and sign
 out as well." Already solved; not in scope.
@@ -77,14 +88,42 @@ would reach BootFailure before a scanner is shown.
   `/templemate/connect/<slug>`, returns the slug (D6, D7).
 - **`ConnectionLink`** emits the new payload, taking the temple it already has
   (D6).
-- **The scan verifies the slug against the backend before loading** (D7). The
-  app is signed in when the scanner appears (`App.js:218` gates on `signedIn`,
-  `:219` on the tenant), so an authenticated native call carrying
-  `temple_slug` verifies it: `native_base_controller.rb:33-37` resolves any
-  temple by slug and returns `tenant_not_found` 404. No backend change is
-  needed for verification.
+- **The scan verifies the slug against the backend before loading** (D7).
 - **Loaded, not bound** (D3). The word "bind" in the code is the code's, not
   the Director's; existing identifiers may keep it, new text should not.
+
+Added 2026-09-12, after the first attempt shipped a branch that could not sign
+in. All three are removals.
+
+- **Sign-in never touches a temple** (D8, D10). The session routes are already
+  temple-optional. OAuth is not: `native_oauth_flow.rb:26` passes
+  `temple_slug: @temple.slug` into the transaction and `:121` falls back to it
+  for `central_tenant_slug`, so a temple-less start raises `NoMethodError`
+  through a rescue list that does not cover it. OAuth credentials are
+  per-deployment ENV values — `AUTH_BASE_URL`, `AUTH_CLIENT_ID`,
+  `AUTH_CLIENT_SECRET`, and each provider's pair
+  (`app_constants/oauth.rb:30,47`)
+  — so nothing about signing in varies by temple. The temple comes out. This is
+  not a platform-tenant concept; `ENV["AUTH_TENANT_SLUG"]` already exists.
+- **Nothing temple-scoped runs without a temple** (D8). `loadBootstrap()` is
+  called unconditionally at `adapter.js:55` (`authenticate`, covering sign-in
+  and password reset), `:68` (`exchangeOAuth`), and `:88` (`restoreSession`,
+  which wipes the stored session before rethrowing). `loadCollections()` — six
+  temple-scoped requests — runs the same way from `completeSignIn`
+  (`App.js:158-171`) and startup (`App.js:119`). Bootstrap stays temple-required
+  on the server: every line of `native_bootstrap_controller.rb:11-14` is
+  temple-scoped, and `native_temple_delinquent?`
+  (`native_base_controller.rb:22`)
+  dereferences the temple unguarded.
+- **One code path, not two** (D11). `isReleaseConfig()` is the surviving half of
+  the dummy-client switch removed in `ae82ad6`, and it selects behaviour, not
+  wording: binding persistence exists only in release
+  (`tenant/storage.js:7,18`),
+  and the temple's identity comes from `boundTenant` (`App.js:91`) in
+  development but from storage in release. That fence is why criterion 2 fails —
+  the code that names a temple after loading it sits on the side a release build
+  never runs. Deleting the switch brings that behaviour to the one path, and
+  forces choosing one string from each `demo`/`...Release` pair in `copy.js`.
 
 ## 5. Not in scope
 
@@ -92,10 +131,18 @@ would reach BootFailure before a scanner is shown.
 - Any switchboard or multi-temple UI (D2).
 - Stale-temple handling (withdrawn — already solved).
 - Renaming the `shengfukung-wenfu` tenant — separate plan.
-- Whether this needs a native rebuild, and any AAB sequencing. Not determined
-  here; ask.
+- Whether this needs a native rebuild, and any AAB sequencing. Ask.
+- The rest of the `ae82ad6` vocabulary: `clientMode` in `app.config.js` and
+  `eas.json`, the `verify-*` scripts that assert it, unimported dummy-era
+  modules, and copy belonging to removed flows. Only what deleting
+  `isReleaseConfig` forces is in scope here.
+- **The token-refresh defect.** Nothing calls `adapter.refresh()`; the only
+  caller is a test. `JWT_ACCESS_TTL` defaults to 15 minutes and is set nowhere
+  in the repository, and a 401 clears retained state. A session cannot outlive
+  its access token. Reported to the Director 2026-09-12; it predates both
+  defects and affects production now. Not this assignment.
 
-## 6. Readiness scan — what already works, Observed 2026-09-12
+## 6. Readiness scan — Observed 2026-09-12
 
 Scanned before planning any work, because most of this exists. Build only what
 is missing; everything else is a regression guard.
@@ -103,62 +150,74 @@ is missing; everything else is a regression guard.
 | # | criterion | now | covered by | missing |
 | - | --- | --- | --- | --- |
 | 1 | no hardcoded slug | false | — | the four places in §2 |
-| 2 | release build starts | true | it is in production | must not break; §2 shows the naive removal throws |
-| 3 | scan loads that temple, backend-confirmed | half | `tenant-binding.test.js:29` | the QR carries no slug; the scan confirms the *configured* temple |
+| 2 | scan loads that temple, backend-confirmed | false | `tenant-binding.test.js:29` | the load itself — see below |
+| 3 | release build starts | true | it is in production | must not break |
 | 4 | non-platform origin refused | true, wrong value | `tenant-binding.test.js:13-17` | only the pinned origin changes |
 | 5 | unload → scanner → load another | true | `ui-refinement.test.js:95` | **nothing** |
+| 6 | temple-less sign-in reaches the scanner | false | — | §4, all three removals |
 
-**Criterion 5 is not work.** `App.js:193` clears stored state, `App.js:219`
-returns to `TenantSetupGate` when no temple is loaded, and a test already
-guards that only the explicit Unbind control forgets it. "A different temple"
-fails today solely because of the slug pin — a consequence of 1 and 3, not a
-separate feature. Do not build it.
+**Row 2 was recorded "half" on 2026-09-12 and was wrong.** The scan confirms a
+slug; it does not load a temple. `onCameraResult` (`App.js:228`) saves the
+binding and calls `setData(adapter.snapshot())` — the snapshot as it already
+was. No bootstrap, no collections. On `main` the compiled tenant hid this: both
+had already run at sign-in. Corrected after Recovery's ADVICE of 2026-09-12,
+verified here.
+
+**Criterion 5 is not work.** `App.js:193` clears stored state and `App.js:219`
+returns to the scanner. Do not build it.
 
 **Criterion 4 is nearly free.** `binding.js:13` already enforces exact origin,
-https only, no credentials, no fragment. Only the value it compares against
-moves. Two of the existing assertions already prove a foreign origin and plain
-`http` are refused.
-
-**Criterion 3 is the work**, and the existing test names the property that must
-survive: *"The QR code's claim about which temple it is never wins; the server
-does."* That stays true — the QR carries a slug, the backend confirms it, and a
-slug the backend rejects does not load. Same guarantee, new input.
+https only, no credentials, no fragment. Only the compared value moves.
 
 **`verify-release-interface.js:5` hard-asserts
 `TEMPLEMATE_PUBLIC_TENANT_SLUG === 'shengfukung-wenfu'`** for both lanes. It
-fails the moment the slug leaves `eas.json`, so it is part of the change rather
-than collateral.
+fails the moment the slug leaves `eas.json`, so it is part of the change.
 
 ## 7. Done criteria
 
-BUILD:
+Numbers are stable identifiers, not an order. 1, 2, 6 and 7 are BUILD; 3, 4 and
+5 are GUARD — already true, and must remain true.
 
-1. No hardcoded tenant slug in `mobile/` — the three places in §2 — and
+1. No hardcoded tenant slug in `mobile/` — the places in §2 — and
    `app.config.js:115` still resolves local development. (D1, D3)
-2. Scanning a temple's QR in the app loads that temple, after the backend
-   confirms the slug. (D6, D7)
-
-GUARD — already true, must remain true:
-
-3. A release build starts. (D3; §2 shows why this is not automatic)
+2. Scanning a temple's QR loads that temple — its name, its collections —
+   after the backend confirms the slug. (D6, D7)
+3. A release build starts. (D3)
 4. A payload from any origin other than `sourcegridlabs.com` is refused. (D5)
 5. Unload returns to the scanner, and a different temple can then be loaded.
    (D2, D6)
+6. A patron with no temple loaded signs in by email, by Google and by Apple,
+   and lands on the scanner with no error banner. (D8, D9, D10)
+7. `isReleaseConfig` is gone, and one path serves every build. (D11)
+
+**A fixture that cannot fail does not satisfy any of these.** Three checks have
+now passed for the wrong reason on this work: the mobile `/bootstrap` fixture
+answered success regardless of `temple_slug`; a Rails test asserted the very
+`tenant_required` that breaks criterion 6; and the branch's OAuth-start test
+stops one line before the dereference, on an unset env var. The adapter fixture
+must answer `tenant_required` 422 with no slug, and `tenant_not_found` 404 for
+an unknown one, on every path outside the session set.
 
 ## 8. Files — Observed
 
+    mobile/App.js                     the gates, the scan, the loads
     mobile/app.config.js              the slug, and the local-dev slug
-    mobile/app/real/config.js         PUBLIC_TENANT, boot throws
-    mobile/app/real/adapter.js        boot throw, sends temple_slug
+    mobile/app/real/config.js         PUBLIC_TENANT, boot, isReleaseConfig
+    mobile/app/real/adapter.js        boot, temple_slug, bootstrap calls
     mobile/app/tenant/binding.js      the payload format
     mobile/app/tenant/scanner.js      scan then verify
     mobile/app/tenant/storage.js      key namespace derives from the slug
+    mobile/app/ui/copy.js             the demo/Release pairs
     mobile/eas.json                   TEMPLEMATE_PUBLIC_TENANT_SLUG
     mobile/scripts/verify-release-interface.js   enforces that env value
     mobile/__tests__/tenant-binding.test.js
     mobile/__tests__/camera-session.test.js
     mobile/__tests__/real-adapter.test.js
     mobile/__tests__/native-config.test.js
+    mobile/__tests__/ui-refinement.test.js       pins the demo phrases
+    rails/app/services/auth/native_oauth_flow.rb          the temple in the flow
+    rails/app/services/auth/native_oauth_transaction.rb  temple in the token
     rails/app/services/templemate/connection_link.rb
     rails/app/controllers/account/connections_controller.rb
     rails/test/integration/account/connect_qr_test.rb
+    rails/test/integration/account/api/native_sessions_test.rb
