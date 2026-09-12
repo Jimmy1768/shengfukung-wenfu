@@ -173,7 +173,11 @@ temple-required.
 - §2's unimported-module list and §5 were not re-derived here.
 - 15 minutes and 30 days are the defaults in `jwt.rb`; production may override
   both by environment variable, and neither was read from the droplet.
-- The protocol currently contradicts the permission profile on who may merge
-  (`work_mode_config.md:35` against Control B's deny list). Reported to the
-  Director 2026-09-12; those files belong to Workspace Strategy and are not
-  touched from here.
+- The repo-local protocol contradicts itself on who may merge.
+  `work_mode_config.md:35` says a Control "merges that branch into `main`";
+  its line 60 defers the question to `repo_context.md`; `repo_context.md`
+  contains no occurrence of "merg". Control B's profile denies
+  `Bash(git merge:*)`, and this session was refused the same command by the
+  auto mode classifier, so integration currently has no lane that can perform
+  it. Reported to the Director 2026-09-12. Those files belong to Workspace
+  Strategy and are not touched from here.
