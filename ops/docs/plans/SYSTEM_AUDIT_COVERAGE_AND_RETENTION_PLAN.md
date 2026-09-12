@@ -334,6 +334,35 @@ Phase 3 progress:
 Remaining in Phase 3:
 - admin refund/cancel/reconcile/manual override flows, if and when those runtime paths exist
 
+Re-inventory, 2026-09-12. Phase 3 was completed against the admin console as it
+stood then; the console has grown since and the recorder did not follow. Seven
+controllers with mutating actions record nothing anywhere in their path —
+neither the controller, nor its form object, nor a service it calls:
+
+- `gallery_entries` — albums, photos, reorder, archive, and 永久刪除, which
+  destroys a `MediaAsset` and its S3 object through `after_destroy_commit`.
+  Irreversible and unattributed. Deleting an album does the same for every
+  photo it holds. Tier 1 by the criteria already in this document.
+- `temple_switches` — which temple an admin was acting as. Without it, entries
+  written by other controllers cannot be placed in the right tenant context by
+  someone reading back.
+- `gatherings` — 3 mutating actions
+- `news_posts` — 3 mutating actions
+- `locales` — 1
+- `themes` — 1
+- `sessions` — admin sign-in and sign-out. Judgement rather than an obvious
+  gap; Tier 2 at most, and reasonably skipped.
+
+Not gaps, checked and cleared: `permissions`, `payment_methods` and `temples`
+record from their form objects rather than their controllers. A first pass that
+grepped controller files reported all three as missing — it answered "does this
+file mention audit" where the question was "is this action recorded". Any
+re-inventory has to follow each controller's collaborators, or it will keep
+producing that same false positive.
+
+The general point this exposes: nothing notices when a new admin surface
+appears without a recorder. This list will drift again the same way.
+
 ### Phase 4 — Retention + Access Policy
 
 - [ ] Lock retention windows by audit tier.
