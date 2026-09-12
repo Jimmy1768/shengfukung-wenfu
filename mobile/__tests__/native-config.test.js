@@ -73,7 +73,11 @@ test('TestFlight and production source profiles are real, public, and isolated f
     const config = configFor(profile);
     assert.equal(config.extra.clientMode, 'real');
     assert.equal(config.extra.apiBaseUrl, 'https://shengfukung.com.tw');
-    assert.equal(config.extra.tenantSlug, 'shengfukung-wenfu');
+    // One build serves every temple. A slug here is what pinned a release to a
+    // single tenant, so its absence is the thing worth asserting -- and the
+    // local-development passthrough must not leak into a release lane either.
+    assert.equal(config.extra.tenantSlug, '', 'a release lane carries no tenant');
+    assert.equal(JSON.stringify(config.extra).includes('shengfukung-wenfu'), false);
     assert.equal(config.extra.easUpdateChannel, profile);
     assert.equal(config.updates.url, 'https://u.expo.dev/c7b8523a-2fad-4123-bc96-0c0c85a23dec');
     // Real incident, 2026-08-20: this assertion used to check
@@ -87,6 +91,19 @@ test('TestFlight and production source profiles are real, public, and isolated f
     assert.equal(eas.build[profile].distribution, 'store');
   }
   assert.equal(eas.build.development.channel, undefined);
+});
+
+// scripts/verify-release-interface.js also asserts this, but nothing runs that
+// file -- no npm script requires it, no test loads it, and nothing else in the
+// repository references it. Asserting it here puts the guard inside `npm test`,
+// where it will actually fail if a tenant slug returns to a release lane.
+test('no release lane carries a tenant slug in its build environment', () => {
+  for (const lane of ['testflight', 'production']) {
+    const env = eas.build[lane].env;
+    assert.equal(env.TEMPLEMATE_PUBLIC_API_ORIGIN, 'https://shengfukung.com.tw', 'the API origin stays pinned');
+    assert.equal(env.TEMPLEMATE_PUBLIC_TENANT_SLUG, undefined, `${lane} must not name a tenant`);
+  }
+  assert.equal(JSON.stringify(eas).includes('shengfukung-wenfu'), false, 'one build serves every temple');
 });
 
 test('both public configs declare QR-only camera access without Android audio recording', () => {

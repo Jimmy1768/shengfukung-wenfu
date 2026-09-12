@@ -27,7 +27,6 @@ const releaseConfiguration = buildMode => {
   return {
     clientMode: 'real',
     apiBaseUrl: 'https://shengfukung.com.tw',
-    tenantSlug: 'shengfukung-wenfu',
     clientEnvironment: environment,
     easUpdateChannel: environment
   };
@@ -112,7 +111,9 @@ module.exports = () => {
         },
         clientMode: 'real',
         apiBaseUrl: release?.apiBaseUrl || process.env.TEMPLEMATE_LOCAL_API_BASE_URL || '',
-        tenantSlug: release?.tenantSlug || process.env.TEMPLEMATE_LOCAL_TENANT_SLUG || '',
+        // Local development only, and deliberately absent from a release lane:
+        // a release build is compiled with no temple and loads one from a scan.
+        tenantSlug: process.env.TEMPLEMATE_LOCAL_TENANT_SLUG || '',
         clientEnvironment: release?.clientEnvironment || process.env.TEMPLEMATE_CLIENT_ENVIRONMENT || 'development',
         easUpdateChannel: release?.easUpdateChannel || 'development',
         nativeOAuthReturnUrl,

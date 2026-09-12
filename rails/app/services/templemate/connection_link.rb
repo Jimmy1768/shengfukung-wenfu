@@ -4,34 +4,39 @@ module Templemate
   # The exact string the TempleMate app expects to scan.
   #
   # mobile/app/tenant/binding.js#parseProductionConnectionLink accepts it only
-  # when: scheme is https, origin matches the app's configured apiBaseUrl,
-  # path is exactly PATH, there is no userinfo or fragment, and the only
-  # permitted query parameter is v=1. Anything else is rejected as
-  # invalid_connection_link -- so this is built from the request's own origin
-  # rather than assembled from parts.
+  # when: scheme is https, origin is exactly ORIGIN, path is PATH_PREFIX
+  # followed by a single slug segment, and there is no userinfo, query or
+  # fragment. Anything else is rejected as invalid_connection_link.
   module ConnectionLink
-    PATH = "/connect/templemate/v1"
+    # The platform's origin, deliberately not the temple's.
+    #
+    # Each client temple gets its own Vue domain, so a tenant domain cannot be
+    # the anchor the app trusts -- it changes per client, and one app serves
+    # them all. This host is the one part that stays constant, which is what
+    # makes pinning it meaningful rather than decorative.
+    #
+    # It is also not the API origin. The app still talks to the shared Rails
+    # backend; this is only where the code points, so that scanning with a
+    # phone's own camera lands on the TempleMate page instead of failing.
+    #
+    # Historical note: this used to be built from request.base_url, with www
+    # stripped, because the app compared the origin to its configured
+    # apiBaseUrl exactly and nginx serves www.<domain> directly -- a code
+    # generated on www was rejected with no visible reason, which is how it
+    # failed for the Director's staff on 2026-09-02. Deriving the origin from
+    # the request is what created that failure mode; a fixed constant removes
+    # the class of bug rather than patching the one host that triggered it.
+    ORIGIN = "https://sourcegridlabs.com"
+    PATH_PREFIX = "/templemate/connect"
     MODULE_SIZE = 6
     QUIET_ZONE = 2
 
-    # Built from the CANONICAL origin, not simply request.base_url.
-    #
-    # nginx serves www.<domain> directly rather than redirecting it, so a page
-    # opened on www produced a QR encoding https://www.<domain>/... . The app
-    # compares the origin to its configured apiBaseUrl exactly
-    # (mobile/app/real/config.js PUBLIC_ORIGIN, the apex), so that code was
-    # rejected as invalid_connection_link with no visible reason -- which is
-    # exactly how it failed for the Director's staff on 2026-09-02.
-    def self.for(request:)
-      "#{canonical_origin(request)}#{PATH}"
-    end
-
-    def self.canonical_origin(request)
-      uri = URI.parse(request.base_url)
-      uri.host = uri.host.sub(/\Awww\./i, "") if uri.host.present?
-      uri.to_s
-    rescue URI::InvalidURIError
-      request.base_url
+    # The temple is passed in rather than resolved here. The page already has
+    # it -- Account::BaseController has resolved current_temple long before
+    # this runs -- and the slug is what the app needs in order to load a temple
+    # it was never compiled with.
+    def self.for(temple:)
+      "#{ORIGIN}#{PATH_PREFIX}/#{temple.slug}"
     end
 
     # standalone: true keeps the <svg> element (standalone: false omits it and

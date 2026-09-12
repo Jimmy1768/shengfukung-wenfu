@@ -29,12 +29,41 @@ module Api
           request.format = :json
         end
 
+        # Signing in does not require a temple. The app has two gates on purpose:
+        # a signed-in patron with no temple loaded is shown the scanner. That is
+        # a steady state, not an onboarding phase -- a patron can unload a temple
+        # at any time and scan another, so "temple-less and signed in" has to be
+        # representable or the scanner is unreachable.
+        #
+        # A slug that IS supplied is still resolved on these routes, and still
+        # 404s when it names nothing. Sessions issued with a temple keep joining
+        # it exactly as before; only the blank case is now allowed through.
         def resolve_native_temple!
           slug = params[:temple_slug].to_s.strip
-          return render_error("tenant_required", :unprocessable_entity) if slug.blank?
+          if slug.blank?
+            return if temple_optional?
+
+            return render_error("tenant_required", :unprocessable_entity)
+          end
 
           @current_native_temple = Temple.find_by(slug: slug)
           render_error("tenant_not_found", :not_found) unless @current_native_temple
+        end
+
+        # Mirrors the skip_before_action :authenticate_native_user! lists in the
+        # three controllers that issue or begin a session without one:
+        # NativeSessionsController, NativeOauthController and
+        # NativeOauthResolutionsController. Keyed by controller as well as action
+        # because "show" is also a route on bootstrap, profile, preferences and
+        # privacy, all of which do require a temple.
+        TEMPLE_OPTIONAL_ACTIONS = {
+          "api/v1/account/native_sessions" => %w[signup login refresh password_recovery password_reset],
+          "api/v1/account/native_oauth" => %w[start exchange],
+          "api/v1/account/native_oauth_resolutions" => %w[show existing new_account]
+        }.freeze
+
+        def temple_optional?
+          TEMPLE_OPTIONAL_ACTIONS.fetch(controller_path, []).include?(action_name)
         end
 
         def authenticate_native_user!
@@ -65,7 +94,12 @@ module Api
           # refresh, password reset, OAuth exchange and resolution -- lands
           # here, and none of them run authenticate_native_user!, so recording
           # only in that filter missed the binding until the *next* request.
-          TempleConnection.record!(user:, temple: current_native_temple)
+          #
+          # A session can now be issued with no temple at all (see
+          # resolve_native_temple!), and there is nothing to join in that case.
+          # Nothing is lost: the patron reaches the scanner, loads a temple, and
+          # the next authenticated request joins it in authenticate_native_user!.
+          TempleConnection.record!(user:, temple: current_native_temple) if current_native_temple
 
           result = Auth::RefreshToken.new(user).issue!(
             user_agent: request.user_agent,

@@ -129,6 +129,48 @@ test('logging out clears the session but keeps the remembered temple', async () 
     'the session itself must still be cleared');
 });
 
+// The tenant is runtime state, read per request from what the scan stored --
+// not captured when the adapter was constructed. A patron can unload a temple
+// and load another without signing out or restarting, so an adapter built once
+// must follow that rather than hold the answer it started with.
+test('the adapter sends whichever temple is loaded, and none when there is none', async () => {
+  const releaseConfig = { mode: 'real', apiBaseUrl: 'http://local.test', environment: 'testflight' };
+  const local = store();
+  const calls = [];
+  const adapter = createRealAdapter({ config: releaseConfig, store: local, transport: fixtureTransport(calls) });
+  const bindings = createTrustedBindingStorage({ store: local, config: releaseConfig });
+
+  // Signed in with no temple loaded: the scanner screen is this state, and the
+  // session routes accept a request that names no tenant.
+  await adapter.signIn({ email: user.email, password: 'test-password' });
+  assert.ok(calls.length > 0);
+  assert.equal(calls.every(call => !call.url.includes('temple_slug=')), true,
+    'no temple loaded means no temple_slug at all, not an empty one');
+
+  await bindings.save({ state: 'bound', tenant: { id: 'first-temple', name: 'First' }, error: null, source: 'qr' });
+  calls.length = 0;
+  await adapter.listDependents();
+  assert.equal(calls.every(call => call.url.includes('temple_slug=first-temple')), true,
+    'the temple the scan stored is the one sent');
+
+  // Unload and load another, on the same adapter instance.
+  await bindings.save({ state: 'bound', tenant: { id: 'second-temple', name: 'Second' }, error: null, source: 'qr' });
+  calls.length = 0;
+  await adapter.listDependents();
+  assert.equal(calls.every(call => call.url.includes('temple_slug=second-temple')), true,
+    'a different temple takes effect without rebuilding the adapter');
+  assert.equal(calls.some(call => call.url.includes('first-temple')), false);
+});
+
+// Local development has no scan and no stored binding; its slug still comes
+// from configuration, which is the one place a tenant may still be named.
+test('local development still takes its tenant from configuration', async () => {
+  const calls = [];
+  const adapter = createRealAdapter({ config, store: store(), transport: fixtureTransport(calls) });
+  await adapter.signIn({ email: user.email, password: 'test-password' });
+  assert.equal(calls.every(call => call.url.includes('temple_slug=fixture-temple')), true);
+});
+
 test('real transport errors are surfaced and never return fixture data', async () => {
   const adapter = createRealAdapter({ config, store: store(), transport: fixtureTransport([], { '/login': response({ code: 'invalid_credentials' }, 401) }) });
   await assert.rejects(adapter.signIn({ email: user.email, password: 'bad' }), { code: 'invalid_credentials' });
