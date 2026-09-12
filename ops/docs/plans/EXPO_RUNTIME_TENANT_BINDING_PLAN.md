@@ -1,142 +1,164 @@
-# EXPO RUNTIME TENANT BINDING PLAN
+# EXPO RUNTIME TENANT PLAN
 
-## Purpose
+## 0. Source — the Director's words, 2026-09-12
 
-Remove the hardcoded tenant from the Expo release configuration so one build
-serves every temple. A patron scans their temple's QR, the app binds to that
-temple, and can unbind. Load, unload — one temple at a time, decided at
-runtime rather than at build time.
+Everything below derives from these and cites them. Nothing else is a
+requirement.
 
-## Why this is not a naming problem
+- **D1** "we can't hardcode one tenant to the expo app. it's one expo app for
+  all tenants."
+- **D2** "the user, scans a QR code for ONE temple, and the app loads in that
+  one slug only. no 2 temple loading, no temple switchboard. Load. Unload.
+  that's it."
+- **D3** "there is not bind. the QR code scan loads in the temple. this already
+  works. we're removing hard code slug from app.config.js."
+- **D4** "scanning with native camera can go to the TempleMate page. it doesn't
+  exist yet. but it will be sourcegridlabs.com/templemate/"
+- **D5** "we should protect from hostile source."
+- **D6** "the qr code scanned using the app, needs to resolve the temple slug,
+  and load it. keep it simple."
+- **D7** "verify the slug against backend, use path segment"
 
-This surfaced while deciding whether to rename the `shengfukung-wenfu` tenant
-slug. It is a separate and larger issue: whatever the demo tenant is called, a
-build-time tenant blocks the second client either way. The naming decision does
-not depend on this and should not wait for it.
+Withdrawn by the Director: any stale-binding behaviour. "a temple is loaded in,
+and is saved in async storage. it persists after reload of the app, and sign
+out as well." Already solved; not in scope.
 
-## Current state — Observed 2026-09-12
+## 1. The gap — Observed
 
-`mobile/app.config.js:30`, inside `releaseConfiguration`:
+The QR encodes `https://shengfukung.com.tw/connect/templemate/v1` and nothing
+else. `ConnectionLink.for(request:)` takes only the request
+(`connection_link.rb:25-27`); `binding.js:15` rejects any query but `v=1`.
 
-```
-apiBaseUrl: 'https://shengfukung.com.tw',
-tenantSlug: 'shengfukung-wenfu',
-```
+The page already knows the temple. `Account::ConnectionsController` is behind
+`Account::BaseController`, whose `@active_temple_slug` comes from the session
+(`base_controller.rb:56`), and the view prints `current_temple.name` three
+times. The controller's own comment says it "hands the app the temple
+identity" — it does not. The slug is in hand and never reaches the link.
 
-The release build is pinned to one temple in three layers, and the first two
-run before the slug is ever compared:
+Nothing resolves a temple from the host: no `request.host` in `app/`, and the
+manifest's `domains:` feeds nothing. `/connect/templemate/v1` is not a route —
+only `/connect` exists — so the QR points at a 404 today.
 
-1. `app/tenant/scanner.js` — `parseProductionConnectionLink(payload,
-   config.apiBaseUrl)` requires the QR link to come from the configured origin.
-2. The scanner then fetches `${config.apiBaseUrl}/api/v1/temple` — it asks the
-   configured origin which temple *it* is, not the temple the QR names.
-3. `temple.slug !== config.tenantSlug` → `binding_failed`.
+## 2. The slug is hardcoded in four places — Observed
 
-The file's own comment states the design: *"The link must come from the
-configured origin, and the temple it names must be the configured tenant."*
+    mobile/app.config.js:30      tenantSlug: 'shengfukung-wenfu'
+    mobile/app/real/config.js:4  PUBLIC_TENANT = 'shengfukung-wenfu'
+    mobile/eas.json:27,40        TEMPLEMATE_PUBLIC_TENANT_SLUG
 
-Consequences:
+`mobile/app.config.js:115` is the local-development slug
+(`TEMPLEMATE_LOCAL_TENANT_SLUG`) and must survive.
 
-- A second temple's QR fails at step 1. In a release build there is no runtime
-  path to any tenant but this one.
-- The scan does not discover a temple. It confirms the one the build already
-  knew.
-- `app/tenant/storage.js:10` refuses a retained binding whose id is not the
-  configured slug, and `app/real/adapter.js:6` sends that slug as `temple_slug`
-  on every request.
+**Removing only `app.config.js:30` makes every release build fail at boot.**
+`real/config.js:15` throws `REAL_CONFIG_REQUIRED` on an empty `tenantSlug`;
+`:24-25` require `tenantSlug === PUBLIC_TENANT` for a release origin and throw
+`TRUSTED_API_REQUIRED` otherwise; `adapter.js:14` throws without it. The app
+would reach BootFailure before a scanner is shown.
 
-This contradicts `ops/protocol/repo_context.md`, which records Rails and
-TempleMate as shared single deployments serving every temple, with only Vue
-being per-client. The document describes the intended app; the code is the
-app that exists.
+## 3. The new QR payload — D4, D5, D6, D7
 
-## The backend needs nothing — Observed
+    https://sourcegridlabs.com/templemate/connect/<temple-slug>
 
-`TempleContextResolver` (`app/services/temple_context_resolver.rb:73`) takes
-`params[:temple_slug]` as its first resolution candidate, ahead of session and
-the project default. `GET /api/v1/temple?temple_slug=<slug>` already answers
-for an arbitrary temple. The server is already the authority on which temples
-exist. The client throws that away by asking the origin who it is.
+- Native camera lands on the TempleMate page (D4). That page does not exist
+  yet; building it is not this work.
+- The app requires the origin to be `sourcegridlabs.com` and rejects anything
+  else (D5). This moves the trust anchor from a tenant's domain to the
+  platform's, which is what stays constant across clients.
+- The slug is a path segment (D7).
 
-**The pin is client-side only.**
+## 4. What changes
 
-## A list of accepted tenants is not the fix
+- **The slug leaves the app** (D1, D3): `app.config.js:30`,
+  `real/config.js:4`, `eas.json:27,40`, and the boot requirements at
+  `real/config.js:15,24-25` and `adapter.js:14` that assume it — because the
+  app must still start (D3: the scan already works).
+- **`apiBaseUrl` stays pinned** to the shared backend. It is not a tenant
+  value; every temple is served by one Rails deployment.
+- **`binding.js`** parses the new payload: origin `sourcegridlabs.com`, path
+  `/templemate/connect/<slug>`, returns the slug (D6, D7).
+- **`ConnectionLink`** emits the new payload, taking the temple it already has
+  (D6).
+- **The scan verifies the slug against the backend before loading** (D7). The
+  app is signed in when the scanner appears (`App.js:218` gates on `signedIn`,
+  `:219` on the tenant), so an authenticated native call carrying
+  `temple_slug` verifies it: `native_base_controller.rb:33-37` resolves any
+  temple by slug and returns `tenant_not_found` 404. No backend change is
+  needed for verification.
+- **Loaded, not bound** (D3). The word "bind" in the code is the code's, not
+  the Director's; existing identifiers may keep it, new text should not.
 
-Any list is stale the moment a client signs up, and staleness means a rebuild
-per temple — the same defect with more entries. One hardcoded slug is a list of
-one. The app must not know which tenants exist.
+## 5. Not in scope
 
-## What changes
+- The `sourcegridlabs.com/templemate/` page itself (D4 says it does not exist).
+- Any switchboard or multi-temple UI (D2).
+- Stale-temple handling (withdrawn — already solved).
+- Renaming the `shengfukung-wenfu` tenant — separate plan.
+- Whether this needs a native rebuild, and any AAB sequencing. Not determined
+  here; ask.
 
-- **`apiBaseUrl` stays.** It is the platform's identity, not a tenant's: one
-  shared backend serves every temple, and pinning it is what stops a hostile QR
-  pointing the app at another server. This is a security property, not an
-  oversight.
-- **`tenantSlug` is removed** from `releaseConfiguration`. Which temple an
-  install belongs to is runtime state.
-- **`scanner.js`** fetches the temple the QR names, at the configured origin,
-  and binds if the server confirms it.
-- **`storage.js` and `adapter.js`** read the bound tenant from stored state
-  rather than from config.
+## 6. Readiness scan — what already works, Observed 2026-09-12
 
-One temple at a time remains the rule. It becomes a session rule rather than a
-compile rule; the current code conflates the two.
+Scanned before planning any work, because most of this exists. Build only what
+is missing; everything else is a regression guard.
 
-## A stored binding must be able to go stale
+| # | criterion | now | covered by | missing |
+| - | --- | --- | --- | --- |
+| 1 | no hardcoded slug | false | — | the four places in §2 |
+| 2 | release build starts | true | it is in production | must not break; §2 shows the naive removal throws |
+| 3 | scan loads that temple, backend-confirmed | half | `tenant-binding.test.js:29` | the QR carries no slug; the scan confirms the *configured* temple |
+| 4 | non-platform origin refused | true, wrong value | `tenant-binding.test.js:13-17` | only the pinned origin changes |
+| 5 | unload → scanner → load another | true | `ui-refinement.test.js:95` | **nothing** |
 
-Removing `tenantSlug` from config removes a check that currently exists by
-accident. `app/tenant/storage.js:10` validates a retained binding against
-`config.tenantSlug` and returns null when they differ — so today a binding can
-only ever be for the one compiled tenant. Once the field is gone, that
-comparison has nothing to compare against and the stored binding is simply
-trusted.
+**Criterion 5 is not work.** `App.js:193` clears stored state, `App.js:219`
+returns to `TenantSetupGate` when no temple is loaded, and a test already
+guards that only the explicit Unbind control forgets it. "A different temple"
+fails today solely because of the slug pin — a consequence of 1 and 3, not a
+separate feature. Do not build it.
 
-That leaves a real state: a binding whose temple no longer resolves. It arises
-whenever a temple is renamed, unpublished or removed — including the planned
-`shengfukung-wenfu` → `shengfukung-demo` rename, where a stale binding would
-send `temple_slug=` for a tenant the server cannot find.
+**Criterion 4 is nearly free.** `binding.js:13` already enforces exact origin,
+https only, no credentials, no fragment. Only the value it compares against
+moves. Two of the existing assertions already prove a foreign origin and plain
+`http` are refused.
 
-The failure is quiet, which is what makes it worth designing for. The app loads,
-looks bound, shows the remembered temple name, and then fails on every request.
+**Criterion 3 is the work**, and the existing test names the property that must
+survive: *"The QR code's claim about which temple it is never wins; the server
+does."* That stays true — the QR carries a slug, the backend confirms it, and a
+slug the backend rejects does not load. Same guarantee, new input.
 
-Required behaviour: when the bound temple does not resolve at the configured
-origin, drop to unbound and prompt for a rescan. Not an error screen, not a
-retry loop — the same state a fresh install is in, which the app already knows
-how to present.
+**`verify-release-interface.js:5` hard-asserts
+`TEMPLEMATE_PUBLIC_TENANT_SLUG === 'shengfukung-wenfu'`** for both lanes. It
+fails the moment the slug leaves `eas.json`, so it is part of the change rather
+than collateral.
 
-This is not only a migration concern. A client whose temple is renamed or
-offboarded hits the same path.
+## 7. Done criteria
 
-## Out of scope
+BUILD:
 
-- Renaming the `shengfukung-wenfu` tenant slug. Separate decision.
-- Any temple switchboard or multi-temple UI. Load and unload, one at a time.
-- Backend changes. None are required.
+1. No hardcoded tenant slug in `mobile/` — the three places in §2 — and
+   `app.config.js:115` still resolves local development. (D1, D3)
+2. Scanning a temple's QR in the app loads that temple, after the backend
+   confirms the slug. (D6, D7)
 
-## Sequencing — this gates the Android build
+GUARD — already true, must remain true:
 
-Do this **before** cutting the first AAB.
+3. A release build starts. (D3; §2 shows why this is not automatic)
+4. A payload from any origin other than `sourcegridlabs.com` is refused. (D5)
+5. Unload returns to the scanner, and a different temple can then be loaded.
+   (D2, D6)
 
-Android `versionCode` must increase with every upload to Play, so each build
-spends a number permanently. iOS is cheaper: the same `version` can carry many
-`buildNumber` increments. `mobile/versioning.js` currently holds
-`appVersion: '1.0.0'`, `iosBuildNumber: '2'`, `androidVersionCode: 1`.
+## 8. Files — Observed
 
-Shipping the fix first means the first Android build is already correct and no
-`versionCode` is spent on a build that cannot onboard a client.
-
-This is a native config change, so it needs a rebuild and a new build number
-rather than an OTA — see `ops/protocol/repo_context.md`, "OTA Reach Is Decided
-by Version, Not by Build".
-
-## Done criteria
-
-- No tenant slug appears anywhere in `mobile/app.config.js`.
-- A release build binds to a temple named by a QR it has never been told about,
-  confirmed against the server.
-- A stored binding whose temple no longer resolves drops to unbound and prompts
-  for a rescan, rather than loading and then failing on every request.
-- A QR from an origin other than the configured one is still refused.
-- Unbind returns the app to an unbound state that can bind to a different
-  temple.
-- Onboarding a temple requires no app build, no submission, and no version bump.
+    mobile/app.config.js              the slug, and the local-dev slug
+    mobile/app/real/config.js         PUBLIC_TENANT, boot throws
+    mobile/app/real/adapter.js        boot throw, sends temple_slug
+    mobile/app/tenant/binding.js      the payload format
+    mobile/app/tenant/scanner.js      scan then verify
+    mobile/app/tenant/storage.js      key namespace derives from the slug
+    mobile/eas.json                   TEMPLEMATE_PUBLIC_TENANT_SLUG
+    mobile/scripts/verify-release-interface.js   enforces that env value
+    mobile/__tests__/tenant-binding.test.js
+    mobile/__tests__/camera-session.test.js
+    mobile/__tests__/real-adapter.test.js
+    mobile/__tests__/native-config.test.js
+    rails/app/services/templemate/connection_link.rb
+    rails/app/controllers/account/connections_controller.rb
+    rails/test/integration/account/connect_qr_test.rb
