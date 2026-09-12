@@ -1,8 +1,15 @@
 # EXPO DUMMY-CLIENT RESIDUE AND DOWNLINE PLAN
 
-Capture only. Nothing here is assigned, and nothing here is to be started
+Capture only, with three exceptions named below. Nothing here is to be started
 without the Director. It exists so these findings stop being re-raised in
 conversation one at a time.
+
+**Assigned out of this file, 2026-09-12** (assignment 014, branch
+`expo-residue-cleanup` from `f049fc47`): from §2, `localTenantBinding` and the
+unreachable demo halves of the camera copy; from §3, all six reference docs.
+Nothing else from §2 was commissioned — the unimported modules,
+`screen_model.js`'s unused exports and the rest of the retired copy stay here.
+§4, §5 and §6 are untouched and remain the Director's.
 
 ## 0. Why this exists
 
