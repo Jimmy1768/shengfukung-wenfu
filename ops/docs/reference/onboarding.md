@@ -107,7 +107,7 @@ Slug convention:
 - `PROJECT_SLUG` is resolved by the tenant's Rails deployment for its singular
   public `/api/v1/temple` routes. It is deployment metadata, never a browser
   URL/query/body selector.
-- `AUTH_TENANT_SLUG` is the central auth tenant identifier. Keep it client-level and stable (for example `shengfukung`) unless central auth explicitly needs a more granular split.
+- `AUTH_TENANT_SLUG` is the app's own registration with SourceGrid central auth at `auth.sourcegridlabs.com`, which holds the OAuth credentials and the redirect-URI allowlist. It is `shengfukung`. This is a rule, not an example: there is one auth tenant for the whole app, every tenant's env file carries the same value, and it is never a temple slug. Signing in is not temple-scoped — a patron may have no temple loaded at all — so nothing about it varies per temple.
 - Do not assume `PROJECT_SLUG == AUTH_TENANT_SLUG`. They may match for simple cases, but they serve different scopes and should be configured deliberately.
 
 ### Template + Theme selection

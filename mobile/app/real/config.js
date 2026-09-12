@@ -49,6 +49,4 @@ function resolveClientConfig(extra = {}) {
   return { mode, apiBaseUrl, tenantSlug, environment, oauthReturnUrl, updateChannel: String(extra.easUpdateChannel || environment) };
 }
 
-const localTenantBinding = config => ({ state: 'bound', tenant: { id: config.tenantSlug, name: config.tenantSlug }, error: null, source: 'local-test' });
-
-module.exports = { PUBLIC_ORIGIN, PLATFORM_CONNECT_ORIGIN, RELEASE_ENVIRONMENTS, resolveClientConfig, localTenantBinding };
+module.exports = { PUBLIC_ORIGIN, PLATFORM_CONNECT_ORIGIN, RELEASE_ENVIRONMENTS, resolveClientConfig };

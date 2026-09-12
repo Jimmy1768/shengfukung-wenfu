@@ -25,10 +25,18 @@ admin-aware scope helpers: for a user who also holds admin authority,
 registration scope can widen to owned admin temples, and preferences accept an
 admin display mode. An account-only app must never receive or mutate that.
 
-The native base instead enforces, on every request:
+The native base instead enforces:
 
-- `temple_slug` present and resolvable, else `tenant_required` /
-  `tenant_not_found`
+- `temple_slug` resolvable where it is supplied, else `tenant_not_found` — on
+  every route, including the ones below that do not require it
+- `temple_slug` **present**, else `tenant_required`, on every route except the
+  ones that issue or begin a session: `native_sessions` signup, login, refresh,
+  password_recovery and password_reset; `native_oauth` start and exchange; and
+  `native_oauth_resolutions` show, existing and new_account
+  (`TEMPLE_OPTIONAL_ACTIONS`, `native_base_controller.rb`). Signing in does not
+  require a temple: a patron with none loaded is shown the scanner, and that is
+  a steady state rather than a first-run phase, since a temple can be unloaded
+  at any time
 - a bearer JWT whose `scope` claim is exactly `"account"`, else
   `session_invalid`
 - a live refresh-session (`session&.active?`), else `session_revoked`
@@ -50,7 +58,7 @@ API gap.
 | Layer | State |
 | --- | --- |
 | Rails native API | Essentially complete (see absences below) |
-| `mobile/app/real/adapter.js` | 37 methods; covers the API except contact + payment |
+| `mobile/app/real/adapter.js` | Covers the API except contact + payment |
 | Expo account screens | Present but **minimal**. All 12 render from `App.js`; several expose a fraction of the fields their endpoint accepts |
 
 Screens are **not** in `mobile/app/account/` (that directory holds registration
