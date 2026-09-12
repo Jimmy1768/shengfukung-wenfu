@@ -27,6 +27,12 @@ being renamed:
   name (`shengfukung_wenfu_dev`) and the S3 bucket prefix, via
   `app/lib/profile/infrastructure.rb:71,75`. **Not touched by this plan.**
 - **`temples.slug`** — the tenant row. What is being renamed.
+- **`AUTH_TENANT_SLUG`** — a third string, and not this one: its value is
+  `shengfukung`, not `shengfukung-wenfu`. It names this deployment as a
+  registered client of SourceGrid's central auth at `auth.sourcegridlabs.com`,
+  which holds the client credentials and the redirect-URI allowlist
+  (`auth_tenant_redirect_uris`). A SourceGrid tenant, not a TempleMate one.
+  **Not touched by this plan**, and see below.
 
 Two temple rows already exist, `demo-lotus` and `shengfukung-wenfu`, so several
 tenants under one project slug is the normal case rather than something this
@@ -40,6 +46,42 @@ introduces.
   arriving with no explicit slug fall back to `:project_default`, which is
   `AppConstants::Project.slug`. After the rename no tenant matches that string.
   Check what relies on that fallback before flipping.
+
+## The env file moves; one value inside it must not
+
+Each tenant has its own env file on the droplet at
+`/etc/default/<temple-slug>-env` — `bin/load_temple_env:35` builds the path from
+the slug, and `ops/docs/commands.md:113` provisions a new one by installing
+`ops/env/template.temple.env` there. So the rename moves
+`/etc/default/shengfukung-wenfu-env` to `/etc/default/shengfukung-demo-env`,
+along with the five places `commands.md` names it literally
+(`:23`, `:33`, `:133`, `:176`, `:186`), `OAUTH_PROVIDERS_SETUP_PLAN.md:78`, and
+`PLATFORM_ENV_FILE_REORGANIZATION_PLAN.md:39`. That last file also records a
+stray `/etc/default/templemate-env` from an aborted attempt; know it is there
+before moving anything in that directory.
+
+**`AUTH_TENANT_SLUG` keeps its value through all of this.** The file is renamed;
+the line inside it is not. Setting it to the new temple slug breaks OAuth,
+because central auth has no tenant by that name — it would fail closed with
+`native_oauth_unavailable` 503 rather than silently, but it would fail. This is
+exactly the trap `ops/docs/reference/onboarding.md:111` exists to prevent: "Do
+not assume `PROJECT_SLUG == AUTH_TENANT_SLUG`. They may match for simple cases,
+but they serve different scopes."
+
+**The implication for every temple after this one.** The Director, 2026-09-12:
+"this is the APP. not per temple." A new temple `jimmytemple` needs its own
+`/etc/default/jimmytemple-env`, and that file carries
+`AUTH_TENANT_SLUG=shengfukung` — the same value as every other temple's file.
+It identifies TempleMate to its auth provider, so it does not vary by tenant and
+is not a per-temple value to be filled in during onboarding. One auth tenant,
+many temples.
+
+Related, confirmed 2026-09-12: the fallback that used to supply a temple's
+own slug here is gone (`native_oauth_flow.rb:123-127` now raises rather than
+defaulting). That fallback would have sent `shengfukung-wenfu`, which is not a
+registered tenant — so OAuth working on TestFlight is evidence the env value is
+already set correctly on the droplet. Confirm it before the first deploy of the
+Expo tenant work; treat it as a check, not a blocker.
 
 ## What it does not touch
 
