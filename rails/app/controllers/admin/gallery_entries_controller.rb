@@ -87,22 +87,37 @@ module Admin
     # Keyed by the parameter each button carries, so a new photo control cannot
     # quietly inherit the Save destination: it has no entry here and would fail
     # the test that covers this.
-    PHOTO_ACTION_ANCHORS = {
-      "photo_move_up" => %w[moved album-photos],
-      "photo_move_down" => %w[moved album-photos],
-      "photo_remove" => %w[removed album-photos],
-      "photo_restore" => %w[restored album-archived],
-      "photo_destroy" => %w[destroyed album-archived]
+    PHOTO_ACTION_OUTCOMES = {
+      "photo_move_up" => "moved",
+      "photo_move_down" => "moved",
+      "photo_remove" => "removed",
+      "photo_restore" => "restored",
+      "photo_destroy" => "destroyed"
     }.freeze
 
     def redirect_after_update
-      outcome, anchor = PHOTO_ACTION_ANCHORS.find { |param, _| params[param].present? }&.last
+      outcome = PHOTO_ACTION_OUTCOMES.find { |param, _| params[param].present? }&.last
 
       if outcome
-        redirect_to edit_admin_gallery_entry_path(@gallery_entry, anchor:),
+        redirect_to edit_admin_gallery_entry_path(@gallery_entry, anchor: anchor_after(outcome)),
           notice: t("admin.gallery_entries.notices.photo_#{outcome}")
       else
         redirect_to admin_gallery_entries_path, notice: t("admin.gallery_entries.notices.updated")
+      end
+    end
+
+    # The anchor names where the photo ended up, not which control was pressed.
+    # Restore moves it into the live grid, so sending the admin to the archived
+    # shelf pointed at the section it just left. Worse, that shelf renders only
+    # while it holds something: restoring or destroying the last archived photo
+    # removes the very element the fragment names, and a fragment with no target
+    # leaves the browser at the top of the page. Reported from production, where
+    # the order controls anchored correctly and restore did not.
+    def anchor_after(outcome)
+      if outcome == "destroyed" && @gallery_entry.photos.archived.any?
+        "album-archived"
+      else
+        "album-photos"
       end
     end
 

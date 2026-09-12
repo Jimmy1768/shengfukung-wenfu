@@ -79,7 +79,7 @@ class AdminGalleryPhotoRemovalTest < ActionDispatch::IntegrationTest
         photo_restore: { @drop.id.to_s => "1" }
       }
 
-    assert_redirected_to edit_admin_gallery_entry_path(@entry, anchor: "album-archived")
+    assert_redirected_to edit_admin_gallery_entry_path(@entry, anchor: "album-photos")
     assert_includes @entry.reload.photo_urls, @drop.url
     assert_not @drop.reload.archived?
   end
@@ -177,7 +177,7 @@ class AdminGalleryPhotoRemovalTest < ActionDispatch::IntegrationTest
         photo_destroy: { @drop.id.to_s => "1" }
       }
 
-    assert_redirected_to edit_admin_gallery_entry_path(@entry, anchor: "album-archived")
+    assert_redirected_to edit_admin_gallery_entry_path(@entry, anchor: "album-photos")
     assert_not TempleGalleryPhoto.exists?(@drop.id)
     assert_not MediaAsset.exists?(asset.id), "the asset row owns the object, so it goes too"
     assert_equal [@keep.url], @entry.reload.photo_urls
@@ -220,8 +220,10 @@ class AdminGalleryPhotoRemovalTest < ActionDispatch::IntegrationTest
       photo_move_up: "album-photos",
       photo_move_down: "album-photos",
       photo_remove: "album-photos",
-      photo_restore: "album-archived",
-      photo_destroy: "album-archived"
+      photo_restore: "album-photos",
+      # One archived photo per album here, so destroying it empties the shelf
+      # and the live grid is the fallback. The shelf case has its own test.
+      photo_destroy: "album-photos"
     }.each do |control, anchor|
       entry = @temple.temple_gallery_entries.create!(title: "相簿 #{control}")
       first = entry.photos.create!(url: "https://example.test/#{control}-1.jpg", position: 0)
@@ -243,6 +245,53 @@ class AdminGalleryPhotoRemovalTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # Reported from production: the order controls anchored correctly and restore
+  # did not. The archived shelf renders only while it holds something, so
+  # restoring or destroying the last archived photo removes the element the
+  # fragment names -- and a fragment with no target leaves the browser at the
+  # top of the page. The anchor has to name where the photo ended up.
+  test "restore lands on the live grid, because that is where the photo went" do
+    @drop.archive!
+
+    patch admin_gallery_entry_path(@entry),
+      params: {
+        temple_gallery_entry: { title: @entry.title, photo_urls_raw: @keep.url },
+        photo_restore: { @drop.id.to_s => "1" }
+      }
+
+    assert_redirected_to edit_admin_gallery_entry_path(@entry, anchor: "album-photos")
+    assert_equal 0, @entry.reload.photos.archived.count,
+      "the shelf is now empty, so album-archived would name nothing"
+  end
+
+  test "destroying the last archived photo falls back to the live grid" do
+    @drop.archive!
+
+    patch admin_gallery_entry_path(@entry),
+      params: {
+        temple_gallery_entry: { title: @entry.title, photo_urls_raw: @keep.url },
+        photo_destroy: { @drop.id.to_s => "1" }
+      }
+
+    assert_redirected_to edit_admin_gallery_entry_path(@entry, anchor: "album-photos")
+    assert_equal 0, @entry.reload.photos.archived.count
+  end
+
+  test "destroying one of several archived photos stays on the shelf" do
+    @drop.archive!
+    other = @entry.photos.create!(url: "https://example.test/other.jpg", position: 2)
+    other.archive!
+
+    patch admin_gallery_entry_path(@entry),
+      params: {
+        temple_gallery_entry: { title: @entry.title, photo_urls_raw: @keep.url },
+        photo_destroy: { @drop.id.to_s => "1" }
+      }
+
+    assert_redirected_to edit_admin_gallery_entry_path(@entry, anchor: "album-archived")
+    assert_equal 1, @entry.reload.photos.archived.count, "the shelf still renders"
+  end
+
   # The anchors are only worth having if the form carries them; without these
   # ids the redirect lands at the top of the page and the admin scrolls back
   # down to the grid after every move.
@@ -262,8 +311,8 @@ class AdminGalleryPhotoRemovalTest < ActionDispatch::IntegrationTest
     get edit_admin_gallery_entry_path(@entry)
     submitted = response.body.scan(/name="(photo_[a-z_]+)\[/).flatten.uniq
 
-    assert_equal [], submitted - Admin::GalleryEntriesController::PHOTO_ACTION_ANCHORS.keys,
-      "a photo control on the form has no entry in PHOTO_ACTION_ANCHORS"
+    assert_equal [], submitted - Admin::GalleryEntriesController::PHOTO_ACTION_OUTCOMES.keys,
+      "a photo control on the form has no entry in PHOTO_ACTION_OUTCOMES"
     assert_includes submitted, "photo_move_up", "the form should be rendering photo controls at all"
   end
 
