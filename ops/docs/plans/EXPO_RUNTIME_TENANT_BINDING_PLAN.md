@@ -82,6 +82,31 @@ one. The app must not know which tenants exist.
 One temple at a time remains the rule. It becomes a session rule rather than a
 compile rule; the current code conflates the two.
 
+## A stored binding must be able to go stale
+
+Removing `tenantSlug` from config removes a check that currently exists by
+accident. `app/tenant/storage.js:10` validates a retained binding against
+`config.tenantSlug` and returns null when they differ — so today a binding can
+only ever be for the one compiled tenant. Once the field is gone, that
+comparison has nothing to compare against and the stored binding is simply
+trusted.
+
+That leaves a real state: a binding whose temple no longer resolves. It arises
+whenever a temple is renamed, unpublished or removed — including the planned
+`shengfukung-wenfu` → `shengfukung-demo` rename, where a stale binding would
+send `temple_slug=` for a tenant the server cannot find.
+
+The failure is quiet, which is what makes it worth designing for. The app loads,
+looks bound, shows the remembered temple name, and then fails on every request.
+
+Required behaviour: when the bound temple does not resolve at the configured
+origin, drop to unbound and prompt for a rescan. Not an error screen, not a
+retry loop — the same state a fresh install is in, which the app already knows
+how to present.
+
+This is not only a migration concern. A client whose temple is renamed or
+offboarded hits the same path.
+
 ## Out of scope
 
 - Renaming the `shengfukung-wenfu` tenant slug. Separate decision.
@@ -109,6 +134,8 @@ by Version, Not by Build".
 - No tenant slug appears anywhere in `mobile/app.config.js`.
 - A release build binds to a temple named by a QR it has never been told about,
   confirmed against the server.
+- A stored binding whose temple no longer resolves drops to unbound and prompts
+  for a rescan, rather than loading and then failing on every request.
 - A QR from an origin other than the configured one is still refused.
 - Unbind returns the app to an unbound state that can bind to a different
   temple.

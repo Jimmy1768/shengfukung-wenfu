@@ -62,7 +62,31 @@ tenant before that fix breaks every installed TestFlight build: they would fail
 to bind and fail to reach the API. Once staff are on a build without the pin,
 the rename costs nothing on the app side.
 
-Sequence: Expo tenant fix → new build → rename.
+Sequence: Expo tenant fix → new TestFlight build → **staff confirmed on that
+build** → rename.
+
+The middle step is the one that is easy to skip. Releasing the build is not the
+same as staff running it; TestFlight does not auto-update, and the demo is what
+the sales team shows.
+
+What the old build does after the rename, if anyone is still on it — both
+failures Observed in the code:
+
+- **A fresh scan is refused.** `app/tenant/scanner.js` compares the server's
+  `temple.slug` against the compiled `tenantSlug`. The server answers
+  `shengfukung-demo`, the build expects `shengfukung-wenfu`, and the result is
+  `binding_failed`.
+- **An existing binding fails quietly, which is worse.**
+  `app/tenant/storage.js:10` validates the stored binding against
+  `config.tenantSlug`, and both are still the old string, so the binding loads
+  and the app looks healthy. Then `app/real/adapter.js:6` sends
+  `temple_slug=shengfukung-wenfu` on every request. `TempleContextResolver`
+  finds no temple for it, falls through to `:project_default` — which is
+  `AppConstants::Project.slug`, the same dead string — and resolves nothing. The
+  app opens normally and then fails at everything.
+
+"Only staff use TestFlight" does not make this safe to skip. Staff are the
+people demonstrating the product.
 
 ## Onboarding the real temple is an addition, not a handover
 
