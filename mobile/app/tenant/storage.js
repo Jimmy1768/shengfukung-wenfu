@@ -1,13 +1,25 @@
 const { storageKey, storageScope } = require('../core/storage_scope');
-const { isReleaseConfig } = require('../real/config');
 
-const trustedBindingKey = config => storageKey(storageScope({ environment: config?.environment, tenantId: config?.tenantSlug }), 'trusted-binding');
+// Deliberately not scoped by tenant. This key is what *tells* the app which
+// temple it is on, so scoping it by that answer was circular -- it worked only
+// while the tenant was compiled in. One device holds one loaded temple at a
+// time, so one key per environment is the whole story.
+const trustedBindingKey = config => storageKey(storageScope({ environment: config?.environment }), 'trusted-binding');
 
 const normalizedBinding = (binding, config) => {
-  if (!isReleaseConfig(config) || binding?.state !== 'bound' || binding?.source !== 'qr') return null;
+  if (binding?.state !== 'bound' || binding?.source !== 'qr') return null;
   const id = String(binding.tenant?.id || '').trim();
   const name = String(binding.tenant?.name || '').trim();
-  if (!id || !name || id !== config.tenantSlug) return null;
+  // No comparison against a configured tenant: there is no longer one to
+  // compare against, and that was the mechanism that pinned a build to a single
+  // temple. What makes a stored binding trustworthy is that it was produced by
+  // a scan the server confirmed (source 'qr'), not that it matches a constant.
+  //
+  // The slug is the identity and is required. The display name is not: the
+  // server confirms a slug without being asked who is calling, and does not
+  // hand out a name to an unauthenticated caller. A temple with no name yet is
+  // a temple that has not loaded; the app shows its own name until it has.
+  if (!id) return null;
   return { state: 'bound', tenant: { id, name }, error: null, source: 'qr' };
 };
 
@@ -15,7 +27,6 @@ function createTrustedBindingStorage({ store, config }) {
   const key = trustedBindingKey(config);
   return {
     async load() {
-      if (!isReleaseConfig(config)) return null;
       const raw = await store.getItem(key);
       if (!raw) return null;
       try {

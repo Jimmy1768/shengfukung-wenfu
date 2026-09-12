@@ -14,10 +14,23 @@ const user = { id: 1, email: 'member@example.test', native_name: '林小安' };
 const session = { access_token: 'access-1', refresh_token: 'refresh-1', token_type: 'Bearer', expires_in: 900 };
 const response = (body = {}, status = 200) => ({ ok: status >= 200 && status < 300, status, body });
 
+// The routes a patron can reach with no temple loaded. Everything else is
+// temple-scoped and the server refuses it without one.
+const SESSION_PATHS = ['/login', '/signup', '/refresh', '/password/recovery', '/password/reset', '/oauth/start', '/oauth/exchange', '/oauth/resolution/existing', '/oauth/resolution/new'];
+const KNOWN_TEMPLES = new Set(['fixture-temple', 'first-temple', 'second-temple', 'shengfukung-wenfu']);
+
 function fixtureTransport(calls, failures = {}, overrides = {}) {
   return async request => {
     calls.push(request);
     const path = request.url.replace(/^.*\/native/, '').replace(/\?.*$/, '');
+    // The server's temple rules, before any route answers. A fixture that
+    // answers every path successfully whatever it is sent cannot fail, and a
+    // test built on one is not evidence -- which is exactly how a temple-less
+    // sign-in was reported as working against a server that returns 422.
+    const found = /[?&]temple_slug=([^&]*)/.exec(request.url);
+    const slug = found ? decodeURIComponent(found[1]) : '';
+    if (slug && !KNOWN_TEMPLES.has(slug)) return response({ error: 'tenant_not_found', code: 'tenant_not_found' }, 404);
+    if (!slug && !SESSION_PATHS.includes(path)) return response({ error: 'tenant_required', code: 'tenant_required' }, 422);
     if (overrides[path]) return overrides[path];
     if (failures[path]) return failures[path];
     if (path === '/login' || path === '/signup' || path === '/password/reset') return response({ user, session });
@@ -127,6 +140,83 @@ test('logging out clears the session but keeps the remembered temple', async () 
     'the temple must survive sign-out');
   assert.equal(await local.getItem(sessionKey(storageScope({ environment: releaseConfig.environment, tenantId: releaseConfig.tenantSlug }))), null,
     'the session itself must still be cleared');
+});
+
+// Criterion 6. Signing in with no temple loaded must work, and must not reach
+// for anything temple-scoped on the way -- the server refuses those, and every
+// sign-in path used to call bootstrap unconditionally.
+test('a patron with no temple signs in, and nothing temple-scoped is attempted', async () => {
+  const releaseConfig = { mode: 'real', apiBaseUrl: 'http://local.test', environment: 'testflight' };
+  const calls = [];
+  const adapter = createRealAdapter({ config: releaseConfig, store: store(), transport: fixtureTransport(calls) });
+
+  await adapter.signIn({ email: user.email, password: 'test-password' });
+
+  assert.equal(calls.some(call => call.url.includes('/bootstrap')), false,
+    'bootstrap is temple-scoped and must not be attempted without one');
+  assert.equal(calls.every(call => !call.url.includes('temple_slug=')), true);
+  assert.deepEqual(calls.map(call => call.url.replace(/^.*\/native/, '').replace(/\?.*$/, '')), ['/login']);
+});
+
+// restoreSession matters on its own: it wiped the stored session before
+// rethrowing, so a temple-less patron who relaunched was silently signed out.
+test('relaunching with no temple keeps the session instead of discarding it', async () => {
+  const releaseConfig = { mode: 'real', apiBaseUrl: 'http://local.test', environment: 'testflight' };
+  const local = store();
+  const first = createRealAdapter({ config: releaseConfig, store: local, transport: fixtureTransport([]) });
+  await first.signIn({ email: user.email, password: 'test-password' });
+  const storedBefore = local.values.size;
+  assert.ok(storedBefore > 0, 'the session must be on disk for this test to mean anything');
+
+  const calls = [];
+  const relaunched = createRealAdapter({ config: releaseConfig, store: local, transport: fixtureTransport(calls) });
+  const restored = await relaunched.restoreSession();
+
+  assert.ok(restored, 'a restored session with no temple is still a session');
+  assert.equal(calls.some(call => call.url.includes('/bootstrap')), false);
+  assert.equal(local.values.size, storedBefore, 'the stored session must survive');
+});
+
+// The tenant is runtime state, read per request from what the scan stored --
+// not captured when the adapter was constructed. A patron can unload a temple
+// and load another without signing out or restarting, so an adapter built once
+// must follow that rather than hold the answer it started with.
+test('the adapter sends whichever temple is loaded, and none when there is none', async () => {
+  const releaseConfig = { mode: 'real', apiBaseUrl: 'http://local.test', environment: 'testflight' };
+  const local = store();
+  const calls = [];
+  const adapter = createRealAdapter({ config: releaseConfig, store: local, transport: fixtureTransport(calls) });
+  const bindings = createTrustedBindingStorage({ store: local, config: releaseConfig });
+
+  // Signed in with no temple loaded: the scanner screen is this state, and the
+  // session routes accept a request that names no tenant.
+  await adapter.signIn({ email: user.email, password: 'test-password' });
+  assert.ok(calls.length > 0);
+  assert.equal(calls.every(call => !call.url.includes('temple_slug=')), true,
+    'no temple loaded means no temple_slug at all, not an empty one');
+
+  await bindings.save({ state: 'bound', tenant: { id: 'first-temple', name: 'First' }, error: null, source: 'qr' });
+  calls.length = 0;
+  await adapter.listDependents();
+  assert.equal(calls.every(call => call.url.includes('temple_slug=first-temple')), true,
+    'the temple the scan stored is the one sent');
+
+  // Unload and load another, on the same adapter instance.
+  await bindings.save({ state: 'bound', tenant: { id: 'second-temple', name: 'Second' }, error: null, source: 'qr' });
+  calls.length = 0;
+  await adapter.listDependents();
+  assert.equal(calls.every(call => call.url.includes('temple_slug=second-temple')), true,
+    'a different temple takes effect without rebuilding the adapter');
+  assert.equal(calls.some(call => call.url.includes('first-temple')), false);
+});
+
+// Local development has no scan and no stored binding; its slug still comes
+// from configuration, which is the one place a tenant may still be named.
+test('local development still takes its tenant from configuration', async () => {
+  const calls = [];
+  const adapter = createRealAdapter({ config, store: store(), transport: fixtureTransport(calls) });
+  await adapter.signIn({ email: user.email, password: 'test-password' });
+  assert.equal(calls.every(call => call.url.includes('temple_slug=fixture-temple')), true);
 });
 
 test('real transport errors are surfaced and never return fixture data', async () => {

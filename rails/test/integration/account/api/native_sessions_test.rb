@@ -108,6 +108,99 @@ class NativeAccountSessionsTest < ActionDispatch::IntegrationTest
     assert_equal "session_invalid", response.parsed_body.fetch("code")
   end
 
+  # Signing in does not require a temple. The app has two gates on purpose, and
+  # a signed-in patron with no temple loaded is shown the scanner -- which is
+  # also where a patron lands after unloading a temple, not only on first run.
+  # Before this, login demanded a temple_slug the patron could only obtain by
+  # scanning, and scanning was behind the sign-in gate.
+  test "a session is issued with no temple at all" do
+    assert_no_difference -> { TempleConnection.count } do
+      post "/api/v1/account/native/login", params: { session: { email: @user.email, password: @password }, device: { device_id: "ios-no-temple", platform: "ios" } }
+      assert_response :success
+    end
+
+    session_payload = response.parsed_body.fetch("session")
+    assert_equal "Bearer", session_payload.fetch("token_type")
+    assert Auth::JwtService.decode(session_payload.fetch("access_token")), "the token must still be usable"
+  end
+
+  test "signup is issued with no temple at all" do
+    assert_no_difference -> { TempleConnection.count } do
+      post "/api/v1/account/native/signup", params: { signup: { email: "no-temple-#{SecureRandom.hex(3)}@example.com", password: @password, password_confirmation: @password }, device: { device_id: "ios-signup", platform: "ios" } }
+      assert_response :created
+    end
+  end
+
+  # The blank case is the only one that changed. A slug that is supplied is
+  # still resolved and still joins, so nothing about the existing flow moves.
+  test "a session issued with a temple still joins it" do
+    assert_difference -> { TempleConnection.count }, 1 do
+      post "/api/v1/account/native/login", params: { temple_slug: @temple.slug, session: { email: @user.email, password: @password }, device: { device_id: "ios-joins", platform: "ios" } }
+      assert_response :success
+    end
+
+    assert TempleConnection.exists?(user_id: @user.id, temple_id: @temple.id)
+  end
+
+  # Tolerating a blank slug must not tolerate a wrong one: this is the signal
+  # the app's scanner relies on to reject a code naming a temple that does not
+  # exist, and it is what keeps the QR's claim from ever winning on its own.
+  test "a slug that names nothing is still refused on a session route" do
+    post "/api/v1/account/native/login", params: { temple_slug: "no-such-temple", session: { email: @user.email, password: @password }, device: { device_id: "ios-bad-temple", platform: "ios" } }
+    assert_response :not_found
+    assert_equal "tenant_not_found", response.parsed_body.fetch("code")
+  end
+
+  # OAuth sign-in is sign-in. A patron with no temple loaded reaches these from
+  # the same signed-out screen as the password path, so they carry no slug
+  # either; leaving them temple-required would have broken Google and Apple
+  # sign-in for exactly the patron this change exists to serve.
+  test "oauth start works with no temple, and still refuses an unknown one" do
+    post "/api/v1/account/native/oauth/start", params: { oauth: { provider: "google", pkce_challenge: "a" * 43, pkce_method: "S256" } }
+    # It gets past temple resolution and fails later, on provider configuration
+    # that this environment does not have -- which is the point: the request is
+    # no longer rejected for having no tenant. Asserting the absence of the two
+    # tenant codes states that directly, without pinning the provider outcome.
+    refute_equal "tenant_required", response.parsed_body["code"], "a missing temple must not be refused"
+    refute_equal "tenant_not_found", response.parsed_body["code"]
+    assert_equal "native_oauth_unavailable", response.parsed_body["code"],
+      "it should reach the provider stage; if this changes, the reason it got there is what matters"
+
+    post "/api/v1/account/native/oauth/start", params: { temple_slug: "no-such-temple", oauth: { provider: "google", pkce_challenge: "a" * 43, pkce_method: "S256" } }
+    assert_response :not_found
+    assert_equal "tenant_not_found", response.parsed_body.fetch("code")
+  end
+
+  # The relaxation is scoped to the routes that issue a session. Everything
+  # authenticated still demands a temple, because it operates inside one.
+  test "an authenticated route still requires a temple" do
+    session_payload = native_login
+
+    get "/api/v1/account/native/bootstrap", headers: bearer(session_payload.fetch("access_token"))
+    assert_response :unprocessable_entity
+    assert_equal "tenant_required", response.parsed_body.fetch("code")
+  end
+
+  # The contract mobile/app/tenant/scanner.js depends on, asserted here so the
+  # two surfaces cannot drift apart silently.
+  #
+  # The scanner is not authenticated -- it runs before a temple is loaded and
+  # is handed no session -- so it has to tell "this slug is a temple" from
+  # "this slug is nothing" without a token. Temple resolution runs before
+  # authentication, which is exactly what makes that possible: an unknown slug
+  # is refused at the first filter, a real one gets as far as the second.
+  test "an unauthenticated native call distinguishes a real temple from an unknown one" do
+    get "/api/v1/account/native/bootstrap", params: { temple_slug: @temple.slug }
+    assert_response :unauthorized
+    assert_equal "session_invalid", response.parsed_body.fetch("code"),
+      "a real temple must get past resolution and fail on the token instead"
+
+    get "/api/v1/account/native/bootstrap", params: { temple_slug: "no-such-temple" }
+    assert_response :not_found
+    assert_equal "tenant_not_found", response.parsed_body.fetch("code"),
+      "an unknown slug must be refused before authentication is even considered"
+  end
+
   private
 
   def native_login

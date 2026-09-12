@@ -19,8 +19,10 @@ class Account::ConnectQrTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "<svg"
 
     # The exact contract in mobile/app/tenant/binding.js.
-    url = URI.parse(Templemate::ConnectionLink.for(request: @request))
-    assert_equal Templemate::ConnectionLink::PATH, url.path
+    url = URI.parse(Templemate::ConnectionLink.for(temple: @temple))
+    assert_equal "https", url.scheme
+    assert_equal URI.parse(Templemate::ConnectionLink::ORIGIN).host, url.host
+    assert_equal "#{Templemate::ConnectionLink::PATH_PREFIX}/#{@temple.slug}", url.path
     assert_nil url.fragment
     assert_nil url.userinfo
     assert_nil url.query
@@ -32,11 +34,27 @@ class Account::ConnectQrTest < ActionDispatch::IntegrationTest
     refute_includes response.body.to_s, "<svg"
   end
 
-  # nginx serves www.<domain> directly instead of redirecting it, and the app
-  # compares the origin to its configured apiBaseUrl exactly -- so a code
-  # generated on www was rejected as invalid_connection_link with no visible
-  # reason. The link must always carry the canonical apex.
-  test "the encoded link strips www so the app's exact-origin check passes" do
+  # The code names the temple, which is the whole point: one app, built with no
+  # tenant in it, loads whichever temple the scanned code identifies.
+  test "the link carries this temple's own slug" do
+    other = create_temple(slug: "second-temple", name: "Second Temple")
+
+    assert_equal "#{Templemate::ConnectionLink::ORIGIN}#{Templemate::ConnectionLink::PATH_PREFIX}/#{@temple.slug}",
+      Templemate::ConnectionLink.for(temple: @temple)
+    assert_equal "#{Templemate::ConnectionLink::ORIGIN}#{Templemate::ConnectionLink::PATH_PREFIX}/#{other.slug}",
+      Templemate::ConnectionLink.for(temple: other)
+    refute_equal Templemate::ConnectionLink.for(temple: @temple), Templemate::ConnectionLink.for(temple: other)
+  end
+
+  # The origin used to be derived from request.base_url, and nginx serves
+  # www.<domain> directly rather than redirecting -- so a code generated on www
+  # encoded a host the app's exact-origin check rejected, with no visible
+  # reason. That is how it failed for the Director's staff on 2026-09-02.
+  #
+  # The origin is now a fixed platform constant, so the request host cannot
+  # reach it at all. This asserts the stronger property the fix actually bought:
+  # not "www is stripped" but "the request cannot influence the origin".
+  test "the encoded link ignores the request host entirely" do
     sign_in_account(@user, temple_slug: @temple.slug)
     get account_connect_path
     assert_response :success
@@ -44,9 +62,9 @@ class Account::ConnectQrTest < ActionDispatch::IntegrationTest
     # Rails' integration host is www.example.com.
     assert_equal "www.example.com", URI.parse(@request.base_url).host
 
-    link = Templemate::ConnectionLink.for(request: @request)
-    assert_equal "example.com", URI.parse(link).host, "www must be stripped"
-    assert link.end_with?(Templemate::ConnectionLink::PATH)
+    link = Templemate::ConnectionLink.for(temple: @temple)
+    assert link.start_with?(Templemate::ConnectionLink::ORIGIN), "the platform origin must be used verbatim"
+    refute_includes link, "example.com"
     refute_includes link, "www."
 
     # The page shows the encoded link, so a failed scan is diagnosable.
