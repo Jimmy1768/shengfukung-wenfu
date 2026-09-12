@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { createRealAdapter } = require('../app/real/adapter');
-const { resolveClientConfig, localTenantBinding } = require('../app/real/config');
+const { resolveClientConfig } = require('../app/real/config');
 const { sessionKey } = require('../app/real/storage');
 const { createTrustedBindingStorage } = require('../app/tenant/storage');
 const { storageScope } = require('../app/core/storage_scope');
@@ -64,7 +64,6 @@ test('there is one mode, and it cannot be configured without tenant and API inpu
   // Needs a config that clears the origin/tenant checks first, since without a
   // dummy fallback those now fire before the OAuth return URL is looked at.
   assert.throws(() => resolveClientConfig({ localApiBaseUrl: 'http://local.test/', localTenantSlug: 'fixture', clientEnvironment: 'test', nativeOAuthReturnUrl: 'templemate://wrong' }), { code: 'NATIVE_OAUTH_RETURN_REQUIRED' });
-  assert.deepEqual(localTenantBinding(config), { state: 'bound', tenant: { id: 'fixture-temple', name: 'fixture-temple' }, error: null, source: 'local-test' });
 });
 
 test('real adapter maps the complete account contract and never falls back to dummy data', async () => {

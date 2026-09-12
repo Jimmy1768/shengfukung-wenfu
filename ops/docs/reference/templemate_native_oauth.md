@@ -35,11 +35,6 @@ tenant switch, and reset all fail closed. An app restart can report one valid,
 unexpired browser interruption, but beginning again replaces the old pending
 record. No code is written to storage or logs.
 
-The deterministic dummy driver uses injected fixture outcomes for Google and
-Apple: success, profile-required, cancellation, denial, failure, interruption,
-and reset. It has `network: disabled` and does not model a provider
-registration or live authority.
-
 ## TempleMate-specific behavior
 
 The visible account-only buttons, localized copy, demo disclosure, existing
@@ -53,8 +48,8 @@ copy this UI or its fixture tenant values blindly.
 
 | Mode | Public inputs | Known values | Deferred external values |
 | --- | --- | --- | --- |
-| Development | client mode, local API base URL, tenant slug, environment, return URI | default mode is dummy; return URI is `templemate://oauth/complete` | provider registration and deployed return allowlist |
-| Production | explicit real-mode configuration, tenant scope, return URI | return URI remains `templemate://oauth/complete` | production API/tenant values, provider registration, universal/app links |
+| Development | local API base URL, tenant slug, environment, return URI | one mode, real: every build talks to a real server (`app/real/config.js`); return URI is `templemate://oauth/complete` | provider registration and deployed return allowlist |
+| Production | API origin and return URI | the origin is pinned; no tenant is compiled in — the temple is loaded at runtime from a scanned code, and signing in needs none. Return URI remains `templemate://oauth/complete`. The central auth tenant is `AUTH_TENANT_SLUG`, the app's own registration and never a temple slug | provider registration, universal/app links |
 
 The public configuration contains no client secret, provider token, ID token,
 refresh token, provider client ID, central response body, or redirect code.

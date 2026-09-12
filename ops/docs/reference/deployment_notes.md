@@ -157,12 +157,25 @@
 Recurring facts from repeated physical-device QA cycles on a Pixel 8, worth
 knowing before repeating this from scratch:
 
-- Dummy-mode Metro/ADB attach recipe, reused unchanged across many device QA
-  sessions:
+- Metro/ADB attach recipe. The older form of this set
+  `TEMPLEMATE_CLIENT_MODE=dummy` and no local API URL. Both are wrong now:
+  `TEMPLEMATE_CLIENT_MODE` is read nowhere in `mobile/app.config.js` or
+  `mobile/app/`, since there is one mode and every build talks to a real
+  server, and `resolveClientConfig` throws `REAL_CONFIG_REQUIRED` when no API
+  origin is configured — so that recipe reaches the boot-failure screen rather
+  than the app. Rails runs on 4001 locally, and the device needs a reverse for
+  it as well as for Metro:
   ```
   adb -s <serial> reverse tcp:8081 tcp:8081
-  TEMPLEMATE_CLIENT_MODE=dummy BUILD_MODE=development npx expo start --dev-client --localhost --port 8081
+  adb -s <serial> reverse tcp:4001 tcp:4001
+  TEMPLEMATE_LOCAL_API_BASE_URL=http://localhost:4001 \
+    BUILD_MODE=development npx expo start --dev-client --localhost --port 8081
   ```
+  `TEMPLEMATE_LOCAL_TENANT_SLUG` is optional and decides where you land: set it
+  and the app has a temple from configuration; leave it unset and it behaves
+  the way a release build does, signing in with no temple and showing the
+  scanner. A release build never reads either variable — it is compiled with no
+  tenant at all and loads one from a scanned code.
 - A long-running device session can go to sleep/lock (Android "Dozing")
   between Planning/Control round-trips. From the outside this looks like a
   stuck system surface fighting the app for focus — a real diagnosis packet

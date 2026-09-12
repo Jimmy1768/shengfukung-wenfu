@@ -15,9 +15,17 @@ test('feedback state owns errors and destination notices across navigation, rese
   assert.deepEqual(emptyFeedback(), { error: null, notice: null }, 'reset and locale changes clear all transient feedback');
 });
 
+// The demo phrases this used to require are gone from the list. Asserting them
+// PRESENT was the dummy client written down as a contract: it would have failed
+// the moment the retired copy was removed, which is backwards for strings no
+// build can reach. What is worth pinning is that both locales are complete and
+// that vocabulary which never belonged in patron-facing copy stays out.
 test('refined presentation keeps both complete locales', () => {
   const source = read('app/ui/copy.js');
-  for (const phrase of ['示範模式', 'Demo mode:', 'TempleMate', '連結失敗', 'Connection failed', '僅供展示', 'display only']) assert.match(source, new RegExp(phrase));
+  for (const phrase of ['TempleMate', '連結失敗', 'Connection failed']) assert.match(source, new RegExp(phrase));
+  for (const gone of ['cameraInvalidQr:', 'cameraInstructions:']) {
+    assert.equal(source.includes(gone), false, `${gone} is the demo half of a pair no build reads`);
+  }
   assert.equal(source.includes('OAuth'), false);
   assert.equal(source.includes('checkout'), false);
 });

@@ -5,9 +5,11 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { createCameraPermissionController, createCameraSession } from './camera_session';
 import { Button, Notice } from '../ui/primitives';
 
-export function TempleQrCamera({ mode, onScan, onCancel, t, palette, isRelease = false }) {
-  const invalidQrMessage = isRelease ? t.cameraInvalidQrRelease : t.cameraInvalidQr;
-  const instructions = isRelease ? t.cameraInstructionsRelease : t.cameraInstructions;
+export function TempleQrCamera({ mode, onScan, onCancel, t, palette }) {
+  // One set of strings. The demo halves of these pairs went with the dummy
+  // client; there is no build that reads them any more.
+  const invalidQrMessage = t.cameraInvalidQrRelease;
+  const instructions = t.cameraInstructionsRelease;
   const [permission, requestPermission] = useCameraPermissions();
   const session = useRef(createCameraSession({ scanPayload: onScan })).current;
   const permissionController = useRef(createCameraPermissionController()).current;
