@@ -132,12 +132,14 @@ if the loop above checks what the loop below never runs. Director's model,
 | TestFlight | native changes, store submission | a new build |
 | new build | — | reserved for when the app is stable |
 
-The dev client auto-loads a dummy temple from `TEMPLEMATE_LOCAL_TENANT_SLUG`
-and never shows the scanner. That is deliberate: the scan is one feature, and
-paying for it on every session — running the web portal, signing in, fetching a
-code — would tax all the work that has nothing to do with temples. The cost is
-that the skipped step is invisible until TestFlight, which is acceptable
-because TestFlight is production conditions anyway.
+The dev client auto-loads a real temple on a local Rails, named by
+`TEMPLEMATE_LOCAL_TENANT_SLUG`, and never shows the scanner. It is a real
+tenant row with real data; only the scan is skipped. That is deliberate: the
+scan is one feature, and paying for it on every session — running the web
+portal, signing in, fetching a code — would tax all the work that has nothing
+to do with temples. The cost is that the skipped step is invisible until
+TestFlight, which is acceptable because TestFlight is production conditions
+anyway.
 
 **Dev and release resolve configuration through different code**
 (`releaseConfiguration` returns null outside the release lanes), so a passing
