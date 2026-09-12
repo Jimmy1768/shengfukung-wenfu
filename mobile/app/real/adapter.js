@@ -51,10 +51,26 @@ function createRealAdapter({ config, store, transport, device = { device_id: 'lo
     return payload;
   };
   const applySession = async next => { session = next; await scoped.saveSession(next); };
-  const loadBootstrap = async () => { const payload = await request('GET', '/bootstrap'); state = { ...state, ...snapshotFromBootstrap(payload) }; return state; };
+  // Every field bootstrap returns is scoped to one temple, and the server
+  // refuses the call without one. A signed-in patron with no temple loaded is
+  // not an error state -- it is the scanner screen, and it is where a patron
+  // sits after unloading a temple as well as before loading a first one. So
+  // this returns what is already held rather than failing the sign-in that
+  // reached it. Three call sites depended on that failure: authenticate,
+  // exchangeOAuth and restoreSession, the last of which wiped the stored
+  // session on the way past.
+  const loadBootstrap = async () => {
+    if (!(await currentTenantSlug())) return state;
+    const payload = await request('GET', '/bootstrap');
+    state = { ...state, ...snapshotFromBootstrap(payload) };
+    return state;
+  };
   const authenticate = async (path, body) => { const payload = await request('POST', path, { ...body, device }, false); await applySession(payload.session); state = { ...state, ...snapshotFromBootstrap(payload) }; return loadBootstrap(); };
   const updateState = (key, value) => { state = { ...state, [key]: value }; return state; };
   return {
+    // Exposed so a scan can load the temple it just confirmed. This is the
+    // same loader sign-in uses, not a second one.
+    bootstrap: () => loadBootstrap(),
     kind: 'real', network: config.environment === 'test' ? 'local-test' : config.environment, mode: 'real', snapshot: () => state,
     oauthStorage: { loadPending: () => scoped.loadPending(), savePending: pending => scoped.savePending(pending), clearPending: () => scoped.clearPending() },
     async startOAuth({ provider, pkceChallenge, pkceMethod }) {

@@ -1,5 +1,4 @@
 const { storageKey, storageScope } = require('../core/storage_scope');
-const { isReleaseConfig } = require('../real/config');
 
 // Deliberately not scoped by tenant. This key is what *tells* the app which
 // temple it is on, so scoping it by that answer was circular -- it worked only
@@ -8,7 +7,7 @@ const { isReleaseConfig } = require('../real/config');
 const trustedBindingKey = config => storageKey(storageScope({ environment: config?.environment }), 'trusted-binding');
 
 const normalizedBinding = (binding, config) => {
-  if (!isReleaseConfig(config) || binding?.state !== 'bound' || binding?.source !== 'qr') return null;
+  if (binding?.state !== 'bound' || binding?.source !== 'qr') return null;
   const id = String(binding.tenant?.id || '').trim();
   const name = String(binding.tenant?.name || '').trim();
   // No comparison against a configured tenant: there is no longer one to
@@ -28,7 +27,6 @@ function createTrustedBindingStorage({ store, config }) {
   const key = trustedBindingKey(config);
   return {
     async load() {
-      if (!isReleaseConfig(config)) return null;
       const raw = await store.getItem(key);
       if (!raw) return null;
       try {

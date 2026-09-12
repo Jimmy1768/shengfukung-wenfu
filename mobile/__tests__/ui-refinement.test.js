@@ -92,6 +92,42 @@ test('tenant connection presentation uses the shared retained-tenant selector', 
 // other path that used to clear it -- sign-out, session expiry, account
 // closure, OAuth, the fixture switch-temple flow -- was a bug, each found
 // separately over 2026-09-04.
+// Criterion 7. isReleaseConfig was the surviving half of the dummy-client
+// switch, and it selected behaviour rather than wording -- which is why a scan
+// never loaded a temple in a release build: the code that names one after
+// loading sat on the side a release build never ran.
+test('one code path serves every build', () => {
+  for (const file of ['App.js', 'app/real/config.js', 'app/tenant/storage.js']) {
+    assert.equal(read(file).includes('isReleaseConfig'), false, `${file} still selects behaviour by build`);
+  }
+});
+
+// Criterion 2. The scan must load the temple it just confirmed -- its name and
+// its collections -- not merely record the slug. This previously called
+// setData(adapter.snapshot()): the snapshot exactly as it already was.
+test('a scan loads the temple it confirmed', () => {
+  const app = read('App.js');
+  const handler = app.slice(app.indexOf('const onCameraResult'), app.indexOf('const onCameraResult') + 1400);
+  assert.match(handler, /trustedBindingStorage\.save\(result\)/, 'the confirmed temple is recorded');
+  assert.match(handler, /adapter\.bootstrap\(\)/, 'and loaded: bootstrap carries the temple name');
+  assert.match(handler, /adapter\.loadCollections\(\)/, 'and its collections');
+  assert.equal(/setData\(adapter\.snapshot\(\)\)/.test(handler), false,
+    'the snapshot as it already was is not a load');
+});
+
+// Criterion 6. Collections are six temple-scoped requests; asking for them
+// with no temple loaded is what produced the error banner on the scanner.
+test('temple-scoped collections are never requested without a temple', () => {
+  const app = read('App.js');
+  const loads = app.split('adapter.loadCollections()');
+  assert.equal(loads.length - 1, 3, 'three call sites: startup, sign-in, and the scan');
+  for (const before of loads.slice(0, -1)) {
+    const window = before.slice(-700);
+    assert.match(window, /activePresentationTenant|onCameraResult|bootstrap\(\)/,
+      'each load is reached only with a temple in hand');
+  }
+});
+
 test('only the explicit Unbind control forgets the temple', () => {
   const app = read('App.js');
   assert.match(app, /const onUnbindTemple = async \(\) => \{/);

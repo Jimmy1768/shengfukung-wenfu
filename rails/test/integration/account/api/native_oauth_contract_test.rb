@@ -29,6 +29,46 @@ class NativeOauthContractTest < ActionDispatch::IntegrationTest
     @challenge = Auth::NativeOAuthTransaction.s256_challenge(@verifier)
   end
 
+  # Criterion 6. A patron with no temple loaded signs in by Google and Apple,
+  # not only by email. The flow read @temple.slug for both the transaction and
+  # the central tenant, so a temple-less start raised NoMethodError through a
+  # rescue list that did not cover it.
+  test "OAuth starts with no temple loaded" do
+    central = FakeCentralOAuthClient.new({ "redirect_url" => "https://central.example.test/google" }, nil)
+
+    with_return_url do
+      Auth::CentralOAuthClient.stub(:new, central) do
+        post native_start_path, params: start_params(provider: "google")
+      end
+    end
+
+    assert_response :created
+    assert_equal "google", response.parsed_body.fetch("oauth").fetch("provider")
+    assert response.parsed_body.fetch("oauth").fetch("transaction_token").present?
+    assert_equal "shengfukung", central.start_calls.first.fetch(:tenant_slug)
+    refute_includes central.start_calls.first.to_s, "native-oauth-temple",
+      "no temple may reach the central client"
+  end
+
+  # A transaction is deliberately no longer bound to a temple. It carried
+  # temple_slug and refused an exchange presented under a different one; that
+  # guarded a session's temple scope, and a session no longer has one. What the
+  # transaction still binds is unchanged and asserted above: the token itself,
+  # the return URL, the PKCE verifier and the provider.
+  test "a transaction is not bound to a temple" do
+    central = FakeCentralOAuthClient.new({ "redirect_url" => "https://central.example.test/google" }, identity_response)
+    token = start_transaction(central)
+
+    with_return_url do
+      Auth::CentralOAuthClient.stub(:new, central) do
+        post native_exchange_path(temple_slug: create_temple.slug), params: exchange_params(token)
+      end
+    end
+
+    refute_equal 401, response.status, "a different temple must not invalidate the transaction"
+    assert_equal "account_resolution_required", response.parsed_body.fetch("code")
+  end
+
   test "Google start uses only server selected return URL and exact S256 arguments" do
     central = FakeCentralOAuthClient.new({ "redirect_url" => "https://central.example.test/google" }, nil)
 
@@ -48,7 +88,9 @@ class NativeOauthContractTest < ActionDispatch::IntegrationTest
       {
         provider: "google",
         return_url: @return_url,
-        tenant_slug: @temple.slug,
+        # The deployment's central tenant, not this temple's slug. Nothing about
+        # signing in varies by temple, and a patron may have none loaded.
+        tenant_slug: "shengfukung",
         pkce_challenge: @challenge,
         pkce_method: "S256",
         context: { "native_oauth_contract" => "v1" }
@@ -215,17 +257,13 @@ class NativeOauthContractTest < ActionDispatch::IntegrationTest
     assert_equal "tenant_not_found", response.parsed_body.fetch("code")
   end
 
-  test "exchange rejects tamper wrong temple changed return verifier mismatch and provider mismatch without a session" do
+  test "exchange rejects tamper changed return verifier mismatch and provider mismatch without a session" do
     central = FakeCentralOAuthClient.new({ "redirect_url" => "https://central.example.test/google" }, identity_response)
     token = start_transaction(central)
 
     with_return_url do
       Auth::CentralOAuthClient.stub(:new, central) do
         post native_exchange_path, params: exchange_params("#{token}x")
-        assert_response :unauthorized
-        assert_equal "invalid_oauth_transaction", response.parsed_body.fetch("code")
-
-        post native_exchange_path(temple_slug: create_temple.slug), params: exchange_params(token)
         assert_response :unauthorized
         assert_equal "invalid_oauth_transaction", response.parsed_body.fetch("code")
 
@@ -546,7 +584,15 @@ class NativeOauthContractTest < ActionDispatch::IntegrationTest
     "header.#{payload}.signature"
   end
 
-  def with_return_url(&)
-    AppConstants::OAuth.stub(:native_return_url, @return_url, &)
+  # The central auth tenant is a deployment identity, supplied here the way the
+  # return URL is. It used to fall back to the temple's slug, which is what made
+  # signing in require a temple; there is no fallback now, so a test that
+  # exercises OAuth has to configure the deployment.
+  def with_return_url(&block)
+    previous = ENV["AUTH_TENANT_SLUG"]
+    ENV["AUTH_TENANT_SLUG"] = "shengfukung"
+    AppConstants::OAuth.stub(:native_return_url, @return_url, &block)
+  ensure
+    previous.nil? ? ENV.delete("AUTH_TENANT_SLUG") : ENV["AUTH_TENANT_SLUG"] = previous
   end
 end

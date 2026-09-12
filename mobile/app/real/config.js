@@ -51,5 +51,4 @@ function resolveClientConfig(extra = {}) {
 
 const localTenantBinding = config => ({ state: 'bound', tenant: { id: config.tenantSlug, name: config.tenantSlug }, error: null, source: 'local-test' });
 
-const isReleaseConfig = config => RELEASE_ENVIRONMENTS.has(config?.environment);
-module.exports = { PUBLIC_ORIGIN, PLATFORM_CONNECT_ORIGIN, RELEASE_ENVIRONMENTS, resolveClientConfig, localTenantBinding, isReleaseConfig };
+module.exports = { PUBLIC_ORIGIN, PLATFORM_CONNECT_ORIGIN, RELEASE_ENVIRONMENTS, resolveClientConfig, localTenantBinding };
