@@ -2,8 +2,9 @@
 
 Product/runtime and builder-procedure context for this repository only. It does
 not apply to any other repository and is not copied into another. `CLAUDE.md`
-and `ops/protocol/claude_work_mode.md` are identical everywhere; everything
-that is true here and nowhere else belongs in this file.
+and `ops/protocol/claude_work_mode.md` are written by Workspace Strategy and
+received here; copies of those lag between repositories and that is expected.
+Everything true here and nowhere else belongs in this file.
 
 The work mode governs builder coordination only. It does not define or change
 Wenfu product/runtime phase integrity — temple, patron/account, offering and
@@ -56,19 +57,22 @@ multi-tenant — the Vue frontend is not.**
 
 ## Control Track Assignment
 
-The work mode's Control A/B are hand-agnostic by default — packet owns the
-branch, either hand can pick one up. This repository keeps them specialized by
-domain instead, inherited from how the work has actually run:
+Control A and Control B are split by **kind of work**, not by surface:
 
-- **Control A** owns Rails / account / admin / offering-data work.
-- **Control B** owns TempleMate / EAS / TestFlight / OTA / native OAuth /
-  mobile work.
-- The two stay independent; cross-track coordination routes through
-  Planning, not Control-to-Control.
+- **Control A — core build.** Features and subsystems, on any surface. Kept
+  clean, so it is never pulled off a subsystem to firefight.
+- **Control B — the Expo app, and live-production hot-fixes.** Both mobile work
+  and anything urgent against what is live, whichever surface it touches.
+- The two stay independent; cross-track coordination routes through Planning,
+  not Control-to-Control.
+
+The second half is the point. A hot-fix goes to B **regardless of surface** — a
+Rails admin fix included — so that A keeps its context on the subsystem it is
+building. An earlier version of this section split them by surface instead
+(A: Rails/account/admin, B: mobile), which left urgent work with no lane and
+interrupted whichever Control owned the affected surface.
 
 This is an operating convention for this repository, not a work-mode rule.
-Wenfu keeps the split because the domain division is already real, and each
-Control's accumulated context stays more useful when it is focused.
 
 ## Mobile/Expo Reference Pattern
 
@@ -94,6 +98,62 @@ matching DojoMate-Expo's actual proven pattern exactly — literal-string
 `runtimeVersion` pinned to `versioning.appVersion`, and the OTA script
 injecting each lane's `BUILD_MODE` itself rather than trusting the
 caller's shell.
+
+## Client Release Tiers
+
+Five tiers, ordered by how fast a result arrives and how much it means. Speed
+and fidelity trade against each other down the list.
+
+1. **Simulator** — iOS, driven by a session directly. Fastest, and the only
+   tier a session can exercise without the Director.
+2. **Dev client** — Android APK, internal distribution, `development` profile.
+   The Director sees results quickly. Android only; there is no dev client for
+   his iPhone, which is the whole reason tier 3 exists.
+3. **TestFlight** — `testflight` profile, store distribution, `testflight`
+   channel. Slower than the dev client, faster than a full rebuild cycle.
+   Doubles as the production-conditions check: a real store build against the
+   real server, not a staging server. Staff test here. **No customer reaches
+   it.** This is where a layout difference between iPhone and everything else
+   gets confirmed.
+4. **Production** — `production` profile and channel, the live build in
+   distribution, iOS and Android.
+5. **Production-China** — Android side-loading, because the marketplace is not
+   available there. **Not configured**: no build profile, no channel, no
+   reference in `eas.json`, `app.config.js` or `versioning.js` as of
+   2026-09-12. It is a tier in the Director's plan, not in the repository.
+
+TestFlight is production, not staging. It is a separate lane the Director uses
+for his own testing; the App Store line is tier 4.
+
+## OTA Reach Is Decided by Version, Not by Build
+
+`runtimeVersion` is pinned to `versioning.appVersion` as a literal string
+(`app.config.js`), and it names the **version**, never the build number.
+`iosBuildNumber` is a separate field that EAS Update does not consult.
+
+Consequences, and they are not obvious:
+
+- An OTA published for a version reaches **every build carrying that version**.
+  Version X build 1 and version X build 2 are one population.
+- Incrementing the iOS build number without spending a version number is an
+  Apple-side convenience. It separates uploads; it does not separate OTA
+  audiences.
+- **`release-x.x.x` is the isolation boundary.** Different version lines can
+  serve different populations at once — a newer line for the Director, an older
+  one for staff, an older one still in distribution — and an OTA on one line
+  cannot touch another. That is what the branch is for.
+
+**Director's decision, 2026-09-12: dev and staff are not separated into
+different builds.** When an OTA fix is needed, staff are brought onto the same
+build as the Director first. TestFlight's group feature would gate who receives
+a *build*; it does not gate an OTA, because reach follows `runtimeVersion`.
+
+**OTA carries JavaScript only.** A dependency change requires a rebuild and
+cannot ship as an update. The hazard that remains runs one way and needs all
+three of: a native module added in a rebuild, the build number bumped without
+the version, and later JS that references that module — at which point the
+older build receives JS assuming a native layer it does not have. Keeping staff
+and Director on one build removes the second condition.
 
 ## QA Dummy Admin Account
 
@@ -155,7 +215,7 @@ or claim legal, accounting, tax, invoice, settlement, or regulatory finality
 from local or stubbed evidence.
 
 Keep Rails, Vue, Expo, deployment, temple, account/admin, authority, payment,
-and documentation ownership explicit in every bounded packet and return.
+and documentation ownership explicit in every assignment and terminal.
 Preserve tenant isolation, owner/admin authority, secret handling, payment
 and accounting semantics, user-work protections, and the assisted-onboarding
 operating model unless an authorized plan explicitly changes them.
