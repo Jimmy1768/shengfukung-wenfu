@@ -122,6 +122,30 @@ and fidelity trade against each other down the list.
    reference in `eas.json`, `app.config.js` or `versioning.js` as of
    2026-09-12. It is a tier in the Director's plan, not in the repository.
 
+**What each tier skips, and who catches it.** The tiers are a safety net only
+if the loop above checks what the loop below never runs. Director's model,
+2026-09-12:
+
+| tier | skips | caught by |
+| --- | --- | --- |
+| dev client | the QR scan, loading and unloading a temple, and the whole release config path | TestFlight |
+| TestFlight | native changes, store submission | a new build |
+| new build | — | reserved for when the app is stable |
+
+The dev client auto-loads a dummy temple from `TEMPLEMATE_LOCAL_TENANT_SLUG`
+and never shows the scanner. That is deliberate: the scan is one feature, and
+paying for it on every session — running the web portal, signing in, fetching a
+code — would tax all the work that has nothing to do with temples. The cost is
+that the skipped step is invisible until TestFlight, which is acceptable
+because TestFlight is production conditions anyway.
+
+**Dev and release resolve configuration through different code**
+(`releaseConfiguration` returns null outside the release lanes), so a passing
+dev run says nothing about whether a release build starts. That is not a
+theoretical gap: on 2026-09-12 the boot checks that could have bricked the app
+existed only on the release path, and no amount of dev-client running would
+have reached them.
+
 TestFlight is production, not staging. It is a separate lane the Director uses
 for his own testing; the App Store line is tier 4.
 
