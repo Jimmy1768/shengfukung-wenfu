@@ -16,7 +16,10 @@ if [ ! -f "$MANIFEST_FILE" ]; then
 fi
 
 read_default_slug() {
-  ruby <<'RUBY' "$MANIFEST_FILE"
+  # `ruby <<HEREDOC "$FILE"` passes the FILE as ruby's script and the heredoc as
+  # ignored stdin, so this read the manifest as Ruby source and died on line 1.
+  # `-` is what makes ruby take the script from stdin and the filename as ARGV.
+  ruby - "$MANIFEST_FILE" <<'RUBY'
 require "yaml"
 data = YAML.safe_load_file(ARGV.first).fetch("temples")
 puts data.first.fetch("slug")
@@ -30,11 +33,16 @@ usage() {
 Usage: bin/expo_build <preset|custom> [-- additional EAS args]
 
 Presets:
-  dev-client  -> eas build --platform android --local --profile development-client
-  apk         -> eas build --platform android --local --profile production
-  aab         -> eas build --platform android --profile production-aab
+  dev-client  -> eas build --platform android --local --profile development
+  testflight  -> eas build --platform ios --profile testflight
   ipa         -> eas build --platform ios --profile production
+  aab         -> eas build --platform android --profile production
   custom      -> provide your own EAS args after `--`
+
+Every profile above exists in mobile/eas.json. There is no release-apk
+profile, so there is no `apk` preset: `development` is the only profile
+that sets android.buildType=apk and it builds a dev client. Use
+`dev-client` for an installable APK, or `aab` for the Play bundle.
 USAGE
   exit 1
 }
@@ -60,16 +68,16 @@ fi
 
 case "$PRESET" in
   dev-client)
-    BUILD_ARGS=(--platform android --local --profile development-client)
+    BUILD_ARGS=(--platform android --local --profile development)
     ;;
-  apk)
-    BUILD_ARGS=(--platform android --local --profile production)
-    ;;
-  aab)
-    BUILD_ARGS=(--platform android --profile production-aab)
+  testflight)
+    BUILD_ARGS=(--platform ios --profile testflight)
     ;;
   ipa)
     BUILD_ARGS=(--platform ios --profile production)
+    ;;
+  aab)
+    BUILD_ARGS=(--platform android --profile production)
     ;;
   custom)
     if [ "${#EXTRA_ARGS[@]}" -eq 0 ]; then

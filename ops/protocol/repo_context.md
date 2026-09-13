@@ -119,6 +119,40 @@ matching DojoMate-Expo's actual proven pattern exactly — literal-string
 injecting each lane's `BUILD_MODE` itself rather than trusting the
 caller's shell.
 
+## Building the Expo App
+
+One command, one file. `bin/expo_build` is the only way builds are invoked here
+-- never a raw `eas build`, which is what produced an unusable IPA on
+2026-09-13. The wrapper resolves the temple slug from the manifest and runs the
+build through `bin/load_temple_env`, so it carries the deployment environment
+that a direct `eas` call does not.
+
+    bin/expo_build dev-client   android, --local, profile development
+    bin/expo_build testflight   ios, profile testflight      <- the live lane
+    bin/expo_build ipa          ios, profile production
+    bin/expo_build aab          android, profile production  <- Play bundle
+    bin/expo_build custom -- <args>
+
+**There is no `apk` preset.** `development` is the only profile setting
+`android.buildType=apk` and it builds a dev client, so `dev-client` is the
+installable APK and `aab` is the Play bundle. A preset called `apk` existed
+until 2026-09-13 and pointed at `production`, which for Android store
+distribution produces a bundle -- it was named for a thing it did not make.
+
+**Every profile a preset names must exist in `mobile/eas.json`.** Three did not:
+`development-client` and `production-aab` were never defined, and there was no
+preset at all for `testflight`, the only lane in use. The wrapper and `eas.json`
+drifted because nothing compares them, which is the same shape as a systemd
+override list with no owner. Worth a check in `npm run verify`, which already
+fails closed on build values.
+
+**The wrapper could not run at all before 2026-09-13.** `read_default_slug` used
+`ruby <<'RUBY' "$MANIFEST_FILE"`; bash hoists the redirection, so Ruby took the
+YAML file as its script and the heredoc as ignored stdin, and it died on line 1
+of the manifest before printing usage. That is why every build in practice went
+through `eas` directly and the presets were free to rot unobserved. Fixed with
+`ruby - "$MANIFEST_FILE" <<'RUBY'`.
+
 ## Client Release Tiers
 
 Five tiers, ordered by how fast a result arrives and how much it means. Speed
