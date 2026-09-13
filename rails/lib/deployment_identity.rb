@@ -61,12 +61,22 @@ class DeploymentIdentity
   # name equals it exactly, so it cannot be used to skip the comparison -- only
   # to state a different expected answer and be held to it.
   #
-  # Convention, which this class cannot enforce: set it inline on the
-  # invocation, never in an instance file, a shared file or a unit. A process
-  # cannot tell whether a variable reached it from a command line, an
-  # EnvironmentFile or a sourced script, so what enforces this is review, not
-  # code. It is not a partition variable and does not belong in that inventory.
-  # Every activation is logged at WARN so it cannot be quiet.
+  # Set it inline on the invocation, never in an instance file, a shared file or
+  # a unit. It is not a partition variable and does not belong in that
+  # inventory, and every activation is logged at WARN so it cannot be quiet.
+  #
+  # This class cannot check where it came from: a process cannot tell whether a
+  # variable reached it from a command line, an EnvironmentFile or a sourced
+  # script. bin/staging closes the gap it can reach, refusing to run when the
+  # name appears in either file it sources -- which is where the convention
+  # actually rots, someone adding it to an env file to stop the WARN and
+  # disarming every later boot.
+  #
+  # The rule is still not enforced everywhere, and should not be read as if it
+  # were: a systemd unit, a shell export or a parent process can set this name
+  # and this guard will honour it. Honouring it is safe on its own terms -- the
+  # resolved database must still equal it exactly -- but nothing here can tell
+  # you that a human meant it this time.
   OVERRIDE_VARIABLE = "WENFU_EXPECTED_DATABASE"
 
   class Mismatch < StandardError; end

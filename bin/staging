@@ -32,6 +32,10 @@ RAILS_DIR="$ROOT_DIR/rails"
 SHARED_ENV_FILE="${WENFU_SHARED_ENV_FILE:-/etc/default/shengfukung-wenfu-env}"
 INSTANCE_ENV_FILE="${WENFU_INSTANCE_ENV_FILE:-$ROOT_DIR/instance.env}"
 
+# Must match DeploymentIdentity::OVERRIDE_VARIABLE. The guard honours this name
+# wherever it comes from; this script refuses to let it come from a file.
+OVERRIDE_VARIABLE="WENFU_EXPECTED_DATABASE"
+
 usage() {
   cat <<'USAGE'
 Usage: bin/staging <command> [args...]
@@ -68,6 +72,35 @@ require_readable_env_file() {
   fi
 }
 
+# WENFU_EXPECTED_DATABASE acknowledges a deliberate, one-off exception on a
+# single invocation: the guard still requires the resolved name to match it
+# exactly, so it states a different expected answer rather than skipping the
+# comparison. In a file it stops being one-off. Every boot from then on passes a
+# guard that has been quietly disarmed, and the WARN line that was supposed to
+# make it noticeable is printed so often it stops being read.
+#
+# That is the one way a convention like this actually rots: someone adds it to
+# an env file to silence the warning. So refuse rather than source it.
+#
+# The limit, stated because this must not read as more than it is: a systemd
+# unit, a shell export or a parent process can still set this name and the guard
+# will honour it. This checks the two files the wrapper itself sources, which is
+# where the rot starts, not everywhere the value can come from.
+refuse_override_in_env_file() {
+  local file="$1"
+  local label="$2"
+
+  if grep -Eq "^[[:space:]]*(export[[:space:]]+)?${OVERRIDE_VARIABLE}[[:space:]]*=" "$file"; then
+    echo "bin/staging: ${OVERRIDE_VARIABLE} is set in the ${label} environment file:" >&2
+    echo "  ${file}" >&2
+    echo "${OVERRIDE_VARIABLE} acknowledges a one-off exception on a single command." >&2
+    echo "In an env file it disarms the deployment guard on every boot instead." >&2
+    echo "Remove the line, and set it inline on the one invocation that needs it:" >&2
+    echo "  ${OVERRIDE_VARIABLE}=<exact database name> bin/staging rails c" >&2
+    exit 1
+  fi
+}
+
 if [[ $# -eq 0 ]]; then
   usage
   exit 1
@@ -88,6 +121,9 @@ require_readable_env_file "$INSTANCE_ENV_FILE" "instance" \
 differ per deployment. Create it from the matching example:
   cp ops/env/template.instance.staging.env ${ROOT_DIR}/instance.env
 Override the path with WENFU_INSTANCE_ENV_FILE."
+
+refuse_override_in_env_file "$SHARED_ENV_FILE" "shared"
+refuse_override_in_env_file "$INSTANCE_ENV_FILE" "instance"
 
 set -a
 # shellcheck disable=SC1090
