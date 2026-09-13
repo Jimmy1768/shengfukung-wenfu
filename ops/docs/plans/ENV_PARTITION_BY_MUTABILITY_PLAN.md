@@ -231,9 +231,11 @@ Put it back.
 
 ### Not yet phased
 
-The env file split, §6.3, is undecided. If adopted it lands between Phase 1 and
-Phase 3 and is **[DIRECTOR — sudo and the edit]** throughout, since it creates
-and populates two root-owned files.
+The env file split is decided and lands between Phase 1 and Phase 3, as
+**Phase 2a**. It is **[DIRECTOR — sudo and the edit]** throughout, since it
+creates and populates two root-owned files in `/etc/default/`. Repository work
+that can precede it with no Director involvement: the two `.env.example` stubs
+under `ops/env/`, mirroring SourceGrid's, which is what a future clone fills in.
 
 ### Where the Director is needed, in one list
 
@@ -419,7 +421,7 @@ production, with a different base because they share a host. The base is a
 per-project parameter. Declaring it once and deriving the three, rather than
 typing three literals, is what makes it a convention instead of a coincidence.
 
-**4. Env file split — the one open decision, and the recommendation.**
+**4. Env file split — DECIDED 2026-09-13: split, same as SourceGrid.**
 
 SourceGrid splits `/etc/default/<project>-runtime.env` from `-secrets.env`.
 Wenfu has one file, in which `STRIPE_SECRET_KEY`, `SECRET_KEY_BASE`,
@@ -429,7 +431,9 @@ carry tighter permissions, and lets the runtime half exist as a reviewable
 template in `ops/env/` that a new clone fills in -- neither of which a single
 mixed file can offer.
 
-That makes three files per deployment, and the unit loads them in order:
+The Director's ruling, 2026-09-13: "yes, split it. same as sourcegrid."
+
+Three files per deployment, and the unit loads them in order:
 
     EnvironmentFile=/etc/default/<project>-runtime.env
     EnvironmentFile=/etc/default/<project>-secrets.env
@@ -437,6 +441,44 @@ That makes three files per deployment, and the unit loads them in order:
 
 The ordering still matters only as defence: under the partition no two of them
 set the same variable.
+
+**Classification follows SourceGrid's own files, not our judgement.** They keep
+stubs in the repository at `ops/env/sourcegrid-labs-*.env.example` --
+runtime carrying real non-secret values, secrets carrying placeholders -- and
+those settle most of what was ambiguous here. Observed 2026-09-13:
+
+    AUTH_CLIENT_ID                  runtime   (its secret sibling is not)
+    STRIPE_PUBLISHABLE_KEY          runtime   (publishable by design)
+    EAS_PROJECT_ID                  runtime
+    S3_SECRET_ACCESS_KEY            secrets
+    BREVO_API_KEY, JWT_SECRET_KEY   secrets
+    SECRET_KEY_BASE                 secrets
+
+By analogy with their `STRIPE_PRICE_*`, our
+`STRIPE_TEMPLEMATE_PLATFORM_ACCOUNT_ID` and the two price IDs are runtime.
+
+**One inconsistency in their files, which we should not copy.** They put
+`AWS_ACCESS_KEY_ID` in runtime and `S3_ACCESS_KEY_ID` in secrets. Those are the
+same kind of value -- an identifier that is useless without its paired secret --
+classified two different ways in one repository. Ours should pick one rule and
+hold it. Recommended: an identifier alone is runtime, anything that
+authenticates on its own is secrets, which puts `S3_ACCESS_KEY_ID` in
+runtime beside
+`S3_SECRET_ACCESS_KEY` in secrets. Worth telling SourceGrid either way, since
+under one framework the two repositories should not disagree with themselves.
+
+**Two keys have no precedent there** and need a call when the files are written:
+`PGUSER`, which is an identifier rather than a credential and by the rule above
+is runtime; and `PGDATABASE_TEST`, which no deployment reads at all and arguably
+should not be on the droplet. SourceGrid has neither, because they resolve the
+database through `DATABASE_URL` -- which they classify as a secret, correctly,
+since it embeds the password.
+
+**What the partition changes about their shape.** SourceGrid's runtime file
+carries `RAILS_ENV` and `PUMA_PORT`; ours must not, because those are two of the
+five that move to `instance.env`. We are adopting their split plus our
+partition, which they do not yet have. Our runtime file is therefore theirs
+minus the five instance keys.
 
 ### Consequence for §4
 
@@ -455,9 +497,10 @@ green, per the spec's own closing note.
 2. **`S3_OBJECT_PREFIX=staging` for the staging instance.** Adopting it changes
    where staging writes, which is the point, but existing staging objects under
    `prod` stay where they are.
-3. **The env file split**, per 5a.4. Recommended, not assumed: it changes the
-   shape of every deployment's files and is the one convention where the two
-   repositories disagree without one of them being clearly right.
+3. ~~**The env file split**~~ — DECIDED 2026-09-13, split as SourceGrid
+   does.
+   See 5a.4 for the classification and the two keys that still need a call when
+   the files are written.
 4. **Whether this lands before or after the Expo promotion.** It touches the
    production unit files and the shared env file; the Expo work needs a Rails
    deploy and a `release/current` promotion. Doing both at once means a failure
