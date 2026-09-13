@@ -79,6 +79,12 @@ every grep, mixing what was true once with what is true now.
 Fix dangling links when you delete. A prose mention that something was retired
 is fine; a link to a file that no longer exists is not.
 
+**Protocol and reference files are read from `main`.** Promotion to the
+production branch happens on the Director's schedule rather than on every
+merge, so those files on a production ref can be far behind `main` while
+reading as current — nothing in the file says which ref it came from.
+`git show main:<path>` when you are standing anywhere else.
+
 ## Databases
 
 **Where each kind of database may exist:**
@@ -136,6 +142,11 @@ before editing one.
 Autonomy is granted for a **kind of work**, not a list of permitted actions.
 Inside the delegated kind, proceed without asking. The question is not "is this
 allowed?" but **"is this still the work that was asked for?"**
+
+**An exception is granted for a named task and covers nothing else.** File
+type, document placement, time pressure, and an earlier exception of the same
+shape do not extend it. Autonomy is granted for a kind of work; an exception is
+granted for one instance of it, and the two do not behave alike.
 
 **An action you generated yourself needs the Director.** Two tests: did anyone
 ask for this specific thing, or did I decide it was a good idea? Am I acting on
