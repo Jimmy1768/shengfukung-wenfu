@@ -13,16 +13,15 @@ const safeUrl = value => { try { return new URL(String(value)); } catch (_) { re
 function resolveClientConfig(extra = {}) {
   const environment = String(extra.clientEnvironment || 'development').toLowerCase();
   const release = RELEASE_ENVIRONMENTS.has(environment);
-  // One mode. The dummy client is gone; every build talks to a real server,
+  // There is no mode. The dummy client is gone: every build talks to a server,
   // a local one in development and the public origin in a release lane.
-  const mode = 'real';
   const apiBaseUrl = String(extra.apiBaseUrl || extra.localApiBaseUrl || '').replace(/\/$/, '');
-  if (mode === 'real' && !apiBaseUrl) {
-    const error = new Error('Real mode requires an explicit API origin.');
-    error.code = 'REAL_CONFIG_REQUIRED';
+  if (!apiBaseUrl) {
+    const error = new Error('A client requires an explicit API origin.');
+    error.code = 'CLIENT_CONFIG_REQUIRED';
     throw error;
   }
-  if (mode === 'real') {
+  {
     const url = safeUrl(apiBaseUrl);
     const host = url?.hostname?.toLowerCase();
     const localHost = host === 'localhost' || host === '127.0.0.1' || host === '::1' || host?.endsWith('.test');
@@ -31,7 +30,7 @@ function resolveClientConfig(extra = {}) {
     // property and it is unchanged.
     const publicExact = url?.origin === PUBLIC_ORIGIN;
     if (!url || !['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.hash || url.pathname !== '/' || url.search || !(publicExact || (!release && localHost))) {
-      const error = new Error('Real mode requires an exact trusted API origin.');
+      const error = new Error('A client requires an exact trusted API origin.');
       error.code = 'TRUSTED_API_REQUIRED';
       throw error;
     }
@@ -51,7 +50,7 @@ function resolveClientConfig(extra = {}) {
     error.code = 'NATIVE_OAUTH_RETURN_REQUIRED';
     throw error;
   }
-  return { mode, apiBaseUrl, environment, oauthReturnUrl, localEmail, localPassword, localTempleSlug, updateChannel: String(extra.easUpdateChannel || environment) };
+  return { apiBaseUrl, environment, oauthReturnUrl, localEmail, localPassword, localTempleSlug, updateChannel: String(extra.easUpdateChannel || environment) };
 }
 
 module.exports = { PUBLIC_ORIGIN, PLATFORM_CONNECT_ORIGIN, RELEASE_ENVIRONMENTS, resolveClientConfig };

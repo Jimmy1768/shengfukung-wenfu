@@ -83,7 +83,7 @@ for (const config of [developmentConfig, productionConfig]) {
 }
 if (!publicConfigurationMatrix.development || !publicConfigurationMatrix.production || JSON.stringify(publicConfigurationMatrix).match(/secret|client[_-]?id|token/i)) fail('OAuth configuration matrix must remain public and nonsecret');
 if (!eas.build?.development?.developmentClient || eas.build.development.android?.buildType !== 'apk') fail('development APK profile is missing');
-for (const lane of ['testflight', 'production']) if (eas.build?.[lane]?.channel !== lane || eas.build[lane]?.env?.TEMPLEMATE_CLIENT_MODE !== 'real') fail(`${lane} release profile is invalid`);
+for (const lane of ['testflight', 'production']) if (eas.build?.[lane]?.channel !== lane) fail(`${lane} release profile is invalid`);
 if (JSON.stringify(eas).match(/autoIncrement/i)) fail('auto-increment configuration is forbidden');
 if (!fs.existsSync(path.join(root, 'assets', 'dev-icon.png')) || !fs.existsSync(path.join(root, 'assets', 'dev-adaptive-icon.png'))) fail('development artwork is missing');
 if (activeSourceHasRejectedIdentifier) fail('rejected tenant, admin, country, or SourceGrid identifier remains in active mobile source');

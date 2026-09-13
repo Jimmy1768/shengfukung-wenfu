@@ -16,8 +16,8 @@ const PROFILE_FIELDS = ['english_name', 'native_name', 'phone', 'city'];
 const registrationFields = input => Object.fromEntries(Object.entries(input || {}).filter(([key, value]) => ['quantity', 'registrant_scope', 'dependent_id', 'contact_name', 'contact_phone', 'contact_email', 'household_notes', 'arrival_window', 'ceremony_notes'].includes(key) && value !== undefined && value !== null && value !== ''));
 
 function createRealAdapter({ config, store, transport, device = { device_id: 'local-test-client', platform: 'expo' } }) {
-  if (!config?.apiBaseUrl) throw Object.assign(new Error('Real mode requires explicit trusted configuration.'), { code: 'REAL_CONFIG_REQUIRED' });
-  if (typeof transport !== 'function') throw new Error('A trusted transport is required for real mode.');
+  if (!config?.apiBaseUrl) throw Object.assign(new Error('A client requires explicit trusted configuration.'), { code: 'CLIENT_CONFIG_REQUIRED' });
+  if (typeof transport !== 'function') throw new Error('A trusted transport is required.');
   const scoped = createScopedStorage(store, storageScope({ environment: config.environment }));
   // The loaded temple, read at call time rather than captured at construction.
   // It is runtime state: a patron loads one by scanning and can unload it
@@ -101,7 +101,7 @@ function createRealAdapter({ config, store, transport, device = { device_id: 'lo
     // Exposed so a scan can load the temple it just confirmed. This is the
     // same loader sign-in uses, not a second one.
     bootstrap: () => loadBootstrap(),
-    kind: 'real', network: config.environment === 'test' ? 'local-test' : config.environment, mode: 'real', snapshot: () => state,
+    network: config.environment === 'test' ? 'local-test' : config.environment, snapshot: () => state,
     oauthStorage: { loadPending: () => scoped.loadPending(), savePending: pending => scoped.savePending(pending), clearPending: () => scoped.clearPending() },
     async startOAuth({ provider, pkceChallenge, pkceMethod }) {
       const payload = await request('POST', '/oauth/start', { oauth: { provider, pkce_challenge: pkceChallenge, pkce_method: pkceMethod } }, false);

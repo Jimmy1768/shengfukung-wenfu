@@ -1,17 +1,17 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { createRealAdapter } = require('../app/real/adapter');
-const { resolveClientConfig } = require('../app/real/config');
-const { sessionKey } = require('../app/real/storage');
+const { createRealAdapter } = require('../app/client/adapter');
+const { resolveClientConfig } = require('../app/client/config');
+const { sessionKey } = require('../app/client/storage');
 const { createTrustedBindingStorage, trustedBindingKey } = require('../app/tenant/storage');
 const { storageScope } = require('../app/core/storage_scope');
 const { createOAuthController } = require('../app/oauth/transaction');
-const { nativeError } = require('../app/real/response');
+const { nativeError } = require('../app/client/response');
 
 // No tenant in the config, in any lane. A temple is loaded at runtime and
 // lives in storage, so a test that needs one seeds storage -- the same place a
 // scan writes to. There is no configured fallback left to lean on.
-const config = { mode: 'real', apiBaseUrl: 'http://local.test', environment: 'test' };
+const config = { apiBaseUrl: 'http://local.test', environment: 'test' };
 const loadedTemple = (environment, id = 'fixture-temple') => JSON.stringify({ state: 'bound', tenant: { id, name: 'Fixture Temple' }, error: null, source: 'qr' });
 const store = (temple = 'fixture-temple') => {
   const values = new Map();
@@ -71,7 +71,7 @@ function fixtureTransport(calls, failures = {}, overrides = {}) {
 // if a build ever supplies extra it should not.
 test('sign-in prefill reaches development only, and a release environment refuses it', () => {
   const dev = resolveClientConfig({
-    clientMode: 'real', localApiBaseUrl: 'http://local.test/', localTenantSlug: 'fixture',
+    localApiBaseUrl: 'http://local.test/', localTempleSlug: 'fixture',
     clientEnvironment: 'test', localEmail: 'member@example.test', localPassword: 'templemate-demo'
   });
   assert.equal(dev.localEmail, 'member@example.test');
@@ -126,20 +126,20 @@ test('a session with no recorded expiry is left for the server to judge', async 
     'a live token is not renewed for no reason');
 });
 
-test('there is one mode, and it cannot be configured without tenant and API inputs', () => {
+test('there is no mode, and a client cannot be configured without an API origin', () => {
   // No dummy fallback to land in: a build with nothing configured fails loudly
   // rather than quietly serving fixtures.
-  assert.throws(() => resolveClientConfig({}), { code: 'REAL_CONFIG_REQUIRED' });
-  assert.throws(() => resolveClientConfig({ clientMode: 'real' }), { code: 'REAL_CONFIG_REQUIRED' });
-  assert.equal(resolveClientConfig({ clientMode: 'real', localApiBaseUrl: 'http://local.test/', localTempleSlug: 'fixture', clientEnvironment: 'test' }).localTempleSlug, 'fixture');
-  assert.throws(() => resolveClientConfig({ clientMode: 'real', localApiBaseUrl: 'https://example.com', localTenantSlug: 'fixture' }), { code: 'TRUSTED_API_REQUIRED' });
+  assert.throws(() => resolveClientConfig({}), { code: 'CLIENT_CONFIG_REQUIRED' });
+  assert.throws(() => resolveClientConfig({}), { code: 'CLIENT_CONFIG_REQUIRED' });
+  assert.equal(resolveClientConfig({ localApiBaseUrl: 'http://local.test/', localTempleSlug: 'fixture', clientEnvironment: 'test' }).localTempleSlug, 'fixture');
+  assert.throws(() => resolveClientConfig({ localApiBaseUrl: 'https://example.com' }), { code: 'TRUSTED_API_REQUIRED' });
   const release = resolveClientConfig({ clientEnvironment: 'testflight', apiBaseUrl: 'https://shengfukung.com.tw', easUpdateChannel: 'testflight' });
   // The dev seed is refused in a release lane whatever `extra` carries, the same
   // way the local credentials are. A build that reaches a patron cannot be born
   // knowing a temple; it loads one from a scan or it has none.
   assert.equal(resolveClientConfig({ clientEnvironment: 'testflight', apiBaseUrl: 'https://shengfukung.com.tw', localTempleSlug: 'smuggled-temple' }).localTempleSlug, '');
   assert.equal(release.localTempleSlug, '');
-  assert.equal(release.mode, 'real'); assert.equal(release.updateChannel, 'testflight');
+  assert.equal(release.updateChannel, 'testflight');
   assert.throws(() => resolveClientConfig({ clientEnvironment: 'production', apiBaseUrl: 'http://shengfukung.com.tw' }), { code: 'TRUSTED_API_REQUIRED' });
   // Needs a config that clears the origin/tenant checks first, since without a
   // dummy fallback those now fire before the OAuth return URL is looked at.
@@ -149,7 +149,7 @@ test('there is one mode, and it cannot be configured without tenant and API inpu
 test('real adapter maps the complete account contract and never falls back to dummy data', async () => {
   const calls = []; const local = store(); const adapter = createRealAdapter({ config, store: local, transport: fixtureTransport(calls) });
   const signedIn = await adapter.signIn({ email: user.email, password: 'test-password' });
-  assert.equal(adapter.kind, 'real'); assert.equal(adapter.network, 'local-test'); assert.equal(signedIn.profile.name, '林小安');
+  assert.equal(adapter.network, 'local-test'); assert.equal(signedIn.profile.name, '林小安');
   assert.deepEqual(signedIn.registrations[0], { id: '9', offering: { id: '1', title: '祈福', slug: 'prayer', account_action: 'event', price_cents: 1200, currency: 'TWD' }, registrantName: '', registrantScope: 'self', dependentId: null, quantity: 1, totalAmountCents: 1200, state: 'pending', lifecycle: 'pending', lifecycleStage: null, paymentState: 'unpaid', readOnly: false });
   await adapter.signUp({ email: user.email, password: 'test-password' });
   await adapter.recoverPassword({ email: user.email }); await adapter.resetPassword({ token: 'local-reset', password: 'test-password', password_confirmation: 'test-password' });
@@ -225,7 +225,7 @@ test('logging out clears the session but keeps the remembered temple', async () 
 // for anything temple-scoped on the way -- the server refuses those, and every
 // sign-in path used to call bootstrap unconditionally.
 test('a patron with no temple signs in, and nothing temple-scoped is attempted', async () => {
-  const releaseConfig = { mode: 'real', apiBaseUrl: 'http://local.test', environment: 'testflight' };
+  const releaseConfig = { apiBaseUrl: 'http://local.test', environment: 'testflight' };
   const calls = [];
   const adapter = createRealAdapter({ config: releaseConfig, store: store(null), transport: fixtureTransport(calls) });
 
@@ -240,7 +240,7 @@ test('a patron with no temple signs in, and nothing temple-scoped is attempted',
 // restoreSession matters on its own: it wiped the stored session before
 // rethrowing, so a temple-less patron who relaunched was silently signed out.
 test('relaunching with no temple keeps the session instead of discarding it', async () => {
-  const releaseConfig = { mode: 'real', apiBaseUrl: 'http://local.test', environment: 'testflight' };
+  const releaseConfig = { apiBaseUrl: 'http://local.test', environment: 'testflight' };
   const local = store(null);
   const first = createRealAdapter({ config: releaseConfig, store: local, transport: fixtureTransport([]) });
   await first.signIn({ email: user.email, password: 'test-password' });
@@ -261,7 +261,7 @@ test('relaunching with no temple keeps the session instead of discarding it', as
 // and load another without signing out or restarting, so an adapter built once
 // must follow that rather than hold the answer it started with.
 test('the adapter sends whichever temple is loaded, and none when there is none', async () => {
-  const releaseConfig = { mode: 'real', apiBaseUrl: 'http://local.test', environment: 'testflight' };
+  const releaseConfig = { apiBaseUrl: 'http://local.test', environment: 'testflight' };
   const local = store(null);
   const calls = [];
   const adapter = createRealAdapter({ config: releaseConfig, store: local, transport: fixtureTransport(calls) });
@@ -402,7 +402,7 @@ test('every resolution error code rails/app/controllers/api/v1/account/native_oa
 });
 
 test('lifecycle_stage drives the patron caption and never discloses the temple billing state', () => {
-  const { mapRegistration } = require('../app/real/response');
+  const { mapRegistration } = require('../app/client/response');
   const { registrationCaption } = require('../app/account/screen_model');
   const { copy } = require('../app/ui/copy');
 
@@ -486,7 +486,7 @@ test('updateProfile keeps the single-name shorthand working', async () => {
 });
 
 test('a validation failure shows the server message, not a generic English one', () => {
-  const { nativeError } = require('../app/real/response');
+  const { nativeError } = require('../app/client/response');
   // Mirrors App.js#errorMessage / firstDetail.
   const firstDetail = reason => {
     const details = reason?.details;

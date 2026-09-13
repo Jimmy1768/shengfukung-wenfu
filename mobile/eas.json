@@ -20,7 +20,6 @@
       "channel": "testflight",
       "env": {
         "BUILD_MODE": "testflight",
-        "TEMPLEMATE_CLIENT_MODE": "real",
         "TEMPLEMATE_CLIENT_ENVIRONMENT": "testflight",
         "TEMPLEMATE_EAS_UPDATE_CHANNEL": "testflight",
         "TEMPLEMATE_PUBLIC_API_ORIGIN": "https://shengfukung.com.tw"
@@ -32,7 +31,6 @@
       "channel": "production",
       "env": {
         "BUILD_MODE": "production",
-        "TEMPLEMATE_CLIENT_MODE": "real",
         "TEMPLEMATE_CLIENT_ENVIRONMENT": "production",
         "TEMPLEMATE_EAS_UPDATE_CHANNEL": "production",
         "TEMPLEMATE_PUBLIC_API_ORIGIN": "https://shengfukung.com.tw"

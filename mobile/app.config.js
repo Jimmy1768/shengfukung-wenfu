@@ -25,7 +25,6 @@ const releaseConfiguration = buildMode => {
   const environment = String(process.env.TEMPLEMATE_CLIENT_ENVIRONMENT || buildMode).toLowerCase();
   if (!['testflight', 'production'].includes(environment)) return null;
   return {
-    clientMode: 'real',
     apiBaseUrl: 'https://shengfukung.com.tw',
     clientEnvironment: environment,
     easUpdateChannel: environment
@@ -109,7 +108,6 @@ module.exports = () => {
         eas: {
           projectId: 'c7b8523a-2fad-4123-bc96-0c0c85a23dec'
         },
-        clientMode: 'real',
         apiBaseUrl: release?.apiBaseUrl || process.env.TEMPLEMATE_LOCAL_API_BASE_URL || '',
         // A seed for the dev client only, and named so it can never be read as
         // the app's tenant. There is no tenant in this app: a temple is loaded

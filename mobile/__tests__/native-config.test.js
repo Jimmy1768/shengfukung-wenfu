@@ -71,7 +71,6 @@ test('production config uses the public TempleMate native identifiers', () => {
 test('TestFlight and production source profiles are real, public, and isolated from development', () => {
   for (const profile of ['testflight', 'production']) {
     const config = configFor(profile);
-    assert.equal(config.extra.clientMode, 'real');
     assert.equal(config.extra.apiBaseUrl, 'https://shengfukung.com.tw');
     // One build serves every temple. A slug here is what pinned a release to a
     // single tenant, so its absence is the thing worth asserting -- and the

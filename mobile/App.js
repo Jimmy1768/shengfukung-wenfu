@@ -4,9 +4,9 @@ import { AppState, BackHandler, Image, KeyboardAvoidingView, Linking, Modal, Pla
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Constants from 'expo-constants';
 
-import { createRealAdapter } from './app/real/adapter';
-import { resolveClientConfig } from './app/real/config';
-import { productionTransport } from './app/real/transport';
+import { createRealAdapter } from './app/client/adapter';
+import { resolveClientConfig } from './app/client/config';
+import { productionTransport } from './app/client/transport';
 import { scopedStorage } from './app/lib/auth/storage';
 import { activePresentationTenant, initialBinding } from './app/tenant/binding';
 import { scanCameraPayload } from './app/tenant/scanner';
@@ -108,7 +108,6 @@ function AppBody() {
   }, [screen, cameraOpen, album]);
   useEffect(() => {
     let mounted = true;
-    if (clientConfig.mode !== 'real') { setStartup(false); return () => { mounted = false; }; }
     (async () => {
       try {
         // The remembered temple is a fact about this device, not about the
@@ -312,7 +311,7 @@ function TenantSetupGate({ t, palette, binding, setBinding, setData, setCollecti
     }
   };
 
-  return <Shell palette={palette}><Header t={t} palette={palette} binding={binding} onSignOut={signOut} /><ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled"><Section title={t.setupTemple} palette={palette}><Text style={[styles.body, { color: palette.text }]}>{t.setupTempleDescription}</Text>{cameraOpen ? <TempleQrCamera mode={clientConfig.mode} t={t} palette={palette} isRelease onCancel={onCameraResult} onScan={payload => scanCameraPayload({ mode: clientConfig.mode, payload, config: clientConfig, transport: productionTransport })} /> : <Button label={t.scanCodeRelease} palette={palette} onPress={() => setCameraOpen(true)} />}</Section></ScrollView></Shell>;
+  return <Shell palette={palette}><Header t={t} palette={palette} binding={binding} onSignOut={signOut} /><ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled"><Section title={t.setupTemple} palette={palette}><Text style={[styles.body, { color: palette.text }]}>{t.setupTempleDescription}</Text>{cameraOpen ? <TempleQrCamera t={t} palette={palette} isRelease onCancel={onCameraResult} onScan={payload => scanCameraPayload({ payload, config: clientConfig, transport: productionTransport })} /> : <Button label={t.scanCodeRelease} palette={palette} onPress={() => setCameraOpen(true)} />}</Section></ScrollView></Shell>;
 }
 
 function SignedOut({ t, palette, locale, setLocale, dark, setDark, screen, setScreen, email, setEmail, password, setPassword, signup, setSignup, recoveryEmail, setRecoveryEmail, pending, error, setError, notice, run, signIn, setSignedIn, beginOAuth, oauthState }) {
