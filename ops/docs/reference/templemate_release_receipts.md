@@ -3,11 +3,22 @@
 | App version | iOS build | Android code | iOS build state | Published OTA update |
 | --- | --- | --- | --- | --- |
 | 1.0.0 | 1 | 1 | uploaded, distributed, installed by staff | see the update table below |
-| 1.0.0 | 2 | 1 | prepared in `versioning.js`, not confirmed uploaded | none recorded |
+| 1.0.0 | 2 | 1 | **uploaded to App Store Connect 2026-08-20** | none recorded |
+| 1.0.0 | 3 | 1 | bumped `e234da4`, not yet built | — |
 
 Build 1 was uploaded to TestFlight, installed by Director's staff, and reported
-green (Director, 2026-08-31). `versioning.js` was subsequently bumped to
-iOS build 2 (`5e1e3cd`); whether that build was uploaded is not confirmed here.
+green (Director, 2026-08-31). `versioning.js` was bumped to iOS build 2
+(`5e1e3cd`) and **that build was uploaded**: EAS submission
+`ed2303e3-0b3e-4c6a-a545-7717f9b9f264`, status finished, 2026-08-20 18:03, from
+build `2a7dee90` at commit `5e1e3cde`. Build 2 is therefore spent -- App Store
+Connect refuses a repeat -- and the next IPA is build 3.
+
+This row read "not confirmed uploaded" until 2026-09-13 and the omission cost a
+build. Planning read it, concluded build 2 was still free, and produced an IPA
+(`eedadebd`) that can never be submitted. The confirmation was one
+`eas submit:list` away the whole time. **Record the submission here when one
+happens, not the intention to submit** -- a build number is spent by the upload,
+and nothing in `versioning.js` shows that.
 
 Apple-side state is not visible from this repository. Any claim about
 submission, review, or acceptance status must come from the Director or App
