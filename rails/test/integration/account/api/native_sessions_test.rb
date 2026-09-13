@@ -173,6 +173,24 @@ class NativeAccountSessionsTest < ActionDispatch::IntegrationTest
 
   # The relaxation is scoped to the routes that issue a session. Everything
   # authenticated still demands a temple, because it operates inside one.
+  # Observed on a device 2026-09-13: signing out with no temple loaded returned
+  # tenant_required, and the client clears its own state regardless -- so the
+  # patron appeared signed out while the refresh_tokens row stayed active for its
+  # full 30 days. Revoking a session needs proof of identity, not a temple.
+  test "signing out needs no temple, and actually revokes the session" do
+    session_payload = native_login
+    token = session_payload.fetch("access_token")
+
+    delete "/api/v1/account/native/logout",
+      params: { refresh_token: session_payload.fetch("refresh_token") },
+      headers: bearer(token)
+    assert_response :success
+
+    get "/api/v1/account/native/bootstrap", params: { temple_slug: @temple.slug }, headers: bearer(token)
+    assert_response :unauthorized
+    assert_equal "session_revoked", response.parsed_body.fetch("code")
+  end
+
   test "an authenticated route still requires a temple" do
     session_payload = native_login
 

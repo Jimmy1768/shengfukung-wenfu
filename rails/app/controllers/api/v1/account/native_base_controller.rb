@@ -50,14 +50,25 @@ module Api
           render_error("tenant_not_found", :not_found) unless @current_native_temple
         end
 
-        # Mirrors the skip_before_action :authenticate_native_user! lists in the
-        # three controllers that issue or begin a session without one:
-        # NativeSessionsController, NativeOauthController and
-        # NativeOauthResolutionsController. Keyed by controller as well as action
-        # because "show" is also a route on bootstrap, profile, preferences and
-        # privacy, all of which do require a temple.
+        # Every action that issues, renews or ends a session. Mostly this mirrors
+        # the skip_before_action :authenticate_native_user! lists in the three
+        # controllers that begin a session without one -- NativeSessionsController,
+        # NativeOauthController and NativeOauthResolutionsController -- but logout
+        # is the deliberate exception. It stays authenticated, because revoking a
+        # session means proving it is yours; it needs no temple, because a
+        # refresh_tokens row belongs to a user and has no temple_id.
+        #
+        # Observed on a device 2026-09-13: without this a patron signing out with
+        # no temple loaded got tenant_required, and the client clears its own state
+        # in a finally block -- so they appeared signed out while the row stayed
+        # active? for its full 30 days. Unreachable until temple-less became a real
+        # state.
+        #
+        # Keyed by controller as well as action because "show" is also a route on
+        # bootstrap, profile, preferences and privacy, all of which do require a
+        # temple.
         TEMPLE_OPTIONAL_ACTIONS = {
-          "api/v1/account/native_sessions" => %w[signup login refresh password_recovery password_reset],
+          "api/v1/account/native_sessions" => %w[signup login logout refresh password_recovery password_reset],
           "api/v1/account/native_oauth" => %w[start exchange],
           "api/v1/account/native_oauth_resolutions" => %w[show existing new_account]
         }.freeze
