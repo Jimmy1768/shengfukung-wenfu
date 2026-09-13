@@ -51,6 +51,67 @@ function fixtureTransport(calls, failures = {}, overrides = {}) {
   };
 }
 
+// The dev-client prefill is a local convenience, and the thing that makes it
+// safe is not that release lanes omit the values -- it is that the resolver
+// refuses them. Both halves are asserted, because only the second one holds
+// if a build ever supplies extra it should not.
+test('sign-in prefill reaches development only, and a release environment refuses it', () => {
+  const dev = resolveClientConfig({
+    clientMode: 'real', localApiBaseUrl: 'http://local.test/', localTenantSlug: 'fixture',
+    clientEnvironment: 'test', localEmail: 'member@example.test', localPassword: 'templemate-demo'
+  });
+  assert.equal(dev.localEmail, 'member@example.test');
+  assert.equal(dev.localPassword, 'templemate-demo');
+
+  for (const clientEnvironment of ['testflight', 'production']) {
+    const released = resolveClientConfig({
+      clientEnvironment, apiBaseUrl: 'https://shengfukung.com.tw',
+      localEmail: 'member@example.test', localPassword: 'templemate-demo'
+    });
+    assert.equal(released.localEmail, '', `${clientEnvironment} must not carry a prefill email`);
+    assert.equal(released.localPassword, '', `${clientEnvironment} must not carry a prefill password`);
+  }
+});
+
+// The server has always sent expires_in and nothing read it, so a session died
+// fifteen minutes after sign-in and the patron was signed out mid-task. A 401 is
+// not a renewal signal here: request() clears retained state on one, so renewing
+// after rejection means signing them out. DojoMate-Expo renews before the call
+// and treats a 401 as a diagnostic; this asserts the same order.
+test('an access token is renewed before it is sent, not after it is refused', async () => {
+  const calls = [];
+  const adapter = createRealAdapter({ config, store: store(), transport: fixtureTransport(calls) });
+  await adapter.signIn({ email: user.email, password: 'test-password' });
+  calls.length = 0;
+
+  const realNow = Date.now;
+  try {
+    Date.now = () => realNow() + 900 * 1000; // the access token has aged out
+    await adapter.listRegistrations();
+  } finally {
+    Date.now = realNow;
+  }
+
+  const paths = calls.map(call => call.url.replace(/^.*\/native/, '').replace(/\?.*$/, ''));
+  assert.equal(paths[0], '/refresh', 'renewal happens first, before the call that needed it');
+  assert.ok(paths.includes('/registrations'), 'and the original request still runs');
+  const authenticated = calls.find(call => call.url.includes('/registrations'));
+  assert.equal(authenticated.headers.Authorization, 'Bearer access-2',
+    'the request carries the renewed token, not the stale one');
+});
+
+// A session stored before expires_at existed has no expiry to read. Renewing on
+// every request would be wrong; the server is the fallback authority.
+test('a session with no recorded expiry is left for the server to judge', async () => {
+  const calls = [];
+  const adapter = createRealAdapter({ config, store: store(), transport: fixtureTransport(calls) });
+  await adapter.signIn({ email: user.email, password: 'test-password' });
+  calls.length = 0;
+  await adapter.listRegistrations();
+  assert.equal(calls.some(call => call.url.includes('/refresh')), false,
+    'a live token is not renewed for no reason');
+});
+
 test('there is one mode, and it cannot be configured without tenant and API inputs', () => {
   // No dummy fallback to land in: a build with nothing configured fails loudly
   // rather than quietly serving fixtures.

@@ -36,6 +36,7 @@ function createRealAdapter({ config, store, transport, device = { device_id: 'lo
   // binding, so nothing needs an explicit clear.
   const clearRetainedState = async () => { await scoped.clearAll(); };
   const request = async (method, path, body, authenticated = true) => {
+    if (authenticated) await ensureFreshAccessToken();
     const result = await transport({ method, url: `${config.apiBaseUrl}${query(`${nativePath}${path}`, await currentTenantSlug())}`, headers: jsonHeaders(authenticated ? session?.access_token : null), body: body === undefined ? undefined : JSON.stringify(body) });
     const payload = result?.body || {};
     if (!result?.ok) {
@@ -50,7 +51,34 @@ function createRealAdapter({ config, store, transport, device = { device_id: 'lo
     }
     return payload;
   };
-  const applySession = async next => { session = next; await scoped.saveSession(next); };
+  // expires_in is relative seconds and the server has always sent it; nothing
+  // read it. Stored as-is it is meaningless after a relaunch, so it becomes an
+  // absolute instant at the moment it is received.
+  const applySession = async next => {
+    const ttl = Number(next?.expires_in);
+    session = Number.isFinite(ttl) && ttl > 0 ? { ...next, expires_at: Date.now() + ttl * 1000 } : next;
+    await scoped.saveSession(session);
+  };
+  // Renew before the token is sent, never after it is refused. A 401 is not a
+  // renewal signal here: the server clears retained state on one, so waiting
+  // for rejection means signing the patron out. authenticated=false on the
+  // refresh call is what stops this recursing through request().
+  const CLOCK_SKEW_MS = 30000;
+  const renew = async () => {
+    if (!session?.refresh_token) return null;
+    const payload = await request('POST', '/refresh', { refresh_token: session.refresh_token }, false);
+    await applySession(payload.session);
+    return session;
+  };
+  const ensureFreshAccessToken = async () => {
+    if (!session?.access_token || !session?.refresh_token) return;
+    const expiresAt = Number(session.expires_at);
+    // A session stored before this existed carries no expiry. Let the server
+    // answer rather than renewing blindly on every request.
+    if (!Number.isFinite(expiresAt)) return;
+    if (expiresAt - Date.now() > CLOCK_SKEW_MS) return;
+    try { await renew(); } catch (_) { /* the request below will report it */ }
+  };
   // Every field bootstrap returns is scoped to one temple, and the server
   // refuses the call without one. A signed-in patron with no temple loaded is
   // not an error state -- it is the scanner screen, and it is where a patron
@@ -101,8 +129,8 @@ function createRealAdapter({ config, store, transport, device = { device_id: 'lo
     signIn: input => authenticate('/login', { session: input }),
     recoverPassword: input => request('POST', '/password/recovery', input, false),
     resetPassword: input => authenticate('/password/reset', input),
-    async restoreSession() { session = await scoped.loadSession(); if (!session) return null; try { return await loadBootstrap(); } catch (error) { await clearRetainedState(); throw error; } },
-    async refresh() { if (!session?.refresh_token) return null; const payload = await request('POST', '/refresh', { refresh_token: session.refresh_token }, false); await applySession(payload.session); return session; },
+    async restoreSession() { session = await scoped.loadSession(); if (!session) return null; try { await ensureFreshAccessToken(); return await loadBootstrap(); } catch (error) { await clearRetainedState(); throw error; } },
+    async refresh() { return renew(); },
     async logout() { try { if (session) await request('DELETE', '/logout', { refresh_token: session.refresh_token }); } finally { session = null; await clearRetainedState(); } },
     async clearTenantState() { session = null; state = snapshotFromBootstrap(); await clearRetainedState(); },
     async updateProfile(input) { const profile = input.name ? { native_name: input.name } : Object.fromEntries(Object.entries(input || {}).filter(([key]) => PROFILE_FIELDS.includes(key))); const payload = await request('PATCH', '/profile', { profile }); state.profile = { id: String(payload.user.id), email: payload.user.email, name: nameFor(payload.user), user: payload.user }; return state; },
