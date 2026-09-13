@@ -88,6 +88,21 @@ source "$SHARED_ENV_FILE"
 source "$INSTANCE_ENV_FILE"
 set +a
 
+# Nothing is exported here, and the absence is the design.
+#
+# sourcegrid-labs/bin/staging has eighteen `export` lines at exactly this point
+# -- RAILS_ENV, PUMA_PORT, DATABASE_URL, PGHOST and the rest -- each with a
+# `${SOURCEGRID_STAGING_*:-default}` fallback. Do not restore them here by
+# analogy. Those exports are a third source of truth layered on top of two env
+# files, which is the precedence problem this repository removed: staging used
+# to correct the shared environment file with a systemd ExecStart prefix, and
+# losing that prefix silently gave staging production's database.
+#
+# Under the partition the instance file already carries every value that differs
+# per deployment, so an export here could only restate a value or contradict
+# one. Both are worse than nothing. If a value seems to be missing, it belongs
+# in this checkout's instance.env, not in this script.
+
 cd "$RAILS_DIR"
 
 if [[ "$1" == "rails" ]]; then
