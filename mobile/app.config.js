@@ -114,6 +114,12 @@ module.exports = () => {
         // Local development only, and deliberately absent from a release lane:
         // a release build is compiled with no temple and loads one from a scan.
         tenantSlug: process.env.TEMPLEMATE_LOCAL_TENANT_SLUG || '',
+        // Same rule, same reason: no release lane supplies these, so a
+        // release build has nothing to prefill even before config.js
+        // refuses to pass them through. They name a seeded local fixture
+        // account and live in the untracked .env.development.
+        localEmail: process.env.TEMPLEMATE_LOCAL_EMAIL || '',
+        localPassword: process.env.TEMPLEMATE_LOCAL_PASSWORD || '',
         clientEnvironment: release?.clientEnvironment || process.env.TEMPLEMATE_CLIENT_ENVIRONMENT || 'development',
         easUpdateChannel: release?.easUpdateChannel || 'development',
         nativeOAuthReturnUrl,

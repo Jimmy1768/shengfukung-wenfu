@@ -40,13 +40,18 @@ function resolveClientConfig(extra = {}) {
       throw error;
     }
   }
+  // A convenience for the local loop, and a hard refusal everywhere else:
+  // whatever `extra` carries, a release environment resolves to empty, so
+  // no shipped build can present credentials on its sign-in screen.
+  const localEmail = release ? '' : String(extra.localEmail || '').trim();
+  const localPassword = release ? '' : String(extra.localPassword || '');
   const oauthReturnUrl = String(extra.nativeOAuthReturnUrl || nativeOAuthReturnUrl);
   if (oauthReturnUrl !== nativeOAuthReturnUrl) {
     const error = new Error('Native OAuth return URL must use the configured templemate scheme.');
     error.code = 'NATIVE_OAUTH_RETURN_REQUIRED';
     throw error;
   }
-  return { mode, apiBaseUrl, tenantSlug, environment, oauthReturnUrl, updateChannel: String(extra.easUpdateChannel || environment) };
+  return { mode, apiBaseUrl, tenantSlug, environment, oauthReturnUrl, localEmail, localPassword, updateChannel: String(extra.easUpdateChannel || environment) };
 }
 
 module.exports = { PUBLIC_ORIGIN, PLATFORM_CONNECT_ORIGIN, RELEASE_ENVIRONMENTS, resolveClientConfig };
