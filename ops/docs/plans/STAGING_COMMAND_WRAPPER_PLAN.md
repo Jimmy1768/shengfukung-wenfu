@@ -1,7 +1,17 @@
 # STAGING COMMAND WRAPPER PLAN
 
-Plan only. Nothing here is implemented, and the two decisions in §5 are the
-Director's.
+**Superseded in approach, 2026-09-13, by
+`ENV_PARTITION_BY_MUTABILITY_PLAN.md`.** That plan removes the precedence
+problem this one proposed to guard against: once nothing is overridden, the
+wrapper carries no values and there is nothing for it to drift from. §5's
+second decision is answered there and §3's override list no longer applies.
+
+What survives and is still worth reading: §0, why hand-assembled commands
+were rejected; §2, why this repository's own ruling shapes the answer; and
+§4, why a duplicated override list fails worse here than in the repository
+it was modelled on. `bin/staging` is still needed and becomes step 5 there.
+
+Plan only. Nothing here is implemented.
 
 ## 0. Why this exists
 
