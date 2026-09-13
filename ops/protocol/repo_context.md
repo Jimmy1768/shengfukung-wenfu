@@ -55,6 +55,26 @@ multi-tenant — the Vue frontend is not.**
   `shengfukung.com.tw` keeps its current role as the demo/sales-sandbox
   temple going forward; it is not replaced or retired by any of this.
 
+## Who May Merge
+
+`work_mode_config.md` defers this here, and until 2026-09-13 this file was
+silent, which is why it blocked three times in one day: Control A could not
+merge `main` into its branch, Control B sent `purge-tenant-slug` for merge
+rather than merging it, and Planning was refused the command by the auto mode
+classifier.
+
+**Planning may merge.** The Director, 2026-09-13.
+
+Neither Control may. `Bash(git merge:*)` is denied in both Control profiles,
+alongside push, rebase, `reset --hard`, worktree and the `git -C` family, and a
+deny refuses outright rather than prompting. A Control that needs `main` in its
+branch, or its branch in `main`, asks Planning and does not reproduce the merge
+by hand -- hand-applying one is the same act by another name.
+
+This is the repository's answer, not a universal one. Workspace Strategy
+declined to promote Combatives' rule that a Control may merge its own
+authorized task, as not holding everywhere.
+
 ## Control Track Assignment
 
 Control A and Control B are split by **kind of work**, not by surface:
