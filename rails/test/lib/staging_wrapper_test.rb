@@ -124,11 +124,78 @@ class StagingWrapperTest < ActiveSupport::TestCase
     end
   end
 
+  # --- the override may not come from a file ------------------------------
+
+  # WENFU_EXPECTED_DATABASE acknowledges a one-off exception on one invocation;
+  # the guard still demands an exact match. In a file it stops being one-off and
+  # silently disarms every later boot, which is how a convention like this rots:
+  # someone adds it to an env file to stop the WARN line.
+  test "it refuses when the override is set in the shared file, naming file and key" do
+    with_env_file("SECRET_KEY_BASE=x\nWENFU_EXPECTED_DATABASE=templemate_data\n") do |shared|
+      with_env_file("RAILS_ENV=staging\n") do |instance|
+        _stdout, stderr, status = run_wrapper(
+          "ruby", "-e", "print 1", shared: shared, instance: instance
+        )
+
+        assert_equal 1, status.exitstatus
+        assert_match "WENFU_EXPECTED_DATABASE is set in the shared environment file", stderr
+        assert_match shared, stderr
+      end
+    end
+  end
+
+  test "it refuses when the override is exported from the instance file" do
+    with_env_file("SECRET_KEY_BASE=x\n") do |shared|
+      with_env_file("export WENFU_EXPECTED_DATABASE=templemate_data\n") do |instance|
+        _stdout, stderr, status = run_wrapper(
+          "ruby", "-e", "print 1", shared: shared, instance: instance
+        )
+
+        assert_equal 1, status.exitstatus
+        assert_match "WENFU_EXPECTED_DATABASE is set in the instance environment file", stderr
+        assert_match instance, stderr
+      end
+    end
+  end
+
+  # A refusal that fired on a commented line would teach people to delete the
+  # comment explaining why the line is not there.
+  test "a commented-out override is not a refusal" do
+    with_env_file("SECRET_KEY_BASE=x\n") do |shared|
+      with_env_file("# WENFU_EXPECTED_DATABASE=templemate_data\n") do |instance|
+        stdout, _stderr, status = run_wrapper(
+          "ruby", "-e", 'print "RAN"', shared: shared, instance: instance
+        )
+
+        assert_predicate status, :success?
+        assert_equal "RAN", stdout.strip
+      end
+    end
+  end
+
+  # The supported way to use it. This is what the refusal is steering people to,
+  # so it has to keep working.
+  test "the override set inline is allowed and reaches the process" do
+    with_env_file("SECRET_KEY_BASE=x\n") do |shared|
+      with_env_file("RAILS_ENV=staging\n") do |instance|
+        stdout, _stderr, status = run_wrapper(
+          "ruby", "-e", 'print ENV["WENFU_EXPECTED_DATABASE"]',
+          shared: shared, instance: instance,
+          env: { "WENFU_EXPECTED_DATABASE" => "templemate_data_staging" }
+        )
+
+        assert_predicate status, :success?
+        assert_equal "templemate_data_staging", stdout.strip
+      end
+    end
+  end
+
   private
 
-  def run_wrapper(*args, shared: "/nonexistent/shared.env", instance: "/nonexistent/instance.env")
+  def run_wrapper(*args, shared: "/nonexistent/shared.env",
+                  instance: "/nonexistent/instance.env", env: {})
     Open3.capture3(
-      { "WENFU_SHARED_ENV_FILE" => shared, "WENFU_INSTANCE_ENV_FILE" => instance },
+      { "WENFU_SHARED_ENV_FILE" => shared, "WENFU_INSTANCE_ENV_FILE" => instance }.merge(env),
       WRAPPER, *args, chdir: REPO_ROOT.to_s
     )
   end
