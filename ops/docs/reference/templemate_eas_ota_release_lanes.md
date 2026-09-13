@@ -1,6 +1,6 @@
 # TempleMate EAS build and update lanes
 
-This source contract defines `testflight` and `production` as distinct, app-version runtime lanes for TempleMate. Both use the public Shengfukung demo origin and tenant (`https://shengfukung.com.tw`, `shengfukung-wenfu`).
+This source contract defines `testflight` and `production` as distinct, app-version runtime lanes for TempleMate. Both use the public origin `https://shengfukung.com.tw`. Neither carries a tenant: the app is built with no temple, the camera scans a temple's QR code, and the slug it resolves is kept in async storage.
 
 **`testflight` is a live EAS Update channel** (Director, 2026-08-31): iOS build 1 was uploaded, distributed, and installed by staff, and simple JS changes reach that lane as an OTA update rather than a rebuild. Native config, native dependency, and `runtimeVersion` changes still require a build. `production` remains reserved and unexercised.
 
