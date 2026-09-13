@@ -1,95 +1,180 @@
 require "test_helper"
 require "stringio"
 
-# The guard that keeps production and staging on their own databases.
+# The guard that keeps a process on the database its environment is supposed to
+# use. Shape settled in §4a of ENV_PARTITION_BY_MUTABILITY_PLAN.md.
 #
-# These drive DeploymentIdentity directly rather than by booting an
-# environment, which is the reason the decision was extracted out of
-# config/initializers/deployment_identity.rb in the first place. The
+# The decision table under test, in one place:
+#
+#   declared, disagrees            -> refuse, TTY or not
+#   not declared, disagrees, TTY   -> warn
+#   not declared, disagrees, no TTY-> refuse
+#   override set                   -> expect exactly that name, both paths
+#
+# These drive DeploymentIdentity directly rather than by booting an environment,
+# which is why the decision was extracted out of the initializer at all. The
 # initializer's own wiring is asserted at the bottom.
 class DeploymentIdentityTest < ActiveSupport::TestCase
-  test "production on its own database passes" do
-    guard = DeploymentIdentity.new(env: "production", database: "templemate_data")
+  # Minimal stand-in; Rails.logger is not available to a plain object under test.
+  class FakeLogger
+    attr_reader :warnings
 
-    assert guard.ok?
-    assert guard.verify!
+    def initialize = @warnings = []
+    def warn(message) = @warnings << message
+  end
+
+  def guard(**overrides)
+    DeploymentIdentity.new(**{ env: "staging", database: "templemate_data_staging" }.merge(overrides))
+  end
+
+  # --- agreement -----------------------------------------------------------
+
+  test "production on its own database passes" do
+    assert guard(env: "production", database: "templemate_data").verify!
   end
 
   test "staging on its own database passes" do
-    guard = DeploymentIdentity.new(env: "staging", database: "templemate_data_staging")
-
-    assert guard.ok?
     assert guard.verify!
   end
 
-  # The incident this exists for: staging loses its PGDATABASE override and
-  # inherits production's, so it would serve production's data silently.
-  test "staging pointed at production's database is refused" do
-    guard = DeploymentIdentity.new(env: "staging", database: "templemate_data")
+  test "a declaration that agrees with the resolved database passes" do
+    assert guard(declared_environment: "staging").verify!
+  end
 
-    assert_not guard.ok?
-    error = assert_raises(DeploymentIdentity::Mismatch) { guard.verify! }
+  # --- criterion 1: a declared mismatch refuses, present or not ------------
+
+  # The defect this whole round exists for: a wrapper named `staging` used to
+  # warn and open a production console anyway.
+  test "a declared environment disagreeing with the database refuses away from a console" do
+    error = assert_raises(DeploymentIdentity::Mismatch) do
+      guard(declared_environment: "staging", database: "templemate_data", tty: false).verify!
+    end
+
     assert_match "templemate_data_staging", error.message
-    assert_match "templemate_data", error.message
+    assert_match "WENFU_DECLARED_ENVIRONMENT=staging", error.message
   end
 
-  test "production pointed at staging's database is refused" do
-    guard = DeploymentIdentity.new(env: "production", database: "templemate_data_staging")
-
-    assert_not guard.ok?
-    assert_raises(DeploymentIdentity::Mismatch) { guard.verify! }
+  # The same, with a human watching. Presence is what makes a warning readable;
+  # it is not what makes it timely. A broken promise is refused either way.
+  test "a declared environment disagreeing with the database refuses at a console too" do
+    assert_raises(DeploymentIdentity::Mismatch) do
+      guard(declared_environment: "staging", database: "templemate_data", tty: true).verify!
+    end
   end
 
-  # PGDATABASE present but empty is a typo, not a state anyone chooses, and it
-  # is the one blank worth catching: libpq would fall back to the OS user's
-  # database name rather than failing.
-  test "a blank database is refused and says so readably" do
-    guard = DeploymentIdentity.new(env: "production", database: "")
+  test "a declaration naming an environment with no known database refuses" do
+    error = assert_raises(DeploymentIdentity::Mismatch) do
+      guard(env: "development", declared_environment: "banana",
+            database: "anything", tty: true).verify!
+    end
 
-    error = assert_raises(DeploymentIdentity::Mismatch) { guard.verify! }
+    assert_match "banana", error.message
+    assert_match "no known environment", error.message
+  end
+
+  # --- criterion 2: two positive conditions for the permissive path --------
+
+  test "no declaration plus a TTY warns instead of raising" do
+    warner = StringIO.new
+    subject = guard(database: "templemate_data", tty: true)
+
+    assert_nothing_raised { assert_not subject.verify!(warner: warner) }
+    assert_match "MISMATCH", warner.string
+    assert_match "templemate_data_staging", warner.string
+  end
+
+  # Absence alone must not be permissive: a declaration can go missing from the
+  # wrapper failing before its export, `sudo` or `env -i` stripping it, or a
+  # refactor moving the export below the exec.
+  test "no declaration without a TTY refuses" do
+    assert_raises(DeploymentIdentity::Mismatch) do
+      guard(database: "templemate_data", tty: false).verify!
+    end
+  end
+
+  test "a warning is silent when the database agrees" do
+    warner = StringIO.new
+
+    assert guard(tty: true).verify!(warner: warner)
+    assert_empty warner.string
+  end
+
+  # --- criterion 3: the override is an acknowledgement, not a bypass -------
+
+  test "the override passes only on an exact match" do
+    assert guard(env: "production", database: "templemate_restored",
+                 override: "templemate_restored").verify!
+  end
+
+  test "the override refuses when the resolved name differs from it" do
+    error = assert_raises(DeploymentIdentity::Mismatch) do
+      guard(env: "production", database: "templemate_data",
+            override: "templemate_restored", tty: false).verify!
+    end
+
+    assert_match "templemate_restored", error.message
+    assert_match "WENFU_EXPECTED_DATABASE", error.message
+  end
+
+  # It cannot be used to skip the comparison, only to state a different answer
+  # and be held to it. A near miss is still a refusal.
+  test "the override does not let a mismatched database through on a declared path" do
+    assert_raises(DeploymentIdentity::Mismatch) do
+      guard(declared_environment: "staging", database: "templemate_data",
+            override: "templemate_data_staging", tty: true).verify!
+    end
+  end
+
+  test "the override logs at WARN whenever it is active" do
+    logger = FakeLogger.new
+
+    guard(env: "production", database: "templemate_restored",
+          override: "templemate_restored").verify!(logger: logger)
+
+    assert_equal 1, logger.warnings.length
+    assert_match "WENFU_EXPECTED_DATABASE=templemate_restored", logger.warnings.first
+  end
+
+  test "no override means no WARN line" do
+    logger = FakeLogger.new
+
+    guard.verify!(logger: logger)
+
+    assert_empty logger.warnings
+  end
+
+  # --- unguarded environments ---------------------------------------------
+
+  test "development with nothing declared is not guarded" do
+    subject = guard(env: "development", database: "anything_at_all", tty: false)
+
+    assert_not subject.guarded?
+    assert subject.verify!
+  end
+
+  test "test with nothing declared is not guarded" do
+    assert guard(env: "test", database: "templemate_data", tty: false).verify!
+  end
+
+  # A declaration makes any environment guarded. Otherwise the wrapper could be
+  # run in a development checkout and the claim would go unchecked.
+  test "a declaration makes an otherwise unguarded environment guarded" do
+    subject = guard(env: "development", declared_environment: "staging",
+                    database: "shengfukung_wenfu_dev", tty: true)
+
+    assert subject.guarded?
+    assert_raises(DeploymentIdentity::Mismatch) { subject.verify! }
+  end
+
+  test "a blank database is refused and named readably" do
+    error = assert_raises(DeploymentIdentity::Mismatch) do
+      guard(declared_environment: "staging", database: "").verify!
+    end
+
     assert_match "(blank)", error.message
   end
 
-  test "development has no expectation and is never guarded" do
-    guard = DeploymentIdentity.new(env: "development", database: "anything_at_all")
-
-    assert_not guard.guarded?
-    assert guard.ok?
-    assert guard.verify!
-  end
-
-  test "test has no expectation and is never guarded" do
-    guard = DeploymentIdentity.new(env: "test", database: "templemate_data")
-
-    assert_not guard.guarded?
-    assert guard.verify!
-  end
-
-  # Deliberate exclusion. A console is how you diagnose this misconfiguration,
-  # and a guard that removes that tool is one that gets deleted rather than
-  # fixed. It warns loudly instead, naming both databases.
-  test "a console warns instead of raising, and names both databases" do
-    guard = DeploymentIdentity.new(
-      env: "staging", database: "templemate_data", console: true
-    )
-    warner = StringIO.new
-
-    assert_nothing_raised { assert_not guard.verify!(warner: warner) }
-
-    assert_match "MISMATCH", warner.string
-    assert_match "templemate_data_staging", warner.string
-    assert_match "templemate_data", warner.string
-  end
-
-  test "a console on the right database says nothing" do
-    guard = DeploymentIdentity.new(
-      env: "staging", database: "templemate_data_staging", console: true
-    )
-    warner = StringIO.new
-
-    assert guard.verify!(warner: warner)
-    assert_empty warner.string
-  end
+  # --- constants -----------------------------------------------------------
 
   test "the expected databases are exactly production and staging" do
     assert_equal(
@@ -98,10 +183,17 @@ class DeploymentIdentityTest < ActiveSupport::TestCase
     )
   end
 
+  test "the declaration and override variables are named as the wrapper expects" do
+    assert_equal "WENFU_DECLARED_ENVIRONMENT", DeploymentIdentity::DECLARATION_VARIABLE
+    assert_equal "WENFU_EXPECTED_DATABASE", DeploymentIdentity::OVERRIDE_VARIABLE
+  end
+
+  # --- wiring --------------------------------------------------------------
+
   # The class above is inert unless something calls it at boot. This fails if
-  # the initializer is deleted or stops invoking the guard -- the failure mode
-  # where the tests above all still pass and no deployment is actually guarded.
-  test "the boot initializer exists and invokes the guard after initialize" do
+  # the initializer is deleted or stops passing an input -- the failure mode
+  # where every test above still passes and no process is actually guarded.
+  test "the boot initializer exists and passes every input to the guard" do
     initializer = Rails.root.join("config/initializers/deployment_identity.rb")
 
     assert initializer.exist?,
@@ -113,12 +205,14 @@ class DeploymentIdentityTest < ActiveSupport::TestCase
       "cannot be referenced during initialization")
     assert_match(/DeploymentIdentity\.new/, source)
     assert_match(/verify!/, source)
+    assert_match(/declared_environment:\s*ENV\[DeploymentIdentity::DECLARATION_VARIABLE\]/, source,
+      "the declaration must be read from the environment, or every path looks undeclared")
+    assert_match(/override:\s*ENV\[DeploymentIdentity::OVERRIDE_VARIABLE\]/, source)
+    assert_match(/tty:\s*\$stdin\.tty\?/, source,
+      "the TTY probe must be real; hardcoding it opens the permissive path")
+    assert_match(/logger:/, source, "the override's WARN line needs a logger")
   end
 
-  # config/database.yml must name the database for the two guarded environments,
-  # because the guard compares a name it reads from configuration rather than
-  # from an open connection. A `url:` key here would resolve to nil with no
-  # DATABASE_URL on the droplet and hand the choice back to libpq.
   test "database.yml names the database for production and staging" do
     source = Rails.root.join("config/database.yml").read
     guarded = source[/^production:.*/m]

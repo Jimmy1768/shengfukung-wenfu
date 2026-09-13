@@ -5,14 +5,20 @@ require "tmpdir"
 # bin/staging runs a Rails command against a checkout's deployment environment
 # by sourcing the shared environment file and then that checkout's instance.env.
 #
-# Refusing is the behaviour under test. On a development machine neither file
-# exists, so refusing clearly is this script's normal local outcome, and the
-# thing most worth pinning: a wrapper that sourced whichever file happened to
-# exist would run commands with half an environment, which is how a command
-# ends up on the wrong database.
+# Two behaviours are pinned here. Refusing when a file is unreadable, because a
+# wrapper that sourced whichever file happened to exist would run with half an
+# environment, which is how a command ends up on the wrong database. And
+# exporting exactly one thing -- a declaration of which environment it believes
+# it is, never a copy of any value. Copying a value would protect the console
+# and leave the systemd service reading the instance file, with nothing able to
+# say which was right when they disagreed.
 class StagingWrapperTest < ActiveSupport::TestCase
   REPO_ROOT = Rails.root.join("..").expand_path
   WRAPPER = REPO_ROOT.join("bin/staging").to_s
+
+  # The five values that differ per deployment. The wrapper must carry none of
+  # them; they live in instance.env and nowhere else.
+  PARTITION_KEYS = %w[RAILS_ENV RACK_ENV PUMA_PORT PGDATABASE S3_OBJECT_PREFIX].freeze
 
   test "the wrapper exists and is executable" do
     assert File.executable?(WRAPPER), "bin/staging must be executable"
@@ -26,10 +32,7 @@ class StagingWrapperTest < ActiveSupport::TestCase
   end
 
   test "it refuses when the shared environment file is unreadable, and names it" do
-    _stdout, stderr, status = run_wrapper(
-      "rails", "runner", "puts 1",
-      shared: "/nonexistent/shared.env", instance: "/nonexistent/instance.env"
-    )
+    _stdout, stderr, status = run_wrapper("rails", "runner", "puts 1")
 
     assert_equal 1, status.exitstatus
     assert_match "cannot read the shared environment file", stderr
@@ -38,15 +41,11 @@ class StagingWrapperTest < ActiveSupport::TestCase
 
   test "it refuses when only the instance file is missing, and says how to make one" do
     with_env_file("SECRET_KEY_BASE=x\n") do |shared|
-      _stdout, stderr, status = run_wrapper(
-        "rails", "runner", "puts 1",
-        shared: shared, instance: "/nonexistent/instance.env"
-      )
+      _stdout, stderr, status = run_wrapper("rails", "runner", "puts 1", shared: shared)
 
       assert_equal 1, status.exitstatus
       assert_match "cannot read the instance environment file", stderr
       assert_match "/nonexistent/instance.env", stderr
-      # The remedy has to be actionable, not just a complaint.
       assert_match "ops/env/template.instance.staging.env", stderr
     end
   end
@@ -65,6 +64,63 @@ class StagingWrapperTest < ActiveSupport::TestCase
         assert_predicate status, :success?
         assert_equal "from_shared,instance", stdout.strip
       end
+    end
+  end
+
+  # --- criterion 4 ---------------------------------------------------------
+
+  test "it declares the environment it believes it is running" do
+    with_env_file("") do |shared|
+      with_env_file("") do |instance|
+        stdout, _stderr, status = run_wrapper(
+          "ruby", "-e", 'print ENV["WENFU_DECLARED_ENVIRONMENT"].inspect',
+          shared: shared, instance: instance
+        )
+
+        assert_predicate status, :success?
+        assert_equal '"staging"', stdout.strip
+      end
+    end
+  end
+
+  # A value the wrapper set itself would silently win over the instance file.
+  # This proves the five partition values arrive from the file untouched.
+  test "it does not overwrite any value the instance file provides" do
+    supplied = PARTITION_KEYS.map { |key| "#{key}=sentinel_#{key.downcase}\n" }.join
+
+    with_env_file("") do |shared|
+      with_env_file(supplied) do |instance|
+        script = PARTITION_KEYS.map { |key| %(ENV["#{key}"]) }.join(%(+","+))
+        stdout, _stderr, status = run_wrapper(
+          "ruby", "-e", "print #{script}", shared: shared, instance: instance
+        )
+
+        assert_predicate status, :success?
+        assert_equal PARTITION_KEYS.map { |key| "sentinel_#{key.downcase}" }.join(","),
+          stdout.strip
+      end
+    end
+  end
+
+  # The behavioural tests above pass if the wrapper exports a partition value
+  # that happens to equal what the instance file said. This one does not: it
+  # fails the moment a second export appears, whatever its value.
+  test "the wrapper contains exactly one export, and it is the declaration" do
+    exports = File.readlines(WRAPPER).grep(/^\s*export\s/).map(&:strip)
+
+    assert_equal ['export WENFU_DECLARED_ENVIRONMENT="staging"'], exports,
+      "bin/staging must export its declaration and nothing else. A copied value " \
+      "here becomes a second source of truth that only the console reads, while " \
+      "the systemd service keeps reading instance.env."
+  end
+
+  test "the wrapper names no partition value at all" do
+    source = File.read(WRAPPER)
+    body = source.lines.reject { |line| line.strip.start_with?("#") }.join
+
+    PARTITION_KEYS.each do |key|
+      assert_no_match(/^\s*(export\s+)?#{key}=/, body,
+        "#{key} is a partition value and belongs in instance.env, not in the wrapper")
     end
   end
 
