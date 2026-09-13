@@ -71,12 +71,12 @@ test('production config uses the public TempleMate native identifiers', () => {
 test('TestFlight and production source profiles are real, public, and isolated from development', () => {
   for (const profile of ['testflight', 'production']) {
     const config = configFor(profile);
-    assert.equal(config.extra.clientMode, 'real');
     assert.equal(config.extra.apiBaseUrl, 'https://shengfukung.com.tw');
     // One build serves every temple. A slug here is what pinned a release to a
     // single tenant, so its absence is the thing worth asserting -- and the
     // local-development passthrough must not leak into a release lane either.
-    assert.equal(config.extra.tenantSlug, '', 'a release lane carries no tenant');
+    assert.equal(config.extra.tenantSlug, undefined, 'no tenant field reaches a release lane at all');
+    assert.equal(config.extra.localTempleSlug, '', 'and the dev seed is empty there');
     assert.equal(JSON.stringify(config.extra).includes('shengfukung-wenfu'), false);
     assert.equal(config.extra.easUpdateChannel, profile);
     assert.equal(config.updates.url, 'https://u.expo.dev/c7b8523a-2fad-4123-bc96-0c0c85a23dec');

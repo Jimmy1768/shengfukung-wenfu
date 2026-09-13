@@ -4,9 +4,9 @@ import { AppState, BackHandler, Image, KeyboardAvoidingView, Linking, Modal, Pla
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Constants from 'expo-constants';
 
-import { createRealAdapter } from './app/real/adapter';
-import { resolveClientConfig } from './app/real/config';
-import { productionTransport } from './app/real/transport';
+import { createRealAdapter } from './app/client/adapter';
+import { resolveClientConfig } from './app/client/config';
+import { productionTransport } from './app/client/transport';
 import { scopedStorage } from './app/lib/auth/storage';
 import { activePresentationTenant, initialBinding } from './app/tenant/binding';
 import { scanCameraPayload } from './app/tenant/scanner';
@@ -108,13 +108,23 @@ function AppBody() {
   }, [screen, cameraOpen, album]);
   useEffect(() => {
     let mounted = true;
-    if (clientConfig.mode !== 'real') { setStartup(false); return () => { mounted = false; }; }
     (async () => {
       try {
         // The remembered temple is a fact about this device, not about the
         // session, so it is read before any sign-in is attempted. It used to be
         // loaded only when a session restored, which meant a signed-out launch
         // asked for the QR code again even though the binding was still stored.
+        // The dev client skips the scan, and this is how. The seed goes into
+        // the same storage a scan writes to, so there is one path to "a temple
+        // is loaded" and the dev client exercises it rather than a second one.
+        // Empty in every release lane, and only ever used when nothing is
+        // stored, so a real scan always wins. The server names the temple on
+        // bootstrap, as it does after a scan.
+        if (clientConfig.localTempleSlug && !(await trustedBindingStorage.load())) {
+          await trustedBindingStorage
+            .save({ state: 'bound', tenant: { id: clientConfig.localTempleSlug, name: '' }, error: null, source: 'qr' })
+            .catch(() => null);
+        }
         const remembered = await trustedBindingStorage.load();
         if (remembered && mounted) setBinding(remembered);
         const next = await adapter.restoreSession();
@@ -219,11 +229,12 @@ function AppBody() {
     });
   }, [loadedUser.english_name, loadedUser.native_name, loadedUser.phone, loadedUser.city]);
 
-  // Sign-out keeps the remembered temple. It is where the device is, not who is
-  // holding it, and the release config pins the tenant anyway -- normalizedBinding
-  // refuses any binding whose id is not config.tenantSlug, so a retained one
-  // cannot point elsewhere. Making a patron find the QR code again just to sign
-  // back in bought nothing.
+  // Sign-out keeps the loaded temple. It is where the device is, not who is
+  // holding it, and making a patron find the QR code again just to sign back in
+  // bought nothing. This used to add that a retained temple could not point
+  // anywhere else because the build pinned the tenant -- it no longer does, and
+  // that is fine: a stored temple is one the server confirmed, and unloading is
+  // the explicit control below.
   // Explicit, and the only way a device forgets its temple.
   const onUnbindTemple = async () => {
     await trustedBindingStorage.clear().catch(() => null);
@@ -300,7 +311,7 @@ function TenantSetupGate({ t, palette, binding, setBinding, setData, setCollecti
     }
   };
 
-  return <Shell palette={palette}><Header t={t} palette={palette} binding={binding} onSignOut={signOut} /><ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled"><Section title={t.setupTemple} palette={palette}><Text style={[styles.body, { color: palette.text }]}>{t.setupTempleDescription}</Text>{cameraOpen ? <TempleQrCamera mode={clientConfig.mode} t={t} palette={palette} isRelease onCancel={onCameraResult} onScan={payload => scanCameraPayload({ mode: clientConfig.mode, payload, config: clientConfig, transport: productionTransport })} /> : <Button label={t.scanCodeRelease} palette={palette} onPress={() => setCameraOpen(true)} />}</Section></ScrollView></Shell>;
+  return <Shell palette={palette}><Header t={t} palette={palette} binding={binding} onSignOut={signOut} /><ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled"><Section title={t.setupTemple} palette={palette}><Text style={[styles.body, { color: palette.text }]}>{t.setupTempleDescription}</Text>{cameraOpen ? <TempleQrCamera t={t} palette={palette} isRelease onCancel={onCameraResult} onScan={payload => scanCameraPayload({ payload, config: clientConfig, transport: productionTransport })} /> : <Button label={t.scanCodeRelease} palette={palette} onPress={() => setCameraOpen(true)} />}</Section></ScrollView></Shell>;
 }
 
 function SignedOut({ t, palette, locale, setLocale, dark, setDark, screen, setScreen, email, setEmail, password, setPassword, signup, setSignup, recoveryEmail, setRecoveryEmail, pending, error, setError, notice, run, signIn, setSignedIn, beginOAuth, oauthState }) {

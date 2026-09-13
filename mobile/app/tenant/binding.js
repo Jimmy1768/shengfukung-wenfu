@@ -2,7 +2,7 @@
 // here -- fixture tenants, link parsing against example.test origins, the
 // switch-temple dance -- went with the dummy client. A real device loads a
 // temple by scanning its code, and that is the only way it loads one.
-const { PLATFORM_CONNECT_ORIGIN } = require('../real/config');
+const { PLATFORM_CONNECT_ORIGIN } = require('../client/config');
 
 const productionConnectionPath = '/templemate/connect';
 

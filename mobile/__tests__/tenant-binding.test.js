@@ -4,12 +4,12 @@ const { activePresentationTenant, initialBinding, parseProductionConnectionLink 
 const { storageKey, storageScope } = require('../app/core/storage_scope');
 const { scanCameraPayload } = require('../app/tenant/scanner');
 const { createTrustedBindingStorage, trustedBindingKey } = require('../app/tenant/storage');
-const { PLATFORM_CONNECT_ORIGIN } = require('../app/real/config');
+const { PLATFORM_CONNECT_ORIGIN } = require('../app/client/config');
 
 const apiOrigin = 'https://shengfukung.com.tw';
-// No tenantSlug. A release build is compiled without one; the slug arrives in
+// No tenant in the config at all. A build is compiled without one; the slug arrives in
 // the scanned code and is confirmed by the server.
-const config = { mode: 'real', environment: 'testflight', apiBaseUrl: apiOrigin };
+const config = { environment: 'testflight', apiBaseUrl: apiOrigin };
 const linkFor = slug => `${PLATFORM_CONNECT_ORIGIN}/templemate/connect/${slug}`;
 const templeTransport = (slug, name) => async () => ({ ok: true, status: 200, body: { temple: { slug, name } } });
 

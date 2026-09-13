@@ -8,7 +8,7 @@ const nativePath = '/api/v1/account/native';
 // loaded is a real state -- it is what the scanner screen is -- and the session
 // routes accept a request without one; everything else still requires it and
 // says so itself.
-const query = (path, tenantSlug) => (tenantSlug ? `${path}${path.includes('?') ? '&' : '?'}temple_slug=${encodeURIComponent(tenantSlug)}` : path);
+const query = (path, templeSlug) => (templeSlug ? `${path}${path.includes('?') ? '&' : '?'}temple_slug=${encodeURIComponent(templeSlug)}` : path);
 const jsonHeaders = token => ({ Accept: 'application/json', 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) });
 // Exactly what NativeProfileController#profile_params permits. `notes` is
 // deliberately not here -- removed from the profile on both surfaces.
@@ -16,17 +16,19 @@ const PROFILE_FIELDS = ['english_name', 'native_name', 'phone', 'city'];
 const registrationFields = input => Object.fromEntries(Object.entries(input || {}).filter(([key, value]) => ['quantity', 'registrant_scope', 'dependent_id', 'contact_name', 'contact_phone', 'contact_email', 'household_notes', 'arrival_window', 'ceremony_notes'].includes(key) && value !== undefined && value !== null && value !== ''));
 
 function createRealAdapter({ config, store, transport, device = { device_id: 'local-test-client', platform: 'expo' } }) {
-  if (!config?.apiBaseUrl) throw Object.assign(new Error('Real mode requires explicit trusted configuration.'), { code: 'REAL_CONFIG_REQUIRED' });
-  if (typeof transport !== 'function') throw new Error('A trusted transport is required for real mode.');
-  const scoped = createScopedStorage(store, storageScope({ environment: config.environment, tenantId: config.tenantSlug }));
+  if (!config?.apiBaseUrl) throw Object.assign(new Error('A client requires explicit trusted configuration.'), { code: 'CLIENT_CONFIG_REQUIRED' });
+  if (typeof transport !== 'function') throw new Error('A trusted transport is required.');
+  const scoped = createScopedStorage(store, storageScope({ environment: config.environment }));
   // The loaded temple, read at call time rather than captured at construction.
-  // It is runtime state now: a patron loads one by scanning and can unload it
+  // It is runtime state: a patron loads one by scanning and can unload it
   // without signing out, so an adapter built once must not hold a stale answer.
-  // config.tenantSlug survives only as the local-development value.
-  const loadedTenant = createTrustedBindingStorage({ store, config });
-  const currentTenantSlug = async () => {
-    try { return (await loadedTenant.load())?.tenant?.id || config.tenantSlug || ''; }
-    catch (_) { return config.tenantSlug || ''; }
+  // Storage is the only source. There is no configured tenant to fall back to
+  // any more, in any lane -- that fallback was the last place a build could
+  // carry a temple, and the dev client now pre-fills the same storage instead.
+  const loadedTemple = createTrustedBindingStorage({ store, config });
+  const currentTempleSlug = async () => {
+    try { return (await loadedTemple.load())?.tenant?.id || ''; }
+    catch (_) { return ''; }
   };
   let session = null; let state = snapshotFromBootstrap();
   // Session, cache and pending work only. The trusted temple binding is NOT
@@ -37,7 +39,7 @@ function createRealAdapter({ config, store, transport, device = { device_id: 'lo
   const clearRetainedState = async () => { await scoped.clearAll(); };
   const request = async (method, path, body, authenticated = true) => {
     if (authenticated) await ensureFreshAccessToken();
-    const result = await transport({ method, url: `${config.apiBaseUrl}${query(`${nativePath}${path}`, await currentTenantSlug())}`, headers: jsonHeaders(authenticated ? session?.access_token : null), body: body === undefined ? undefined : JSON.stringify(body) });
+    const result = await transport({ method, url: `${config.apiBaseUrl}${query(`${nativePath}${path}`, await currentTempleSlug())}`, headers: jsonHeaders(authenticated ? session?.access_token : null), body: body === undefined ? undefined : JSON.stringify(body) });
     const payload = result?.body || {};
     if (!result?.ok) {
       const error = nativeError(result?.status || 0, payload);
@@ -88,7 +90,7 @@ function createRealAdapter({ config, store, transport, device = { device_id: 'lo
   // exchangeOAuth and restoreSession, the last of which wiped the stored
   // session on the way past.
   const loadBootstrap = async () => {
-    if (!(await currentTenantSlug())) return state;
+    if (!(await currentTempleSlug())) return state;
     const payload = await request('GET', '/bootstrap');
     state = { ...state, ...snapshotFromBootstrap(payload) };
     return state;
@@ -99,7 +101,7 @@ function createRealAdapter({ config, store, transport, device = { device_id: 'lo
     // Exposed so a scan can load the temple it just confirmed. This is the
     // same loader sign-in uses, not a second one.
     bootstrap: () => loadBootstrap(),
-    kind: 'real', network: config.environment === 'test' ? 'local-test' : config.environment, mode: 'real', snapshot: () => state,
+    network: config.environment === 'test' ? 'local-test' : config.environment, snapshot: () => state,
     oauthStorage: { loadPending: () => scoped.loadPending(), savePending: pending => scoped.savePending(pending), clearPending: () => scoped.clearPending() },
     async startOAuth({ provider, pkceChallenge, pkceMethod }) {
       const payload = await request('POST', '/oauth/start', { oauth: { provider, pkce_challenge: pkceChallenge, pkce_method: pkceMethod } }, false);

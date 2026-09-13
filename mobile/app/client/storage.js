@@ -1,5 +1,5 @@
 const resourceNames = ['session', 'cache', 'pending'];
-const keyFor = (scope, name) => `templemate.${scope.environment}.${scope.tenantId}.real-${name}`;
+const keyFor = (scope, name) => `templemate.${scope.environment}.${scope.tenantId}.${name}`;
 const sessionKey = scope => keyFor(scope, 'session');
 
 function createScopedStorage(store, scope) {

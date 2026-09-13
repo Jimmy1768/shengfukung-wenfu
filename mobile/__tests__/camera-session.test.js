@@ -5,7 +5,7 @@ const path = require('node:path');
 const { createCameraPermissionController, createCameraSession, permissionState } = require('../app/tenant/camera_session');
 const { scanCameraPayload } = require('../app/tenant/scanner');
 const { resolveHardwareBack } = require('../app/tenant/back');
-const { PLATFORM_CONNECT_ORIGIN } = require('../app/real/config');
+const { PLATFORM_CONNECT_ORIGIN } = require('../app/client/config');
 
 // A scan loads a temple only when the code comes from the platform origin AND
 // the server confirms the slug it names. The config carries no tenant at all

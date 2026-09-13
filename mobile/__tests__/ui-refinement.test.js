@@ -105,8 +105,22 @@ test('tenant connection presentation uses the shared retained-tenant selector', 
 // never loaded a temple in a release build: the code that names one after
 // loading sat on the side a release build never ran.
 test('one code path serves every build', () => {
-  for (const file of ['App.js', 'app/real/config.js', 'app/tenant/storage.js']) {
+  for (const file of ['App.js', 'app/client/config.js', 'app/tenant/storage.js']) {
     assert.equal(read(file).includes('isReleaseConfig'), false, `${file} still selects behaviour by build`);
+  }
+});
+
+// Removing a configuration field while a reader survives is invisible to every
+// other test here: the read just yields undefined, and a gate written as
+// `!== 'real'` then inverts. That happened -- clientConfig.mode outlived the
+// mode itself and short-circuited startup, so the app restored nothing.
+test('App.js reads only configuration the client actually resolves', () => {
+  const { resolveClientConfig } = require('../app/client/config');
+  const resolved = Object.keys(resolveClientConfig({ localApiBaseUrl: 'http://local.test', clientEnvironment: 'test' }));
+  const fieldsRead = [...new Set([...read('App.js').matchAll(/clientConfig\.([a-zA-Z]+)/g)].map(match => match[1]))];
+  assert.ok(fieldsRead.length > 0, 'the check is worthless if it matches nothing');
+  for (const field of fieldsRead) {
+    assert.ok(resolved.includes(field), `App.js reads clientConfig.${field}, which resolveClientConfig does not return`);
   }
 });
 

@@ -5,7 +5,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { createCameraPermissionController, createCameraSession } from './camera_session';
 import { Button, Notice } from '../ui/primitives';
 
-export function TempleQrCamera({ mode, onScan, onCancel, t, palette }) {
+export function TempleQrCamera({ onScan, onCancel, t, palette }) {
   // One set of strings. The demo halves of these pairs went with the dummy
   // client; there is no build that reads them any more.
   const invalidQrMessage = t.cameraInvalidQrRelease;
