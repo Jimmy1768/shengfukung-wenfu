@@ -81,12 +81,32 @@ is fine; a link to a file that no longer exists is not.
 
 ## Databases
 
-Use the development database. Do not create one per task or per worktree — it
-multiplies setup, leaves stale databases behind, and obscures which one a
-failure came from.
+**Where each kind of database may exist:**
+
+| Kind | Local | Droplet |
+|---|---|---|
+| Development | yes | yes |
+| Production | no | yes |
+| Test | yes | no |
 
 A normal task does not touch production. If a task requires production access,
 it is different work: say so and stop.
+
+**Prefer the development database for dummy data.** Do not create one per task
+or per worktree — it multiplies setup, leaves stale databases behind, and
+obscures which one a failure came from. Where a test database is genuinely
+needed for a specific reason, delete it when that reason ends. One that
+outlives its task is a stray the next person to find it cannot safely drop,
+because nothing says whether anything still uses it.
+
+**Most strays are not created by a decision, so a rule against creating them
+does not reach them.** Rails parallel testing creates one database per CPU core
+on every suite run — on 2026-09-13, sixteen of about twenty strays on this
+machine were `_test-N`. libpq with no database named falls back to the
+connecting user's name, which is where a droplet's `<user>_development` and
+`<user>_test` pair comes from. Nobody chose either. What catches them is a
+listing checked against the table above, run after the work rather than
+intended before it.
 
 **Production is remote.** A production branch is checked out on its server, not
 on this machine, and nothing is served locally. A local checkout sitting on a
@@ -217,10 +237,11 @@ blind to nineteen entries rather than the trees differing. Two runs would have
 left both explanations open.
 
 This applies to tools as much as to counts. `awk` on this machine measures
-bytes; a line holding three em-dashes reads as 81 with `awk` and 79 with a
-character-aware reader. Two lanes reported a file as over-width and both were
-measuring the counter. The second implementation was worth more than the first
-because it could disagree with it.
+bytes, and an em-dash is three bytes to one character — so a line holding one
+reads 81 with `awk` and 79 with a character-aware reader. Three such lines in
+this file were reported over-width and none of them was. Two lanes reported it
+and both were measuring the counter. The second implementation was worth more
+than the first because it could disagree with it.
 
 **An instrument can answer a question next to the one you asked, and the
 output looks correct either way.** `awk length()` returns bytes where width was
