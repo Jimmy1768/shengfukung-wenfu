@@ -113,6 +113,56 @@ test('one code path serves every build', () => {
 // Criterion 2. The scan must load the temple it just confirmed -- its name and
 // its collections -- not merely record the slug. This previously called
 // setData(adapter.snapshot()): the snapshot exactly as it already was.
+// Found on a device, not by a test: the header read "connected -" with no name
+// after signing out and back in, while a relaunch showed it correctly. Storage
+// is authoritative for WHICH temple; only the server knows what it is called,
+// and the scanner that writes storage never learns the name.
+test('signing in takes the temple name from the server, not from the stored record', () => {
+  const app = read('App.js');
+  const fn = app.slice(app.indexOf('const bindingAfterSignIn'), app.indexOf('const completeSignIn'));
+  assert.equal(/if \(remembered\) return remembered;/.test(fn), false,
+    'the stored record is nameless when a scan wrote it, so it cannot win outright');
+  assert.match(fn, /boundTenant\(adapter\.snapshot\(\)\)/,
+    'the name comes from the bootstrap that has just run');
+  assert.match(fn, /trustedBindingStorage\.save\(named\)/,
+    'and is written back, so it heals instead of staying nameless until a relaunch');
+  assert.match(fn, /remembered\.tenant\?\.id !== named\.tenant\.id/,
+    'a snapshot for a different temple never overwrites the device record');
+});
+
+// A whole class, not one instance. TenantSetupGate is a top-level component, so
+// anything declared inside App is not in its scope -- yet onCameraResult called
+// setCollections, boundTenant and showError as if it were. Every scan threw
+// ReferenceError on the second statement, outside the try, so no error ever
+// surfaced and the tests, which read this file rather than run it, all passed.
+test('the tenant gate uses only its own props and module-level values', () => {
+  const app = read('App.js');
+  const signature = app.slice(app.indexOf('function TenantSetupGate'));
+  const props = new Set(signature.slice(signature.indexOf('{') + 1, signature.indexOf('}')).match(/\w+/g));
+  const start = app.indexOf('const onCameraResult');
+  const body = app.slice(start, app.indexOf('\n  };', start));
+  const moduleLevel = new Set(['adapter', 'trustedBindingStorage', 'errorMessage', 'initialBinding', 'scanCameraPayload', 'productionTransport', 'clientConfig']);
+  const used = new Set(body.match(/\b(set[A-Z]\w+|showError|boundTenant)\b/g) || []);
+  const unresolved = [...used].filter(name => !props.has(name) && !moduleLevel.has(name));
+  assert.deepEqual(unresolved, [],
+    `onCameraResult references ${unresolved.join(', ')}, which are neither props of TenantSetupGate nor module-level — a ReferenceError on every scan`);
+});
+
+// Setting the binding closes the gate, which drops the patron wherever they
+// were -- Settings, when they reached the scanner via Unbind. Nothing on that
+// screen says a temple loaded, so a successful scan read as a no-op.
+test('a confirmed scan lands the patron on home, not wherever they were', () => {
+  const app = read('App.js');
+  const start = app.indexOf('const onCameraResult');
+  const handler = app.slice(start, app.indexOf('\n  };', start));
+  assert.match(handler, /setScreen\('home'\)/, 'a confirmed scan navigates home');
+  assert.ok(handler.indexOf("setScreen('home')") > handler.indexOf('setBinding(result)'),
+    'only after the scan is confirmed, never before');
+  const signature = app.slice(app.indexOf('function TenantSetupGate'));
+  const props = new Set(signature.slice(signature.indexOf('{') + 1, signature.indexOf('}')).match(/\w+/g));
+  assert.ok(props.has('setScreen'), 'setScreen is declared inside App, so it must arrive as a prop');
+});
+
 test('a scan loads the temple it confirmed', () => {
   const app = read('App.js');
   const handler = app.slice(app.indexOf('const onCameraResult'), app.indexOf('const onCameraResult') + 1400);

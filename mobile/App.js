@@ -81,7 +81,7 @@ function AppBody() {
 
   const [startup, setStartup] = useState(true); const [signedIn, setSignedIn] = useState(false); const [screen, setScreen] = useState('home');
   const [locale, setLocale] = useState('zh-TW'); const [dark, setDark] = useState(false); const [binding, setBinding] = useState(initialBinding()); const [data, setData] = useState(adapter.snapshot()); const [collections, setCollections] = useState('idle');
-  const [email, setEmail] = useState(''); const [password, setPassword] = useState(''); const [signup, setSignup] = useState({ name: '', email: '', password: '' }); const [recoveryEmail, setRecoveryEmail] = useState('');
+  const [email, setEmail] = useState(clientConfig.localEmail || ''); const [password, setPassword] = useState(clientConfig.localPassword || ''); const [signup, setSignup] = useState({ name: '', email: '', password: '' }); const [recoveryEmail, setRecoveryEmail] = useState('');
   const [profileForm, setProfileForm] = useState({ english_name: '', native_name: '', phone: '', city: '' }); const [dependent, setDependent] = useState({ id: null, name: '', relationship: '家人' }); const [registration, setRegistration] = useState(null); const [album, setAlbum] = useState(null);
   const [supportMessage, setSupportMessage] = useState(''); const [closureConfirmation, setClosureConfirmation] = useState(''); const [pending, setPending] = useState(false); const [feedback, setFeedback] = useState(emptyFeedback());
   const [oauthState, setOauthState] = useState(oauthController.snapshot()); const [cameraOpen, setCameraOpen] = useState(false);
@@ -162,8 +162,22 @@ function AppBody() {
   // the Director signed out and back in rather than restarting.
   const bindingAfterSignIn = async () => {
     const remembered = await trustedBindingStorage.load();
-    if (remembered) return remembered;
-    return boundTenant(adapter.snapshot());
+    // Storage says WHICH temple -- a device fact that outlives the session.
+    // Only the server says what it is CALLED: a scan confirms a slug and never
+    // learns a name, so a record written by the scanner is nameless. Returning
+    // it wholesale is what left the header reading "connected -" with nothing
+    // after it, while a relaunch showed the name correctly because the startup
+    // path prefers the snapshot. Identity from storage, name from the bootstrap
+    // that has just run, and written back so it heals rather than staying
+    // nameless until the next relaunch.
+    const named = boundTenant(adapter.snapshot());
+    if (named.state !== 'bound') return remembered || initialBinding();
+    // A snapshot for a different temple than the one on the device never wins.
+    if (remembered && remembered.tenant?.id !== named.tenant.id) return remembered;
+    if (remembered?.tenant?.name !== named.tenant.name) {
+      await trustedBindingStorage.save(named).catch(() => null);
+    }
+    return named;
   };
   // Everything a successful sign-in must do, in one place. There were four
   // paths doing four different subsets: the password path loaded the
@@ -234,7 +248,7 @@ function AppBody() {
     finally { setPending(false); }
   };
   const updatePreference = async next => { const previous = { locale, dark }; const payload = { ...(next.locale ? { locale: next.locale } : {}), ...(next.theme ? { mobile_theme_id: next.theme } : {}) }; const ok = await run(async () => adapter.updatePreferences(payload)); if (ok) { if (next.locale) { setFeedback(emptyFeedback()); setLocale(next.locale); } if (next.theme) setDark(next.theme === 'dark'); } else { setLocale(previous.locale); setDark(previous.dark); } };
-  const shared = { t, palette, locale, setLocale, dark, setDark, screen, setScreen: navigate, data, setData, binding, setBinding, profileForm, setProfileForm, dependent, setDependent, registration, setRegistration, album, setAlbum, supportMessage, setSupportMessage, closureConfirmation, setClosureConfirmation, pending, error, setError: message => message ? showError(message) : dismissError(), notice, run, signOut, onUnbindTemple, collections, loadingText, updatePreference, oauthState, cameraOpen, setCameraOpen };
+  const shared = { t, palette, locale, setLocale, dark, setDark, screen, setScreen: navigate, data, setData, binding, setBinding, profileForm, setProfileForm, dependent, setDependent, registration, setRegistration, album, setAlbum, supportMessage, setSupportMessage, closureConfirmation, setClosureConfirmation, pending, error, setError: message => message ? showError(message) : dismissError(), notice, run, signOut, onUnbindTemple, collections, setCollections, boundTenant, loadingText, updatePreference, oauthState, cameraOpen, setCameraOpen };
   if (startup) return <Shell palette={palette}><View style={styles.center}><Text style={[styles.brand, { color: palette.text }]}>{t.appName}</Text><Text style={[styles.muted, { color: palette.textMuted }]}>{loadingText}</Text></View></Shell>;
   if (!signedIn) return oauthState.phase === 'account_resolution' ? <OAuthResolution {...shared} onSubmit={submitResolution} /> : <SignedOut {...shared} {...{ email, setEmail, password, setPassword, signup, setSignup, recoveryEmail, setRecoveryEmail, signIn, setSignedIn, beginOAuth }} />;
   if (!activePresentationTenant(binding)) return <TenantSetupGate {...shared} />;
@@ -245,7 +259,13 @@ function Shell({ palette, children }) { return <SafeAreaProvider><SafeAreaView s
 function Header({ t, palette, binding, onSettings, onSignOut }) { const activeTenant = activePresentationTenant(binding); return <View style={[styles.header, { borderBottomColor: palette.border }]}><View style={styles.headerCopy}><Text style={[styles.brandSmall, { color: palette.text }]}>{t.appName}</Text><Text numberOfLines={1} style={[styles.muted, { color: palette.textMuted }]}>{activeTenant ? `${t.connected} · ${activeTenant.name}` : t.notConnected}</Text></View><View style={styles.headerUtilities}>{activeTenant && <Button label={t.settings} palette={palette} tone="secondary" onPress={onSettings} />}<Button label={t.signOut} palette={palette} tone="secondary" onPress={onSignOut} /></View></View>; }
 function Navigation({ t, palette, screen, setScreen }) { return <ScrollView horizontal accessibilityRole="tablist" style={[styles.navigationShell, { borderBottomColor: palette.border }]} contentContainerStyle={styles.navigation} showsHorizontalScrollIndicator={false}>{menuKeys.map(key => <Pressable accessibilityRole="tab" accessibilityState={{ selected: screen === key }} key={key} onPress={() => setScreen(key)} style={[styles.navItem, { borderColor: palette.border, backgroundColor: screen === key ? palette.primary : palette.inset }]}><Text style={{ color: screen === key ? palette.onPrimary : palette.text, fontWeight: '800' }}>{t[key]}</Text></Pressable>)}</ScrollView>; }
 
-function TenantSetupGate({ t, palette, binding, setBinding, setData, cameraOpen, setCameraOpen, setError, signOut }) {
+// setCollections and boundTenant are declared inside the App component, so they
+// are NOT in scope here and must arrive as props. onCameraResult called
+// setCollections as its second statement, outside the try, so every scan threw
+// ReferenceError before it could load anything. setBinding had already run,
+// which is why the header read connected with no name and no error appeared.
+// Nothing caught it: the tests read this file as text, they never run it.
+function TenantSetupGate({ t, palette, binding, setBinding, setData, setCollections, boundTenant, setScreen, cameraOpen, setCameraOpen, setError, signOut }) {
   // A scan loads the temple; it does not merely remember it. This used to save
   // the record and call setData(adapter.snapshot()) -- the snapshot exactly as
   // it already was, with no name and no collections. A compiled tenant hid
@@ -256,6 +276,11 @@ function TenantSetupGate({ t, palette, binding, setBinding, setData, cameraOpen,
     if (result.state === 'binding_failed') { setError(t.cameraInvalidQrRelease); return; }
     try { await trustedBindingStorage.save(result); } catch (_) { setError(t.cameraInvalidQrRelease); return; }
     setBinding(result);
+    // Setting the binding closes this gate, and the patron lands on whichever
+    // screen they were last on -- Settings, if they reached the scanner through
+    // Unbind, which reads as though nothing happened. Home is where a loaded
+    // temple is legible: its name in the header and its collections beneath.
+    setScreen('home');
     setCollections('loading');
     try {
       const loaded = await adapter.bootstrap();
@@ -271,7 +296,7 @@ function TenantSetupGate({ t, palette, binding, setBinding, setData, cameraOpen,
       setCollections('ready');
     } catch (reason) {
       setCollections('failed');
-      showError(errorMessage(reason));
+      setError(errorMessage(reason));
     }
   };
 
