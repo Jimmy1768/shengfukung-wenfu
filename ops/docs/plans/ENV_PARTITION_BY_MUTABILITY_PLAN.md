@@ -177,20 +177,29 @@ apart. Observed: zero `Rails.env.staging?` references in `rails/app` or
 means SourceGrid adopts the one-line `staging.rb`; it does not mean Wenfu
 adopts the pretence.
 
-**2. Blank versus absent — the boundary this rule needs.**
+**2. Blank is fine, and nothing needs migrating.**
 
-"Present and blank when unused" and "absent cannot serve traffic" are both
-right, and they collide unless the boundary is stated:
+Unused keys are present and blank. Existing env files already carry many
+blanks; they live in the shared file, the partition does not move them, and
+none of them needs touching.
 
-- In the **shared** file, blank is legal. It means "this project does not use
-  this feature", and the schema stays identical across repositories.
-- In an **instance** file, blank is never legal. These are the five values that
-  decide which database and which port a deployment owns.
+Blank already reads as "unused" where it matters. `s3_service.rb:57-61`:
 
-So §4's step 2 uses fetch-and-reject-blank rather than plain `fetch`:
-`ENV.fetch("PGDATABASE").presence || raise`. A blank `PGDATABASE` must fail
-exactly as hard as a missing one. Without this, a uniform schema that fills
-every key with a blank quietly disarms the protection the partition exists for.
+    prefix = ENV["S3_OBJECT_PREFIX"].to_s
+    return raw if prefix.blank?
+
+Blank means no prefix, which is exactly the intent. A sentinel would be worse,
+not better: environment values are strings, so `S3_OBJECT_PREFIX=null` is not
+blank, gets normalised to `"null/"`, and every object lands under
+`s3://bucket/null/`. Making a sentinel safe would mean every consumer -- Rails,
+the Vue build, shell scripts -- decoding it, and one missed decode is silent.
+
+The only case worth guarding is a blank value for one of the five *instance*
+keys, which is a typo rather than a state anyone chooses. Step 0's guard
+already covers the one that matters: a blank `PGDATABASE` does not resolve to
+the expected name, so the deployment aborts. No additional rule, no schema, and
+no declaration of which keys may be blank -- that was considered and rejected
+as machinery for a problem the guard already solves.
 
 **3. Ports — already uniform; declare the base.**
 
