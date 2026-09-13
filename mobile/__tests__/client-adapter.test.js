@@ -25,7 +25,7 @@ const session = { access_token: 'access-1', refresh_token: 'refresh-1', token_ty
 // Session, cache and pending records are the scoped state; the loaded temple
 // is not. Asserting on these rather than on the store's size says what is
 // meant, and keeps saying it now that a temple is stored alongside them.
-const scopedRecords = local => [...local.values.keys()].filter(key => key.includes('.real-'));
+const scopedRecords = local => [...local.values.keys()].filter(key => !key.endsWith('.trusted-binding'));
 const response = (body = {}, status = 200) => ({ ok: status >= 200 && status < 300, status, body });
 
 // The routes a patron can reach with no temple loaded. Everything else is
