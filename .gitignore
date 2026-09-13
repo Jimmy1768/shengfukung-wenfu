@@ -11,6 +11,15 @@ npm-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Per-checkout instance environment. Phase 2 of the env partition writes this
+# file beside each checkout on the droplet, holding the five values that differ
+# per instance (RAILS_ENV, RACK_ENV, PUMA_PORT, PGDATABASE, S3_OBJECT_PREFIX).
+# It is deliberately not root-anchored, so a checkout nested at any depth still
+# gets it. Unignored it would sit untracked inside a live deployment, where
+# `git clean` deletes it and every `git status --porcelain` cleanliness check
+# reports the checkout dirty. The committed examples are in ops/env/.
+instance.env
+
 # Node dependencies, at any depth. This was three per-directory patterns
 # (vue/, expo/, mobile/) and the repository root was the gap they left --
 # 131 files, 16MB, including darwin-arm64 native binaries, were committed

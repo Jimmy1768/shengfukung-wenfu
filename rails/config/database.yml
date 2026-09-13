@@ -51,10 +51,28 @@ test:
   <<: *default
   database: <%= ENV.fetch("PGDATABASE_TEST", "#{db_base}_test") %>
 
+# DATABASE_URL is not set on the droplet, so `url:` resolved to nil here and the
+# database name was decided entirely by libpq reading PGDATABASE. That made the
+# name unknowable from config without opening a connection, and it is why
+# staging silently ran against production's database whenever its systemd
+# ExecStart override was missing. Naming it here is what lets the boot guard in
+# config/initializers/deployment_identity.rb check the name before connecting.
+#
+# The default of nil is required, not sloppy. Rails renders the ERB for this
+# whole file in one pass, in whatever environment happens to be running, so a
+# bare ENV.fetch("PGDATABASE") on these two lines raises KeyError during
+# `bin/rails test` and every development boot, where PGDATABASE is legitimately
+# unset. Observed: it aborts the test suite from line 66, production's line.
+#
+# Absence is still fatal where it matters, just enforced one layer up:
+# DeploymentIdentity refuses to boot production or staging when the resolved
+# name is blank, and unlike a KeyError from inside an ERB template it can say
+# which file to look in. A forgotten value is absent, and absent cannot serve
+# traffic -- that property is kept, the mechanism moved.
 production:
   <<: *default
-  url: <%= ENV["DATABASE_URL"] %>
+  database: <%= ENV.fetch("PGDATABASE", nil) %>
 
 staging:
   <<: *default
-  url: <%= ENV["DATABASE_URL"] %>
+  database: <%= ENV.fetch("PGDATABASE", nil) %>

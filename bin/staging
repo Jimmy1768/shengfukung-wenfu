@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+#
+# Run a Rails command against this checkout's deployment environment.
+#
+# There was previously no supported way to do this. The gap got filled by
+# hand-assembling `RAILS_ENV=staging PGDATABASE=... bin/rails ...` on the
+# command line, which is invented protocol: it works until the day one of the
+# values is wrong or forgotten, and then it runs against production.
+#
+# This wrapper sets nothing itself. It sources the shared environment file and
+# then this checkout's instance.env, in that order, and execs. Under the
+# environment partition no variable appears in both files, so the order is
+# defence rather than precedence -- there is nothing to override.
+#
+# Deliberately unlike sourcegrid-labs/bin/staging, which this mirrors in shape:
+# that script sources its env files and then exports eighteen explicit staging
+# overrides. Those overrides are the precedence problem this repository is
+# removing, so the skeleton is reused and the override block is not.
+#
+# If the runtime/secrets split (plan §6.3) is adopted, the one line that changes
+# is SHARED_ENV_FILE below: it becomes two files, sourced in order. Nothing else
+# here depends on the shared environment living in a single file.
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+RAILS_DIR="$ROOT_DIR/rails"
+
+SHARED_ENV_FILE="${WENFU_SHARED_ENV_FILE:-/etc/default/shengfukung-wenfu-env}"
+INSTANCE_ENV_FILE="${WENFU_INSTANCE_ENV_FILE:-$ROOT_DIR/instance.env}"
+
+usage() {
+  cat <<'USAGE'
+Usage: bin/staging <command> [args...]
+
+Examples:
+  bin/staging rails c
+  bin/staging rails db:migrate
+  bin/staging rails runner 'puts Rails.env'
+
+Sources the shared environment file and then this checkout's instance.env,
+in that order, and sets nothing of its own. Run it from the checkout whose
+environment you want; it takes its values from where it stands, not from
+its name.
+
+Override the file locations for testing with WENFU_SHARED_ENV_FILE and
+WENFU_INSTANCE_ENV_FILE.
+USAGE
+}
+
+require_readable_env_file() {
+  local file="$1"
+  local label="$2"
+  local remedy="$3"
+
+  if [[ ! -r "$file" ]]; then
+    echo "bin/staging: cannot read the ${label} environment file:" >&2
+    echo "  ${file}" >&2
+    echo "${remedy}" >&2
+    exit 1
+  fi
+}
+
+if [[ $# -eq 0 ]]; then
+  usage
+  exit 1
+fi
+
+# Refusing is the correct outcome, not an inconvenience. Sourcing whichever of
+# the two files happens to exist is how a command ends up running with half an
+# environment, and half an environment is how it ends up on the wrong database.
+# On a development machine neither file exists, so refusing is also the normal
+# local behaviour of this script.
+require_readable_env_file "$SHARED_ENV_FILE" "shared" \
+  "It is root-owned and readable by the deploy user on the droplet. This
+script is for use on a deployment host; on a development machine use
+bin/rails directly. Override the path with WENFU_SHARED_ENV_FILE."
+
+require_readable_env_file "$INSTANCE_ENV_FILE" "instance" \
+  "Every checkout needs its own instance.env holding the five values that
+differ per deployment. Create it from the matching example:
+  cp ops/env/template.instance.staging.env ${ROOT_DIR}/instance.env
+Override the path with WENFU_INSTANCE_ENV_FILE."
+
+set -a
+# shellcheck disable=SC1090
+source "$SHARED_ENV_FILE"
+# shellcheck disable=SC1090
+source "$INSTANCE_ENV_FILE"
+set +a
+
+cd "$RAILS_DIR"
+
+if [[ "$1" == "rails" ]]; then
+  shift
+  exec bundle exec rails "$@"
+fi
+
+exec bundle exec "$@"
