@@ -135,9 +135,23 @@ Ordinary Control work, merged to `main`, deployed later in Phase 4.
   delete it and every `git status --porcelain` cleanliness check would report
   it. Do this first; it is the cheapest thing to forget.
 - **`rails/config/database.yml`**: give `production:` and `staging:` a
-  `database: <%= ENV.fetch("PGDATABASE") %>` and remove the dead
+  `database: <%= ENV.fetch("PGDATABASE", nil) %>` and remove the dead
   `url: <%= ENV["DATABASE_URL"] %>` lines. This is what makes the name knowable
   from config, which the guard depends on.
+
+  **The nil default is required.** This plan and the spec both originally said
+  bare `ENV.fetch`, arguing it gave "structural loudness in Rails config". It
+  does not: Rails renders the whole file's ERB in one pass in whatever
+  environment is running, so production's line is evaluated during `bin/rails
+  test` and every development boot, where `PGDATABASE` is legitimately unset,
+  and raises `KeyError` before a test runs. Observed by applying the original
+  form and running the suite. Absence stays fatal, enforced one layer up in
+  the guard, which can name the file to fix rather than surfacing a KeyError
+  from inside a template.
+
+  SourceGrid Planning's generalisation, which is the rule to carry: *a config
+  file evaluated in every environment cannot carry an environment-specific
+  assertion; assertions belong after `Rails.env` is known.*
 - **`rails/config/initializers/deployment_identity.rb`**: the boot guard, with
   the spec's `Console` exclusion. Decide deliberately which commands it stops.
 - **`ops/env/`**: templates for the two instance files, so a future clone has
@@ -232,6 +246,95 @@ and populates two root-owned files.
 
 Phase 1 needs nothing from the Director beyond ordinary review. Phase 2 needs
 judgement on two values and no sudo.
+
+## 4a. The guard and the wrapper — settled 2026-09-13
+
+The spec left two things undecided and this plan asked SourceGrid Planning to
+rule, since the spec is theirs. Settled across `decision.001` through `.003` and
+this repository's replies. Attribution is marked because the reasoning matters
+more than the outcome.
+
+### What gets built
+
+**The guard** makes one comparison, in one place:
+
+- Refuse when a **declared** environment disagrees with the resolved database
+  name. Console or not, human present or not.
+- Warn only when there is **no declaration AND stdin is a TTY**.
+- Refuse otherwise.
+- `WENFU_EXPECTED_DATABASE=<exact name>` overrides the comparison on both paths.
+
+**The wrapper** sources the shared file, then the checkout's `instance.env`, and
+exports nothing but the one environment it declares. It carries no copy of any
+value, so there is no second list to drift.
+
+Result: one copy of every value (the instance file), one comparison (the guard),
+one declared intent (the wrapper's name).
+
+### Why each piece is shaped that way
+
+**Assert the database name, not `RAILS_ENV`** — SourceGrid. This plan proposed
+asserting `RAILS_ENV` and it was wrong: the hazard is an omission failure.
+Staging's instance file can set `RAILS_ENV=staging` and omit `PGDATABASE`, the
+shared file answers in its place, and a `RAILS_ENV` assertion passes while the
+console connects to production. A label that correlates with the hazard is not
+the hazard.
+
+**The wrapper asserts rather than exports** — this repository. SourceGrid first
+ruled that the wrapper should export its own values, as theirs does. Withdrawn
+after checking: hardcoding a database in the wrapper protects the console and
+leaves the systemd service reading the same surface, so it removes the risk from
+one of two consumers and leaves them disagreeing with no way to tell which is
+right. See §4 for why a second list is the hazard here specifically.
+
+**The exemption keys on declaration, not on console** — this repository, ruled
+by SourceGrid. The guard as first built warned rather than refused at a console,
+following the spec's own note that a guard which aborts `rails console` "is how
+guards get deleted rather than fixed". That exemption swallows the Gap 1 defect:
+a wrapper named `staging` would warn and open a production console anyway.
+
+Keying on declaration separates two real situations. Nobody asserted anything:
+the operator's belief is still forming and a warning informs it. Something
+asserted an environment and was wrong: the belief is already fixed and already
+false. SourceGrid's formulation — *presence is what makes a warning readable, it
+is not what makes it timely* — is why a human being present does not soften a
+declared mismatch. And a guard that fires only on a broken promise is silent
+through every correct invocation, so it does not accumulate the resentment the
+spec was protecting against.
+
+**Two positive conditions, not one absence** — SourceGrid. Requiring only that a
+declaration be *absent* to reach the warning makes absence the permissive
+direction, which is Defect 1's shape one layer up. A declaration can go missing
+from the wrapper failing before its export, a hand-sourced instance file, `sudo`
+or `env -i` stripping it, or a refactor moving the export below the exec. So the
+permissive path requires no declaration **and** an interactive stdin.
+
+### The TTY probe — verified in both directions
+
+Observed in this repository: `$stdin.tty?` is false from a Claude session
+directly, under `bundle exec`, and through a pipe. Reproduced independently by
+SourceGrid Planning in `sourcegrid-labs`, a different repository and session.
+
+Observed in both repositories, using `script(1)` to allocate a pty: true under a
+pty, and true through a plain `exec` — the shape `bin/staging` ends with, so the
+TTY survives it.
+
+Two consequences worth keeping:
+
+- **The permissive path is structurally unreachable from an agent session.**
+  Every session, script, pipe and automation takes the refusal. The warning is
+  reachable only with a real terminal. That matters here because the main
+  non-human operator of this repository is a Claude session, and this excludes
+  them by construction rather than by policy.
+- **The probe fails closed.** Every way of losing a TTY — `ssh` without `-t`, a
+  pipe, a script, a stripped environment — lands on refuse. No configuration
+  accidentally opens the permissive path.
+
+Evidence limit: a pty is not any particular terminal emulator, and `tty?`
+interrogates the file descriptor rather than what is attached beyond it. This
+confirms the probe answers correctly to a pty through an `exec`. Whether a given
+operator's path supplies one is still an observation, not an assumption — and
+where it does not, the guard refuses, which is the safe direction.
 
 ## 5. Relationship to the wrapper plan
 
