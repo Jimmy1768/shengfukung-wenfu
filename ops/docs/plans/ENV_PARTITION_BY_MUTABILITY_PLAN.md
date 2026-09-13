@@ -457,15 +457,17 @@ those settle most of what was ambiguous here. Observed 2026-09-13:
 By analogy with their `STRIPE_PRICE_*`, our
 `STRIPE_TEMPLEMATE_PLATFORM_ACCOUNT_ID` and the two price IDs are runtime.
 
-**One inconsistency in their files, which we should not copy.** They put
-`AWS_ACCESS_KEY_ID` in runtime and `S3_ACCESS_KEY_ID` in secrets. Those are the
-same kind of value -- an identifier that is useless without its paired secret --
-classified two different ways in one repository. Ours should pick one rule and
-hold it. Recommended: an identifier alone is runtime, anything that
-authenticates on its own is secrets, which puts `S3_ACCESS_KEY_ID` in
-runtime beside
-`S3_SECRET_ACCESS_KEY` in secrets. Worth telling SourceGrid either way, since
-under one framework the two repositories should not disagree with themselves.
+**The rule this repository uses**, decided 2026-09-13: an identifier alone is
+runtime; anything that authenticates on its own is secrets. So
+`S3_ACCESS_KEY_ID` sits in runtime and `S3_SECRET_ACCESS_KEY` in secrets.
+
+SourceGrid's own files disagree with themselves on this -- `AWS_ACCESS_KEY_ID`
+in runtime, `S3_ACCESS_KEY_ID` in secrets, the same kind of value classified two
+ways. **That is not this work's problem to raise.** The Director's ruling: the
+rule is right but reconciling it now would mix two repositories' decisions
+together, and he will move the key himself during SourceGrid's own staging and
+env-protocol phase. Nothing here waits on that, and nothing here should send it
+to them as an action.
 
 **Two keys have no precedent there** and need a call when the files are written:
 `PGUSER`, which is an identifier rather than a credential and by the rule above
