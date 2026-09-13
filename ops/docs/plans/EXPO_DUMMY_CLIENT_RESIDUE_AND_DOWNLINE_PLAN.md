@@ -109,9 +109,18 @@ checked here at `templemate_native_account_api.md` only.
   real temple on a local Rails. The word re-entered the protocol file on
   2026-09-12.
 
-## 4. The token-refresh defect — production, predates both defects
+## 4. The token-refresh defect — FIXED 2026-09-13 (b5eff13)
 
-Verified here. This is the only item in this file that affects production now.
+Kept as the record of what was wrong and how it was found, not as open work.
+Fixed after it interrupted device testing three times: `applySession` now
+records an absolute `expires_at` from the `expires_in` the server always
+sent, and both `request()` and `restoreSession` renew before sending rather
+than after a refusal — the shape DojoMate-Expo uses at `apiClient.js` and
+`AppEntry.js`. Verified on the Pixel: a 19-minute-old session relaunched into
+`POST /refresh` 200, bootstrap 200, six collections 200, no sign-out, and the
+old row revoked at renewal.
+
+The original finding follows.
 
 - Nothing calls `adapter.refresh()`. The only caller in the repository is
   `real-adapter.test.js:64` (Observed, grep across `mobile/` excluding
@@ -164,8 +173,9 @@ temple-required.
    (`refresh_tokens` has no `temple_id`), so a per-tenant key was a fiction of
    the compile-time pin.
 2. **Temple-less account operations** — scanner-only as today, or reachable.
-3. **The token-refresh defect** — whether it jumps the queue. It affects
-   production now; neither defect does.
+3. ~~**The token-refresh defect** — whether it jumps the queue.~~ Answered by
+   events: it blocked device verification three times on 2026-09-13 and was
+   fixed the same day (`b5eff13`). See §4.
 4. **Deploy order.** Recovery, not verified here: no single QR string satisfies
    both the old and new parsers, so Rails deploys first and the app follows.
    The new link points at `sourcegridlabs.com/templemate/connect/<slug>`, a page
