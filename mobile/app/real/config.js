@@ -17,10 +17,6 @@ function resolveClientConfig(extra = {}) {
   // a local one in development and the public origin in a release lane.
   const mode = 'real';
   const apiBaseUrl = String(extra.apiBaseUrl || extra.localApiBaseUrl || '').replace(/\/$/, '');
-  // Local development only. A release build carries no tenant at all: which
-  // temple an install is on is decided by a scan at runtime, so requiring one
-  // here would make every release build fail before it could show a scanner.
-  const tenantSlug = String(extra.tenantSlug || extra.localTenantSlug || '').trim();
   if (mode === 'real' && !apiBaseUrl) {
     const error = new Error('Real mode requires an explicit API origin.');
     error.code = 'REAL_CONFIG_REQUIRED';
@@ -45,13 +41,17 @@ function resolveClientConfig(extra = {}) {
   // no shipped build can present credentials on its sign-in screen.
   const localEmail = release ? '' : String(extra.localEmail || '').trim();
   const localPassword = release ? '' : String(extra.localPassword || '');
+  // The dev client's seed temple. Same refusal as the credentials above: a
+  // release lane resolves it to empty whatever `extra` carries, so no build
+  // that reaches a patron can be born knowing a temple.
+  const localTempleSlug = release ? '' : String(extra.localTempleSlug || '').trim();
   const oauthReturnUrl = String(extra.nativeOAuthReturnUrl || nativeOAuthReturnUrl);
   if (oauthReturnUrl !== nativeOAuthReturnUrl) {
     const error = new Error('Native OAuth return URL must use the configured templemate scheme.');
     error.code = 'NATIVE_OAUTH_RETURN_REQUIRED';
     throw error;
   }
-  return { mode, apiBaseUrl, tenantSlug, environment, oauthReturnUrl, localEmail, localPassword, updateChannel: String(extra.easUpdateChannel || environment) };
+  return { mode, apiBaseUrl, environment, oauthReturnUrl, localEmail, localPassword, localTempleSlug, updateChannel: String(extra.easUpdateChannel || environment) };
 }
 
 module.exports = { PUBLIC_ORIGIN, PLATFORM_CONNECT_ORIGIN, RELEASE_ENVIRONMENTS, resolveClientConfig };

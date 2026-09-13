@@ -7,7 +7,7 @@ const { createTrustedBindingStorage, trustedBindingKey } = require('../app/tenan
 const { PLATFORM_CONNECT_ORIGIN } = require('../app/real/config');
 
 const apiOrigin = 'https://shengfukung.com.tw';
-// No tenantSlug. A release build is compiled without one; the slug arrives in
+// No tenant in the config at all. A build is compiled without one; the slug arrives in
 // the scanned code and is confirmed by the server.
 const config = { mode: 'real', environment: 'testflight', apiBaseUrl: apiOrigin };
 const linkFor = slug => `${PLATFORM_CONNECT_ORIGIN}/templemate/connect/${slug}`;

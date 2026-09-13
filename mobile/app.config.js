@@ -111,9 +111,12 @@ module.exports = () => {
         },
         clientMode: 'real',
         apiBaseUrl: release?.apiBaseUrl || process.env.TEMPLEMATE_LOCAL_API_BASE_URL || '',
-        // Local development only, and deliberately absent from a release lane:
-        // a release build is compiled with no temple and loads one from a scan.
-        tenantSlug: process.env.TEMPLEMATE_LOCAL_TENANT_SLUG || '',
+        // A seed for the dev client only, and named so it can never be read as
+        // the app's tenant. There is no tenant in this app: a temple is loaded
+        // at runtime and lives in async storage. This value only pre-fills that
+        // storage so the dev client skips the scan, exactly as localEmail and
+        // localPassword pre-fill sign-in. Absent from every release lane.
+        localTempleSlug: process.env.TEMPLEMATE_LOCAL_TENANT_SLUG || '',
         // Same rule, same reason: no release lane supplies these, so a
         // release build has nothing to prefill even before config.js
         // refuses to pass them through. They name a seeded local fixture

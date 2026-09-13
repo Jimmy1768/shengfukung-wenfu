@@ -3,15 +3,29 @@ const assert = require('node:assert/strict');
 const { createRealAdapter } = require('../app/real/adapter');
 const { resolveClientConfig } = require('../app/real/config');
 const { sessionKey } = require('../app/real/storage');
-const { createTrustedBindingStorage } = require('../app/tenant/storage');
+const { createTrustedBindingStorage, trustedBindingKey } = require('../app/tenant/storage');
 const { storageScope } = require('../app/core/storage_scope');
 const { createOAuthController } = require('../app/oauth/transaction');
 const { nativeError } = require('../app/real/response');
 
-const config = { mode: 'real', apiBaseUrl: 'http://local.test', tenantSlug: 'fixture-temple', environment: 'test' };
-const store = () => { const values = new Map(); return { values, getItem: async key => values.get(key) || null, setItem: async (key, value) => values.set(key, value), deleteItem: async key => values.delete(key) }; };
+// No tenant in the config, in any lane. A temple is loaded at runtime and
+// lives in storage, so a test that needs one seeds storage -- the same place a
+// scan writes to. There is no configured fallback left to lean on.
+const config = { mode: 'real', apiBaseUrl: 'http://local.test', environment: 'test' };
+const loadedTemple = (environment, id = 'fixture-temple') => JSON.stringify({ state: 'bound', tenant: { id, name: 'Fixture Temple' }, error: null, source: 'qr' });
+const store = (temple = 'fixture-temple') => {
+  const values = new Map();
+  // Every environment storage_scope recognises, so a test that builds a release
+  // config gets a loaded temple without having to know which lane it picked.
+  if (temple) for (const environment of ['development', 'test', 'testflight', 'production']) values.set(trustedBindingKey({ environment }), loadedTemple(environment, temple));
+  return { values, getItem: async key => values.get(key) || null, setItem: async (key, value) => values.set(key, value), deleteItem: async key => values.delete(key) };
+};
 const user = { id: 1, email: 'member@example.test', native_name: '林小安' };
 const session = { access_token: 'access-1', refresh_token: 'refresh-1', token_type: 'Bearer', expires_in: 900 };
+// Session, cache and pending records are the scoped state; the loaded temple
+// is not. Asserting on these rather than on the store's size says what is
+// meant, and keeps saying it now that a temple is stored alongside them.
+const scopedRecords = local => [...local.values.keys()].filter(key => key.includes('.real-'));
 const response = (body = {}, status = 200) => ({ ok: status >= 200 && status < 300, status, body });
 
 // The routes a patron can reach with no temple loaded. Everything else is
@@ -117,11 +131,16 @@ test('there is one mode, and it cannot be configured without tenant and API inpu
   // rather than quietly serving fixtures.
   assert.throws(() => resolveClientConfig({}), { code: 'REAL_CONFIG_REQUIRED' });
   assert.throws(() => resolveClientConfig({ clientMode: 'real' }), { code: 'REAL_CONFIG_REQUIRED' });
-  assert.equal(resolveClientConfig({ clientMode: 'real', localApiBaseUrl: 'http://local.test/', localTenantSlug: 'fixture', clientEnvironment: 'test' }).tenantSlug, 'fixture');
+  assert.equal(resolveClientConfig({ clientMode: 'real', localApiBaseUrl: 'http://local.test/', localTempleSlug: 'fixture', clientEnvironment: 'test' }).localTempleSlug, 'fixture');
   assert.throws(() => resolveClientConfig({ clientMode: 'real', localApiBaseUrl: 'https://example.com', localTenantSlug: 'fixture' }), { code: 'TRUSTED_API_REQUIRED' });
-  const release = resolveClientConfig({ clientEnvironment: 'testflight', apiBaseUrl: 'https://shengfukung.com.tw', tenantSlug: 'shengfukung-wenfu', easUpdateChannel: 'testflight' });
+  const release = resolveClientConfig({ clientEnvironment: 'testflight', apiBaseUrl: 'https://shengfukung.com.tw', easUpdateChannel: 'testflight' });
+  // The dev seed is refused in a release lane whatever `extra` carries, the same
+  // way the local credentials are. A build that reaches a patron cannot be born
+  // knowing a temple; it loads one from a scan or it has none.
+  assert.equal(resolveClientConfig({ clientEnvironment: 'testflight', apiBaseUrl: 'https://shengfukung.com.tw', localTempleSlug: 'smuggled-temple' }).localTempleSlug, '');
+  assert.equal(release.localTempleSlug, '');
   assert.equal(release.mode, 'real'); assert.equal(release.updateChannel, 'testflight');
-  assert.throws(() => resolveClientConfig({ clientEnvironment: 'production', apiBaseUrl: 'http://shengfukung.com.tw', tenantSlug: 'shengfukung-wenfu' }), { code: 'TRUSTED_API_REQUIRED' });
+  assert.throws(() => resolveClientConfig({ clientEnvironment: 'production', apiBaseUrl: 'http://shengfukung.com.tw' }), { code: 'TRUSTED_API_REQUIRED' });
   // Needs a config that clears the origin/tenant checks first, since without a
   // dummy fallback those now fire before the OAuth return URL is looked at.
   assert.throws(() => resolveClientConfig({ localApiBaseUrl: 'http://local.test/', localTenantSlug: 'fixture', clientEnvironment: 'test', nativeOAuthReturnUrl: 'templemate://wrong' }), { code: 'NATIVE_OAUTH_RETURN_REQUIRED' });
@@ -145,7 +164,7 @@ test('real adapter maps the complete account contract and never falls back to du
   assert.deepEqual(JSON.parse(profile.body), { profile: { native_name: '新名字' } });
   assert.equal(calls.some(call => /admin|oauth|checkout|provider/i.test(call.url)), false);
   assert.equal(JSON.stringify(signedIn.registrations[0]).match(/provider|checkout|payment_reference/i), null);
-  await adapter.logout(); assert.equal(local.values.size, 0);
+  await adapter.logout(); assert.deepEqual(scopedRecords(local), []);
 });
 
 test('real local/test Assistance sends the exact profile-channel body, maps duplicate outcomes, and preserves the account snapshot', async () => {
@@ -171,13 +190,13 @@ test('real session expiry, replay, revocation, closure and tenant cleanup clear 
     await initial.signIn({ email: user.email, password: 'test-password' });
     const adapter = createRealAdapter({ config, store: local, transport: fixtureTransport([], { '/bootstrap': response({ code }, 401) }) });
     await assert.rejects(adapter.restoreSession(), { code });
-    assert.equal(local.values.size, 0, code);
+    assert.deepEqual(scopedRecords(local), [], code);
   }
   const local = store(); const adapter = createRealAdapter({ config, store: local, transport: fixtureTransport([]) });
   await adapter.signIn({ email: user.email, password: 'test-password' });
-  assert.ok(local.values.has(sessionKey({ environment: 'test', tenantId: 'fixture-temple' })));
-  await adapter.clearTenantState(); assert.equal(local.values.size, 0);
-  await adapter.signIn({ email: user.email, password: 'test-password' }); await adapter.closeAccount(); assert.equal(local.values.size, 0);
+  assert.ok(local.values.has(sessionKey(storageScope({ environment: 'test' }))));
+  await adapter.clearTenantState(); assert.deepEqual(scopedRecords(local), []);
+  await adapter.signIn({ email: user.email, password: 'test-password' }); await adapter.closeAccount(); assert.deepEqual(scopedRecords(local), []);
 });
 
 test('logging out clears the session but keeps the remembered temple', async () => {
@@ -190,15 +209,15 @@ test('logging out clears the session but keeps the remembered temple', async () 
   const local = store();
   const adapter = createRealAdapter({ config: releaseConfig, store: local, transport: fixtureTransport([]) });
   const bindings = createTrustedBindingStorage({ store: local, config: releaseConfig });
-  await bindings.save({ state: 'bound', tenant: { id: releaseConfig.tenantSlug, name: 'Demo Temple' }, error: null, source: 'qr' });
+  await bindings.save({ state: 'bound', tenant: { id: 'fixture-temple', name: 'Demo Temple' }, error: null, source: 'qr' });
 
   await adapter.signIn({ email: user.email, password: 'test-password' });
   await adapter.logout();
 
   const remembered = await bindings.load();
-  assert.equal(remembered?.tenant?.id, releaseConfig.tenantSlug,
+  assert.equal(remembered?.tenant?.id, 'fixture-temple',
     'the temple must survive sign-out');
-  assert.equal(await local.getItem(sessionKey(storageScope({ environment: releaseConfig.environment, tenantId: releaseConfig.tenantSlug }))), null,
+  assert.equal(await local.getItem(sessionKey(storageScope({ environment: releaseConfig.environment }))), null,
     'the session itself must still be cleared');
 });
 
@@ -208,7 +227,7 @@ test('logging out clears the session but keeps the remembered temple', async () 
 test('a patron with no temple signs in, and nothing temple-scoped is attempted', async () => {
   const releaseConfig = { mode: 'real', apiBaseUrl: 'http://local.test', environment: 'testflight' };
   const calls = [];
-  const adapter = createRealAdapter({ config: releaseConfig, store: store(), transport: fixtureTransport(calls) });
+  const adapter = createRealAdapter({ config: releaseConfig, store: store(null), transport: fixtureTransport(calls) });
 
   await adapter.signIn({ email: user.email, password: 'test-password' });
 
@@ -222,7 +241,7 @@ test('a patron with no temple signs in, and nothing temple-scoped is attempted',
 // rethrowing, so a temple-less patron who relaunched was silently signed out.
 test('relaunching with no temple keeps the session instead of discarding it', async () => {
   const releaseConfig = { mode: 'real', apiBaseUrl: 'http://local.test', environment: 'testflight' };
-  const local = store();
+  const local = store(null);
   const first = createRealAdapter({ config: releaseConfig, store: local, transport: fixtureTransport([]) });
   await first.signIn({ email: user.email, password: 'test-password' });
   const storedBefore = local.values.size;
@@ -243,7 +262,7 @@ test('relaunching with no temple keeps the session instead of discarding it', as
 // must follow that rather than hold the answer it started with.
 test('the adapter sends whichever temple is loaded, and none when there is none', async () => {
   const releaseConfig = { mode: 'real', apiBaseUrl: 'http://local.test', environment: 'testflight' };
-  const local = store();
+  const local = store(null);
   const calls = [];
   const adapter = createRealAdapter({ config: releaseConfig, store: local, transport: fixtureTransport(calls) });
   const bindings = createTrustedBindingStorage({ store: local, config: releaseConfig });
@@ -296,12 +315,12 @@ test('real OAuth adapter sends only the accepted Rails native start and exchange
   assert.deepEqual(JSON.parse(start.body), { oauth: { provider: 'google', pkce_challenge: 'c'.repeat(43), pkce_method: 'S256' } });
   assert.deepEqual(JSON.parse(exchange.body), { oauth: { code: 'return-code', transaction_token: 'opaque-native-transaction', pkce_verifier: 'v'.repeat(64) }, device: { device_id: 'local-test-client', platform: 'expo' } });
   assert.equal(calls.filter(call => /google|apple|sourcegrid/i.test(call.url)).length, 0);
-  assert.ok(local.values.has(sessionKey({ environment: 'test', tenantId: 'fixture-temple' })));
+  assert.ok(local.values.has(sessionKey(storageScope({ environment: 'test' }))));
 });
 
 test('TestFlight and production OAuth use only the trusted Rails-native origin with the existing scheme and PKCE envelopes', async () => {
   for (const [environment, provider] of [['testflight', 'google'], ['production', 'apple']]) {
-    const release = resolveClientConfig({ clientEnvironment: environment, apiBaseUrl: 'https://shengfukung.com.tw', tenantSlug: 'shengfukung-wenfu', easUpdateChannel: environment });
+    const release = resolveClientConfig({ clientEnvironment: environment, apiBaseUrl: 'https://shengfukung.com.tw', easUpdateChannel: environment });
     const calls = [];
     const adapter = createRealAdapter({ config: release, store: store(), transport: fixtureTransport(calls) });
     await adapter.startOAuth({ provider, pkceChallenge: 'c'.repeat(43), pkceMethod: 'S256' });
@@ -309,8 +328,8 @@ test('TestFlight and production OAuth use only the trusted Rails-native origin w
     const start = calls.find(call => call.url.includes('/oauth/start?'));
     const exchange = calls.find(call => call.url.includes('/oauth/exchange?'));
     assert.equal(release.oauthReturnUrl, 'templemate://oauth/complete');
-    assert.equal(start.url, 'https://shengfukung.com.tw/api/v1/account/native/oauth/start?temple_slug=shengfukung-wenfu');
-    assert.equal(exchange.url, 'https://shengfukung.com.tw/api/v1/account/native/oauth/exchange?temple_slug=shengfukung-wenfu');
+    assert.equal(start.url, 'https://shengfukung.com.tw/api/v1/account/native/oauth/start?temple_slug=fixture-temple');
+    assert.equal(exchange.url, 'https://shengfukung.com.tw/api/v1/account/native/oauth/exchange?temple_slug=fixture-temple');
     assert.deepEqual(JSON.parse(start.body), { oauth: { provider, pkce_challenge: 'c'.repeat(43), pkce_method: 'S256' } });
     assert.deepEqual(JSON.parse(exchange.body), { oauth: { code: 'return-code', transaction_token: 'opaque-native-transaction', pkce_verifier: 'v'.repeat(64) }, device: { device_id: 'local-test-client', platform: 'expo' } });
     assert.ok(calls.every(call => new URL(call.url).origin === 'https://shengfukung.com.tw'));
@@ -322,9 +341,9 @@ test('real OAuth session cleanup removes an exchange-applied session and every s
   const calls = []; const local = store(); const adapter = createRealAdapter({ config, store: local, transport: fixtureTransport(calls) });
   await adapter.exchangeOAuth({ code: 'return-code', transactionToken: 'opaque-native-transaction', pkceVerifier: 'v'.repeat(64) });
   await adapter.oauthStorage.savePending({ provider: 'google' });
-  assert.ok(local.values.size > 0);
+  assert.ok(scopedRecords(local).length > 0);
   await adapter.clearOAuthSession();
-  assert.equal(local.values.size, 0);
+  assert.deepEqual(scopedRecords(local), []);
   assert.equal(adapter.snapshot().profile.email, '');
 });
 
@@ -342,7 +361,7 @@ test('malformed or provider-mismatched real exchange envelopes leave no retained
       openBrowser: async () => ({ type: 'success', url: 'templemate://oauth/complete?code=return-code' })
     });
     assert.equal((await controller.begin('google')).phase, 'failed');
-    assert.equal(local.values.size, 0);
+    assert.deepEqual(scopedRecords(local), []);
   }
 });
 
