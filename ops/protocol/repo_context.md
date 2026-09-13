@@ -121,57 +121,36 @@ caller's shell.
 
 ## Building the Expo App
 
-**Two paths exist, and only one has ever been used.** `mobile/package.json`
-carries `build:testflight` and `build:production`, plain `eas build` calls with
-the right profile. Every real build went that way -- builds 1 and 2, and the
-2026-09-13 IPA. `bin/expo_build` is ops-level tooling that wraps the same thing
-and could not run at all until 2026-09-13, so nothing depended on it and its
-presets drifted unobserved.
+Builds are npm scripts in `mobile/package.json`. There is no wrapper:
 
-The wrapper's one distinguishing act is running the build through
-`bin/load_temple_env`, which exports a per-temple environment. For release
-lanes that buys nothing: `eas.json`'s `testflight` and `production` profiles
-already set `BUILD_MODE`, `TEMPLEMATE_CLIENT_ENVIRONMENT`,
-`TEMPLEMATE_EAS_UPDATE_CHANNEL` and `TEMPLEMATE_PUBLIC_API_ORIGIN` themselves.
-Which raises the Director's question of 2026-09-13 -- why wrap a command this
-short at all -- and his answer, that the wrapper was built to inject a
-per-temple value into the build, which is the thing the tenant purge removed.
-That is a hypothesis about intent, not a fact about the code; the file predates
-the tenant work, so if it is right the tenancy came to the wrapper rather than
-the other way round. Unresolved, and worth resolving before either path is
-declared canonical.
+    npm run build:testflight    ios, profile testflight    <- the live lane
+    npm run build:production    ios, profile production
 
-    bin/expo_build dev-client   android, --local, profile development
-    bin/expo_build testflight   ios, profile testflight      <- the live lane
-    bin/expo_build ipa          ios, profile production
-    bin/expo_build aab          android, profile production  <- Play bundle
-    bin/expo_build custom -- <args>
+`bin/expo_build` and `bin/expo_prebuild` were removed on 2026-09-13. Neither had
+ever run -- both used `ruby <<'RUBY' "$MANIFEST_FILE"`, which hands Ruby the
+manifest as its script, so they died on line 1 of the YAML before doing
+anything. Every real build went through the npm scripts, which is why nobody
+noticed and why the wrappers' presets were free to rot: two named profiles that
+`eas.json` never defined, and none for `testflight`, the only lane in use.
+`DojoMate-Expo`, the reference, has no such wrapper either.
 
-**`apk` is the China lane and must not be removed.** There is no Google Play
-in China, so that build is side-loaded -- tier 5 above. Planning deleted the
-preset on 2026-09-13 on the reasoning that no profile produced an APK, which
-was true and was the wrong conclusion: the gap is a missing profile, not a
-surplus preset. Restored.
+Do not rename `build:testflight` or `build:production`. Control B's permission
+profile denies them by exact string; a rename leaves a runnable build command
+covered by no deny rule.
 
-It needs `production-apk` in `mobile/eas.json` with `android.buildType=apk`,
-which does not exist yet. Until it does, `bin/expo_build apk` fails on an
-unknown profile -- which is the correct failure, because the preset it replaced
-pointed at `production` and quietly produced a bundle instead. Every other
-profile a preset names is defined.
+**The Android lanes are not configured, and that is the real gap.** Tier 5
+above -- Android side-loading for China, where there is no Google Play -- has no
+profile and no script. `mobile/eas.json` defines `development`, `testflight` and
+`production` only. `DojoMate-Expo` has the shape to copy, Observed 2026-09-13:
 
-**Every profile a preset names must exist in `mobile/eas.json`.** Three did not:
-`development-client` and `production-aab` were never defined, and there was no
-preset at all for `testflight`, the only lane in use. The wrapper and `eas.json`
-drifted because nothing compares them, which is the same shape as a systemd
-override list with no owner. Worth a check in `npm run verify`, which already
-fails closed on build values.
+    production             distribution store,    android buildType app-bundle
+    production-apk         distribution internal, android buildType apk
+    production-china-apk   distribution internal, android buildType apk,
+                           channel production-china
 
-**The wrapper could not run at all before 2026-09-13.** `read_default_slug` used
-`ruby <<'RUBY' "$MANIFEST_FILE"`; bash hoists the redirection, so Ruby took the
-YAML file as its script and the heredoc as ignored stdin, and it died on line 1
-of the manifest before printing usage. That is why every build in practice went
-through `eas` directly and the presets were free to rot unobserved. Fixed with
-`ruby - "$MANIFEST_FILE" <<'RUBY'`.
+Note the separate channel on the China build: it is its own OTA population, not
+a variant of production. Adding these is a release-lane decision and is the
+Director's, not cleanup.
 
 ## Client Release Tiers
 

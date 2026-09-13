@@ -156,7 +156,7 @@ Evidence was classified as:
 | Artwork | app, adaptive, development, splash, favicon assets | Present; store suitability unverified |
 | Secure storage | `expo-secure-store` and auth storage helper | Scaffolded; key names are unsafe residue |
 | HTTP auth helper | login, refresh, logout request helper | Scaffolded against nonexistent routes |
-| EAS/build | `mobile/eas.json`, `bin/expo_prebuild`, `bin/expo_build` | Present; profile/config defects found; no build run |
+| EAS/build | `mobile/eas.json`, `mobile/package.json` scripts | The two bin wrappers were removed 2026-09-13; the profile defects this row found were real |
 | Versioning | `mobile/versioning.js` | Accepted independent TempleMate app version uses DojoMate-Expo's three-component `major.minor.patch` pattern and starts at `1.0.0`; iOS build starts at `1` and Android version code starts at `1`; EAS local authority/no auto-increment is aligned, but no synchronization check, consumed-number receipt, or bump/reset guard exists |
 
 ### Placeholder and template residue that must not ship
@@ -185,7 +185,8 @@ Evidence was classified as:
 - Mobile translations live under `demo_admin`; they are not account copy.
 - Mobile advertises Japanese while the web account locale selector currently
   offers only Traditional Chinese and English.
-- `bin/expo_build dev-client` selects `development-client`, but `eas.json`
+- (Resolved 2026-09-13 by removing the wrapper.) `bin/expo_build dev-client`
+  selected `development-client`, but `eas.json`
   defines `development` instead.
 - `app.config.js` expects a Komainu/local config plugin, while no matching
   `mobile/plugins-local` package was found in Wenfu.

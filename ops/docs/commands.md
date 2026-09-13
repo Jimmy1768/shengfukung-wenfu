@@ -137,10 +137,10 @@ bin/deploy_vue <slug>
 bin/deploy_vue_all
 
 # Expo prebuild wrapper (loads env for the shared app, runs dev/prod presets, then flushes Metro cache)
-bin/expo_prebuild <dev|prod> [-- --platform android]
+npx expo prebuild --clean   # run from mobile/; bin/expo_prebuild removed 2026-09-13
 
 # Expo/EAS build wrapper with presets (dev-client/apk/aab/ipa/custom)
-bin/expo_build <preset> [-- extra eas args]
+npm --prefix mobile run build:testflight   # ios, the live lane
 
 # Smoke tests: curl each tenant deployment's /api/v1/temple endpoint.
 # The manifest selects deployment base URLs only; a browser/API URL never includes a slug.
@@ -342,7 +342,7 @@ bin/local-only/sync_expo_plugins ../expo-config-plugins
 npm run ios
 npm run android
 
-# Prefer `bin/expo_prebuild <dev|prod>` to handle env + cache flush automatically.
+# bin/expo_prebuild was removed 2026-09-13, having never run; use expo prebuild directly.
 # Manual reference: load the right env file before prebuild/EAS so the slug/bundle IDs match.
 source .env.development && (cd mobile && npx expo prebuild --platform android)
 source .env.production && (cd mobile && npx expo prebuild --platform android)
@@ -371,7 +371,7 @@ npx expo start -c
 
 ```bash
 
-# Prefer `bin/expo_build <preset>` for builds that already load the shared app env.
+# Builds are npm scripts; bin/expo_build was removed 2026-09-13, having never run.
 
 # Android .apk (Development)
 eas build --platform android --local --profile development
