@@ -297,3 +297,14 @@ never arrives as something a lane could approve. Observed 2026-09-11 in a lane
 allowing `Bash(git push:*)` and denying `Bash(git push -f:*)`: refused before
 the command reached git. The reverse ordering, a specific `allow` beneath a
 general `deny`, is a different comparison and has not been tested.
+
+**10.12** A Thread Refresh is not complete when the successor exists. It is
+complete when the successor's cwd is verified against the tree it was meant to
+run in. `change_directory` returns success whether or not it moved the session,
+so its own result is not that check — the successor reports its cwd, or the
+refresh is still open. Reported 2026-09-13 by Wenfu Control A about itself: its
+successor came up in the primary checkout rather than the worktree, the call
+returned success and did not move it, and git in the worktree stayed denied
+until the Director moved it by hand. The same call moved Wenfu Control B
+correctly on 2026-09-10, so the failure is intermittent and not reliably
+visible to the moving session or to an observer.
