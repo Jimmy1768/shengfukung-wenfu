@@ -51,7 +51,7 @@ if (pkg.version !== versioning.appVersion || developmentConfig.version !== versi
 // deliberately per TestFlight upload, per the marketing-version-stays-
 // fixed convention in ops/docs/plans/TEMPLEMATE_REFINE.md); Android
 // hasn't shipped a build yet, so it still pins to 1.
-if (versioning.iosBuildNumber !== '2' || versioning.androidVersionCode !== 1) fail('build values must match the current accepted pin (iOS 2, Android 1)');
+if (versioning.iosBuildNumber !== '3' || versioning.androidVersionCode !== 1) fail('build values must match the current accepted pin (iOS 3, Android 1)');
 if (project.name !== 'komainu') fail('internal project name must be komainu');
 if (developmentConfig.owner !== 'jimmy1768' || productionConfig.owner !== 'jimmy1768') fail('development and production public config must use the exact EAS owner');
 if (developmentConfig.extra.eas?.projectId !== 'c7b8523a-2fad-4123-bc96-0c0c85a23dec' || productionConfig.extra.eas?.projectId !== 'c7b8523a-2fad-4123-bc96-0c0c85a23dec') fail('development and production public config must use the exact EAS project ID');
