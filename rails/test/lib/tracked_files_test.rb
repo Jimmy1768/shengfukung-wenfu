@@ -33,8 +33,16 @@ class TrackedFilesTest < ActiveSupport::TestCase
   end
 
   test "gitignore covers node_modules at the root, not only in subdirectories" do
+    # The trailing slash is load-bearing. `node_modules/` in .gitignore is a
+    # directory-only pattern, and check-ignore can only match it against a bare
+    # name when the directory exists on disk -- so without the slash this
+    # asserted "a node_modules is sitting here", which is the artefact it was
+    # written to prevent. It passed in the primary checkout and failed in every
+    # fresh clone and worktree. Observed 2026-09-13: exit 1 with no directory,
+    # exit 0 after mkdir, exit 0 with no directory once the argument carries the
+    # slash.
     _stdout, _stderr, status = Open3.capture3(
-      "git", "-C", REPO_ROOT.to_s, "check-ignore", "-q", "node_modules"
+      "git", "-C", REPO_ROOT.to_s, "check-ignore", "-q", "node_modules/"
     )
 
     assert status.success?,
