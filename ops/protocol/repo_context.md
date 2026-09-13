@@ -121,11 +121,25 @@ caller's shell.
 
 ## Building the Expo App
 
-One command, one file. `bin/expo_build` is the only way builds are invoked here
--- never a raw `eas build`, which is what produced an unusable IPA on
-2026-09-13. The wrapper resolves the temple slug from the manifest and runs the
-build through `bin/load_temple_env`, so it carries the deployment environment
-that a direct `eas` call does not.
+**Two paths exist, and only one has ever been used.** `mobile/package.json`
+carries `build:testflight` and `build:production`, plain `eas build` calls with
+the right profile. Every real build went that way -- builds 1 and 2, and the
+2026-09-13 IPA. `bin/expo_build` is ops-level tooling that wraps the same thing
+and could not run at all until 2026-09-13, so nothing depended on it and its
+presets drifted unobserved.
+
+The wrapper's one distinguishing act is running the build through
+`bin/load_temple_env`, which exports a per-temple environment. For release
+lanes that buys nothing: `eas.json`'s `testflight` and `production` profiles
+already set `BUILD_MODE`, `TEMPLEMATE_CLIENT_ENVIRONMENT`,
+`TEMPLEMATE_EAS_UPDATE_CHANNEL` and `TEMPLEMATE_PUBLIC_API_ORIGIN` themselves.
+Which raises the Director's question of 2026-09-13 -- why wrap a command this
+short at all -- and his answer, that the wrapper was built to inject a
+per-temple value into the build, which is the thing the tenant purge removed.
+That is a hypothesis about intent, not a fact about the code; the file predates
+the tenant work, so if it is right the tenancy came to the wrapper rather than
+the other way round. Unresolved, and worth resolving before either path is
+declared canonical.
 
     bin/expo_build dev-client   android, --local, profile development
     bin/expo_build testflight   ios, profile testflight      <- the live lane
@@ -133,11 +147,17 @@ that a direct `eas` call does not.
     bin/expo_build aab          android, profile production  <- Play bundle
     bin/expo_build custom -- <args>
 
-**There is no `apk` preset.** `development` is the only profile setting
-`android.buildType=apk` and it builds a dev client, so `dev-client` is the
-installable APK and `aab` is the Play bundle. A preset called `apk` existed
-until 2026-09-13 and pointed at `production`, which for Android store
-distribution produces a bundle -- it was named for a thing it did not make.
+**`apk` is the China lane and must not be removed.** There is no Google Play
+in China, so that build is side-loaded -- tier 5 above. Planning deleted the
+preset on 2026-09-13 on the reasoning that no profile produced an APK, which
+was true and was the wrong conclusion: the gap is a missing profile, not a
+surplus preset. Restored.
+
+It needs `production-apk` in `mobile/eas.json` with `android.buildType=apk`,
+which does not exist yet. Until it does, `bin/expo_build apk` fails on an
+unknown profile -- which is the correct failure, because the preset it replaced
+pointed at `production` and quietly produced a bundle instead. Every other
+profile a preset names is defined.
 
 **Every profile a preset names must exist in `mobile/eas.json`.** Three did not:
 `development-client` and `production-aab` were never defined, and there was no

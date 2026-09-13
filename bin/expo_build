@@ -37,12 +37,14 @@ Presets:
   testflight  -> eas build --platform ios --profile testflight
   ipa         -> eas build --platform ios --profile production
   aab         -> eas build --platform android --profile production
+  apk         -> eas build --platform android --profile production-apk
   custom      -> provide your own EAS args after `--`
 
-Every profile above exists in mobile/eas.json. There is no release-apk
-profile, so there is no `apk` preset: `development` is the only profile
-that sets android.buildType=apk and it builds a dev client. Use
-`dev-client` for an installable APK, or `aab` for the Play bundle.
+apk is the China lane: no Google Play there, so that build is side-loaded.
+It needs a `production-apk` profile in mobile/eas.json with
+android.buildType=apk, which does not exist yet -- the preset pointed at
+`production`, which for store distribution produces a bundle, so it has
+never made an APK. Every other profile above is defined.
 USAGE
   exit 1
 }
@@ -78,6 +80,9 @@ case "$PRESET" in
     ;;
   aab)
     BUILD_ARGS=(--platform android --profile production)
+    ;;
+  apk)
+    BUILD_ARGS=(--platform android --profile production-apk)
     ;;
   custom)
     if [ "${#EXTRA_ARGS[@]}" -eq 0 ]; then
