@@ -101,30 +101,137 @@ listed second so it wins during the staged migration; no `-` prefix, so a
 missing file is a hard failure; and no `Environment=` and no ExecStart prefix,
 since neither is needed once nothing is overridden.
 
-## 4. Migration
+## 4. Implementation phases
 
-The spec's steps 0-5, with 1b applied and one reordering.
+The spec's steps 0-5, ordered along the permission boundaries that actually
+exist on the host, Observed 2026-09-13:
 
-**Run step 2 before step 0.** The spec says the guard reads config, but config
-cannot name the database until step 2 puts `database:` back — until then the
-guard sees nil and silently passes. The spec offers writing step 0 against
-`SELECT current_database()` and simplifying later; taking step 2 first is
-cheaper and leaves one guard rather than two.
+    /etc/default/shengfukung-wenfu-env   root:jimmy1768_user 640  sudo
+    /etc/systemd/system/*.service        root:root           644  sudo
+    ~/Projects/<checkout>/               jimmy1768_user           writable
 
-Then: step 1 create both instance files and add the second `EnvironmentFile=`
-to all four units, changing nothing observable; step 0 add the boot guard and
-prove it passes against a known-good state; step 3 remove the ExecStart
-prefixes; step 4 delete the five keys from the shared file; step 5 make the
-wrapper source shared-then-instance and export nothing of its own.
+So instance files need no sudo; unit files, the shared env file, and every
+`daemon-reload` and `restart` do. Anything marked **[DIRECTOR]** cannot be done
+from a session: `sudo` on this host prompts for a password.
 
-The spec's verification stands and is not optional:
+Run this after every phase, against both deployments:
+
+    bin/rails runner 'puts ActiveRecord::Base.connection.execute(
+      %q{SELECT current_database()}).first'
+
+### Phase 0 — enable staging **[DIRECTOR — sudo]**
+
+Staging was disabled 2026-09-05 and nothing listens on 4002. Nothing below can
+be verified until it runs. Enable and start both units on the *current* config,
+unchanged, and confirm it boots. That is also the baseline Phase 3 is measured
+against, and it is what the Expo promotion needs regardless of this work.
+
+### Phase 1 — repository only. No droplet, no Director.
+
+Ordinary Control work, merged to `main`, deployed later in Phase 4.
+
+- **`.gitignore`: add `instance.env`.** Observed: it is not currently ignored,
+  so it would sit untracked inside each checkout, where `git clean` would
+  delete it and every `git status --porcelain` cleanliness check would report
+  it. Do this first; it is the cheapest thing to forget.
+- **`rails/config/database.yml`**: give `production:` and `staging:` a
+  `database: <%= ENV.fetch("PGDATABASE") %>` and remove the dead
+  `url: <%= ENV["DATABASE_URL"] %>` lines. This is what makes the name knowable
+  from config, which the guard depends on.
+- **`rails/config/initializers/deployment_identity.rb`**: the boot guard, with
+  the spec's `Console` exclusion. Decide deliberately which commands it stops.
+- **`ops/env/`**: templates for the two instance files, so a future clone has
+  the shape.
+- **`bin/staging`**: sources the shared file then the instance file for the
+  checkout it stands in, in that order, exporting nothing of its own.
+
+The guard is written here but only becomes live in Phase 4, by which time
+`database.yml` can answer it. That is the spec's step-0-before-step-2 hazard,
+resolved by phasing rather than by reordering.
+
+### Phase 2 — write the instance files. No sudo.
+
+Both checkouts are writable by the deploy user, and none of these five values
+is a secret.
+
+    ~/Projects/shengfukung-wenfu/instance.env
+      RAILS_ENV=production
+      RACK_ENV=production
+      PUMA_PORT=4003
+      PGDATABASE=templemate_data
+      S3_OBJECT_PREFIX=prod
+
+    ~/Projects/shengfukung-wenfu-staging/instance.env
+      RAILS_ENV=staging
+      RACK_ENV=staging
+      PUMA_PORT=4002
+      PGDATABASE=templemate_data_staging
+      S3_OBJECT_PREFIX=staging
+
+**[DIRECTOR — confirm, do not supply]** Every production value above was read
+live from the host and needs no invention. The one to check rather than trust
+is `S3_OBJECT_PREFIX=prod`: the spec proposed empty, and empty would move every
+production S3 object path. `staging` for the staging file is decision §6.2 and
+is a change in behaviour, not a transcription.
+
+Nothing reads these files yet. Writing them changes nothing.
+
+### Phase 3 — units load the instance file **[DIRECTOR — sudo]**
+
+Add a second `EnvironmentFile=` line to all four units, pointing at the
+instance file in that unit's own checkout, listed after the shared file and
+with no `-` prefix. `daemon-reload`, restart all four.
+
+Nothing should change: all sources now agree. This is the phase that buys the
+staged safety, because the instance file already wins before anything is
+removed from the shared file.
+
+### Phase 4 — deploy Phase 1, prove the guard **[DIRECTOR — sudo]**
+
+Pull both checkouts to the merged `main`, restart. The guard is now live and
+passing against a state known to be correct. A guard that has never passed
+against a known-good state is untested, and the later phases are the wrong
+moment to find it was written wrong.
+
+### Phase 5 — remove the ExecStart prefixes **[DIRECTOR — sudo]**
+
+Delete `RAILS_ENV=staging PUMA_PORT=4002 PGDATABASE=templemate_data_staging`
+from both staging units. `daemon-reload`, restart, verify. The instance file is
+now doing the work alone.
+
+### Phase 6 — empty the shared file, prove it fails **[DIRECTOR — sudo + edit]**
+
+Delete `RAILS_ENV`, `RACK_ENV`, `PUMA_PORT`, `PGDATABASE` and
+`S3_OBJECT_PREFIX` from `/etc/default/shengfukung-wenfu-env`. Root-owned, so
+this is an edit only the Director can make. Restart both.
+
+Only now is absence structural: from here a missing instance file or a missing
+key stops a deployment instead of silently handing it production's values.
+
+Then, from the spec, and not optional:
 
 > delete one key from staging's instance file and confirm staging refuses to
-> boot — **the migration is not proven until you have seen it fail.**
+> boot -- **the migration is not proven until you have seen it fail.**
 
-Note the spec's `Console` exclusion on the guard, and decide deliberately which
-commands it should stop. A guard that also aborts `rails console` and
-`db:migrate` is a guard that gets deleted rather than fixed.
+Put it back.
+
+### Not yet phased
+
+The env file split, §6.3, is undecided. If adopted it lands between Phase 1 and
+Phase 3 and is **[DIRECTOR — sudo and the edit]** throughout, since it creates
+and populates two root-owned files.
+
+### Where the Director is needed, in one list
+
+    Phase 0   sudo    enable and start the staging units
+    Phase 2   values  confirm S3_OBJECT_PREFIX=prod and the staging prefix
+    Phase 3   sudo    edit four unit files, daemon-reload, restart
+    Phase 4   sudo    restart after deploying
+    Phase 5   sudo    edit two unit files, daemon-reload, restart
+    Phase 6   sudo    edit the shared env file, restart, and the failure test
+
+Phase 1 needs nothing from the Director beyond ordinary review. Phase 2 needs
+judgement on two values and no sudo.
 
 ## 5. Relationship to the wrapper plan
 
