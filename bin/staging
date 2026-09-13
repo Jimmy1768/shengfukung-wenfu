@@ -7,10 +7,14 @@
 # command line, which is invented protocol: it works until the day one of the
 # values is wrong or forgotten, and then it runs against production.
 #
-# This wrapper sets nothing itself. It sources the shared environment file and
-# then this checkout's instance.env, in that order, and execs. Under the
-# environment partition no variable appears in both files, so the order is
-# defence rather than precedence -- there is nothing to override.
+# This wrapper carries no value. It sources the shared environment file and then
+# this checkout's instance.env, in that order, and execs. Under the environment
+# partition no variable appears in both files, so the order is defence rather
+# than precedence -- there is nothing to override.
+#
+# It exports exactly one thing, and that thing is not a value: a declaration of
+# which environment it believes it is running. The guard holds it to that. See
+# the block above the export below for why declaring beats copying.
 #
 # Deliberately unlike sourcegrid-labs/bin/staging, which this mirrors in shape:
 # that script sources its env files and then exports eighteen explicit staging
@@ -38,9 +42,13 @@ Examples:
   bin/staging rails runner 'puts Rails.env'
 
 Sources the shared environment file and then this checkout's instance.env,
-in that order, and sets nothing of its own. Run it from the checkout whose
-environment you want; it takes its values from where it stands, not from
-its name.
+in that order. It copies no value. It declares one thing -- that this is
+staging -- and the guard refuses if the database that actually resolves
+disagrees with that claim.
+
+So run it from the staging checkout. Run anywhere else it refuses, rather
+than quietly handing you whatever environment that checkout happens to
+hold: the name you typed is treated as a decision, not a label.
 
 Override the file locations for testing with WENFU_SHARED_ENV_FILE and
 WENFU_INSTANCE_ENV_FILE.
@@ -88,7 +96,7 @@ source "$SHARED_ENV_FILE"
 source "$INSTANCE_ENV_FILE"
 set +a
 
-# Nothing is exported here, and the absence is the design.
+# One export, and it is a claim rather than a value.
 #
 # sourcegrid-labs/bin/staging has eighteen `export` lines at exactly this point
 # -- RAILS_ENV, PUMA_PORT, DATABASE_URL, PGHOST and the rest -- each with a
@@ -98,10 +106,20 @@ set +a
 # to correct the shared environment file with a systemd ExecStart prefix, and
 # losing that prefix silently gave staging production's database.
 #
-# Under the partition the instance file already carries every value that differs
-# per deployment, so an export here could only restate a value or contradict
-# one. Both are worse than nothing. If a value seems to be missing, it belongs
-# in this checkout's instance.env, not in this script.
+# Copying a value here would also protect only half of what runs. The console
+# would read the wrapper's copy and the systemd service would read the instance
+# file, and when the two disagreed nothing could say which was right. Under the
+# partition the instance file already carries every value that differs per
+# deployment, so an export of a value could only restate one or contradict it.
+# If a value seems to be missing, it belongs in this checkout's instance.env.
+#
+# What the wrapper does contribute is intent. Its name is a decision -- someone
+# typed `bin/staging` because they meant staging -- and that decision is
+# otherwise thrown away at exec. Exporting it lets the guard compare the claim
+# against the database actually resolved, and refuse a claim that turns out to
+# be false, whether or not a human is watching. Declaring is not copying: this
+# says which environment, never which database.
+export WENFU_DECLARED_ENVIRONMENT="staging"
 
 cd "$RAILS_DIR"
 
