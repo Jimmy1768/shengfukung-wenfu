@@ -136,6 +136,97 @@ still needed — there is still no supported way to run a manual staging command
 — but it becomes step 5, a file that sources two files in order and exports
 nothing.
 
+## 5a. One framework for every repository — the Director, 2026-09-13
+
+"i want one system that runs all of my repos, i don't want to remember big
+differences. if it requires more build, i can accept it... use the same
+convention for all. so don't say, sourcegrid has it but we don't, so we don't
+need it."
+
+This governs the work and outranks per-repository convenience. The partition
+above is not a Wenfu answer to a Wenfu problem; it is the shape every
+deployment takes, and Wenfu is where it is proven first. Where repositories
+currently differ, the difference is resolved rather than accommodated, and the
+resolution goes to `Golden-Template` so no clone inherits a dialect.
+
+Unused does not mean absent: a key that a project has no use for is present and
+blank. AppRelay does not use S3, so it carries `S3_OBJECT_PREFIX=` rather than
+omitting it. The schema is the same everywhere; only values differ.
+
+### The four conventions, and how each resolves
+
+**1. `RAILS_ENV` for staging — Wenfu's, not SourceGrid's.**
+
+The repositories disagree deliberately, and the less obvious one is right.
+SourceGrid runs staging with `RAILS_ENV=production` so it behaves identically
+to production. Wenfu runs `RAILS_ENV=staging`, and
+`rails/config/environments/staging.rb` is a single `require_relative
+"production"`, with the reasoning in its header:
+
+> Staging is infrastructure separation only, not a distinct application
+> behavior -- it must run identically to production... Reusing production.rb
+> directly (rather than duplicating its settings here) is what actually
+> guarantees that: there is no second copy of these settings to drift out of
+> sync... not in `RAILS_ENV` pretending to be "production" the way some sibling
+> projects' staging setups do.
+
+Same behavioural guarantee, and `Rails.env` stays honest, so logs, error
+reports and `config/puma.rb`'s `when "staging"` case can tell the deployments
+apart. Observed: zero `Rails.env.staging?` references in `rails/app` or
+`rails/config`, so nothing depends on staging behaving differently. Unifying
+means SourceGrid adopts the one-line `staging.rb`; it does not mean Wenfu
+adopts the pretence.
+
+**2. Blank versus absent — the boundary this rule needs.**
+
+"Present and blank when unused" and "absent cannot serve traffic" are both
+right, and they collide unless the boundary is stated:
+
+- In the **shared** file, blank is legal. It means "this project does not use
+  this feature", and the schema stays identical across repositories.
+- In an **instance** file, blank is never legal. These are the five values that
+  decide which database and which port a deployment owns.
+
+So §4's step 2 uses fetch-and-reject-blank rather than plain `fetch`:
+`ENV.fetch("PGDATABASE").presence || raise`. A blank `PGDATABASE` must fail
+exactly as hard as a missing one. Without this, a uniform schema that fills
+every key with a blank quietly disarms the protection the partition exists for.
+
+**3. Ports — already uniform; declare the base.**
+
+Not a divergence. SourceGrid is 3201/3202/3203 and Wenfu 4001/4002/4003:
+one convention, `<base>01` development, `<base>02` staging, `<base>03`
+production, with a different base because they share a host. The base is a
+per-project parameter. Declaring it once and deriving the three, rather than
+typing three literals, is what makes it a convention instead of a coincidence.
+
+**4. Env file split — the one open decision, and the recommendation.**
+
+SourceGrid splits `/etc/default/<project>-runtime.env` from `-secrets.env`.
+Wenfu has one file, in which `STRIPE_SECRET_KEY`, `SECRET_KEY_BASE`,
+`JWT_SECRET_KEY` and `QA_DUMMY_ADMIN_PASSWORD` sit beside `PROJECT_NAME` and
+`VITE_TEMPLE_LAYOUT`. Recommendation: adopt the split. It lets the secrets half
+carry tighter permissions, and lets the runtime half exist as a reviewable
+template in `ops/env/` that a new clone fills in -- neither of which a single
+mixed file can offer.
+
+That makes three files per deployment, and the unit loads them in order:
+
+    EnvironmentFile=/etc/default/<project>-runtime.env
+    EnvironmentFile=/etc/default/<project>-secrets.env
+    EnvironmentFile=<checkout>/instance.env
+
+The ordering still matters only as defence: under the partition no two of them
+set the same variable.
+
+### Consequence for §4
+
+Wenfu's migration is unchanged in shape but gains the split as a step between
+1 and 3, and step 2 takes the blank-rejecting form. The framework -- not the
+values -- then ports to `Golden-Template`, per `6a` of
+`STAGING_COMMAND_WRAPPER_PLAN.md`, and SourceGrid adopts it after Wenfu is
+green, per the spec's own closing note.
+
 ## 6. Decisions for the Director
 
 1. **Payment and mail credentials.** Confirmed shared: staging can create real
@@ -145,7 +236,10 @@ nothing.
 2. **`S3_OBJECT_PREFIX=staging` for the staging instance.** Adopting it changes
    where staging writes, which is the point, but existing staging objects under
    `prod` stay where they are.
-3. **Whether this lands before or after the Expo promotion.** It touches the
+3. **The env file split**, per 5a.4. Recommended, not assumed: it changes the
+   shape of every deployment's files and is the one convention where the two
+   repositories disagree without one of them being clearly right.
+4. **Whether this lands before or after the Expo promotion.** It touches the
    production unit files and the shared env file; the Expo work needs a Rails
    deploy and a `release/current` promotion. Doing both at once means a failure
    has two candidate causes.
