@@ -83,17 +83,70 @@ Once it exists, the §0 commands become:
     bin/staging rails runner \
       'puts ActiveRecord::Base.connection_db_config.database'
 
-## 4. The duplication this does not by itself solve
+## 4. The duplication, and why it is sharper here than in SourceGrid
 
-Observed: `sourcegrid-labs` carries the same override list **three** times --
-`Environment=` directives in the unit, an `env` prefix inside that unit's
-`ExecStart`, and again in `bin/staging`. Adding a wrapper here without further
-thought produces two copies (unit and wrapper) that can drift apart silently,
-and a wrapper that has drifted from the unit is worse than no wrapper: it would
-be trusted.
+### What the duplication is
 
-The consolidation -- have the systemd unit invoke `bin/staging` so one file owns
-the list -- is §5's second decision. It is not assumed here.
+Staging differs from production by a short list of values. That list has no
+owner. In `sourcegrid-labs` it exists three times, Observed 2026-09-13:
+
+1. `Environment=` directives in `puma-sourcegrid-labs-staging.service`;
+2. an `env VAR=... VAR=...` prefix inside that same unit's `ExecStart`;
+3. the `export` block in `bin/staging`.
+
+The first two are both in one file and both necessary, which is the part that
+looks like redundancy and is not. Per `systemd.exec(7)`, `EnvironmentFile=`
+is resolved **after** `Environment=`, so an `Environment=PGDATABASE=...` line is
+silently overwritten by the shared production env file loaded afterwards. The
+`ExecStart` prefix is applied last and therefore actually wins. This
+repository's own unit carries a long comment explaining exactly this, and uses
+only the prefix form.
+
+The third copy exists because a shell is a different entry point from systemd.
+`bin/staging` cannot read the unit, so it restates the list.
+
+### Why drift is silent
+
+Nothing compares the copies. Rename the staging database, or change its port,
+and update one copy: the service and the manual commands now address different
+things, and both continue to work. Nothing fails, no log line appears, and the
+divergence surfaces only as a confusing result -- a migration that "ran" but
+whose table never appears to the app, or a console that shows data the running
+service does not have.
+
+### Why this repository fails worse than the one being copied
+
+SourceGrid's wrapper supplies a **safe default**:
+
+    export DATABASE_URL="${SOURCEGRID_STAGING_DATABASE_URL:-postgresql:///sourcegrid_staging}"
+
+If the override variable is absent, it still resolves to the staging database.
+The failure mode of an omission is "staging", and at worst a connection error.
+
+Here there is no default anywhere in the chain. Observed: `database.yml`'s
+`staging:` entry is `url: <%= ENV["DATABASE_URL"] %>`; `DATABASE_URL` is unset
+on the droplet; with no `url` and no `database:` key, libpq falls back to
+`PGDATABASE`; and the shared env file sets `PGDATABASE=templemate_data`, which
+is production. So an omitted or drifted override does not fail and does not
+reach staging -- it connects to the production database and proceeds normally.
+
+That asymmetry is the point. Copying SourceGrid's structure without its safe
+default reproduces the ceremony and not the protection, in the one repository
+where the unguarded path leads somewhere worse.
+
+### What follows for the implementation
+
+Structure alone is not enough here. Whatever §5 decides about consolidating the
+copies, the wrapper should also:
+
+- resolve the staging database from an explicit default rather than relying on
+  the override being present, as SourceGrid's does; and
+- refuse to run if the database it resolved is not the staging one -- assert
+  before executing, rather than trusting that the export worked.
+
+A guard makes drift loud instead of silent, which is worth having even if the
+copies are consolidated, and is the only thing that makes them safe if they are
+not.
 
 ## 5. Decisions for the Director
 
