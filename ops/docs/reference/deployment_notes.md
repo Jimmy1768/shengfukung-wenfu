@@ -106,7 +106,7 @@
   systemd puma/sidekiq pair (`ops/systemd/shengfukung-wenfu-staging-*.service`),
   a separate nginx vhost (`ops/nginx/shengfukung-wenfu-staging.conf`), and a
   separate database (`templemate_data_staging` -- never production's
-  `templemate_data` or the local `shengfukung_wenfu_development`), all
+  `templemate_data` or the local `templemate_dev`), all
   running from their own checkout
   (`/home/jimmy1768_user/Projects/shengfukung-wenfu-staging`), independent
   of the production checkout.

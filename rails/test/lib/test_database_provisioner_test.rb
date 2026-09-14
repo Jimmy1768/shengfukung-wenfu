@@ -237,7 +237,7 @@ class TestDatabaseProvisionerTest < ActiveSupport::TestCase
       tasks = FakeTasks.new
 
       result = TestDatabaseProvisioner.remove!(
-        config: Struct.new(:database).new("shengfukung_wenfu_dev"), env: environment,
+        config: Struct.new(:database).new("templemate_dev"), env: environment,
         out: StringIO.new, tasks: tasks, disconnect: -> { flunk "must not touch #{environment}" }
       )
 
