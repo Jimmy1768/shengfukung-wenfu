@@ -6,8 +6,8 @@ RAILS_DIR="$ROOT_DIR/rails"
 
 HOST="${ADMIN_REVIEW_HOST:-127.0.0.1}"
 PORT="${ADMIN_REVIEW_PORT:-3312}"
-DATABASE="${ADMIN_REVIEW_DATABASE:-shengfukung_wenfu_review}"
-SESSION_COOKIE="${ADMIN_REVIEW_SESSION_COOKIE:-_shengfukung_wenfu_review_session}"
+DATABASE="${ADMIN_REVIEW_DATABASE:-templemate_review}"
+SESSION_COOKIE="${ADMIN_REVIEW_SESSION_COOKIE:-_templemate_review_session}"
 EMAIL="${ADMIN_REVIEW_EMAIL:-operator-ui-review@example.test}"
 PASSWORD="${ADMIN_REVIEW_PASSWORD:-Password123!}"
 
