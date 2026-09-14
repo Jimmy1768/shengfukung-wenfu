@@ -62,6 +62,41 @@ repository has 3 `overflow-x` rules. Three of those views are patron-facing —
 admin. A table wider than the screen with nothing to scroll it drags the whole
 page sideways.
 
+## A2. The connect page, measured behind login
+
+Added after the first pass. The Rails server was restarted onto `templemate_dev`
+and the page opened as the seeded patron, so these are renderings rather than
+inferences — the gap the first pass had to leave open.
+
+**At 375×812 the patron sees only navigation.** Nothing is broken; nothing is
+reachable either.
+
+    nav chrome ends            747px   92% of the first screen
+    connect content begins     780px   below the fold
+    QR code begins             997px   1.23 screens down
+    instructions               1236px  BELOW the QR
+    raw URL                    1366px
+    page total                 1735px  2.1 screens
+
+The same page on desktop puts the QR at 0.86 screens — above the fold on a
+1024×768 window. So the page was not designed badly; it was designed for the
+only viewport anyone looked at.
+
+Three things follow, and none of them is a CSS bug:
+
+- **The header is the page on a phone.** Title, sign-out, language toggle,
+  display-mode toggle and ten nav buttons in a two-column grid consume the
+  entire first screen before any content starts.
+- **The instructions sit below the QR.** A patron reaches the code before
+  reading what to do with it, and on a phone they cannot see both at once.
+- **No horizontal overflow, 15 tap targets under 44px.** The layout is
+  technically responsive. It is the *information order* that assumes a screen
+  tall enough to show everything at once.
+
+This is the sharpest available statement of what "we collapsed the two entrance
+cases" cost. Every element is present and correctly sized; the page simply
+assumes the reader can see a screenful of it at once, which a phone cannot.
+
 ## B. Usable but degraded
 
 **Tap targets below the 44px minimum.** Measured: 17 on the Vue homepage, 7 on
