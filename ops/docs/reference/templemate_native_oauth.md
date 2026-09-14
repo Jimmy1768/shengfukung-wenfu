@@ -48,7 +48,7 @@ copy this UI or its fixture tenant values blindly.
 
 | Mode | Public inputs | Known values | Deferred external values |
 | --- | --- | --- | --- |
-| Development | local API base URL, tenant slug, environment, return URI | one mode, real: every build talks to a real server (`app/real/config.js`); return URI is `templemate://oauth/complete` | provider registration and deployed return allowlist |
+| Development | local API base URL, tenant slug, environment, return URI | one client: every build talks to a real server (`app/client/config.js`); return URI is `templemate://oauth/complete` | provider registration and deployed return allowlist |
 | Production | API origin and return URI | the origin is pinned; no tenant is compiled in — the temple is loaded at runtime from a scanned code, and signing in needs none. Return URI remains `templemate://oauth/complete`. The central auth tenant is `AUTH_TENANT_SLUG`, the app's own registration and never a temple slug | provider registration, universal/app links |
 
 The public configuration contains no client secret, provider token, ID token,

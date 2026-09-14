@@ -2,6 +2,19 @@
 
 Plan only. Nothing implemented. The decisions in §6 are the Director's.
 
+## What this is
+
+Release server hardening -- the Director's name for it, 2026-09-13: "correcting
+env files, and how we start our 2 servers on droplet and connected databases."
+That is the whole of this document. There is no separate hardening track; the
+partition, the guard and the wrapper are it.
+
+Two servers on one droplet, production on 4003 and staging on 4002, sharing one
+env file in which the only thing telling them apart is an override on staging's
+`ExecStart`. Remove that override and staging runs against production's
+database, silently. The phases below end that by construction rather than by
+care.
+
 ## 0. Where this came from
 
 SourceGrid Control A wrote an implementation spec on 2026-09-13

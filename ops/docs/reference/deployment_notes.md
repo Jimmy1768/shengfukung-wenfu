@@ -161,7 +161,7 @@ knowing before repeating this from scratch:
   `TEMPLEMATE_CLIENT_MODE=dummy` and no local API URL. Both are wrong now:
   `TEMPLEMATE_CLIENT_MODE` is read nowhere in `mobile/app.config.js` or
   `mobile/app/`, since there is one mode and every build talks to a real
-  server, and `resolveClientConfig` throws `REAL_CONFIG_REQUIRED` when no API
+  server, and `resolveClientConfig` throws `CLIENT_CONFIG_REQUIRED` when no API
   origin is configured — so that recipe reaches the boot-failure screen rather
   than the app. Rails runs on 4001 locally, and the device needs a reverse for
   it as well as for Metro:

@@ -5,7 +5,7 @@
 **The native account API is built.** As of 2026-08-31 there are 43 routes under
 `/api/v1/account/native/*` covering sessions, OAuth, profile, dependents,
 registrations, resources, preferences, privacy, and assistance — and
-`mobile/app/real/adapter.js` consumes nearly all of them.
+`mobile/app/client/adapter.js` consumes nearly all of them.
 
 This doc exists because the planning record said the opposite for a long time
 and was widely cited. `EXPO_ACCOUNT_APP_READINESS_AND_PARITY_PLAN.md` asserted
@@ -58,7 +58,7 @@ API gap.
 | Layer | State |
 | --- | --- |
 | Rails native API | Essentially complete (see absences below) |
-| `mobile/app/real/adapter.js` | Covers the API except contact + payment |
+| `mobile/app/client/adapter.js` | Covers the API except contact + payment |
 | Expo account screens | Present but **minimal**. All 12 render from `App.js`; several expose a fraction of the fields their endpoint accepts |
 
 Screens are **not** in `mobile/app/account/` (that directory holds registration
@@ -123,7 +123,7 @@ depend on per-temple offering configuration — it consumes a stable contract.
 - `app/controllers/api/v1/account/native_*_controller.rb` — the endpoints.
 - `app/services/auth/refresh_token.rb`, `app/services/auth/jwt_service.rb` —
   session lifecycle.
-- `mobile/app/real/adapter.js` — the client surface, with `/api/v1/account/native`
+- `mobile/app/client/adapter.js` — the client surface, with `/api/v1/account/native`
   as its base path.
 - `ops/docs/reference/templemate_native_oauth.md` — the OAuth transaction in
   detail (start/exchange, `templemate://oauth/complete`).
