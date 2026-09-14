@@ -94,6 +94,44 @@ interrupted whichever Control owned the affected surface.
 
 This is an operating convention for this repository, not a work-mode rule.
 
+## Database Names Come From the Product, Not the Repository
+
+The repository is called `shengfukung-wenfu`. The product is TempleMate. The
+databases are named after the product.
+
+| | |
+| --- | --- |
+| production | `templemate_data` |
+| staging | `templemate_staging` — still `templemate_data_staging` on the droplet; renamed with the env-partition work |
+| local development | `templemate_dev` |
+| local test | `templemate_test`, which exists only during a run |
+| local review | `templemate_review`, behind `bin/review_admin_server` |
+
+**Two code paths, and they do not meet.** Production and staging resolve from
+`ENV.fetch("PGDATABASE", nil)` and read no derived base at all, so nothing named
+locally can reach a deployment. Development and test derive theirs from
+`databaseName` in `shared/app_constants/project.json`, falling back to the slug
+when that key is absent — so a clone that has not set one behaves exactly as it
+did before the key existed. `PGDATABASE` and `PGDATABASE_TEST` override either.
+
+That separation is asserted rather than assumed.
+`rails/test/lib/database_configuration_test.rb` has a case proving production
+and staging resolve to **nothing** when `PGDATABASE` is unset. It is the case
+that earns its place: with `PGDATABASE` set, a derived fallback would pass
+unnoticed, and a derived fallback there is exactly how staging came to run
+silently against production's database.
+
+`databaseName` beats `PROJECT_SLUG`. The more specific key wins, and
+`PROJECT_SLUG` steering database names was always a side effect of naming the
+project rather than a decision about databases.
+
+**One thing none of this covers.** `Profile::Infrastructure::Storage.db_base`
+and `.db_name` derive their own database names from the slug, independently of
+`database.yml`, and have no callers anywhere in `app`, `lib`, `config`, `bin` or
+`ops`. They are guarded by a test protecting a regression in code nothing runs.
+Found and left alone on 2026-09-14: delete or align them deliberately, not
+incidentally while doing something else.
+
 ## The Test Database Is Disposable, And The Suite Provisions It
 
 `rails/test/test_helper.rb` creates the test database when it is missing, loads

@@ -160,7 +160,7 @@ class DeploymentIdentityTest < ActiveSupport::TestCase
   # run in a development checkout and the claim would go unchecked.
   test "a declaration makes an otherwise unguarded environment guarded" do
     subject = guard(env: "development", declared_environment: "staging",
-                    database: "shengfukung_wenfu_dev", tty: true)
+                    database: "templemate_dev", tty: true)
 
     assert subject.guarded?
     assert_raises(DeploymentIdentity::Mismatch) { subject.verify! }
