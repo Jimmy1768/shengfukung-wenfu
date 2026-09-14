@@ -117,22 +117,14 @@ Four properties, each held by a test in
 - **It never drops, today.** A scan asserts nothing under `rails/test/` reaches
   for a drop. That is a step in the sequence below, not the finished shape.
 
-**Prove provisioning against a throwaway name, never the one your suite uses:**
+**Prove provisioning against a throwaway name, never the shared database:**
 
     cd rails && PGDATABASE_TEST=<a name that exists nowhere> bin/rails test
 
-`rails/config/database.yml` honours `PGDATABASE_TEST` above the derived name,
-so this exercises genuine absence without touching the database your own suite
-uses. Verified this way on 2026-09-14. Drop the throwaway when you are done —
-that is the same rule as everything else here, and it applies to the person
-proving the feature too.
-
-**Seam, where an assignment forbids every drop.** That method and a no-drop
-scope cannot both hold in one round: proving provisioning creates a database
-the prover is then forbidden to remove. Whoever writes the assignment sequences
-it — either the round may drop the throwaway it created, or provisioning is
-proved from something already observed rather than re-created. Found on
-assignment 028, which hit exactly this and said so rather than smoothing it.
+`rails/config/database.yml` reads `PGDATABASE_TEST`, so this exercises genuine
+absence with no blast radius on a database three sessions share. Verified this
+way on 2026-09-14. Drop the throwaway when you are done — that is the same rule
+as everything else here, and it applies to the person proving the feature too.
 
 **The rule, and it is this repository's, not the workspace's.** A suite that
 creates a test database removes it in the same run. Creating and removing are
@@ -146,43 +138,23 @@ database work, and the condition below was written as a sentence rather than as
 something that could refuse anyone. We build and test it here first. It
 propagates to no other repository until it is proven here.
 
-**Step 1 is done. The removal half is unblocked, and is not built.** As of
-edb75fc the name is derived from the checkout directory in
-`rails/lib/test_database_name.rb`, so the three checkouts resolve three names:
+**Half of it is built. The removal half is blocked, on purpose.** The create
+half is live. The removal half cannot be switched on while nothing in a local
+checkout sets `PGDATABASE_TEST`: the primary tree and both Control worktrees
+derive `shengfukung_wenfu_test` identically, so a teardown drop would land on
+whichever checkout is mid-suite. Two suites running at once already collide
+today, and the failure reads like a code defect rather than contention — it
+cost an hour on 2026-09-13, which is what made the provisioner necessary.
 
-| checkout | test database |
-| --- | --- |
-| `shengfukung-wenfu` (primary) | `shengfukung_wenfu_test` |
-| `shengfukung-wenfu-control-a` | `shengfukung_wenfu_test_control_a` |
-| `shengfukung-wenfu-control-b` | `shengfukung_wenfu_test_control_b` |
+So the order is fixed and is not a preference:
 
-Derived rather than configured, because a per-checkout `.env` file is something
-a person has to remember and can forget — the exact failure that got the
-workspace version of this rule reverted. There is nothing to create: a worktree
-made tomorrow is distinct on its first run. `PGDATABASE_TEST` still wins
-outright, and a blank one is now ignored rather than yielding an empty name.
+1. `PGDATABASE_TEST` per checkout, so the name cannot be shared by accident.
+2. Then the removal half, and only then.
 
-The primary keeps its old name, so nothing was migrated and nothing abandoned.
-Suffixes are readable rather than hashed on purpose: finding strays is a listing
-checked against a table, and that only works if a name says which checkout owns
-it. A digest says only that something owned it once.
-
-**The hole this leaves, and it is deliberate.** Two checkouts whose directory
-basenames are identical under different parents still collide, and the likely
-instance is a second clone also named `shengfukung-wenfu`, which would resolve
-to the primary's own name. Closing it means hashing the path into the suffix,
-which buys safety in a case that does not exist on this machine and costs every
-worktree name its readability. If that case ever arises it is one expression.
-
-So the order, with step 1 struck:
-
-1. ~~`PGDATABASE_TEST` per checkout~~ — done, edb75fc.
-2. The removal half. Possible now; not built; assigned to nobody.
-
-The "nothing under `rails/test/` drops a database" test still enforces step 2
-not happening by accident. When it is built, that test is what has to change,
-deliberately and with this paragraph read first. Anyone who finds it in their
-way has found the guard working, not a stale assertion.
+The "nothing under `rails/test/` drops a database" test is what enforces step 2
+not happening early. When the removal half is built, that test is what has to
+change, deliberately and with this paragraph read first. Anyone who finds it in
+their way has found the guard working, not a stale assertion.
 
 ## Mobile/Expo Reference Pattern
 

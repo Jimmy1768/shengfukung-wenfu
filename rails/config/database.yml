@@ -12,11 +12,6 @@
 <%
   require "json"
 
-  # Required by absolute path rather than autoloaded: this file is rendered
-  # while the application is still booting, long before lib/ is on an autoload
-  # path.
-  require Rails.root.join("lib", "test_database_name").to_s
-
   project_slug = ENV["PROJECT_SLUG"]
   if project_slug.nil? || project_slug.strip.empty?
     project_slug =
@@ -52,14 +47,9 @@ development:
   <<: *default
   database: <%= ENV.fetch("PGDATABASE", "#{db_base}_dev") %>
 
-# Derived per checkout, so the primary tree and each worktree get their own
-# test database and two suites cannot collide. The primary keeps
-# "<slug>_test" unchanged; a worktree gets a readable suffix. PGDATABASE_TEST
-# still wins outright. See lib/test_database_name.rb for why it takes the path
-# rather than reading Rails.root itself.
 test:
   <<: *default
-  database: <%= TestDatabaseName.call(checkout_path: Rails.root.parent, base: db_base, override: ENV["PGDATABASE_TEST"]) %>
+  database: <%= ENV.fetch("PGDATABASE_TEST", "#{db_base}_test") %>
 
 # DATABASE_URL is not set on the droplet, so `url:` resolved to nil here and the
 # database name was decided entirely by libpq reading PGDATABASE. That made the
