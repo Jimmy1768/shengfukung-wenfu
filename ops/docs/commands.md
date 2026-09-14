@@ -104,6 +104,23 @@ sudo bin/apply_systemd_units
 # 3) Copy rendered nginx config to /etc/nginx + run nginx -t && reload
 sudo bin/apply_nginx_config
 
+# 3.5) Ask whether the copies on this host still match what is committed.
+# Read-only, no sudo, exits non-zero if anything differs or is missing, so a
+# deploy script can gate on it. Run it ON the droplet, from the checkout you
+# care about -- both checkouts hold the same ops/ at different commits, and the
+# report names which one it ran from.
+#
+# Run it after step 2 or 3 to confirm the copy landed, and before starting work
+# on a unit or a config to confirm you are editing what is actually running.
+# It found nothing for a long time because nothing looked: on 2026-09-14 both
+# staging units were missing S3_OBJECT_PREFIX=staging, committed here for some
+# time, so staging was writing uploads into production's S3 namespace. The
+# nginx configs were identical the same day -- the problem was never that
+# everything had drifted, it was that nobody could tell either way.
+#
+# It reports and never repairs. Fixing drift is step 2 or 3, which is a deploy.
+bin/check_ops_drift
+
 # 4) After certbot/manual edits on the droplet, capture the live configs back into ops/
 sudo bin/capture_live_configs
 
