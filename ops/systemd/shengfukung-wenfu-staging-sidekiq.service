@@ -25,7 +25,7 @@ EnvironmentFile=/etc/default/shengfukung-wenfu-env
 # the shared file. There is no `-` prefix: `EnvironmentFile=-/path` skips a
 # missing file silently and throws away that whole property.
 EnvironmentFile=/home/jimmy1768_user/Projects/shengfukung-wenfu-staging/instance.env
-ExecStart=/usr/bin/bash -lc "RAILS_ENV=staging PUMA_PORT=4002 PGDATABASE=templemate_data_staging S3_OBJECT_PREFIX=staging /home/jimmy1768_user/.rbenv/bin/rbenv exec bundle exec sidekiq -r . -C config/sidekiq.yml"
+ExecStart=/usr/bin/bash -lc "/home/jimmy1768_user/.rbenv/bin/rbenv exec bundle exec sidekiq -r . -C config/sidekiq.yml"
 Restart=always
 
 [Install]
