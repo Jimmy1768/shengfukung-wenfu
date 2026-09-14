@@ -105,14 +105,6 @@ needed for a specific reason, delete it when that reason ends. One that
 outlives its task is a stray the next person to find it cannot safely drop,
 because nothing says whether anything still uses it.
 
-**A suite that creates a test database removes it in the same run.** Creating
-and removing are one obligation, not two intentions — the line above is advice
-to a person, and no person is present at the moment a suite provisions a
-database. This is safe only where the name is per-checkout: several worktrees
-resolving one name means a teardown drop lands on another checkout's running
-suite, so the per-checkout name comes first and the removal half is turned on
-after it.
-
 **Most strays are not created by a decision, so a rule against creating them
 does not reach them.** Rails parallel testing creates one database per CPU core
 on every suite run — on 2026-09-13, sixteen of about twenty strays on this
