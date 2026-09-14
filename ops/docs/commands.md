@@ -2,7 +2,9 @@
 
 ```bash
 
-# Droplet (digital ocean) templemate-web
+# Droplet (DigitalOcean) taiwan-01-web -- same as its shell hostname.
+# Two checkouts live on it: shengfukung-wenfu (production, 4003) and
+# shengfukung-wenfu-staging (staging, 4002).
 ssh jimmy1768_user@174.138.18.211
 
 ```
@@ -158,6 +160,24 @@ git fetch origin && git reset --hard origin/release/current
 
 cd rails
 
+# NOTHING RUBY IS ON THE INTERACTIVE PATH ON THIS HOST. Not `bundle`, not
+# `ruby`, and not `rbenv` itself. `bin/rails` and `bin/bundle` are
+# `#!/usr/bin/env ruby` binstubs and fail the same way. Every unit file calls
+# rbenv by absolute path for exactly this reason -- see
+# ops/systemd/shengfukung-wenfu-puma.service:18 -- so prefix every Ruby command
+# here with the same path:
+#
+#     ~/.rbenv/bin/rbenv exec <command>
+#
+# Using any other Ruby installs gems somewhere Puma will not look, which
+# reproduces the error below instead of fixing it. Observed 2026-09-14:
+# `bundle install` gives "Command 'bundle' not found", and `rbenv version`
+# gives "Command 'rbenv' not found, but can be installed with: sudo apt install
+# rbenv" -- following that suggestion installs a SECOND rbenv and is not the
+# fix. This note said plain `bundle install` until 2026-09-14: it described
+# this exact failure two lines above itself and then gave the command that
+# causes it.
+#
 # Run from rails/, NOT the repo root -- the Gemfile lives here, and from the
 # root bundler exits with "Could not locate Gemfile". This note said the repo
 # root until 2026-09-06, which went unnoticed because no deploy before then had
@@ -166,16 +186,16 @@ cd rails
 # Needed in two cases:
 #   1. Gemfile/Gemfile.lock changed in this deploy. Not optional -- Puma boots
 #      without the new gem and fails at the first line that requires it.
-#   2. The plain SSH shell does not have the gems systemd's `rbenv exec` path
-#      finds for Puma:
+#   2. This checkout does not have the gems systemd's `rbenv exec` path finds
+#      for Puma:
 #        Could not find rails-7.1.6, puma-... in locally installed gems
-bundle install
+~/.rbenv/bin/rbenv exec bundle install
 
 # Sourcing the env file is what an interactive shell needs and systemd gets for
 # free from EnvironmentFile=. Without it: "Missing JWT_SECRET_KEY in production".
 set -a && source /etc/default/shengfukung-wenfu-env && set +a
-RAILS_ENV=production bin/rails db:migrate          # when there are migrations
-RAILS_ENV=production bin/rails <task>              # any other rake task
+RAILS_ENV=production ~/.rbenv/bin/rbenv exec bundle exec rails db:migrate   # when there are migrations
+RAILS_ENV=production ~/.rbenv/bin/rbenv exec bundle exec rails <task>       # any other rake task
 
 # Ad-hoc Ruby against production: put it in a file and scp it. Inlining Ruby in
 # `bin/rails runner "..."` through ssh has to survive both the local and remote
@@ -183,7 +203,7 @@ RAILS_ENV=production bin/rails <task>              # any other rake task
 # quotes, #{} or $ -- it fails as a Ruby syntax error that looks like a code
 # bug rather than a quoting one.
 #   scp check.rb jimmy1768_user@<host>:/tmp/check.rb
-#   ssh ... 'cd ~/Projects/shengfukung-wenfu/rails && set -a && source /etc/default/shengfukung-wenfu-env && set +a && RAILS_ENV=production bin/rails runner /tmp/check.rb; rm -f /tmp/check.rb'
+#   ssh ... 'cd ~/Projects/shengfukung-wenfu/rails && set -a && source /etc/default/shengfukung-wenfu-env && set +a && RAILS_ENV=production ~/.rbenv/bin/rbenv exec bundle exec rails runner /tmp/check.rb; rm -f /tmp/check.rb'
 
 # Frontend, when vue/ changed. No sudo -- /var/www is owned by the deploy user,
 # and building as root leaves files Puma's user cannot replace.
@@ -196,10 +216,42 @@ sudo systemctl restart shengfukung-wenfu-sidekiq
 # outage status showed "active (running)" while Puma was crash-looping.
 sudo journalctl -u shengfukung-wenfu-puma -n 40 --no-pager
 
+# Staging bring-up (recorded 2026-09-14, the first time staging was started
+# after being disabled 2026-09-05).
+#
+# Staging is a SECOND CHECKOUT on the same droplet, with its own gems, its own
+# database and its own units. It tracks `main`, not `release/current`: main is
+# the verified integration branch and is what staging runs. Everything below
+# is the production sequence pointed at the other checkout -- there is no
+# separate procedure, and inventing one is how the two drift.
+cd ~/Projects/shengfukung-wenfu-staging
+git fetch origin && git reset --hard origin/main
+
+# Its gems are separate from production's. A staging checkout left down while
+# main moves will be missing whatever the newer Gemfile.lock wants, and Puma
+# fails at boot with "Could not find rails-... in locally installed gems"
+# naming the STAGING Gemfile path. Same absolute rbenv path as everywhere else.
+cd rails && ~/.rbenv/bin/rbenv exec bundle install
+
+sudo systemctl enable --now shengfukung-wenfu-staging-puma shengfukung-wenfu-staging-sidekiq
+sudo systemctl restart shengfukung-wenfu-staging-puma shengfukung-wenfu-staging-sidekiq
+systemctl is-active shengfukung-wenfu-staging-puma shengfukung-wenfu-staging-sidekiq
+
+# `enable --now` reports the symlink even when the service then dies, so check
+# is-active, and read the journal rather than `systemctl status`.
+sudo journalctl -u shengfukung-wenfu-staging-puma -n 40 --no-pager
+
+# What staging actually connected to. This is the check the whole environment
+# partition exists for: staging must resolve templemate_data_staging, never
+# production's templemate_data.
+cd ~/Projects/shengfukung-wenfu-staging/rails && RAILS_ENV=staging ~/.rbenv/bin/rbenv exec bundle exec rails runner 'puts ActiveRecord::Base.connection.execute(%q{SELECT current_database()}).first'
+
+curl -sS -o /dev/null -w '%{http_code}\n' http://127.0.0.1:4002/up
+
 # Phase 0 media prefix migration (dry run by default; apply=1 writes)
 # See ops/docs/plans/MEDIA_ASSET_REMOVAL_AND_ORPHAN_RECLAMATION_PLAN.md
-RAILS_ENV=production bin/rails media:migrate_prefix
-RAILS_ENV=production bin/rails media:migrate_prefix apply=1
+RAILS_ENV=production ~/.rbenv/bin/rbenv exec bundle exec rails media:migrate_prefix
+RAILS_ENV=production ~/.rbenv/bin/rbenv exec bundle exec rails media:migrate_prefix apply=1
 
 # Registration period key governance (Phase B)
 # Audit invalid service/registration period keys and write a remediation report
