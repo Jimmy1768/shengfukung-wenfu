@@ -105,6 +105,17 @@ needed for a specific reason, delete it when that reason ends. One that
 outlives its task is a stray the next person to find it cannot safely drop,
 because nothing says whether anything still uses it.
 
+**A run that creates a test database deletes it in the same run.** The
+obligation is bounded by what the run itself made: a database that was already
+there is used and left alone. A suite can therefore never remove one it did not
+create.
+
+**How a repository names its databases, and how its checkouts and worktrees are
+laid out, are not work-mode concerns.** They are that repository's own and
+belong in its `repo_context.md` — a file this one's author does not write. No
+rule here should be made about either. This policy deliberately depends on
+neither, which is why it is safe everywhere.
+
 **Most strays are not created by a decision, so a rule against creating them
 does not reach them.** Rails parallel testing creates one database per CPU core
 on every suite run — on 2026-09-13, sixteen of about twenty strays on this
