@@ -124,6 +124,55 @@ already use `repeat(auto-fit, minmax(…))`, which collapses correctly. So this 
 not a rewrite: the account surface is closer than the admin surface, and the
 worst findings are a small number of specific rules.
 
+## The fork — Director, 2026-09-14
+
+**"We can't make a mobile version just by editing the web version. Don't even
+try. There are only 2 buckets."**
+
+That rules out the obvious reading of everything above. **Sections A, B and C are
+evidence of the size of the gap, not a work list.** Nothing in them should be
+turned into a responsive-CSS pass.
+
+### Bucket 1 — a real mobile version
+
+Its own layout, smaller elements, dropdowns instead of a ten-button grid. A
+second presentation of the same data, not the desktop one reflowed. The measured
+finding supports this: the connect page has no CSS defect at all, and is still
+unusable on a phone because the information order assumes a tall screen. That is
+not reachable by editing breakpoints.
+
+Open: which surfaces get one. The patron account is what the entrance problem
+argues for. Admin is a different user at a desk and holds 13 of the 19 unwrapped
+tables.
+
+### Bucket 2 — no mobile version; send the visitor to the app
+
+Detect a device, show a page with App Store and Play Store buttons, and let the
+app be the mobile experience.
+
+**It is not available today, and the reason is not the web.** Observed
+2026-09-14:
+
+- **iOS has no App Store listing.** Build 3 is TestFlight, by invitation. There
+  is no public link anywhere in this repository.
+- **Android has no release lane at all.** `mobile/eas.json` defines an `android`
+  block only under `development` (an internal APK). `testflight` and
+  `production` are iOS-only. Tier 5, the China side-load lane, has no profile
+  and no script — `repo_context.md` already records this as the real gap.
+
+So bucket 2 cannot be built until both apps ship. It is a decision about where
+to spend effort next, not an option that can be taken this week.
+
+**And it has a loop that must be solved first.** The connect page exists so a
+patron can load a temple into the app — the app is built with no temple and gets
+one by scanning. If the mobile web shows only "download the app", then a
+phone-only patron goes: install the app → the app shows a scanner → the scanner
+needs a QR code → the QR code is on the website → the website says install the
+app. There is no second screen to break the cycle.
+
+The exit is a `templemate://` deep link carrying the slug, so the temple binds
+without a scan. That is a prerequisite of bucket 2, not a detail of it.
+
 ## Decisions before any of this becomes a plan
 
 1. **Which surfaces are in scope.** Patron account is the one the entrance
