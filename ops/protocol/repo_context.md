@@ -132,68 +132,68 @@ and `.db_name` derive their own database names from the slug, independently of
 Found and left alone on 2026-09-14: delete or align them deliberately, not
 incidentally while doing something else.
 
-## The Test Database Is Disposable, And The Suite Provisions It
+## The Test Database Is Disposable, And The Suite Makes and Removes It
 
 `rails/test/test_helper.rb` creates the test database when it is missing, loads
-`db/schema.rb`, and says so on one line. An absent test database costs a
-two-second pause rather than an aborted run and a manual `bin/rails db:create`.
+`db/schema.rb`, and removes it again when the run that created it ends. **The
+steady state on a machine is that no test database exists between runs.**
 
-It exists because the Director's policy makes a test database disposable —
-created for an implementation run, removed when that run ends, with the
-development database as the sandbox for dummy data. Scaffolding that punished
-you for having deleted one is what made keeping strays the cheaper option.
+Measured 2026-09-14: create and load schema 2.6s, suite 29.4s, drop 0.3s. An
+empty Postgres database costs 8.6 MB before a single table exists, and our 64
+tables add 5.2 MB of structure holding no rows — which is why 28 abandoned test
+databases on this machine came to 377 MB storing nothing. The disk was going on
+their existence, not their contents.
 
-Four properties, each held by a test in
+**THE BOUND IS THE WHOLE DESIGN: a run removes only what that run created.** A
+database that was already there is used and left alone. That is what makes this
+safe with no naming scheme and no knowledge of how checkouts are laid out — a
+teardown can never land on another checkout's running suite, whatever the two
+are called. An earlier attempt built a per-checkout naming scheme to satisfy a
+precondition that was never real. Naming is a separate decision and is a
+precondition for nothing here.
+
+Properties, each held by a test in
 `rails/test/lib/test_database_provisioner_test.rb` rather than by a comment:
 
-- **Test environment only**, guarded first and unconditionally, so no
-  connection is attempted at all in development, staging or production.
-- **Absence only.** It triggers on `ActiveRecord::NoDatabaseError` and nothing
-  else. Bad credentials or a dead server surface as themselves instead of being
-  answered by creating things.
-- **Loud once.** One line when it creates, silence when the database is there.
-- **It never drops, today.** A scan asserts nothing under `rails/test/` reaches
-  for a drop. That is where it stands now, not the finished shape.
+- **Test environment only**, guarded first and unconditionally, so nothing is
+  created or dropped in development, staging or production under any
+  circumstance, including being loaded by accident.
+- **Absence only.** Creation triggers on `ActiveRecord::NoDatabaseError` and
+  nothing else. Bad credentials or a dead server surface as themselves rather
+  than being answered by creating things.
+- **Removal is armed in one place**, the branch that has just created the
+  database, and is handed the config captured at that moment. There is no call
+  path that arms removal for a database the run found.
+- **A red or broken run still removes what it made.** `at_exit`, not
+  `Minitest.after_run`, because the latter does not cover an exception raised
+  while test files are loading. A stray is not the price of a failing suite.
+- **Loud, twice.** One line when it makes the database, one when it removes it.
+- **A failed removal prints and returns**, naming the exact `dropdb` command,
+  rather than raising. Cleanup cannot turn a green run red.
+- **Exactly one file may drop a database**, named as `test/test_helper.rb` and
+  not as a directory, asserted by a scan over the whole test tree.
 
-**Prove provisioning against a throwaway name, never the shared database:**
+**Proving provisioning without touching anything shared:**
 
     cd rails && PGDATABASE_TEST=<a name that exists nowhere> bin/rails test
 
-`rails/config/database.yml` reads `PGDATABASE_TEST`, so this exercises genuine
-absence with no blast radius on a database three sessions share. Verified this
-way on 2026-09-14. Drop the throwaway when you are done — that is the same rule
-as everything else here, and it applies to the person proving the feature too.
+**Breaking a guard that runs at suite-load time is destructive during the run
+that tests it.** `provision!` is called with real defaults every time
+`test_helper` loads, so a break in the created/found distinction fires against
+the real configuration and drops the real database — this is how the shared test
+database was lost on 2026-09-14, and it was reproduced deliberately afterwards
+to confirm it. Pin `PGDATABASE_TEST` to a throwaway before running any break of
+this file. That is not a precaution, it is the difference between testing the
+guard and executing it.
 
-**The rule, and it is this repository's, not the workspace's.** A suite that
-creates a test database removes it in the same run. Creating and removing are
-one obligation, not two intentions — "delete it when you are done" is advice to
-a person, and no person is present at the moment a suite provisions a database.
+**Not covered, and left uncovered on purpose:** a hard kill leaves the database
+behind, because nothing in-process can catch one. The next run finds it and, by
+the bound, leaves it alone. Remove it by hand.
 
-It lives here rather than in `work_mode_config.md` because how this repository
-names its databases, and how its checkouts are laid out, is its own business and
-the workspace file cannot see either. It was in the workspace file for part of
-2026-09-14 and the Director took it out: it reached repositories outside the
-server and database work, and it carried a naming precondition a workspace rule
-has no way to enforce. A version with no naming in it is with Workspace Strategy
-and unwritten, behind a freeze on protocol work.
-
-**Only the create half is built.** A run deleting the database it created is not
-written, here or anywhere.
-
-What makes that safe is not a naming scheme. It is the bound: **a run removes
-only what that run created.** A database that was already there is used and left
-alone, so a teardown can never land on another checkout's running suite, whatever
-the two are called.
-
-That corrects an earlier version of this section, which said a per-checkout name
-had to come first and gave a numbered order for it. It does not have to come
-first. Naming is a separate decision and is a precondition for nothing here.
-
-The "nothing under `rails/test/` drops a database" test still stands, and is
-still what stops a drop appearing by accident. When the removal half is built,
-that test is what has to change — deliberately, and with this paragraph read
-first. Anyone who finds it in their way has found the guard working, not a stale
-assertion.
+The workspace policy this implements is in `work_mode_config.md`'s Databases
+section: a run that creates a test database deletes it in the same run, and how
+a repository names its databases is not a work-mode concern. That file carries
+the rule; this section is what this repository does about it.
 
 ## Mobile/Expo Reference Pattern
 
