@@ -1,5 +1,74 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
+
+# Creates the test database when it is missing, so the suite provisions itself.
+#
+# Why. The Director's database policy makes a test database disposable: created
+# for an implementation, deleted when it ends, with development as the sandbox
+# for dummy data. The scaffolding contradicted that. `rails/test_help` maintains
+# a schema but does not create a database, so an absent one raised
+# ActiveRecord::NoDatabaseError and the suite aborted before running a test,
+# telling the operator to go run `bin/rails db:create`. A policy that says
+# "delete it when you are done" and tooling that punishes you for having done so
+# pull against each other, and the tooling wins, so databases outlive their
+# tasks. Observed 2026-09-13: this database vanished mid-session and the time
+# went on deciding whether it was a defect, a concurrent run or a real change.
+#
+# It is deliberately a module taking injectable collaborators. The alternative
+# is a begin/rescue inline here, which can only be exercised by actually
+# destroying a database, so the cases that matter -- that it does nothing
+# outside test, that it drops nothing -- would never be tested at all.
+module TestDatabaseProvisioner
+  module_function
+
+  # Returns :created, :present, or :skipped_not_test.
+  #
+  # env       - the environment name; provisioning happens in "test" and nowhere else
+  # out       - where the one announcement line goes
+  # tasks     - the ActiveRecord database task interface (create/load_schema only)
+  # connect   - callable that touches the database and raises NoDatabaseError if absent
+  # reconnect - callable run after creation, so later code gets a live connection
+  def provision!(
+    env: Rails.env,
+    out: $stdout,
+    tasks: ActiveRecord::Tasks::DatabaseTasks,
+    connect: -> { ActiveRecord::Base.connection.execute("SELECT 1") },
+    reconnect: -> { ActiveRecord::Base.establish_connection(:test) }
+  )
+    # The guard is first and unconditional. Creating a database is not something
+    # this file should be able to do in development, staging or production under
+    # any circumstance, including being loaded by accident: a provisioning step
+    # that can fire outside test is worse than the problem it solves.
+    return :skipped_not_test unless env.to_s == "test"
+
+    begin
+      connect.call
+      # Present. Say nothing and create nothing; rails/test_help below handles a
+      # stale schema on its own, and announcing every run would train people to
+      # ignore the line that matters.
+      :present
+    rescue ActiveRecord::NoDatabaseError
+      config = ActiveRecord::Base.connection_db_config
+
+      # Loud on purpose. A database appearing silently is a worse surprise than
+      # a slow first run, and someone watching the suite should be told why this
+      # one paused.
+      out.puts(
+        "[test] #{config.database} does not exist; creating it and loading " \
+          "db/schema.rb. A test database is disposable here -- it is created " \
+          "when absent and never dropped by the suite."
+      )
+
+      tasks.create(config)
+      tasks.load_schema(config)
+      reconnect.call
+      :created
+    end
+  end
+end
+
+TestDatabaseProvisioner.provision!
+
 require "rails/test_help"
 require "minitest/mock"
 require "securerandom"

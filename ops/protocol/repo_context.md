@@ -94,6 +94,47 @@ interrupted whichever Control owned the affected surface.
 
 This is an operating convention for this repository, not a work-mode rule.
 
+## The Test Database Provisions Itself, And The Suite Never Drops It
+
+`rails/test/test_helper.rb` creates the test database when it is missing, loads
+`db/schema.rb`, and says so on one line. An absent test database costs a
+two-second pause rather than an aborted run and a manual `bin/rails db:create`.
+
+It exists because the Director's policy makes a test database disposable —
+created for an implementation run, removed when that run ends, with the
+development database as the sandbox for dummy data. Scaffolding that punished
+you for having deleted one is what made keeping strays the cheaper option.
+
+Four properties, each held by a test in
+`rails/test/lib/test_database_provisioner_test.rb` rather than by a comment:
+
+- **Test environment only**, guarded first and unconditionally, so no
+  connection is attempted at all in development, staging or production.
+- **Absence only.** It triggers on `ActiveRecord::NoDatabaseError` and nothing
+  else. Bad credentials or a dead server surface as themselves instead of being
+  answered by creating things.
+- **Loud once.** One line when it creates, silence when the database is there.
+- **It never drops.** A scan asserts nothing under `rails/test/` reaches for a
+  drop. Removing a test database is the operator's act, not a suite's.
+
+**Prove provisioning against a throwaway name, never the shared database:**
+
+    cd rails && PGDATABASE_TEST=<a name that exists nowhere> bin/rails test
+
+`rails/config/database.yml` reads `PGDATABASE_TEST`, so this exercises genuine
+absence with no blast radius on a database three sessions share. Verified this
+way on 2026-09-14. Drop the throwaway when you are done — that is the same rule
+as everything else here, and it applies to the person proving the feature too.
+
+**Known hazard: one test database, three checkouts.** Nothing in a local
+checkout sets `PGDATABASE_TEST`, so the primary tree and both Control worktrees
+derive `shengfukung_wenfu_test` identically. Two suites running at once collide,
+and the failure reads like a code defect rather than contention — it cost an
+hour on 2026-09-13, which is what made the provisioner necessary. Provisioning
+softens this (the loser reprovisions) but does not remove it. The fix is
+`PGDATABASE_TEST` per checkout in an instance file, and it belongs to the
+environment-partition work rather than here.
+
 ## Mobile/Expo Reference Pattern
 
 `~/Projects/DojoMate-Expo` is the Director's mature, proven Expo/EAS
