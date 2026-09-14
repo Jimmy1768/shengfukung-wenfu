@@ -115,7 +115,7 @@ Four properties, each held by a test in
   answered by creating things.
 - **Loud once.** One line when it creates, silence when the database is there.
 - **It never drops, today.** A scan asserts nothing under `rails/test/` reaches
-  for a drop. That is a step in the sequence below, not the finished shape.
+  for a drop. That is where it stands now, not the finished shape.
 
 **Prove provisioning against a throwaway name, never the shared database:**
 
@@ -131,30 +131,31 @@ creates a test database removes it in the same run. Creating and removing are
 one obligation, not two intentions — "delete it when you are done" is advice to
 a person, and no person is present at the moment a suite provisions a database.
 
-It lives here rather than in `work_mode_config.md` because the mechanism that
-makes it safe lives here. It was in the workspace file for part of 2026-09-14
-and the Director took it out: it reached repositories outside the server and
-database work, and the condition below was written as a sentence rather than as
-something that could refuse anyone. We build and test it here first. It
-propagates to no other repository until it is proven here.
+It lives here rather than in `work_mode_config.md` because how this repository
+names its databases, and how its checkouts are laid out, is its own business and
+the workspace file cannot see either. It was in the workspace file for part of
+2026-09-14 and the Director took it out: it reached repositories outside the
+server and database work, and it carried a naming precondition a workspace rule
+has no way to enforce. A version with no naming in it is with Workspace Strategy
+and unwritten, behind a freeze on protocol work.
 
-**Half of it is built. The removal half is blocked, on purpose.** The create
-half is live. The removal half cannot be switched on while nothing in a local
-checkout sets `PGDATABASE_TEST`: the primary tree and both Control worktrees
-derive `shengfukung_wenfu_test` identically, so a teardown drop would land on
-whichever checkout is mid-suite. Two suites running at once already collide
-today, and the failure reads like a code defect rather than contention — it
-cost an hour on 2026-09-13, which is what made the provisioner necessary.
+**Only the create half is built.** A run deleting the database it created is not
+written, here or anywhere.
 
-So the order is fixed and is not a preference:
+What makes that safe is not a naming scheme. It is the bound: **a run removes
+only what that run created.** A database that was already there is used and left
+alone, so a teardown can never land on another checkout's running suite, whatever
+the two are called.
 
-1. `PGDATABASE_TEST` per checkout, so the name cannot be shared by accident.
-2. Then the removal half, and only then.
+That corrects an earlier version of this section, which said a per-checkout name
+had to come first and gave a numbered order for it. It does not have to come
+first. Naming is a separate decision and is a precondition for nothing here.
 
-The "nothing under `rails/test/` drops a database" test is what enforces step 2
-not happening early. When the removal half is built, that test is what has to
-change, deliberately and with this paragraph read first. Anyone who finds it in
-their way has found the guard working, not a stale assertion.
+The "nothing under `rails/test/` drops a database" test still stands, and is
+still what stops a drop appearing by accident. When the removal half is built,
+that test is what has to change — deliberately, and with this paragraph read
+first. Anyone who finds it in their way has found the guard working, not a stale
+assertion.
 
 ## Mobile/Expo Reference Pattern
 
