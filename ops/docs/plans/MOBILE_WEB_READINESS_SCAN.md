@@ -185,6 +185,51 @@ applies wherever the store link is shown rather than to this page: there is no
 iOS App Store listing and no Android release lane, so today there is nothing to
 link to.
 
+## How a patron actually gets here — Director, 2026-09-14
+
+Bucket 2 in full, in his words, and it settles most of the open questions above.
+
+**A phone visiting the website is blocked and shown the app store link.** That is
+the whole mobile web surface. Everything else happens in the app.
+
+**Then they log in and need to link a temple, which means scanning. There are
+exactly two places a QR can be scanned:**
+
+1. On a computer screen — their own, or one at the temple.
+2. From a printout, or from a social media post.
+
+**And exactly two ways a person arrives at all:**
+
+1. Physically at the temple. An admin shows them how to download the app and
+   create an account, and they scan on the spot.
+2. They see the temple on social media and follow the instructions.
+
+For path 2 the patron may be holding the only screen the code is on, and cannot
+scan it. The exit is a scanner that can **select an image from the gallery** as
+well as open the camera, so a screenshot works.
+
+**Deferred, deliberately.** *"I don't need to build gallery now. It's a super
+edge case. 90% of people won't find and download some random temple app. It will
+be suggested by the temple admin."* Path 1 is the real volume, and it has a
+second screen by definition.
+
+### Two observations this raises
+
+**The QR is public data.** `ConnectionLink.for(temple:)` returns only the origin,
+a fixed path prefix and `temple.slug` — nothing patron-specific. Printing it on a
+poster or posting it publicly leaks nothing, so both distribution channels above
+are safe by construction. It also means the connect page sits behind patron
+login by choice rather than by necessity.
+
+**Deferring gallery has one consequence, in recovery rather than acquisition.**
+The connect page exists partly for recovery — its own comment: *"a reinstall or
+cleared app data... without this page there is nowhere to obtain a code, so the
+patron is stranded at a scanner."* A phone-only patron who reinstalls at home
+needs a computer, a printout, or the social post. The 90% argument applies here
+too, and recovery is the moment that generates a support call rather than a lost
+signup. Because the code is public, the cheap answer if it ever bites is for the
+temple to send the image directly — no feature required.
+
 ## Decisions before any of this becomes a plan
 
 1. **Which surfaces are in scope.** Patron account is the one the entrance
