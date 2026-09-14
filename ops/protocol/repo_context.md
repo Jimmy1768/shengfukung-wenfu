@@ -132,6 +132,52 @@ and `.db_name` derive their own database names from the slug, independently of
 Found and left alone on 2026-09-14: delete or align them deliberately, not
 incidentally while doing something else.
 
+## Installed Ops Artefacts Drift, In Two Directions
+
+`ops/systemd/*.service` and `ops/nginx/*.conf` are authored here and are inert
+until somebody copies them onto the droplet. Nothing reloads them for you and
+nothing has ever checked that the copy happened.
+
+    ops/systemd/<name>.service   ->  /etc/systemd/system/<name>.service
+    ops/nginx/<name>.conf        ->  /etc/nginx/sites-available/<name>.conf
+
+`bin/check_ops_drift` reports whether each committed artefact matches its
+installed copy. Run it **on the droplet**, from a checkout, as the deploy user —
+both installed locations are mode 644, so it needs no sudo. It exits non-zero on
+any difference, and it only looks: a test scans it for seventeen write verbs and
+fails if one appears. Fixing drift is a deploy, which is a different act with a
+different approval, and a drift checker that grows a `--fix` flag becomes
+`bin/apply_systemd_units` again.
+
+Why it exists, Observed on taiwan-01-web 2026-09-14: both staging units were
+missing `S3_OBJECT_PREFIX=staging`, committed here for some time. Staging was
+inheriting production's `prod` and writing uploads into production's S3
+namespace, and since the two databases are separate a reclamation sweep in
+either would have read the other's files as orphans. The nginx configs, checked
+the same day, were identical. The problem was never that everything had
+drifted — it was that nobody could tell either way.
+
+**It only walks committed → installed, and that is half the problem.** The other
+direction is an installed artefact with no committed source, which is worse: a
+file running on the host that nobody can review, reproduce or diff against
+anything. Observed 2026-09-14, installed 2026-08-04, four of them:
+
+    shengfukung-wenfu-platform-billing-lifecycle.service     + .timer
+    shengfukung-wenfu-platform-billing-monthly-close.service + .timer
+
+All four are `static` and `inactive` with no timer scheduled, so they do
+nothing today. Nothing in this repository renders them: `ops/systemd/template/`
+holds `golden-template-platform-billing-*` originals whose names do not even
+match (`monthly-collection` and `monthly-review` against an installed
+`monthly-close`), and no rendered copy was ever committed back. They are what
+`bin/apply_systemd_units` leaves behind — it renders units from templates
+rather than installing the reviewed files, which is what took production down
+for five minutes on 2026-08-19.
+
+Reverse drift is not built. Until it is, the answer to "what is running on that
+host" is the listing, not this check.
+
+
 ## The Test Database Is Disposable, And The Suite Makes and Removes It
 
 `rails/test/test_helper.rb` creates the test database when it is missing, loads

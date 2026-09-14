@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+#
+# Reports whether each committed ops artefact matches the copy installed on this
+# host. Run it ON the droplet, from a checkout, as the deploy user.
+#
+# Why it exists. ops/systemd/*.service and ops/nginx/*.conf are authored in this
+# repository and are inert until somebody installs them. Nothing had ever
+# checked that this happened. Observed on taiwan-01-web, 2026-09-14: both
+# staging units were missing S3_OBJECT_PREFIX=staging, which had been committed
+# here for some time, so staging inherited production's prod prefix and wrote
+# uploads into production's S3 namespace. The two databases are separate, so a
+# reclamation sweep in either would have read the other's files as orphans. It
+# was found by diffing by hand, because nothing else could find it. The nginx
+# configs were identical the same day -- so the problem was never "everything
+# has drifted", it was that nobody could tell either way.
+#
+# THIS SCRIPT ONLY LOOKS. It reads two directories and compares bytes. It does
+# not install, reload, enable or repair anything, and it must not learn how:
+# rails/test/lib/ops_drift_check_test.rb scans this file for write verbs and
+# fails if one appears. Fixing drift is a deploy, which is a different act with
+# a different approval.
+#
+# DELIBERATELY OUT OF SCOPE: /etc/default/shengfukung-wenfu-env. Do not add it.
+# That file is not a copy of ops/env/template.temple.env -- the template carries
+# placeholder values and the installed file carries real ones, so a content
+# comparison there reports drift on every line and means nothing. It also holds
+# live secrets, which this script must never read. Comparing the two key sets,
+# ignoring values, is a genuinely useful check and is a different script.
+#
+# The template/ subdirectories are excluded by construction: the globs below are
+# not recursive, and ops/systemd/template and ops/nginx/template hold
+# Golden-Template originals that are never installed on this host. Do not make
+# these globs recursive.
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Overridable so the test suite can point at fixtures. Never pointed at /etc by
+# anything except a real run on the droplet.
+SYSTEMD_INSTALLED_DIR="${OPS_DRIFT_SYSTEMD_DIR:-/etc/systemd/system}"
+NGINX_INSTALLED_DIR="${OPS_DRIFT_NGINX_DIR:-/etc/nginx/sites-available}"
+
+matched=0
+differing=0
+missing=0
+unreadable=0
+
+describe_checkout() {
+  local commit branch
+  commit="$(git -C "$ROOT_DIR" rev-parse --short HEAD 2>/dev/null || echo unknown)"
+  branch="$(git -C "$ROOT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown)"
+
+  # Criterion 5: both checkouts on the host hold the same ops/ but sit at
+  # different commits, so a report that does not say where it ran cannot be
+  # acted on.
+  printf 'ops drift check\n'
+  printf '  checkout: %s (%s on %s)\n' "$ROOT_DIR" "$commit" "$branch"
+  printf '  systemd:  %s\n' "$SYSTEMD_INSTALLED_DIR"
+  printf '  nginx:    %s\n\n' "$NGINX_INSTALLED_DIR"
+}
+
+# Compares one committed artefact against its installed counterpart.
+#
+# The difference is reported as a count and two paths, never as the diff itself.
+# The installed side is by definition content this repository does not control:
+# if a secret has drifted into a unit file, printing the diff is what leaks it,
+# and a drift report is likely to be pasted into a message. A human who wants
+# the detail has both paths and can run diff themselves, on the host, where the
+# content already is.
+compare_artefact() {
+  local committed="$1"
+  local installed="$2"
+  local name
+  name="$(basename "$committed")"
+
+  if [[ ! -e "$installed" ]]; then
+    missing=$((missing + 1))
+    printf 'missing    %s\n' "$name"
+    printf '             expected:  %s\n' "$installed"
+    return
+  fi
+
+  if [[ ! -r "$installed" ]]; then
+    # Not one of the three states asked for, but the honest answer when the
+    # comparison could not be made. Counted as a failure: reporting it as
+    # matched would be a false green, and as missing would be a false fact.
+    unreadable=$((unreadable + 1))
+    printf 'unreadable %s\n' "$name"
+    printf '             installed: %s (present, not readable by this user)\n' "$installed"
+    return
+  fi
+
+  if cmp -s "$committed" "$installed"; then
+    matched=$((matched + 1))
+    printf 'matched    %s\n' "$name"
+    return
+  fi
+
+  local lines
+  lines="$(diff "$committed" "$installed" | grep -c '^[<>]' || true)"
+  differing=$((differing + 1))
+  printf 'differing  %s (%s differing lines)\n' "$name" "$lines"
+  printf '             committed: %s\n' "$committed"
+  printf '             installed: %s\n' "$installed"
+}
+
+check_directory() {
+  local source_dir="$1"
+  local installed_dir="$2"
+  local pattern="$3"
+  local committed
+
+  for committed in "$source_dir"/$pattern; do
+    # An unmatched glob comes back as the pattern itself.
+    [[ -f "$committed" ]] || continue
+    compare_artefact "$committed" "$installed_dir/$(basename "$committed")"
+  done
+}
+
+describe_checkout
+check_directory "$ROOT_DIR/ops/systemd" "$SYSTEMD_INSTALLED_DIR" '*.service'
+check_directory "$ROOT_DIR/ops/nginx" "$NGINX_INSTALLED_DIR" '*.conf'
+
+total=$((matched + differing + missing + unreadable))
+printf '\n%s artefacts: %s matched, %s differing, %s missing, %s unreadable\n' \
+  "$total" "$matched" "$differing" "$missing" "$unreadable"
+
+if [[ "$total" -eq 0 ]]; then
+  # Nothing compared is not a pass. An empty ops/ means the check is pointed at
+  # the wrong place, and reporting success would be the worst of the outcomes.
+  printf 'no artefacts found under %s -- nothing was checked\n' "$ROOT_DIR/ops"
+  exit 1
+fi
+
+if [[ $((differing + missing + unreadable)) -gt 0 ]]; then
+  printf 'drift: what is installed does not match what is committed\n'
+  exit 1
+fi
+
+printf 'no drift\n'
