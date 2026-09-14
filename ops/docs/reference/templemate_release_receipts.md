@@ -4,7 +4,7 @@
 | --- | --- | --- | --- | --- |
 | 1.0.0 | 1 | 1 | uploaded, distributed, installed by staff | see the update table below |
 | 1.0.0 | 2 | 1 | **uploaded to App Store Connect 2026-08-20** | none recorded |
-| 1.0.0 | 3 | 1 | bumped `e234da4`, not yet built | — |
+| 1.0.0 | 3 | 1 | built, submitted, live on TestFlight, verified on device 2026-09-14 | none recorded |
 
 Build 1 was uploaded to TestFlight, installed by Director's staff, and reported
 green (Director, 2026-08-31). `versioning.js` was bumped to iOS build 2
@@ -23,6 +23,48 @@ and nothing in `versioning.js` shows that.
 Apple-side state is not visible from this repository. Any claim about
 submission, review, or acceptance status must come from the Director or App
 Store Connect, never from inference off `versioning.js`.
+
+## iOS build 3 — 2026-09-14
+
+| | |
+| --- | --- |
+| EAS build | `33fdf735-694b-4266-bf71-a98e71bed31f` |
+| Profile / channel | `testflight` / `testflight`, distribution store |
+| Version / runtime | 1.0.0 / 1.0.0, SDK 54.0.0 |
+| Source commit | `8046461`, `mobile/` byte-identical to it |
+| Built | 2026-09-14, 20:37–20:42, `npm run build:testflight` |
+| Submitted | by the Director; TestFlight notified 20:49 |
+| Verified | Director, on iPhone: Google sign-in, temple connected, account loaded |
+
+Credentials were not requested and none were entered. The distribution
+certificate and provisioning profile are stored on EAS from earlier runs and are
+valid to 2027-06-09, so a build signs without contacting Apple. Submission is a
+different Apple API and was the Director's.
+
+**The build was correct and the server was not.** The first TestFlight report was
+that Google sign-in was broken. The IPA was never at fault. Production ran
+`release/current`, 78 commits behind `main`, predating the temple-less sign-in
+work entirely — `TEMPLE_OPTIONAL_ACTIONS` did not exist in that tree, so a fresh
+install with no temple was refused before the provider was even read. Observed
+against both live servers with the same request:
+
+    POST /api/v1/account/native/oauth/start  {"oauth":{"provider":"google",…}}
+      production (release/current)  →  422  {"error":"tenant_required"}
+      staging    (main)             →  201  with a real Google authorization URL
+
+Email, Apple and Facebook would have failed identically. The website was
+unaffected: it signs in through a different path.
+
+Fixed by cherry-picking the `rails/` half of `28437c3`, `f049fc4` and `5346d6b`
+onto `release/current` — ten files, no Gemfile change, no migration. The mobile
+halves were excluded deliberately: the app is built from `main` and already
+carried them. After deploying, production returned 201 on both the local port and
+the public origin, and the Director confirmed sign-in on the device.
+
+**The lesson is about distance, not about this bug.** No suite could have caught
+it: the tests pass on `main`, and `main` is not what production runs. Nothing
+measures the gap between the branch that is tested and the branch that is
+deployed, and a defect fixed on 2026-09-11 was still live on 2026-09-14.
 
 ## Published OTA updates
 
