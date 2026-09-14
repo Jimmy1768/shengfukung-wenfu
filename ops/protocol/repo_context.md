@@ -94,7 +94,7 @@ interrupted whichever Control owned the affected surface.
 
 This is an operating convention for this repository, not a work-mode rule.
 
-## The Test Database Provisions Itself, And The Suite Never Drops It
+## The Test Database Is Disposable, And The Suite Provisions It
 
 `rails/test/test_helper.rb` creates the test database when it is missing, loads
 `db/schema.rb`, and says so on one line. An absent test database costs a
@@ -114,8 +114,8 @@ Four properties, each held by a test in
   else. Bad credentials or a dead server surface as themselves instead of being
   answered by creating things.
 - **Loud once.** One line when it creates, silence when the database is there.
-- **It never drops.** A scan asserts nothing under `rails/test/` reaches for a
-  drop. Removing a test database is the operator's act, not a suite's.
+- **It never drops, today.** A scan asserts nothing under `rails/test/` reaches
+  for a drop. That is a step in the sequence below, not the finished shape.
 
 **Prove provisioning against a throwaway name, never the shared database:**
 
@@ -126,14 +126,35 @@ absence with no blast radius on a database three sessions share. Verified this
 way on 2026-09-14. Drop the throwaway when you are done — that is the same rule
 as everything else here, and it applies to the person proving the feature too.
 
-**Known hazard: one test database, three checkouts.** Nothing in a local
-checkout sets `PGDATABASE_TEST`, so the primary tree and both Control worktrees
-derive `shengfukung_wenfu_test` identically. Two suites running at once collide,
-and the failure reads like a code defect rather than contention — it cost an
-hour on 2026-09-13, which is what made the provisioner necessary. Provisioning
-softens this (the loser reprovisions) but does not remove it. The fix is
-`PGDATABASE_TEST` per checkout in an instance file, and it belongs to the
-environment-partition work rather than here.
+**The rule, and it is this repository's, not the workspace's.** A suite that
+creates a test database removes it in the same run. Creating and removing are
+one obligation, not two intentions — "delete it when you are done" is advice to
+a person, and no person is present at the moment a suite provisions a database.
+
+It lives here rather than in `work_mode_config.md` because the mechanism that
+makes it safe lives here. It was in the workspace file for part of 2026-09-14
+and the Director took it out: it reached repositories outside the server and
+database work, and the condition below was written as a sentence rather than as
+something that could refuse anyone. We build and test it here first. It
+propagates to no other repository until it is proven here.
+
+**Half of it is built. The removal half is blocked, on purpose.** The create
+half is live. The removal half cannot be switched on while nothing in a local
+checkout sets `PGDATABASE_TEST`: the primary tree and both Control worktrees
+derive `shengfukung_wenfu_test` identically, so a teardown drop would land on
+whichever checkout is mid-suite. Two suites running at once already collide
+today, and the failure reads like a code defect rather than contention — it
+cost an hour on 2026-09-13, which is what made the provisioner necessary.
+
+So the order is fixed and is not a preference:
+
+1. `PGDATABASE_TEST` per checkout, so the name cannot be shared by accident.
+2. Then the removal half, and only then.
+
+The "nothing under `rails/test/` drops a database" test is what enforces step 2
+not happening early. When the removal half is built, that test is what has to
+change, deliberately and with this paragraph read first. Anyone who finds it in
+their way has found the guard working, not a stale assertion.
 
 ## Mobile/Expo Reference Pattern
 
