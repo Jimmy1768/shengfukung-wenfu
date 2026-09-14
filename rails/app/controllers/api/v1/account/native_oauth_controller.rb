@@ -71,7 +71,7 @@ module Api
         private
 
         def flow
-          @flow ||= Auth::NativeOAuthFlow.new(temple: current_native_temple)
+          @flow ||= Auth::NativeOAuthFlow.new
         end
 
         def start_params

@@ -13,8 +13,7 @@ module Auth
     class InvalidGrant < Error; end
     class ResolutionUnavailable < Error; end
 
-    def initialize(temple:, central_client: Auth::CentralOAuthClient.new, transaction: Auth::NativeOAuthTransaction.new)
-      @temple = temple
+    def initialize(central_client: Auth::CentralOAuthClient.new, transaction: Auth::NativeOAuthTransaction.new)
       @central_client = central_client
       @transaction = transaction
     end
@@ -23,7 +22,6 @@ module Auth
       @transaction.validate_start!(provider:, pkce_challenge:, pkce_method:)
       return_url = configured_return_url!
       transaction_token = @transaction.issue!(
-        temple_slug: @temple.slug,
         provider:,
         return_url:,
         pkce_challenge:,
@@ -61,7 +59,6 @@ module Auth
       return_url = configured_return_url!
       transaction = @transaction.verify!(
         token: transaction_token,
-        temple_slug: @temple.slug,
         return_url:,
         pkce_verifier:
       )
@@ -117,8 +114,17 @@ module Auth
       return_url
     end
 
+    # The central auth tenant, which is a deployment identity and not a temple.
+    # This used to fall back to the temple's slug, which is what made signing in
+    # depend on having one loaded -- and raised NoMethodError through a rescue
+    # list that did not cover it once a patron could have none. There is no
+    # fallback now: if it is unset, OAuth is misconfigured and says so, the same
+    # way a missing return URL does.
     def central_tenant_slug
-      ENV["AUTH_TENANT_SLUG"].to_s.strip.presence || @temple.slug
+      slug = ENV["AUTH_TENANT_SLUG"].to_s.strip.presence
+      raise ConfigurationError, "native OAuth is not configured" if slug.blank?
+
+      slug
     end
 
     def authorization_url_from(response)

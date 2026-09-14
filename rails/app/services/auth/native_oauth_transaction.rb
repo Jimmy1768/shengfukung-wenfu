@@ -21,26 +21,29 @@ module Auth
     class UnsupportedProvider < Error; end
     class InvalidPkce < Error; end
 
-    def self.issue!(temple_slug:, provider:, return_url:, pkce_challenge:, pkce_method:)
-      new.issue!(temple_slug:, provider:, return_url:, pkce_challenge:, pkce_method:)
+    def self.issue!(provider:, return_url:, pkce_challenge:, pkce_method:)
+      new.issue!(provider:, return_url:, pkce_challenge:, pkce_method:)
     end
 
-    def self.verify!(token:, temple_slug:, return_url:, provider: nil, pkce_verifier: nil)
-      new.verify!(token:, temple_slug:, return_url:, provider:, pkce_verifier:)
+    def self.verify!(token:, return_url:, provider: nil, pkce_verifier: nil)
+      new.verify!(token:, return_url:, provider:, pkce_verifier:)
     end
 
     def self.validate_start!(provider:, pkce_challenge:, pkce_method:)
       new.validate_start!(provider:, pkce_challenge:, pkce_method:)
     end
 
-    def issue!(temple_slug:, provider:, return_url:, pkce_challenge:, pkce_method:)
-      validate_issue_inputs!(temple_slug:, provider:, return_url:, pkce_challenge:, pkce_method:)
+    # No temple. Signing in is not temple-scoped: a patron may have none
+    # loaded, and nothing about the exchange varies by temple -- the central
+    # credentials are per-deployment ENV values. The transaction binds a
+    # provider, a return URL and a PKCE challenge, which is what it protects.
+    def issue!(provider:, return_url:, pkce_challenge:, pkce_method:)
+      validate_issue_inputs!(return_url:, provider:, pkce_challenge:, pkce_method:)
 
       expires_at = Time.current + TTL
       encryptor.encrypt_and_sign(
         {
           "version" => VERSION,
-          "temple_slug" => temple_slug,
           "provider" => provider,
           "return_url" => return_url,
           "pkce_challenge" => pkce_challenge,
@@ -58,10 +61,9 @@ module Auth
       raise InvalidPkce, "invalid PKCE challenge" unless valid_challenge?(pkce_challenge)
     end
 
-    def verify!(token:, temple_slug:, return_url:, provider: nil, pkce_verifier: nil)
+    def verify!(token:, return_url:, provider: nil, pkce_verifier: nil)
       payload = decrypt!(token)
       validate_payload!(payload)
-      match!(payload.fetch("temple_slug"), temple_slug, "temple")
       match!(payload.fetch("return_url"), return_url, "return URL")
       match!(payload.fetch("provider"), provider, "provider") if provider.present?
 
@@ -95,14 +97,17 @@ module Auth
       raise InvalidTransaction, "invalid native OAuth transaction"
     end
 
-    def validate_issue_inputs!(temple_slug:, provider:, return_url:, pkce_challenge:, pkce_method:)
-      raise InvalidTransaction, "missing temple" if temple_slug.to_s.blank?
+    def validate_issue_inputs!(return_url:, provider:, pkce_challenge:, pkce_method:)
       raise InvalidTransaction, "missing return URL" if return_url.to_s.blank?
       validate_start!(provider:, pkce_challenge:, pkce_method:)
     end
 
     def validate_payload!(payload)
-      required = %w[version temple_slug provider return_url pkce_challenge pkce_method nonce expires_at]
+      # VERSION stays at 1 deliberately. The only change is a field removed, so
+      # a token issued before this deploy still satisfies every requirement
+      # below; bumping would reject in-flight sign-ins for five minutes and buy
+      # nothing, since the check that field fed is the one being removed.
+      required = %w[version provider return_url pkce_challenge pkce_method nonce expires_at]
       raise InvalidTransaction, "invalid native OAuth transaction" unless (required - payload.keys).empty?
       raise InvalidTransaction, "unsupported transaction version" unless payload["version"] == VERSION
       raise InvalidTransaction, "unsupported provider" unless PROVIDERS.include?(payload["provider"])
