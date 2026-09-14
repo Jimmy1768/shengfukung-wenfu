@@ -163,15 +163,27 @@ app be the mobile experience.
 So bucket 2 cannot be built until both apps ship. It is a decision about where
 to spend effort next, not an option that can be taken this week.
 
-**And it has a loop that must be solved first.** The connect page exists so a
-patron can load a temple into the app — the app is built with no temple and gets
-one by scanning. If the mobile web shows only "download the app", then a
-phone-only patron goes: install the app → the app shows a scanner → the scanner
-needs a QR code → the QR code is on the website → the website says install the
-app. There is no second screen to break the cycle.
+**Correction, Director 2026-09-14.** An earlier revision of this section claimed
+bucket 2 contained a circular dependency: that a phone-only patron would be told
+to install the app, and then need a QR code from the website to bind a temple,
+and be sent back to install the app. That reasoning was wrong and is recorded
+here because the mistake is instructive.
 
-The exit is a `templemate://` deep link carrying the slug, so the temple binds
-without a scan. That is a prerequisite of bucket 2, not a detail of it.
+It assumed the connect page is where app acquisition happens. It is not. *"The
+scanner is for temple qr code — to link the temple."* The store link is shown far
+earlier in the journey, so by the time anyone reaches a connect page they already
+have the app, and nothing about temple linking needs the website to surface a
+download. The Director's framing: **there is no mobile webpage, and all users
+will have the app already.**
+
+So bucket 2 is not "detect a device and offer a download on this page". It is
+that the mobile experience *is* the app, and the web surface does not attempt a
+phone rendering at all.
+
+What survives from the paragraph above is only the distribution fact, and it
+applies wherever the store link is shown rather than to this page: there is no
+iOS App Store listing and no Android release lane, so today there is nothing to
+link to.
 
 ## Decisions before any of this becomes a plan
 
