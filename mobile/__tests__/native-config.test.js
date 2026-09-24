@@ -48,7 +48,7 @@ test('development config uses TempleMate identity and preserves local version au
   assert.equal(config.owner, 'jimmy1768');
   assert.equal(config.extra.eas.projectId, 'c7b8523a-2fad-4123-bc96-0c0c85a23dec');
   assert.equal(config.version, '1.0.0');
-  assert.equal(versioning.iosBuildNumber, '3');
+  assert.equal(versioning.iosBuildNumber, '4');
   assert.equal(versioning.androidVersionCode, 1);
   assert.equal(config.android.compileSdkVersion, 36);
   assert.equal(config.android.targetSdkVersion, 36);
