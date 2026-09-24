@@ -5,8 +5,8 @@
 Draft. The Director started this work and set the target version; the steps
 below are not implementation authority on their own.
 
-- **Target version: 1.0.1.** Node 24 applies to runtime 1.0.1 and later only.
-  Director, 2026-09-24.
+- **Version stays 1.0.0. Next iOS build is 4, on the `production` profile.**
+  Director, 2026-09-24. Not `testflight` — that lane has served its purpose.
 - **Target Node: 24.21.0** — the machine's current default and the version
   DojoMate-Expo migrated to.
 - Scope: `mobile/` only. Nothing in `rails/`, `vue/` or `ops/` changes.
@@ -47,17 +47,38 @@ anything saying so.
 markers — no "Now using node" line, so nothing was pinned and the image default
 was used. Build 3 is live on TestFlight.
 
-## The constraint that shapes this plan
+## The runtime question, and why the channel settles it
 
-`app.config.js` sets `runtimeVersion: versioning.appVersion`. Runtime version is
-therefore the app version, and **1.0.0 is already spent** on a Node 20 build that
-is live.
+`app.config.js` sets `runtimeVersion: versioning.appVersion`, so runtime is the
+app version and **1.0.0 already carries three finished iOS builds** — 1, 2 and 3
+— all built on Node 20, plus ten OTA updates on the `testflight` channel.
 
-If Node 24 were applied at 1.0.0, a Node 24 build and the live Node 20 build
-would share OTA runtime `1.0.0`, and one OTA update would reach both
-populations. Bumping to 1.0.1 puts Node 24 in its own runtime, so no OTA ever
-spans two Node majors. That is why the version bump is a precondition and not
-housekeeping.
+The concern was that a Node 24 build joining runtime 1.0.0 would share OTA
+traffic with Node 20 builds, in both directions: a Node 24 bundle reaching the
+staff member on build 2, and — the likelier one — a fresh build 4 pulling the
+newest existing Node 20 bundle on first launch.
+
+**The `production` profile removes it.** Observed 2026-09-24:
+`eas channel:view production` returns "Could not find channel", so the channel
+does not exist and has never received an update. Build 4 therefore starts with
+no OTA history and cannot pull a Node 20 bundle, and the `testflight` population
+cannot receive anything published to `production`. Runtime is shared; the
+channel is not, and the channel is what routes updates.
+
+So no version bump is needed. The two Node majors are separated by channel
+rather than by version, which costs nothing and spends no version number.
+
+What remains, and it is a discipline rather than a defect: **do not publish the
+same OTA to both channels** while the two Node majors coexist. That is the only
+path by which they could still mix.
+
+Two consequences worth stating:
+
+- This is also **the first `production`-profile build this project has made**.
+  It proves the production lane as well as Node 24.
+- `production` is `distribution: store`. Building is not submitting, and an
+  App Store submission is a separate decision — it would also produce the
+  public listing that the mobile-web fork's bucket 2 currently lacks.
 
 ## Non-goals
 
@@ -70,9 +91,9 @@ housekeeping.
 
 ## Steps
 
-**1. Bump the version. [DIRECTOR]**
-`mobile/versioning.js` → `appVersion: '1.0.1'`. Version and build numbers are
-the Director's. See the open decision on the build number below.
+**1. Bump the build number. [DIRECTOR]**
+`mobile/versioning.js` → `iosBuildNumber: '4'`. `appVersion` stays `1.0.0`.
+Build 3 is spent: it is finished, submitted, and live on TestFlight.
 
 **2. Baseline the suite on Node 20, then on Node 24.**
 Per shell, never a machine-wide relink — operator-kit requires Node >= 24:
@@ -96,10 +117,10 @@ edit, and any guardrail that asserts profile shape may need the new field
 allowed.
 
 **4. Prove it on EAS. [DIRECTOR]**
-One `testflight` build from the branch. Confirm `Now using node v24.21.0` in
-`INSTALL_CUSTOM_TOOLS` — the line whose absence identified build 3 as unpinned.
-A `testflight` build exercises the production JS bundle, which the Android
-development APK DojoMate used did not.
+One `production` build from the branch — `npm run build:production`. Confirm
+`Now using node v24.21.0` in `INSTALL_CUSTOM_TOOLS`, the line whose absence
+identified build 3 as unpinned. A store build exercises the production JS
+bundle, which the Android development APK DojoMate used did not.
 
 **5. Device smoke test.** Metro on Node 24 plus the Pixel or the iPhone.
 Verification on hardware is the Director's, per the standing rule.
@@ -107,15 +128,18 @@ Verification on hardware is the Director's, per the standing rule.
 **6. Merge, push, and log the outcome here** with the build id and the Node line
 from its log.
 
-## Open decision
+## Decided
 
-**The build number for 1.0.1.** Apple requires a build number unique within a
-version, so 1.0.1 may restart at 1. DojoMate restarts per version — its record
-reads "2.0.4 build 1" after "2.0.3 build 2". Continuing at 4 also works and
-keeps a single ascending series. Either is safe; it is the Director's call, and
-it is not decided here.
+- Version stays **1.0.0**; next iOS build is **4**. Google has never received an
+  upload, so no Android version code is consumed, and the iOS version does not
+  need to move because the channel separates the Node majors.
+- Validation build uses the **`production`** profile.
 
 ## Progress log
 
 - **2026-09-24** — Plan written. Baseline captured. Build 3 confirmed as Node
   20.19.4 from its EAS log. Nothing changed in `mobile/`.
+- **2026-09-24** — Director set the target: stay on 1.0.0, iOS build 4,
+  `production` profile. An earlier revision of this plan proposed 1.0.1 to keep
+  the Node majors apart; the `production` channel does the same job for nothing,
+  and the version bump was dropped.
