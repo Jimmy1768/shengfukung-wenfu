@@ -34,13 +34,13 @@ deployment:
     web: taiwan-01-web
     worker: null                    # null if web and worker share one droplet
   hostname_note: "web droplet's shell hostname is taiwan-01-web, same as its DigitalOcean name"
-  nginx_conf: ops/nginx/shengfukung-wenfu.conf   # repo-relative path; null if not nginx-served
+  nginx_conf: ops/nginx/shengfukung-demo.conf   # repo-relative path; null if not nginx-served
   systemd_dir: ops/systemd          # repo-relative path; null if no units
   units:
-    puma: shengfukung-wenfu-puma
-    puma_staging: shengfukung-wenfu-staging-puma       # null if staging is not standing infrastructure; DISABLED 2026-09-05, units still installed
-    sidekiq: shengfukung-wenfu-sidekiq                 # null if this repo runs no background worker
-    sidekiq_staging: shengfukung-wenfu-staging-sidekiq  # DISABLED 2026-09-05, units still installed
+    puma: shengfukung-demo-puma
+    puma_staging: shengfukung-demo-staging-puma       # null if staging is not standing infrastructure; DISABLED 2026-09-05, units still installed
+    sidekiq: shengfukung-demo-sidekiq                 # null if this repo runs no background worker
+    sidekiq_staging: shengfukung-demo-staging-sidekiq  # DISABLED 2026-09-05, units still installed
 
 databases:
   development: templemate_dev                    # derived from databaseName in shared/app_constants/project.json, not from the repo slug
@@ -51,7 +51,7 @@ databases:
 
 checkouts:
   primary: /Users/jimmy1768/Projects/shengfukung-wenfu   # absolute path of the main working tree
-  secondary: /home/jimmy1768_user/Projects/shengfukung-wenfu-staging   # droplet-side staging checkout; set where a repo has a second dedicated checkout
+  secondary: /home/jimmy1768_user/Projects/shengfukung-demo-staging   # droplet-side staging checkout; set where a repo has a second dedicated checkout
 
 co_tenancy:
   codex_present: false              # true if Codex also works in this repository

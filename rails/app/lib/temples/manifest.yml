@@ -5,4 +5,4 @@ temples:
       - "shengfukung.com.tw"
     public_url: "https://shengfukung.com.tw"
     deploy:
-      vue_dir: "/var/www/shengfukung-wenfu"
+      vue_dir: "/var/www/shengfukung-demo"

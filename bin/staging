@@ -29,7 +29,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RAILS_DIR="$ROOT_DIR/rails"
 
-SHARED_ENV_FILE="${WENFU_SHARED_ENV_FILE:-/etc/default/shengfukung-wenfu-env}"
+SHARED_ENV_FILE="${WENFU_SHARED_ENV_FILE:-/etc/default/shengfukung-demo-env}"
 INSTANCE_ENV_FILE="${WENFU_INSTANCE_ENV_FILE:-$ROOT_DIR/instance.env}"
 
 # Must match DeploymentIdentity::OVERRIDE_VARIABLE. The guard honours this name

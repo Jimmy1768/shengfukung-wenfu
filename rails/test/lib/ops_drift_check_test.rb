@@ -61,7 +61,7 @@ class OpsDriftCheckTest < ActiveSupport::TestCase
     source = File.read(SCRIPT)
 
     assert_match(/OUT OF SCOPE/, source)
-    assert_match(%r{/etc/default/shengfukung-wenfu-env}, source,
+    assert_match(%r{/etc/default/shengfukung-demo-env}, source,
       "the exclusion has to name the file, or the next person adds it back")
   end
 
@@ -80,7 +80,7 @@ class OpsDriftCheckTest < ActiveSupport::TestCase
       stdout, _stderr, status = run_check(dirs)
 
       assert_predicate status, :success?, "everything matched, so the check must succeed"
-      assert_match(/^matched\s+shengfukung-wenfu-puma\.service/, stdout)
+      assert_match(/^matched\s+shengfukung-demo-puma\.service/, stdout)
       assert_match(/0 differing, 0 missing/, stdout)
       assert_match(/no drift/, stdout)
     end
@@ -88,23 +88,23 @@ class OpsDriftCheckTest < ActiveSupport::TestCase
 
   # One artefact drifting is enough to fail the whole run, however many matched.
   test "one differing artefact among many matched still fails the run" do
-    with_everything_installed(drift: "shengfukung-wenfu-staging-puma.service") do |dirs|
+    with_everything_installed(drift: "shengfukung-demo-staging-puma.service") do |dirs|
       stdout, _stderr, status = run_check(dirs)
 
       assert_not status.success?,
         "a run where one artefact drifted reported success; the exit code is the only " \
         "part of this a deploy script can gate on"
-      assert_match(/^differing\s+shengfukung-wenfu-staging-puma/, stdout)
+      assert_match(/^differing\s+shengfukung-demo-staging-puma/, stdout)
       assert_match(/1 differing/, stdout)
     end
   end
 
   test "a differing copy is reported differing, with a count and both paths" do
-    with_fixture(differing: %w[shengfukung-wenfu-staging-puma.service]) do |dirs|
+    with_fixture(differing: %w[shengfukung-demo-staging-puma.service]) do |dirs|
       stdout, _stderr, status = run_check(dirs)
 
       assert_not status.success?, "a difference reported as success is a report nobody can gate on"
-      assert_match(/^differing\s+shengfukung-wenfu-staging-puma\.service \(\d+ differing lines\)/, stdout)
+      assert_match(/^differing\s+shengfukung-demo-staging-puma\.service \(\d+ differing lines\)/, stdout)
       assert_match(/committed: .*ops\/systemd/, stdout, "criterion 4 needs the path of each side")
       assert_match(/installed: /, stdout)
     end
@@ -114,16 +114,16 @@ class OpsDriftCheckTest < ActiveSupport::TestCase
   # different fact from one that was deployed and has since drifted, and it
   # points at a different fix.
   test "an absent copy is reported missing, not as a difference" do
-    with_fixture(missing: %w[shengfukung-wenfu-sidekiq.service]) do |dirs|
+    with_fixture(missing: %w[shengfukung-demo-sidekiq.service]) do |dirs|
       stdout, _stderr, status = run_check(dirs)
 
       assert_not status.success?
-      assert_match(/^missing\s+shengfukung-wenfu-sidekiq\.service/, stdout,
+      assert_match(/^missing\s+shengfukung-demo-sidekiq\.service/, stdout,
         "an artefact with no installed copy was not reported missing. If it was reported " \
         "differing instead, the missing case has collapsed into the differing case: a file " \
         "that was never installed now reads as one that was installed and then changed, " \
         "and those point at different fixes.")
-      assert_no_match(/^differing\s+shengfukung-wenfu-sidekiq\.service/, stdout,
+      assert_no_match(/^differing\s+shengfukung-demo-sidekiq\.service/, stdout,
         "missing collapsed into differing: a file that was never installed would be " \
         "read as one that was installed and then changed")
     end
@@ -131,16 +131,16 @@ class OpsDriftCheckTest < ActiveSupport::TestCase
 
   test "the three states are distinguished in one run" do
     with_fixture(
-      matched: %w[shengfukung-wenfu-puma.service],
-      differing: %w[shengfukung-wenfu-staging-puma.service],
-      missing: %w[shengfukung-wenfu-sidekiq.service]
+      matched: %w[shengfukung-demo-puma.service],
+      differing: %w[shengfukung-demo-staging-puma.service],
+      missing: %w[shengfukung-demo-sidekiq.service]
     ) do |dirs|
       stdout, _stderr, status = run_check(dirs)
 
       assert_not status.success?
-      assert_match(/^matched\s+shengfukung-wenfu-puma/, stdout)
-      assert_match(/^differing\s+shengfukung-wenfu-staging-puma/, stdout)
-      assert_match(/^missing\s+shengfukung-wenfu-sidekiq/, stdout)
+      assert_match(/^matched\s+shengfukung-demo-puma/, stdout)
+      assert_match(/^differing\s+shengfukung-demo-staging-puma/, stdout)
+      assert_match(/^missing\s+shengfukung-demo-sidekiq/, stdout)
       assert_match(/1 matched, 1 differing, \d+ missing/, stdout)
     end
   end
@@ -150,7 +150,7 @@ class OpsDriftCheckTest < ActiveSupport::TestCase
   # Both checkouts on the host hold the same ops/ at different commits, so a
   # report that does not say where it ran cannot be acted on.
   test "it says which checkout it is standing in" do
-    with_fixture(matched: %w[shengfukung-wenfu-puma.service]) do |dirs|
+    with_fixture(matched: %w[shengfukung-demo-puma.service]) do |dirs|
       stdout, _stderr, _status = run_check(dirs)
 
       assert_match(REPO_ROOT.to_s, stdout, "the report must name the checkout it ran from")
