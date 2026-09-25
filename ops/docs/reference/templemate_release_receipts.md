@@ -3,15 +3,115 @@
 | App version | iOS build | Android code | iOS build state | Published OTA update |
 | --- | --- | --- | --- | --- |
 | 1.0.0 | 1 | 1 | uploaded, distributed, installed by staff | see the update table below |
-| 1.0.0 | 2 | 1 | prepared in `versioning.js`, not confirmed uploaded | none recorded |
+| 1.0.0 | 2 | 1 | **uploaded to App Store Connect 2026-08-20** | none recorded |
+| 1.0.0 | 3 | 1 | built, submitted, live on TestFlight, verified on device 2026-09-14 | none recorded |
+| 1.0.0 | 4 | 1 | built on Node 24.21.0, submitted, live on TestFlight, verified on device 2026-09-25 | none recorded |
 
 Build 1 was uploaded to TestFlight, installed by Director's staff, and reported
-green (Director, 2026-08-31). `versioning.js` was subsequently bumped to
-iOS build 2 (`5e1e3cd`); whether that build was uploaded is not confirmed here.
+green (Director, 2026-08-31). `versioning.js` was bumped to iOS build 2
+(`5e1e3cd`) and **that build was uploaded**: EAS submission
+`ed2303e3-0b3e-4c6a-a545-7717f9b9f264`, status finished, 2026-08-20 18:03, from
+build `2a7dee90` at commit `5e1e3cde`. Build 2 is therefore spent -- App Store
+Connect refuses a repeat -- and the next IPA is build 3.
+
+This row read "not confirmed uploaded" until 2026-09-13 and the omission cost a
+build. Planning read it, concluded build 2 was still free, and produced an IPA
+(`eedadebd`) that can never be submitted. The confirmation was one
+`eas submit:list` away the whole time. **Record the submission here when one
+happens, not the intention to submit** -- a build number is spent by the upload,
+and nothing in `versioning.js` shows that.
 
 Apple-side state is not visible from this repository. Any claim about
 submission, review, or acceptance status must come from the Director or App
 Store Connect, never from inference off `versioning.js`.
+
+## iOS build 4 — 2026-09-25
+
+| | |
+| --- | --- |
+| EAS build | `e2044b6d-c7f8-4a75-ad10-06e519cb2f29` |
+| EAS submission | `0ef6a6d7-db82-4dfc-9386-cfcee69de116`, status finished |
+| Profile / channel | `production` / `production`, distribution store — the first production-profile build this project has made |
+| Version / runtime | 1.0.0 / 1.0.0 |
+| Node | **24.21.0**, pinned — the first build that is |
+| Source commit | `97a0bf4` on branch `node-24-migration`, not yet merged to `main` |
+| Built | 2026-09-24, started 21:07 |
+| Submitted | 2026-09-25, by Planning with the Director's go, via `eas submit` |
+| Verified | Director, 2026-09-25: installed from TestFlight, works |
+
+**Built on Node 24, and the log proves it rather than the config.** Its
+`INSTALL_CUSTOM_TOOLS` phase reads `Installing node v24.21.0 … Checksums
+matched! … Now using node v24.21.0 (npm v11.19.0)`. Build 3's same phase held
+only start and end markers, so it took the VM image default — which is still
+`Node.js 20.19.4` on the image build 4 ran on. That absent line is how build 3
+was identified as unpinned, and its presence here is the proof the migration
+reached EAS.
+
+**Why 1.0.0 and not 1.0.1.** Runtime version is the app version, and runtime
+1.0.0 already carries three Node 20 builds and ten OTA updates on the
+`testflight` channel. The Director kept 1.0.0 and moved the build to the
+`production` channel instead, which had never existed — `eas channel:view
+production` returned "Could not find channel". So build 4 starts with no OTA
+history and cannot pull a Node 20 bundle, and the `testflight` population
+cannot receive anything published to `production`. The channel does what a
+version bump would have done. The one rule it leaves: **do not publish the same
+OTA to both channels** while the two Node majors coexist.
+
+**No Apple login was needed for either step.** Signing used the distribution
+certificate and provisioning profile stored on EAS. Submission used an App Store
+Connect API key also stored on EAS — Key ID `FUKYXV8BN7`, source "EAS servers".
+`mobile/eas.json` carries only the app id and no key path, so the key is not
+visible from the repository; an earlier note assumed a submit would therefore
+ask for the Director's Apple ID. It did not.
+
+**Reading EAS logs: the file order is not stable.** `eas build:view --json`
+returns two `logFiles`, and which one is the build log varies by build. For
+build 3 it was index 1; for build 4 it was index 0, with the Xcode log at
+index 1. Fetching the wrong one returns a valid log with no Node lines in it,
+which reads as "unpinned" when it is only "wrong file". Pick by filename, not by
+position.
+
+## iOS build 3 — 2026-09-14
+
+| | |
+| --- | --- |
+| EAS build | `33fdf735-694b-4266-bf71-a98e71bed31f` |
+| Profile / channel | `testflight` / `testflight`, distribution store |
+| Version / runtime | 1.0.0 / 1.0.0, SDK 54.0.0 |
+| Source commit | `8046461`, `mobile/` byte-identical to it |
+| Built | 2026-09-14, 20:37–20:42, `npm run build:testflight` |
+| Submitted | by the Director; TestFlight notified 20:49 |
+| Verified | Director, on iPhone: Google sign-in, temple connected, account loaded |
+
+Credentials were not requested and none were entered. The distribution
+certificate and provisioning profile are stored on EAS from earlier runs and are
+valid to 2027-06-09, so a build signs without contacting Apple. Submission is a
+different Apple API and was the Director's.
+
+**The build was correct and the server was not.** The first TestFlight report was
+that Google sign-in was broken. The IPA was never at fault. Production ran
+`release/current`, 78 commits behind `main`, predating the temple-less sign-in
+work entirely — `TEMPLE_OPTIONAL_ACTIONS` did not exist in that tree, so a fresh
+install with no temple was refused before the provider was even read. Observed
+against both live servers with the same request:
+
+    POST /api/v1/account/native/oauth/start  {"oauth":{"provider":"google",…}}
+      production (release/current)  →  422  {"error":"tenant_required"}
+      staging    (main)             →  201  with a real Google authorization URL
+
+Email, Apple and Facebook would have failed identically. The website was
+unaffected: it signs in through a different path.
+
+Fixed by cherry-picking the `rails/` half of `28437c3`, `f049fc4` and `5346d6b`
+onto `release/current` — ten files, no Gemfile change, no migration. The mobile
+halves were excluded deliberately: the app is built from `main` and already
+carried them. After deploying, production returned 201 on both the local port and
+the public origin, and the Director confirmed sign-in on the device.
+
+**The lesson is about distance, not about this bug.** No suite could have caught
+it: the tests pass on `main`, and `main` is not what production runs. Nothing
+measures the gap between the branch that is tested and the branch that is
+deployed, and a defect fixed on 2026-09-11 was still live on 2026-09-14.
 
 ## Published OTA updates
 

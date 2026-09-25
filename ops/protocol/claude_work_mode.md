@@ -129,11 +129,13 @@ A sent message is not edited; a correction is a new message.
 **5.2 Assignment.** Plan reference and its immutable criteria with their pin;
 base branch, commit and tree; owned and forbidden paths, exact and exhaustive;
 required checks as exact commands with expected exit codes; forbidden actions
-for this assignment; and the implementer instruction — model, effort, whether
-implementers run in parallel, and whether each gets its own worktree.
+for this assignment; and the implementer instruction — whether implementers run
+in parallel, and whether each gets its own worktree. Not the model or the
+effort: those are the Control's, per 10.10.
 
 **5.3 Terminal.** State; base and result branch, commit and tree; changed
-paths; for each required check the exact command and its exit code; every
+paths; the model and effort each implementer actually ran on, or `none`;
+for each required check the exact command and its exit code; every
 assertion tagged Observed or Inference; what Control corrected and what it
 refused to decide; blockers and what was not done.
 
@@ -286,10 +288,19 @@ paths and project settings together. It takes no session id, so nothing can
 move a session from outside.
 
 **10.10** *Policy, not harness behaviour — the Director's, and a lane may
-reason against it where the work argues otherwise.* Ephemeral implementers
-default to Sonnet, and escalation is for a specific failing task rather than
-pre-emptive. A Control answering "implementer: none" because the work is
-reading and grepping is exercising that judgement, not breaching a rule.
+reason against it where the work argues otherwise.* Planning runs on Opus 5.5
+at maximum effort, Control on Opus 5 at extra. A Control chooses the model and
+effort for each ephemeral implementer it dispatches, including none at all: work
+that is reading and grepping needs no implementer, and answering "implementer:
+none" is exercising that judgement rather than breaching a rule. There is no
+standing default for implementers to fall back to. The choice is made per
+assignment, by the session that has read the code.
+
+Choosing down, or to none, is the Control's alone. Choosing up is asked for
+rather than taken: when a Control concludes an implementer needs a larger model,
+the usual cause is that the spec ran out, and the request is what surfaces that.
+It goes to its own Planning. A silent escalation resolves the gap instead of
+reporting it, which is the failure the assignment exists to prevent.
 
 **10.11** A `deny` beats a more general `allow` for the same command, and
 refuses outright rather than falling through to a prompt — so a denied action
@@ -297,3 +308,19 @@ never arrives as something a lane could approve. Observed 2026-09-11 in a lane
 allowing `Bash(git push:*)` and denying `Bash(git push -f:*)`: refused before
 the command reached git. The reverse ordering, a specific `allow` beneath a
 general `deny`, is a different comparison and has not been tested.
+
+**10.12** A Thread Refresh is not complete when the successor exists. It is
+complete when the successor's cwd is verified against the tree it was meant to
+run in. `change_directory` returns success whether or not it moved the session,
+so its own result is not that check — the successor reports its cwd, or the
+refresh is still open. Reported 2026-09-13 by Wenfu Control A about itself: its
+successor came up in the primary checkout rather than the worktree, the call
+returned success and did not move it, and git in the worktree stayed denied
+until the Director moved it by hand. The same call moved Wenfu Control B
+correctly on 2026-09-10, so the failure is intermittent and not reliably
+visible to the moving session or to an observer.
+
+The move itself waits for a turn boundary. The tool grants access at once and
+moves the working directory — Bash, relative paths, project settings — when the
+current turn ends. So the check belongs in a later turn: a `pwd` in the same
+turn still shows the old directory, and that is not the failure above.

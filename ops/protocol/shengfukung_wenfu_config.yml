@@ -43,9 +43,10 @@ deployment:
     sidekiq_staging: shengfukung-wenfu-staging-sidekiq  # DISABLED 2026-09-05, units still installed
 
 databases:
-  development: shengfukung_wenfu_development   # the name actually resolved, not the scaffold fallback
-  test: shengfukung_wenfu_development           # same database as development -- no separate test database
-  staging: templemate_data_staging               # follows production's own db name (templemate_data), not the repo name -- null if no standing staging
+  development: templemate_dev                    # derived from databaseName in shared/app_constants/project.json, not from the repo slug
+  test: templemate_test                          # exists only while a run is running: created when absent, removed by the run that created it
+  review: templemate_review                      # bin/review_admin_server's isolated browser-review database
+  staging: templemate_data_staging               # renamed to templemate_staging with the env-partition work; null if no standing staging
   production_env_keys: [PGHOST, PGPORT, PGDATABASE, PGUSER]   # e.g. [DATABASE_URL] or [PGDATABASE_PROD, PGUSER_PROD]
 
 checkouts:

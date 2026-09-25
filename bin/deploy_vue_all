@@ -9,7 +9,12 @@ if [ ! -f "$MANIFEST_FILE" ]; then
   exit 1
 fi
 
-mapfile -t TEMPLE_SLUGS < <(ruby <<'RUBY' "$MANIFEST_FILE"
+# `ruby <<HEREDOC "$FILE"` hands ruby the FILE as its script and the heredoc as
+# ignored stdin, so this read the manifest as Ruby and produced nothing. Inside
+# mapfile that is silent: an empty array, a loop that never runs, and a deploy
+# that reports success having deployed no temple. `-` takes the script from
+# stdin and leaves the filename as ARGV.
+mapfile -t TEMPLE_SLUGS < <(ruby - "$MANIFEST_FILE" <<'RUBY'
 require "yaml"
 file = ARGV.first
 data = YAML.safe_load_file(file).fetch("temples")

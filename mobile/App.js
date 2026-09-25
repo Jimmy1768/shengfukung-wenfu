@@ -4,9 +4,9 @@ import { AppState, BackHandler, Image, KeyboardAvoidingView, Linking, Modal, Pla
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Constants from 'expo-constants';
 
-import { createRealAdapter } from './app/real/adapter';
-import { resolveClientConfig, localTenantBinding, isReleaseConfig } from './app/real/config';
-import { productionTransport } from './app/real/transport';
+import { createRealAdapter } from './app/client/adapter';
+import { resolveClientConfig } from './app/client/config';
+import { productionTransport } from './app/client/transport';
 import { scopedStorage } from './app/lib/auth/storage';
 import { activePresentationTenant, initialBinding } from './app/tenant/binding';
 import { scanCameraPayload } from './app/tenant/scanner';
@@ -81,19 +81,21 @@ function AppBody() {
 
   const [startup, setStartup] = useState(true); const [signedIn, setSignedIn] = useState(false); const [screen, setScreen] = useState('home');
   const [locale, setLocale] = useState('zh-TW'); const [dark, setDark] = useState(false); const [binding, setBinding] = useState(initialBinding()); const [data, setData] = useState(adapter.snapshot()); const [collections, setCollections] = useState('idle');
-  const [email, setEmail] = useState(isReleaseConfig(clientConfig) ? '' : 'member@example.test'); const [password, setPassword] = useState(isReleaseConfig(clientConfig) ? '' : 'templemate-demo'); const [signup, setSignup] = useState({ name: '', email: '', password: '' }); const [recoveryEmail, setRecoveryEmail] = useState('');
+  const [email, setEmail] = useState(clientConfig.localEmail || ''); const [password, setPassword] = useState(clientConfig.localPassword || ''); const [signup, setSignup] = useState({ name: '', email: '', password: '' }); const [recoveryEmail, setRecoveryEmail] = useState('');
   const [profileForm, setProfileForm] = useState({ english_name: '', native_name: '', phone: '', city: '' }); const [dependent, setDependent] = useState({ id: null, name: '', relationship: '家人' }); const [registration, setRegistration] = useState(null); const [album, setAlbum] = useState(null);
   const [supportMessage, setSupportMessage] = useState(''); const [closureConfirmation, setClosureConfirmation] = useState(''); const [pending, setPending] = useState(false); const [feedback, setFeedback] = useState(emptyFeedback());
   const [oauthState, setOauthState] = useState(oauthController.snapshot()); const [cameraOpen, setCameraOpen] = useState(false);
-  // The server is authoritative for the temple's display name. Bootstrap
-  // returns { slug, name }; localTenantBinding only knows the configured slug
-  // and would otherwise show "shengfukung-wenfu" instead of the temple's real name.
+  // The server is authoritative for the temple's display name and it arrives
+  // from bootstrap. There is no configured tenant to fall back to any more, so
+  // a snapshot without a temple means no temple is loaded -- it used to
+  // fabricate one from the compiled slug, which produced a bound state with an
+  // empty id that the temple gate then accepted.
   const boundTenant = snapshot => {
     const temple = snapshot?.temple;
-    if (!temple?.slug) return localTenantBinding(clientConfig);
-    return { state: 'bound', tenant: { id: temple.slug, name: temple.name || temple.slug }, error: null, source: 'local-test' };
+    if (!temple?.slug || !temple?.name) return initialBinding();
+    return { state: 'bound', tenant: { id: temple.slug, name: temple.name }, error: null, source: 'qr' };
   };
-  const t = copy[locale]; const palette = paletteFor(dark); const loadingText = isReleaseConfig(clientConfig) ? t.loadingRelease : t.loading;
+  const t = copy[locale]; const palette = paletteFor(dark); const loadingText = t.loading;
   const showError = (message, owner = screen) => setFeedback(errorFeedback(message, owner));
   const dismissError = () => setFeedback(current => ({ ...current, error: null }));
   const navigate = destination => { setFeedback(current => feedbackForNavigation(current, destination)); setAlbum(null); setScreen(destination); };
@@ -106,17 +108,40 @@ function AppBody() {
   }, [screen, cameraOpen, album]);
   useEffect(() => {
     let mounted = true;
-    if (clientConfig.mode !== 'real') { setStartup(false); return () => { mounted = false; }; }
     (async () => {
       try {
         // The remembered temple is a fact about this device, not about the
         // session, so it is read before any sign-in is attempted. It used to be
         // loaded only when a session restored, which meant a signed-out launch
         // asked for the QR code again even though the binding was still stored.
-        const remembered = isReleaseConfig(clientConfig) ? await trustedBindingStorage.load() : null;
+        // The dev client skips the scan, and this is how. The seed goes into
+        // the same storage a scan writes to, so there is one path to "a temple
+        // is loaded" and the dev client exercises it rather than a second one.
+        // Empty in every release lane, and only ever used when nothing is
+        // stored, so a real scan always wins. The server names the temple on
+        // bootstrap, as it does after a scan.
+        if (clientConfig.localTempleSlug && !(await trustedBindingStorage.load())) {
+          await trustedBindingStorage
+            .save({ state: 'bound', tenant: { id: clientConfig.localTempleSlug, name: '' }, error: null, source: 'qr' })
+            .catch(() => null);
+        }
+        const remembered = await trustedBindingStorage.load();
         if (remembered && mounted) setBinding(remembered);
         const next = await adapter.restoreSession();
-        if (next && mounted) { setData(next); setBinding(isReleaseConfig(clientConfig) ? remembered || initialBinding() : boundTenant(next)); setSignedIn(true); setCollections('loading'); const loaded = await adapter.loadCollections(); if (mounted) { setData(loaded); setCollections('ready'); } }
+        if (next && mounted) {
+          setData(next);
+          // bootstrap ran only if a temple was loaded, so its temple is the
+          // authority on the name; the stored record supplies it otherwise.
+          setBinding(boundTenant(next).state === 'bound' ? boundTenant(next) : remembered || initialBinding());
+          setSignedIn(true);
+          // Collections are six temple-scoped requests. Signed in with no
+          // temple is a real state -- it is the scanner -- so they wait.
+          if (activePresentationTenant(boundTenant(next).state === 'bound' ? boundTenant(next) : remembered || initialBinding())) {
+            setCollections('loading');
+            const loaded = await adapter.loadCollections();
+            if (mounted) { setData(loaded); setCollections('ready'); }
+          }
+        }
       } catch (reason) { if (mounted) { showError(errorMessage(reason)); setSignedIn(false); setCollections('failed'); } }
       finally { if (mounted) setStartup(false); }
     })();
@@ -146,8 +171,23 @@ function AppBody() {
   // and sign-out were fixed first; this was the third place, found only because
   // the Director signed out and back in rather than restarting.
   const bindingAfterSignIn = async () => {
-    if (isReleaseConfig(clientConfig)) return (await trustedBindingStorage.load()) || initialBinding();
-    return clientConfig.mode === 'real' ? boundTenant(adapter.snapshot()) : initialBinding();
+    const remembered = await trustedBindingStorage.load();
+    // Storage says WHICH temple -- a device fact that outlives the session.
+    // Only the server says what it is CALLED: a scan confirms a slug and never
+    // learns a name, so a record written by the scanner is nameless. Returning
+    // it wholesale is what left the header reading "connected -" with nothing
+    // after it, while a relaunch showed the name correctly because the startup
+    // path prefers the snapshot. Identity from storage, name from the bootstrap
+    // that has just run, and written back so it heals rather than staying
+    // nameless until the next relaunch.
+    const named = boundTenant(adapter.snapshot());
+    if (named.state !== 'bound') return remembered || initialBinding();
+    // A snapshot for a different temple than the one on the device never wins.
+    if (remembered && remembered.tenant?.id !== named.tenant.id) return remembered;
+    if (remembered?.tenant?.name !== named.tenant.name) {
+      await trustedBindingStorage.save(named).catch(() => null);
+    }
+    return named;
   };
   // Everything a successful sign-in must do, in one place. There were four
   // paths doing four different subsets: the password path loaded the
@@ -158,7 +198,12 @@ function AppBody() {
   const completeSignIn = async ({ profileRequired = false } = {}) => {
     setData(adapter.snapshot());
     setSignedIn(true);
-    setBinding(await bindingAfterSignIn());
+    const loadedTemple = await bindingAfterSignIn();
+    setBinding(loadedTemple);
+    // Six temple-scoped requests. A patron signing in with no temple loaded
+    // goes to the scanner, and asking for them there produced the error banner
+    // that criterion 6 forbids.
+    if (!activePresentationTenant(loadedTemple)) return;
     setCollections('loading');
     try {
       setData(await adapter.loadCollections());
@@ -184,14 +229,15 @@ function AppBody() {
     });
   }, [loadedUser.english_name, loadedUser.native_name, loadedUser.phone, loadedUser.city]);
 
-  // Sign-out keeps the remembered temple. It is where the device is, not who is
-  // holding it, and the release config pins the tenant anyway -- normalizedBinding
-  // refuses any binding whose id is not config.tenantSlug, so a retained one
-  // cannot point elsewhere. Making a patron find the QR code again just to sign
-  // back in bought nothing.
+  // Sign-out keeps the loaded temple. It is where the device is, not who is
+  // holding it, and making a patron find the QR code again just to sign back in
+  // bought nothing. This used to add that a retained temple could not point
+  // anywhere else because the build pinned the tenant -- it no longer does, and
+  // that is fine: a stored temple is one the server confirmed, and unloading is
+  // the explicit control below.
   // Explicit, and the only way a device forgets its temple.
   const onUnbindTemple = async () => {
-    if (isReleaseConfig(clientConfig)) await trustedBindingStorage.clear().catch(() => null);
+    await trustedBindingStorage.clear().catch(() => null);
     setBinding(initialBinding());
   };
   const signOut = () => { oauthController.clear('idle').then(setOauthState).catch(() => null); Promise.resolve(adapter.logout?.()).catch(() => null); setSignedIn(false); setScreen('home'); setFeedback(emptyFeedback()); };
@@ -213,7 +259,7 @@ function AppBody() {
     finally { setPending(false); }
   };
   const updatePreference = async next => { const previous = { locale, dark }; const payload = { ...(next.locale ? { locale: next.locale } : {}), ...(next.theme ? { mobile_theme_id: next.theme } : {}) }; const ok = await run(async () => adapter.updatePreferences(payload)); if (ok) { if (next.locale) { setFeedback(emptyFeedback()); setLocale(next.locale); } if (next.theme) setDark(next.theme === 'dark'); } else { setLocale(previous.locale); setDark(previous.dark); } };
-  const shared = { t, palette, locale, setLocale, dark, setDark, screen, setScreen: navigate, data, setData, binding, setBinding, profileForm, setProfileForm, dependent, setDependent, registration, setRegistration, album, setAlbum, supportMessage, setSupportMessage, closureConfirmation, setClosureConfirmation, pending, error, setError: message => message ? showError(message) : dismissError(), notice, run, signOut, onUnbindTemple, collections, loadingText, updatePreference, oauthState, cameraOpen, setCameraOpen };
+  const shared = { t, palette, locale, setLocale, dark, setDark, screen, setScreen: navigate, data, setData, binding, setBinding, profileForm, setProfileForm, dependent, setDependent, registration, setRegistration, album, setAlbum, supportMessage, setSupportMessage, closureConfirmation, setClosureConfirmation, pending, error, setError: message => message ? showError(message) : dismissError(), notice, run, signOut, onUnbindTemple, collections, setCollections, boundTenant, loadingText, updatePreference, oauthState, cameraOpen, setCameraOpen };
   if (startup) return <Shell palette={palette}><View style={styles.center}><Text style={[styles.brand, { color: palette.text }]}>{t.appName}</Text><Text style={[styles.muted, { color: palette.textMuted }]}>{loadingText}</Text></View></Shell>;
   if (!signedIn) return oauthState.phase === 'account_resolution' ? <OAuthResolution {...shared} onSubmit={submitResolution} /> : <SignedOut {...shared} {...{ email, setEmail, password, setPassword, signup, setSignup, recoveryEmail, setRecoveryEmail, signIn, setSignedIn, beginOAuth }} />;
   if (!activePresentationTenant(binding)) return <TenantSetupGate {...shared} />;
@@ -224,14 +270,53 @@ function Shell({ palette, children }) { return <SafeAreaProvider><SafeAreaView s
 function Header({ t, palette, binding, onSettings, onSignOut }) { const activeTenant = activePresentationTenant(binding); return <View style={[styles.header, { borderBottomColor: palette.border }]}><View style={styles.headerCopy}><Text style={[styles.brandSmall, { color: palette.text }]}>{t.appName}</Text><Text numberOfLines={1} style={[styles.muted, { color: palette.textMuted }]}>{activeTenant ? `${t.connected} · ${activeTenant.name}` : t.notConnected}</Text></View><View style={styles.headerUtilities}>{activeTenant && <Button label={t.settings} palette={palette} tone="secondary" onPress={onSettings} />}<Button label={t.signOut} palette={palette} tone="secondary" onPress={onSignOut} /></View></View>; }
 function Navigation({ t, palette, screen, setScreen }) { return <ScrollView horizontal accessibilityRole="tablist" style={[styles.navigationShell, { borderBottomColor: palette.border }]} contentContainerStyle={styles.navigation} showsHorizontalScrollIndicator={false}>{menuKeys.map(key => <Pressable accessibilityRole="tab" accessibilityState={{ selected: screen === key }} key={key} onPress={() => setScreen(key)} style={[styles.navItem, { borderColor: palette.border, backgroundColor: screen === key ? palette.primary : palette.inset }]}><Text style={{ color: screen === key ? palette.onPrimary : palette.text, fontWeight: '800' }}>{t[key]}</Text></Pressable>)}</ScrollView>; }
 
-function TenantSetupGate({ t, palette, binding, setBinding, setData, cameraOpen, setCameraOpen, setError, signOut }) {
-  const onCameraResult = async result => { const invalidQrMessage = isReleaseConfig(clientConfig) ? t.cameraInvalidQrRelease : t.cameraInvalidQr; setCameraOpen(false); if (!result) return; if (result.state === 'binding_failed') { setError(invalidQrMessage); return; } if (isReleaseConfig(clientConfig)) { try { await trustedBindingStorage.save(result); } catch (_) { setError(invalidQrMessage); return; } } setBinding(result); setData(adapter.snapshot()); };
-  return <Shell palette={palette}><Header t={t} palette={palette} binding={binding} onSignOut={signOut} /><ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled"><Section title={t.setupTemple} palette={palette}><Text style={[styles.body, { color: palette.text }]}>{t.setupTempleDescription}</Text>{cameraOpen ? <TempleQrCamera mode={clientConfig.mode} t={t} palette={palette} isRelease={isReleaseConfig(clientConfig)} onCancel={onCameraResult} onScan={payload => scanCameraPayload({ mode: clientConfig.mode, payload, config: clientConfig, transport: productionTransport })} /> : <Button label={isReleaseConfig(clientConfig) ? t.scanCodeRelease : t.scanDemoCode} palette={palette} onPress={() => setCameraOpen(true)} />}</Section></ScrollView></Shell>;
+// setCollections and boundTenant are declared inside the App component, so they
+// are NOT in scope here and must arrive as props. onCameraResult called
+// setCollections as its second statement, outside the try, so every scan threw
+// ReferenceError before it could load anything. setBinding had already run,
+// which is why the header read connected with no name and no error appeared.
+// Nothing caught it: the tests read this file as text, they never run it.
+function TenantSetupGate({ t, palette, binding, setBinding, setData, setCollections, boundTenant, setScreen, cameraOpen, setCameraOpen, setError, signOut }) {
+  // A scan loads the temple; it does not merely remember it. This used to save
+  // the record and call setData(adapter.snapshot()) -- the snapshot exactly as
+  // it already was, with no name and no collections. A compiled tenant hid
+  // that, because both had already run at sign-in.
+  const onCameraResult = async result => {
+    setCameraOpen(false);
+    if (!result) return;
+    if (result.state === 'binding_failed') { setError(t.cameraInvalidQrRelease); return; }
+    try { await trustedBindingStorage.save(result); } catch (_) { setError(t.cameraInvalidQrRelease); return; }
+    setBinding(result);
+    // Setting the binding closes this gate, and the patron lands on whichever
+    // screen they were last on -- Settings, if they reached the scanner through
+    // Unbind, which reads as though nothing happened. Home is where a loaded
+    // temple is legible: its name in the header and its collections beneath.
+    setScreen('home');
+    setCollections('loading');
+    try {
+      const loaded = await adapter.bootstrap();
+      setData(loaded);
+      // The server names the temple. Persist that, so a relaunch shows the name
+      // rather than the bare record the scan could confirm but not describe.
+      const named = boundTenant(loaded);
+      if (named.state === 'bound') {
+        setBinding(named);
+        await trustedBindingStorage.save(named).catch(() => null);
+      }
+      setData(await adapter.loadCollections());
+      setCollections('ready');
+    } catch (reason) {
+      setCollections('failed');
+      setError(errorMessage(reason));
+    }
+  };
+
+  return <Shell palette={palette}><Header t={t} palette={palette} binding={binding} onSignOut={signOut} /><ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled"><Section title={t.setupTemple} palette={palette}><Text style={[styles.body, { color: palette.text }]}>{t.setupTempleDescription}</Text>{cameraOpen ? <TempleQrCamera t={t} palette={palette} isRelease onCancel={onCameraResult} onScan={payload => scanCameraPayload({ payload, config: clientConfig, transport: productionTransport })} /> : <Button label={t.scanCodeRelease} palette={palette} onPress={() => setCameraOpen(true)} />}</Section></ScrollView></Shell>;
 }
 
 function SignedOut({ t, palette, locale, setLocale, dark, setDark, screen, setScreen, email, setEmail, password, setPassword, signup, setSignup, recoveryEmail, setRecoveryEmail, pending, error, setError, notice, run, signIn, setSignedIn, beginOAuth, oauthState }) {
   const create = screen === 'signup'; const recovery = screen === 'recovery'; const signUp = async () => { const ok = await run(() => adapter.signUp(signup)); if (ok) setSignedIn(true); };
-  return <Shell palette={palette}><ScrollView contentContainerStyle={styles.auth} keyboardShouldPersistTaps="handled"><Text style={[styles.brand, { color: palette.text }]}>{t.appName}</Text><Text style={[styles.lead, { color: palette.text }]}>{create ? t.createAccount : recovery ? t.forgotPassword : isReleaseConfig(clientConfig) ? t.signIn : t.signInPrompt}</Text><Notice palette={palette} tone="info">{isReleaseConfig(clientConfig) ? t.realAccountRelease : t.realAccount}</Notice>{!create && !recovery && <><Notice palette={palette} tone="info">{t.oauthBrowserNotice}</Notice><FormInput label={t.email} value={email} onChangeText={setEmail} autoCapitalize="none" palette={palette} /><FormInput label={t.password} value={password} onChangeText={setPassword} secureTextEntry autoCapitalize="none" palette={palette} /><Button label={pending ? '…' : t.signIn} palette={palette} onPress={signIn} disabled={pending} /><Button label={pending ? '…' : t.googleSignIn} palette={palette} tone="secondary" onPress={() => beginOAuth('google')} disabled={pending} /><Button label={pending ? '…' : t.appleSignIn} palette={palette} tone="secondary" onPress={() => beginOAuth('apple')} disabled={pending} /><Text style={[styles.muted, { color: palette.textMuted }]}>{t.oauthOutcome[oauthState.phase] || t.oauthOutcome.idle}</Text><Button label={t.createAccount} palette={palette} tone="secondary" onPress={() => setScreen('signup')} /><Button label={t.forgotPassword} palette={palette} tone="secondary" onPress={() => setScreen('recovery')} /></>}{create && <><Notice palette={palette} tone="info">{t.signupNotice}</Notice><FormInput label={t.name} value={signup.name} onChangeText={name => setSignup({ ...signup, name })} palette={palette} /><FormInput label={t.email} value={signup.email} onChangeText={emailValue => setSignup({ ...signup, email: emailValue })} autoCapitalize="none" palette={palette} /><FormInput label={t.password} value={signup.password} onChangeText={passwordValue => setSignup({ ...signup, password: passwordValue })} secureTextEntry autoCapitalize="none" palette={palette} /><Button label={pending ? '…' : t.createAccount} palette={palette} onPress={signUp} disabled={pending} /><Button label={t.back} palette={palette} tone="secondary" onPress={() => setScreen('home')} /></>}{recovery && <><Notice palette={palette} tone="info">{isReleaseConfig(clientConfig) ? t.recoveryNoticeRelease : t.recoveryNotice}</Notice><FormInput label={t.email} value={recoveryEmail} onChangeText={setRecoveryEmail} autoCapitalize="none" palette={palette} /><Button label={pending ? '…' : t.forgotPassword} palette={palette} onPress={() => run(() => adapter.recoverPassword({ email: recoveryEmail }))} disabled={pending} /><Button label={t.back} palette={palette} tone="secondary" onPress={() => setScreen('home')} /></>}{error && <Notice palette={palette} tone="error">{error}<Button label={t.retry} palette={palette} tone="secondary" onPress={() => setError(null)} /></Notice>}{notice && <Notice palette={palette}>{notice}</Notice>}<Preferences {...{ t, palette, locale, setLocale, dark, setDark }} /></ScrollView></Shell>;
+  return <Shell palette={palette}><ScrollView contentContainerStyle={styles.auth} keyboardShouldPersistTaps="handled"><Text style={[styles.brand, { color: palette.text }]}>{t.appName}</Text><Text style={[styles.lead, { color: palette.text }]}>{create ? t.createAccount : recovery ? t.forgotPassword : t.signIn}</Text><Notice palette={palette} tone="info">{t.realAccount}</Notice>{!create && !recovery && <><Notice palette={palette} tone="info">{t.oauthBrowserNotice}</Notice><FormInput label={t.email} value={email} onChangeText={setEmail} autoCapitalize="none" palette={palette} /><FormInput label={t.password} value={password} onChangeText={setPassword} secureTextEntry autoCapitalize="none" palette={palette} /><Button label={pending ? '…' : t.signIn} palette={palette} onPress={signIn} disabled={pending} /><Button label={pending ? '…' : t.googleSignIn} palette={palette} tone="secondary" onPress={() => beginOAuth('google')} disabled={pending} /><Button label={pending ? '…' : t.appleSignIn} palette={palette} tone="secondary" onPress={() => beginOAuth('apple')} disabled={pending} /><Text style={[styles.muted, { color: palette.textMuted }]}>{t.oauthOutcome[oauthState.phase] || t.oauthOutcome.idle}</Text><Button label={t.createAccount} palette={palette} tone="secondary" onPress={() => setScreen('signup')} /><Button label={t.forgotPassword} palette={palette} tone="secondary" onPress={() => setScreen('recovery')} /></>}{create && <><Notice palette={palette} tone="info">{t.signupNotice}</Notice><FormInput label={t.name} value={signup.name} onChangeText={name => setSignup({ ...signup, name })} palette={palette} /><FormInput label={t.email} value={signup.email} onChangeText={emailValue => setSignup({ ...signup, email: emailValue })} autoCapitalize="none" palette={palette} /><FormInput label={t.password} value={signup.password} onChangeText={passwordValue => setSignup({ ...signup, password: passwordValue })} secureTextEntry autoCapitalize="none" palette={palette} /><Button label={pending ? '…' : t.createAccount} palette={palette} onPress={signUp} disabled={pending} /><Button label={t.back} palette={palette} tone="secondary" onPress={() => setScreen('home')} /></>}{recovery && <><Notice palette={palette} tone="info">{t.recoveryNotice}</Notice><FormInput label={t.email} value={recoveryEmail} onChangeText={setRecoveryEmail} autoCapitalize="none" palette={palette} /><Button label={pending ? '…' : t.forgotPassword} palette={palette} onPress={() => run(() => adapter.recoverPassword({ email: recoveryEmail }))} disabled={pending} /><Button label={t.back} palette={palette} tone="secondary" onPress={() => setScreen('home')} /></>}{error && <Notice palette={palette} tone="error">{error}<Button label={t.retry} palette={palette} tone="secondary" onPress={() => setError(null)} /></Notice>}{notice && <Notice palette={palette}>{notice}</Notice>}<Preferences {...{ t, palette, locale, setLocale, dark, setDark }} /></ScrollView></Shell>;
 }
 
 // Shown when app/oauth/transaction.js's exchange hits account_resolution_required
@@ -301,7 +386,7 @@ function AccountSurface(props) {
   if (screen === 'settings') return <Section title={t.settings} palette={palette}><Preferences {...props} /><Text style={[styles.subhead, { color: palette.text }]}>{t.privacyHelp}</Text><Text style={[styles.muted, { color: palette.textMuted }]}>{t.assistanceDescription}</Text><Button label={t.assistance} palette={palette} tone="secondary" onPress={() => setScreen('assistance')} /><Button label={t.privacyRequest} palette={palette} tone="secondary" onPress={() => setScreen('privacy')} /><Button label={t.closeAccount} palette={palette} tone="danger" onPress={() => setScreen('closure')} /><Text style={[styles.subhead, { color: palette.text }]}>{t.templeConnection}</Text><Text style={[styles.muted, { color: palette.textMuted }]}>{activePresentationTenant(binding)?.name}</Text>{binding.state === 'bound' && <Button label={t.unbindTemple} palette={palette} tone="secondary" onPress={onUnbindTemple} />}</Section>;
   if (screen === 'assistance') return <Section title={t.assistance} palette={palette}><Notice palette={palette} tone="info">{t.assistanceDestination}</Notice><FormInput label={t.message} value={supportMessage} onChangeText={setSupportMessage} maxLength={280} palette={palette} /><Text style={[styles.muted, { color: palette.textMuted }]}>{supportMessage.length}/280</Text><Button label={t.send} palette={palette} onPress={async () => { const ok = await run(() => adapter.submitAssistance({ channel: 'profile', message: supportMessage }), { noticeOwner: 'settings', noticeKey: result => result?.outcome === 'duplicate' ? 'assistanceDuplicate' : result?.assistance?.outcome === 'fixture' ? 'assistanceFixtureSubmitted' : 'assistanceCreated' }); if (ok) setScreen('settings'); }} /><Button label={t.back} palette={palette} tone="secondary" onPress={() => setScreen('settings')} /></Section>;
   if (screen === 'privacy') return <Section title={t.privacyRequest} palette={palette}><Button label={t.exportData} palette={palette} onPress={() => run(() => adapter.requestPrivacy({ kind: 'export' }))} /><Button label={t.deletionRequest} palette={palette} tone="danger" onPress={() => run(() => adapter.requestPrivacy({ kind: 'deletion' }))} /><Button label={t.back} palette={palette} tone="secondary" onPress={() => setScreen('settings')} /></Section>;
-  if (screen === 'closure') return <Section title={t.closeAccount} palette={palette}><Text style={[styles.body, { color: palette.text }]}>{isReleaseConfig(clientConfig) ? t.closeDescriptionRelease : t.closeDescription}</Text><FormInput label="CLOSE" value={closureConfirmation} onChangeText={setClosureConfirmation} autoCapitalize="characters" palette={palette} /><Button label={t.closeAccount} palette={palette} tone="danger" onPress={async () => { const ok = await run(() => adapter.closeAccount({ confirmation: closureConfirmation })); if (ok) props.signOut(); }} /><Button label={t.back} palette={palette} tone="secondary" onPress={() => setScreen('settings')} /></Section>;
+  if (screen === 'closure') return <Section title={t.closeAccount} palette={palette}><Text style={[styles.body, { color: palette.text }]}>{t.closeDescription}</Text><FormInput label="CLOSE" value={closureConfirmation} onChangeText={setClosureConfirmation} autoCapitalize="characters" palette={palette} /><Button label={t.closeAccount} palette={palette} tone="danger" onPress={async () => { const ok = await run(() => adapter.closeAccount({ confirmation: closureConfirmation })); if (ok) props.signOut(); }} /><Button label={t.back} palette={palette} tone="secondary" onPress={() => setScreen('settings')} /></Section>;
   if (screen === 'connection') return <Section title={t.templeConnection} palette={palette}><Text style={[styles.body, { color: palette.text }]}>{activePresentationTenant(binding)?.name || t.notConnected}</Text><Button label={t.back} palette={palette} tone="secondary" onPress={() => setScreen('home')} /></Section>;
   return <Section title={t.notFound} palette={palette}><Text style={[styles.body, { color: palette.text }]}>{t.notFoundDescription}</Text><Button label={t.back} palette={palette} tone="secondary" onPress={() => setScreen('home')} /></Section>;
 }

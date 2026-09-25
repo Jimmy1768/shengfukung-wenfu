@@ -157,7 +157,8 @@ Current interpretation after production Google OAuth validation and shared-DB cl
   sudo systemctl restart shengfukung-wenfu-puma
   sudo systemctl restart shengfukung-wenfu-sidekiq
   ```
-- [ ] Optional: Expo builds via `bin/expo_prebuild` / `bin/expo_build` as release scope requires.
+- [ ] Optional: Expo builds via `npm --prefix mobile run build:testflight` as release scope
+      requires. (`bin/expo_prebuild` / `bin/expo_build` removed 2026-09-13; neither ever ran.)
 - [x] Pass criteria: site + API reachable from staging domain.
 
 ## 6. Verification + Smoke Tests

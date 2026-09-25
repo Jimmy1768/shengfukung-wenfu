@@ -1,28 +1,41 @@
-# Database names derive from the project slug in shared/app_constants/project.json
-# so two projects cloned from this template never share a database. Before this,
-# every clone fell back to the template's own dev/test databases and quietly
-# wrote into the same Postgres databases as its siblings.
+# Local database names come from shared/app_constants/project.json, so two
+# projects cloned from this template never share a database. Before this, every
+# clone fell back to the template's own dev/test databases and quietly wrote
+# into the same Postgres databases as its siblings.
 #
-# Override per deployment with PGDATABASE / PGDATABASE_TEST / PGUSER, or set
-# PROJECT_SLUG to change the derived base without editing project.json.
+# The base is `databaseName` when that key is present, and the slug otherwise.
+# They are separate because a repository and the product inside it can be called
+# different things: this repository is shengfukung-wenfu and the product is
+# TempleMate, so the local databases are templemate_dev and templemate_test. A
+# clone that has not set `databaseName` keeps deriving from its slug exactly as
+# before, so adding the key changed nothing for anyone else.
 #
-# These fallbacks are what this project actually uses: the local databases are
-# named shengfukung_wenfu_dev and shengfukung_wenfu_test to match, so a clone
-# works with no .env entries at all. Nothing here should need a local override.
+# Override per deployment with PGDATABASE / PGDATABASE_TEST / PGUSER. PROJECT_SLUG
+# still changes the slug without editing project.json, but only affects database
+# names where no `databaseName` is set -- the more specific key wins.
+#
+# Production and staging below read PGDATABASE alone and never touch this base,
+# so nothing derived here can reach a deployment. That is asserted in
+# test/lib/database_configuration_test.rb rather than left as a comment.
 <%
   require "json"
 
-  project_slug = ENV["PROJECT_SLUG"]
-  if project_slug.nil? || project_slug.strip.empty?
-    project_slug =
-      begin
-        JSON.parse(File.read(Rails.root.join("..", "shared", "app_constants", "project.json")))["slug"]
-      rescue StandardError
-        nil
-      end
-  end
+  project =
+    begin
+      JSON.parse(File.read(Rails.root.join("..", "shared", "app_constants", "project.json")))
+    rescue StandardError
+      {}
+    end
 
-  db_base = project_slug.to_s.downcase.gsub(/[^a-z0-9]+/, "_").gsub(/\A_+|_+\z/, "")
+  normalize = ->(value) { value.to_s.downcase.gsub(/[^a-z0-9]+/, "_").gsub(/\A_+|_+\z/, "") }
+
+  project_slug = ENV["PROJECT_SLUG"]
+  project_slug = project["slug"] if project_slug.nil? || project_slug.strip.empty?
+
+  # The product's name when it has one, the repository's slug when it does not.
+  # Absent the key, this is byte-for-byte the old behaviour.
+  db_base = normalize.call(project["databaseName"])
+  db_base = normalize.call(project_slug) if db_base.empty?
   db_base = "app" if db_base.empty?
 %>
 

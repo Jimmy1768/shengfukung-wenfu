@@ -5,8 +5,9 @@
 Phases 1–3 of the TempleMate cash-only demo, development-client parity, and
 Director UI refinement are complete. The next action is a separately committed
 Phase 4 read-only readiness scan for real Google/Apple native OAuth and
-physical-device validation. Current web OAuth, dummy OAuth, and local/test
-adapters do not prove real native provider behavior. The Apple account-
+physical-device validation. The dummy OAuth driver and the local/test adapters
+it belonged to are gone; there is one adapter and it talks to a real server.
+Web OAuth still does not prove real native provider behaviour. The Apple account-
 resolution rollout and historical user 22 recovery remain separate Control A
 work; this sequence grants no user/account action.
 
@@ -73,24 +74,24 @@ assign equal priority or implementation readiness.
 
 ## Superseded Plan Pointers
 
-- `ops/docs/plans/archive/EXPO_MULTI_ROLE_MODE_SWITCH_PLAN.md` is retained as
-  historical decision evidence. Its multi-role/admin mode direction was
-  superseded on 2026-08-11 by the account-only Expo direction in
+- `EXPO_MULTI_ROLE_MODE_SWITCH_PLAN.md` recorded a multi-role/admin mode
+  direction, superseded on 2026-08-11 by the account-only Expo direction in
   `ops/docs/plans/EXPO_ACCOUNT_APP_READINESS_AND_PARITY_PLAN.md` and the two
-  parallel plans for Rails JSON and Expo-native infrastructure (both now
-  complete and archived as
-  `ops/docs/plans/archive/EXPO_ACCOUNT_JSON_API_TRACK_PLAN.md` and
-  `ops/docs/plans/archive/EXPO_NATIVE_CLIENT_INFRA_TRACK_PLAN.md`).
-- `ops/docs/plans/archive/EXPO_ACCOUNT_V1_BUILD_PLAN.md` is retained as prior
-  planning evidence. Its purpose-first selection gate, selective-CRUD framing,
-  and minimal-shell dummy objective were superseded on 2026-08-11 by the two
-  parallel-track plans above.
-- `ops/docs/plans/archive/EXPO_ACCOUNT_APP_V1_ROADMAP.md`,
-  `ops/docs/plans/archive/EXPO_DUMMY_ACCOUNT_DEVELOPMENT_CLIENT_PLAN.md`,
-  `ops/docs/plans/archive/EXPO_NATIVE_ACCOUNT_FOUNDATION_PLAN.md`,
-  `ops/docs/plans/archive/EXPO_CORE_ACCOUNT_PARITY_PLAN.md`, and
-  `ops/docs/plans/archive/EXPO_V1_UI_REFINEMENT_PLAN.md` are retained as prior
-  phase decomposition evidence. Their independent pre-integration scope was
+  parallel plans for Rails JSON and Expo-native infrastructure
+  (`EXPO_ACCOUNT_JSON_API_TRACK_PLAN.md` and
+  `EXPO_NATIVE_CLIENT_INFRA_TRACK_PLAN.md`, both completed). All three were
+  deleted with `ops/docs/plans/archive/` in 406a349.
+- `EXPO_ACCOUNT_V1_BUILD_PLAN.md` recorded a purpose-first selection gate, a
+  selective-CRUD framing, and a minimal-shell dummy objective, all superseded on
+  2026-08-11 by the two parallel-track plans above. It was deleted with the rest
+  of `ops/docs/plans/archive/` in 406a349 and is recoverable from that commit
+  (`git show 406a349^:ops/docs/plans/archive/EXPO_ACCOUNT_V1_BUILD_PLAN.md`).
+- `EXPO_ACCOUNT_APP_V1_ROADMAP.md`,
+  `EXPO_DUMMY_ACCOUNT_DEVELOPMENT_CLIENT_PLAN.md`,
+  `EXPO_NATIVE_ACCOUNT_FOUNDATION_PLAN.md`, `EXPO_CORE_ACCOUNT_PARITY_PLAN.md`
+  and `EXPO_V1_UI_REFINEMENT_PLAN.md` recorded the earlier phase decomposition.
+  They were deleted with `ops/docs/plans/archive/` in 406a349 and are
+  recoverable from that commit. Their independent pre-integration scope was
   reorganized into the two parallel-track plans above, which completed and
   integrated at canonical commit `6cab3f1b52ebaeaf68667f19a3c804f8d9c43079`.
 
@@ -99,7 +100,7 @@ assign equal priority or implementation readiness.
 73 plans reached an explicit terminal/acceptance disposition (either the
 plan's own closing section or a directly matching `ops/docs/handoffs/`
 record) and were moved intact to `ops/docs/plans/archive/` by Control B,
-alongside this update. This covers completed Account/Admin
+alongside this update. That directory was itself deleted later, in 406a349. This covers completed Account/Admin
 personal-and-offering-data work, completed OAuth account-resolution and
 Apple-recovery scans, the completed repository-local ECPay/cash-only payment
 program (through Phase 4), the completed Expo/TempleMate account-integration,
@@ -166,18 +167,19 @@ demo-readiness roadmap, the Apple user-22 recovery roadmap, TempleMate
 refine, and the two awaiting a Director decision (central auth tenant
 registration, platform env file reorganization).
 
-**Pre-existing, not caused by this pass:** the `ops/docs/plans/archive/`
-paths in the two sections below already dangle. That directory was removed in
-the 2026-08-22 plans/archive cleanup, which left tombstone stubs in
-`ops/docs/plans/` instead. The same `git show` recovery applies.
+`ops/docs/plans/archive/` no longer exists: it was deleted in 406a349 (78
+files). The records below are therefore named rather than linked, which is the
+rule — a prose mention that something was retired is fine, a link to a file
+that is not there is not. Any one of them is recoverable with
+`git show 406a349^:ops/docs/plans/archive/<NAME>.md`.
 
 ## Archived Completed Records
 
-| Archived record | Durable destination |
+| Archived record (deleted in 406a349) | Durable destination |
 | --- | --- |
-| [Admin permissions UI and navigation alignment](../plans/archive/ADMIN_PERMISSIONS_UI_AND_NAVIGATION_ALIGNMENT_PLAN.md) | [Admin portal reference](admin_portal.md) |
-| [Platform billing monthly autopay correction](../plans/archive/PLATFORM_BILLING_MONTHLY_AUTOPAY_CORRECTION_PLAN.md) | [TempleMate platform-billing runtime reference](templemate_platform_billing_runtime.md) |
-| [First-tenant billing entitlement and registration gate](../plans/archive/FIRST_TENANT_BILLING_ENTITLEMENT_AND_REGISTRATION_GATE_PLAN.md) | [TempleMate platform-billing runtime reference](templemate_platform_billing_runtime.md), [onboarding runbook](onboarding.md) |
-| [Final web readiness and Expo gate](../plans/archive/FINAL_WEB_READINESS_AND_EXPO_GATE_PLAN.md) | [Future work](future_work.md), [deployment readiness](../plans/DEPLOYMENT_READINESS.md) |
-| [Codex Work Mode skill migration](../plans/archive/CODEX_WORK_MODE_SKILL_MIGRATION_PLAN.md) | [Codex Work Mode reference](codex_work_mode.md) |
-| [Codex Work Mode on-demand Control lifecycle migration](../plans/archive/CODEX_WORK_MODE_ON_DEMAND_CONTROL_LIFECYCLE_MIGRATION_PLAN.md) | [Codex Work Mode reference](codex_work_mode.md), [current coordination](../handoffs/codex_work_mode_current.md) |
+| `ADMIN_PERMISSIONS_UI_AND_NAVIGATION_ALIGNMENT_PLAN.md` | [Admin portal reference](admin_portal.md) |
+| `PLATFORM_BILLING_MONTHLY_AUTOPAY_CORRECTION_PLAN.md` | [TempleMate platform-billing runtime reference](templemate_platform_billing_runtime.md) |
+| `FIRST_TENANT_BILLING_ENTITLEMENT_AND_REGISTRATION_GATE_PLAN.md` | [TempleMate platform-billing runtime reference](templemate_platform_billing_runtime.md), [onboarding runbook](onboarding.md) |
+| `FINAL_WEB_READINESS_AND_EXPO_GATE_PLAN.md` | [Future work](future_work.md), [deployment readiness](../plans/DEPLOYMENT_READINESS.md) |
+| `CODEX_WORK_MODE_SKILL_MIGRATION_PLAN.md` | Codex Work Mode, itself retired — its reference and current-coordination documents were deleted on 2026-08-23 |
+| `CODEX_WORK_MODE_ON_DEMAND_CONTROL_LIFECYCLE_MIGRATION_PLAN.md` | Codex Work Mode, itself retired — see above |

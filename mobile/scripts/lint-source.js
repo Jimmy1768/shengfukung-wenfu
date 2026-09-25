@@ -9,8 +9,8 @@ const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).forEach(entry =
   if (entry.isDirectory()) walk(target);
   else if (entry.name.endsWith('.js')) files.push(target);
 });
-const allowedTransport = path.join(root, 'real', 'transport.js');
-const oauthPaths = [path.join(root, 'oauth'), path.join(root, 'real', 'adapter.js'), path.join(root, 'real', 'storage.js'), path.join(root, 'real', 'config.js'), path.join(root, 'real', 'response.js'), path.join(root, 'ui', 'copy.js')];
+const allowedTransport = path.join(root, 'client', 'transport.js');
+const oauthPaths = [path.join(root, 'oauth'), path.join(root, 'client', 'adapter.js'), path.join(root, 'client', 'storage.js'), path.join(root, 'client', 'config.js'), path.join(root, 'client', 'response.js'), path.join(root, 'ui', 'copy.js')];
 const sourceFailures = entries => entries.filter(({ file, source }) => {
   // The real adapter's local/test transport is the only permitted fetch seam.
   const checked = file === allowedTransport ? source.replace('globalThis.fetch', '') : source;
@@ -19,7 +19,7 @@ const sourceFailures = entries => entries.filter(({ file, source }) => {
 });
 const liveOriginFailures = entries => entries.filter(({ file, source }) => {
   const relative = path.relative(root, file);
-  if (relative === path.join('real', 'config.js')) return false;
+  if (relative === path.join('client', 'config.js')) return false;
   return /https?:\/\//i.test(source);
 });
 if (require.main === module) {

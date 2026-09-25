@@ -17,7 +17,15 @@ Type=simple
 User=jimmy1768_user
 WorkingDirectory=/home/jimmy1768_user/Projects/shengfukung-wenfu-staging/rails
 EnvironmentFile=/etc/default/shengfukung-wenfu-env
-ExecStart=/usr/bin/bash -lc "RAILS_ENV=staging PUMA_PORT=4002 PGDATABASE=templemate_data_staging S3_OBJECT_PREFIX=staging /home/jimmy1768_user/.rbenv/bin/rbenv exec bundle exec sidekiq -r . -C config/sidekiq.yml"
+# The instance file is named by the checkout path, so this deployment cannot
+# read the other's: which code and which data go together is a filesystem fact,
+# not a list entry. It is listed SECOND because where two EnvironmentFile= lines
+# set the same variable the later one wins (systemd.exec(7)), which is what makes
+# the migration safe in stages -- it already wins before anything is removed from
+# the shared file. There is no `-` prefix: `EnvironmentFile=-/path` skips a
+# missing file silently and throws away that whole property.
+EnvironmentFile=/home/jimmy1768_user/Projects/shengfukung-wenfu-staging/instance.env
+ExecStart=/usr/bin/bash -lc "/home/jimmy1768_user/.rbenv/bin/rbenv exec bundle exec sidekiq -r . -C config/sidekiq.yml"
 Restart=always
 
 [Install]

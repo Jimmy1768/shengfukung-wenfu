@@ -25,9 +25,7 @@ const releaseConfiguration = buildMode => {
   const environment = String(process.env.TEMPLEMATE_CLIENT_ENVIRONMENT || buildMode).toLowerCase();
   if (!['testflight', 'production'].includes(environment)) return null;
   return {
-    clientMode: 'real',
     apiBaseUrl: 'https://shengfukung.com.tw',
-    tenantSlug: 'shengfukung-wenfu',
     clientEnvironment: environment,
     easUpdateChannel: environment
   };
@@ -110,9 +108,19 @@ module.exports = () => {
         eas: {
           projectId: 'c7b8523a-2fad-4123-bc96-0c0c85a23dec'
         },
-        clientMode: 'real',
         apiBaseUrl: release?.apiBaseUrl || process.env.TEMPLEMATE_LOCAL_API_BASE_URL || '',
-        tenantSlug: release?.tenantSlug || process.env.TEMPLEMATE_LOCAL_TENANT_SLUG || '',
+        // A seed for the dev client only, and named so it can never be read as
+        // the app's tenant. There is no tenant in this app: a temple is loaded
+        // at runtime and lives in async storage. This value only pre-fills that
+        // storage so the dev client skips the scan, exactly as localEmail and
+        // localPassword pre-fill sign-in. Absent from every release lane.
+        localTempleSlug: process.env.TEMPLEMATE_LOCAL_TENANT_SLUG || '',
+        // Same rule, same reason: no release lane supplies these, so a
+        // release build has nothing to prefill even before config.js
+        // refuses to pass them through. They name a seeded local fixture
+        // account and live in the untracked .env.development.
+        localEmail: process.env.TEMPLEMATE_LOCAL_EMAIL || '',
+        localPassword: process.env.TEMPLEMATE_LOCAL_PASSWORD || '',
         clientEnvironment: release?.clientEnvironment || process.env.TEMPLEMATE_CLIENT_ENVIRONMENT || 'development',
         easUpdateChannel: release?.easUpdateChannel || 'development',
         nativeOAuthReturnUrl,

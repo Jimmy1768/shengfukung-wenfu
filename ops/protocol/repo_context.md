@@ -55,6 +55,26 @@ multi-tenant — the Vue frontend is not.**
   `shengfukung.com.tw` keeps its current role as the demo/sales-sandbox
   temple going forward; it is not replaced or retired by any of this.
 
+## Who May Merge
+
+`work_mode_config.md` defers this here, and until 2026-09-13 this file was
+silent, which is why it blocked three times in one day: Control A could not
+merge `main` into its branch, Control B sent `purge-tenant-slug` for merge
+rather than merging it, and Planning was refused the command by the auto mode
+classifier.
+
+**Planning may merge.** The Director, 2026-09-13.
+
+Neither Control may. `Bash(git merge:*)` is denied in both Control profiles,
+alongside push, rebase, `reset --hard`, worktree and the `git -C` family, and a
+deny refuses outright rather than prompting. A Control that needs `main` in its
+branch, or its branch in `main`, asks Planning and does not reproduce the merge
+by hand -- hand-applying one is the same act by another name.
+
+This is the repository's answer, not a universal one. Workspace Strategy
+declined to promote Combatives' rule that a Control may merge its own
+authorized task, as not holding everywhere.
+
 ## Control Track Assignment
 
 Control A and Control B are split by **kind of work**, not by surface:
@@ -73,6 +93,153 @@ building. An earlier version of this section split them by surface instead
 interrupted whichever Control owned the affected surface.
 
 This is an operating convention for this repository, not a work-mode rule.
+
+## Database Names Come From the Product, Not the Repository
+
+The repository is called `shengfukung-wenfu`. The product is TempleMate. The
+databases are named after the product.
+
+| | |
+| --- | --- |
+| production | `templemate_data` |
+| staging | `templemate_staging` — still `templemate_data_staging` on the droplet; renamed with the env-partition work |
+| local development | `templemate_dev` |
+| local test | `templemate_test`, which exists only during a run |
+| local review | `templemate_review`, behind `bin/review_admin_server` |
+
+**Two code paths, and they do not meet.** Production and staging resolve from
+`ENV.fetch("PGDATABASE", nil)` and read no derived base at all, so nothing named
+locally can reach a deployment. Development and test derive theirs from
+`databaseName` in `shared/app_constants/project.json`, falling back to the slug
+when that key is absent — so a clone that has not set one behaves exactly as it
+did before the key existed. `PGDATABASE` and `PGDATABASE_TEST` override either.
+
+That separation is asserted rather than assumed.
+`rails/test/lib/database_configuration_test.rb` has a case proving production
+and staging resolve to **nothing** when `PGDATABASE` is unset. It is the case
+that earns its place: with `PGDATABASE` set, a derived fallback would pass
+unnoticed, and a derived fallback there is exactly how staging came to run
+silently against production's database.
+
+`databaseName` beats `PROJECT_SLUG`. The more specific key wins, and
+`PROJECT_SLUG` steering database names was always a side effect of naming the
+project rather than a decision about databases.
+
+**One thing none of this covers.** `Profile::Infrastructure::Storage.db_base`
+and `.db_name` derive their own database names from the slug, independently of
+`database.yml`, and have no callers anywhere in `app`, `lib`, `config`, `bin` or
+`ops`. They are guarded by a test protecting a regression in code nothing runs.
+Found and left alone on 2026-09-14: delete or align them deliberately, not
+incidentally while doing something else.
+
+## Installed Ops Artefacts Drift, In Two Directions
+
+`ops/systemd/*.service` and `ops/nginx/*.conf` are authored here and are inert
+until somebody copies them onto the droplet. Nothing reloads them for you and
+nothing has ever checked that the copy happened.
+
+    ops/systemd/<name>.service   ->  /etc/systemd/system/<name>.service
+    ops/nginx/<name>.conf        ->  /etc/nginx/sites-available/<name>.conf
+
+`bin/check_ops_drift` reports whether each committed artefact matches its
+installed copy. Run it **on the droplet**, from a checkout, as the deploy user —
+both installed locations are mode 644, so it needs no sudo. It exits non-zero on
+any difference, and it only looks: a test scans it for seventeen write verbs and
+fails if one appears. Fixing drift is a deploy, which is a different act with a
+different approval, and a drift checker that grows a `--fix` flag becomes
+`bin/apply_systemd_units` again.
+
+Why it exists, Observed on taiwan-01-web 2026-09-14: both staging units were
+missing `S3_OBJECT_PREFIX=staging`, committed here for some time. Staging was
+inheriting production's `prod` and writing uploads into production's S3
+namespace, and since the two databases are separate a reclamation sweep in
+either would have read the other's files as orphans. The nginx configs, checked
+the same day, were identical. The problem was never that everything had
+drifted — it was that nobody could tell either way.
+
+**It only walks committed → installed, and that is half the problem.** The other
+direction is an installed artefact with no committed source, which is worse: a
+file running on the host that nobody can review, reproduce or diff against
+anything. Observed 2026-09-14, installed 2026-08-04, four of them:
+
+    shengfukung-wenfu-platform-billing-lifecycle.service     + .timer
+    shengfukung-wenfu-platform-billing-monthly-close.service + .timer
+
+All four are `static` and `inactive` with no timer scheduled, so they do
+nothing today. Nothing in this repository renders them: `ops/systemd/template/`
+holds `golden-template-platform-billing-*` originals whose names do not even
+match (`monthly-collection` and `monthly-review` against an installed
+`monthly-close`), and no rendered copy was ever committed back. They are what
+`bin/apply_systemd_units` leaves behind — it renders units from templates
+rather than installing the reviewed files, which is what took production down
+for five minutes on 2026-08-19.
+
+Reverse drift is not built. Until it is, the answer to "what is running on that
+host" is the listing, not this check.
+
+
+## The Test Database Is Disposable, And The Suite Makes and Removes It
+
+`rails/test/test_helper.rb` creates the test database when it is missing, loads
+`db/schema.rb`, and removes it again when the run that created it ends. **The
+steady state on a machine is that no test database exists between runs.**
+
+Measured 2026-09-14: create and load schema 2.6s, suite 29.4s, drop 0.3s. An
+empty Postgres database costs 8.6 MB before a single table exists, and our 64
+tables add 5.2 MB of structure holding no rows — which is why 28 abandoned test
+databases on this machine came to 377 MB storing nothing. The disk was going on
+their existence, not their contents.
+
+**THE BOUND IS THE WHOLE DESIGN: a run removes only what that run created.** A
+database that was already there is used and left alone. That is what makes this
+safe with no naming scheme and no knowledge of how checkouts are laid out — a
+teardown can never land on another checkout's running suite, whatever the two
+are called. An earlier attempt built a per-checkout naming scheme to satisfy a
+precondition that was never real. Naming is a separate decision and is a
+precondition for nothing here.
+
+Properties, each held by a test in
+`rails/test/lib/test_database_provisioner_test.rb` rather than by a comment:
+
+- **Test environment only**, guarded first and unconditionally, so nothing is
+  created or dropped in development, staging or production under any
+  circumstance, including being loaded by accident.
+- **Absence only.** Creation triggers on `ActiveRecord::NoDatabaseError` and
+  nothing else. Bad credentials or a dead server surface as themselves rather
+  than being answered by creating things.
+- **Removal is armed in one place**, the branch that has just created the
+  database, and is handed the config captured at that moment. There is no call
+  path that arms removal for a database the run found.
+- **A red or broken run still removes what it made.** `at_exit`, not
+  `Minitest.after_run`, because the latter does not cover an exception raised
+  while test files are loading. A stray is not the price of a failing suite.
+- **Loud, twice.** One line when it makes the database, one when it removes it.
+- **A failed removal prints and returns**, naming the exact `dropdb` command,
+  rather than raising. Cleanup cannot turn a green run red.
+- **Exactly one file may drop a database**, named as `test/test_helper.rb` and
+  not as a directory, asserted by a scan over the whole test tree.
+
+**Proving provisioning without touching anything shared:**
+
+    cd rails && PGDATABASE_TEST=<a name that exists nowhere> bin/rails test
+
+**Breaking a guard that runs at suite-load time is destructive during the run
+that tests it.** `provision!` is called with real defaults every time
+`test_helper` loads, so a break in the created/found distinction fires against
+the real configuration and drops the real database — this is how the shared test
+database was lost on 2026-09-14, and it was reproduced deliberately afterwards
+to confirm it. Pin `PGDATABASE_TEST` to a throwaway before running any break of
+this file. That is not a precaution, it is the difference between testing the
+guard and executing it.
+
+**Not covered, and left uncovered on purpose:** a hard kill leaves the database
+behind, because nothing in-process can catch one. The next run finds it and, by
+the bound, leaves it alone. Remove it by hand.
+
+The workspace policy this implements is in `work_mode_config.md`'s Databases
+section: a run that creates a test database deletes it in the same run, and how
+a repository names its databases is not a work-mode concern. That file carries
+the rule; this section is what this repository does about it.
 
 ## Mobile/Expo Reference Pattern
 
@@ -99,6 +266,84 @@ matching DojoMate-Expo's actual proven pattern exactly — literal-string
 injecting each lane's `BUILD_MODE` itself rather than trusting the
 caller's shell.
 
+## Building the Expo App
+
+Builds are npm scripts in `mobile/package.json`. There is no wrapper:
+
+    npm run build:production    ios, profile production    <- the live lane, from build 4
+    npm run build:testflight    ios, profile testflight    <- builds 1-3; served its purpose
+
+The Director moved the live lane to `production` on 2026-09-24: "the testflight
+one served its purpose."
+
+**Node is pinned: 24.21.0.** In `mobile/.nvmrc`, and as `node` in every
+`mobile/eas.json` build profile. Before 2026-09-24 nothing pinned it, so EAS
+chose, invisibly — builds 1 to 3 took the VM image default, Node 20.19.4. Build
+4 is the first built on a pinned Node. Local work follows `.nvmrc`; for anything
+that must run on Node 20, set it per shell and never relink Homebrew
+machine-wide, because operator-kit requires Node 24:
+
+    export PATH="/opt/homebrew/opt/node@20/bin:$PATH" && node -v
+
+**Prove which Node a build used from its log, not from the config.** The
+`INSTALL_CUSTOM_TOOLS` phase of a pinned build reads `Installing node v24.21.0 …
+Now using node v24.21.0`. An unpinned build's same phase holds only its start and
+end markers, and the Node it actually ran is the `- Node.js` line under
+`SPIN_UP_BUILDER`. The log is brotli-compressed JSON lines from
+`eas build:view <id> --json`, which returns two `logFiles` — and **which index is
+the build log is not stable between builds**. Build 3's was index 1, build 4's
+was index 0. The wrong file is a valid log with no Node lines in it, which reads
+as "unpinned" when it only means "wrong file". Pick by filename: the build log is
+the one *without* `-xcode` in its name.
+
+**Runtime 1.0.0 now spans two Node majors, separated by channel.** Runtime
+version is the app version, and the Director kept 1.0.0 rather than bumping:
+
+    channel testflight    builds 1-3, Node 20.19.4, ten OTA updates published
+    channel production    build 4 onward, Node 24.21.0, no OTA history
+
+The channel is what routes updates, so the two populations cannot exchange them.
+**Do not publish the same OTA to both channels** while both Node majors are in
+use. That is the only path by which they could still mix, and nothing enforces
+it.
+
+**Submitting needs no Apple login.** `eas submit` uses an App Store Connect API
+key stored on EAS — Key ID `FUKYXV8BN7`, source "EAS servers". `eas.json`
+carries only the app id, so the key is invisible from the repository. It
+submits unattended, and it spends the build number the moment it uploads:
+
+    npx eas submit --platform ios --id <build-id> --profile testflight
+
+`--profile testflight` there is the *submit* profile, the only one defined, and
+it carries nothing but the app id — the same for both lanes. It does not make the
+build a TestFlight-profile build.
+
+`bin/expo_build` and `bin/expo_prebuild` were removed on 2026-09-13. Neither had
+ever run -- both used `ruby <<'RUBY' "$MANIFEST_FILE"`, which hands Ruby the
+manifest as its script, so they died on line 1 of the YAML before doing
+anything. Every real build went through the npm scripts, which is why nobody
+noticed and why the wrappers' presets were free to rot: two named profiles that
+`eas.json` never defined, and none for `testflight`, the only lane in use.
+`DojoMate-Expo`, the reference, has no such wrapper either.
+
+Do not rename `build:testflight` or `build:production`. Control B's permission
+profile denies them by exact string; a rename leaves a runnable build command
+covered by no deny rule.
+
+**The Android lanes are not configured, and that is the real gap.** Tier 5
+above -- Android side-loading for China, where there is no Google Play -- has no
+profile and no script. `mobile/eas.json` defines `development`, `testflight` and
+`production` only. `DojoMate-Expo` has the shape to copy, Observed 2026-09-13:
+
+    production             distribution store,    android buildType app-bundle
+    production-apk         distribution internal, android buildType apk
+    production-china-apk   distribution internal, android buildType apk,
+                           channel production-china
+
+Note the separate channel on the China build: it is its own OTA population, not
+a variant of production. Adding these is a release-lane decision and is the
+Director's, not cleanup.
+
 ## Client Release Tiers
 
 Five tiers, ordered by how fast a result arrives and how much it means. Speed
@@ -121,6 +366,32 @@ and fidelity trade against each other down the list.
    available there. **Not configured**: no build profile, no channel, no
    reference in `eas.json`, `app.config.js` or `versioning.js` as of
    2026-09-12. It is a tier in the Director's plan, not in the repository.
+
+**What each tier skips, and who catches it.** The tiers are a safety net only
+if the loop above checks what the loop below never runs. Director's model,
+2026-09-12:
+
+| tier | skips | caught by |
+| --- | --- | --- |
+| dev client | the QR scan, loading and unloading a temple, and the whole release config path | TestFlight |
+| TestFlight | native changes, store submission | a new build |
+| new build | — | reserved for when the app is stable |
+
+The dev client auto-loads a real temple on a local Rails, named by
+`TEMPLEMATE_LOCAL_TENANT_SLUG`, and never shows the scanner. It is a real
+tenant row with real data; only the scan is skipped. That is deliberate: the
+scan is one feature, and paying for it on every session — running the web
+portal, signing in, fetching a code — would tax all the work that has nothing
+to do with temples. The cost is that the skipped step is invisible until
+TestFlight, which is acceptable because TestFlight is production conditions
+anyway.
+
+**Dev and release resolve configuration through different code**
+(`releaseConfiguration` returns null outside the release lanes), so a passing
+dev run says nothing about whether a release build starts. That is not a
+theoretical gap: on 2026-09-12 the boot checks that could have bricked the app
+existed only on the release path, and no amount of dev-client running would
+have reached them.
 
 TestFlight is production, not staging. It is a separate lane the Director uses
 for his own testing; the App Store line is tier 4.

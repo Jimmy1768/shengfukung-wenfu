@@ -51,7 +51,7 @@ if (pkg.version !== versioning.appVersion || developmentConfig.version !== versi
 // deliberately per TestFlight upload, per the marketing-version-stays-
 // fixed convention in ops/docs/plans/TEMPLEMATE_REFINE.md); Android
 // hasn't shipped a build yet, so it still pins to 1.
-if (versioning.iosBuildNumber !== '2' || versioning.androidVersionCode !== 1) fail('build values must match the current accepted pin (iOS 2, Android 1)');
+if (versioning.iosBuildNumber !== '4' || versioning.androidVersionCode !== 1) fail('build values must match the current accepted pin (iOS 4, Android 1)');
 if (project.name !== 'komainu') fail('internal project name must be komainu');
 if (developmentConfig.owner !== 'jimmy1768' || productionConfig.owner !== 'jimmy1768') fail('development and production public config must use the exact EAS owner');
 if (developmentConfig.extra.eas?.projectId !== 'c7b8523a-2fad-4123-bc96-0c0c85a23dec' || productionConfig.extra.eas?.projectId !== 'c7b8523a-2fad-4123-bc96-0c0c85a23dec') fail('development and production public config must use the exact EAS project ID');
@@ -83,7 +83,7 @@ for (const config of [developmentConfig, productionConfig]) {
 }
 if (!publicConfigurationMatrix.development || !publicConfigurationMatrix.production || JSON.stringify(publicConfigurationMatrix).match(/secret|client[_-]?id|token/i)) fail('OAuth configuration matrix must remain public and nonsecret');
 if (!eas.build?.development?.developmentClient || eas.build.development.android?.buildType !== 'apk') fail('development APK profile is missing');
-for (const lane of ['testflight', 'production']) if (eas.build?.[lane]?.channel !== lane || eas.build[lane]?.env?.TEMPLEMATE_CLIENT_MODE !== 'real') fail(`${lane} release profile is invalid`);
+for (const lane of ['testflight', 'production']) if (eas.build?.[lane]?.channel !== lane) fail(`${lane} release profile is invalid`);
 if (JSON.stringify(eas).match(/autoIncrement/i)) fail('auto-increment configuration is forbidden');
 if (!fs.existsSync(path.join(root, 'assets', 'dev-icon.png')) || !fs.existsSync(path.join(root, 'assets', 'dev-adaptive-icon.png'))) fail('development artwork is missing');
 if (activeSourceHasRejectedIdentifier) fail('rejected tenant, admin, country, or SourceGrid identifier remains in active mobile source');

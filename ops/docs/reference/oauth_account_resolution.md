@@ -2,7 +2,7 @@
 
 Covers the Rails-side policy for what happens when an OAuth (Apple/Google)
 sign-in doesn't cleanly match an existing account. `templemate_native_oauth.md`
-covers the Expo/mobile transaction plumbing (PKCE, dummy driver, deep link) —
+covers the Expo/mobile transaction plumbing (PKCE, deep link) —
 this document covers the account-resolution *decision* that plumbing feeds
 into, which is separate and did not previously have a reference doc.
 
