@@ -1,7 +1,8 @@
 # Mobile web — plan
 
-Wenfu Planning, 2026-09-25. **Phased, not implemented.** The measurements this
-rests on are in `MOBILE_WEB_READINESS_SCAN.md`.
+Wenfu Planning, 2026-09-25. **Phase 1's two named items are done; Phases 2 and
+3 are not started.** The measurements this rests on are in
+`MOBILE_WEB_READINESS_SCAN.md`.
 
 ## The decision
 
@@ -39,14 +40,26 @@ text on every page until the real details arrived. The server did the same for
 any temple that had not filled a section in. Now nothing shows while loading, an
 empty field is hidden label and all, and a guard test fails if the text returns.
 
-**Still open:**
+**Menu tap targets — done, 2026-09-25** (assignment 036). On a phone the seven
+menu links were 30.4px tall — 14px text at the 1.6 line-height plus 4px of
+padding — and the menu button 43.6px, both under the 44px minimum for a
+comfortable tap. Both are now 44px, and the whole row takes the tap, not just
+the words. The desktop header is unchanged, measured before and after at
+1280px. The open menu grew from 246px to 341px against a 400px cap: an eighth
+link still fits; a ninth needs the cap raised.
 
-- **Menu links are 30px tall.** Raise them to the 44px minimum for a
-  comfortable tap.
+**Not scheduled: nine smaller targets.** The scan counted 17 targets under 44px
+on the homepage, and the menu was eight of them. Phase 1 never named the other
+nine. Measured on the live homepage at 375px, 2026-09-25:
+
+- two text links in the page body, "查看全部活動 →" and "前往最新消息 →", at
+  19px — the smallest on the page
+- five footer links at 28px, and the footer's "Email 聯絡" button at 33.6px
+- the brand link in the header, at 40px
 
 **Restored: the Director's Contact subtitles** (assignment 033). 032 removed
-two lines of his own copy because one carried a "（… Placeholder）" suffix and
-the other mentions "在後台". Both are back as he wrote them: the page subtitle
+them because one carried a "（… Placeholder）" suffix and the other mentions
+"在後台". Both are back as written: the page subtitle
 "地址、地圖、開放時間、停車與大眾運輸", shown when a temple has written no service
 notes, and the 交通 / 停車 section's "在後台可隨時更新資訊，方便信眾掌握動線。".
 The first had never actually reached a visitor before: an admin note came first

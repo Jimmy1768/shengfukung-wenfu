@@ -137,6 +137,9 @@ const accountLoginUrl = buildAccountLoginUrl();
 }
 
 .menu-toggle {
+  /* 44px is the comfortable minimum for a finger. The toggle is phone-only --
+     the desktop block hides it -- so this needs no counterpart there. */
+  min-height: 44px;
   justify-self: end;
   border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
   border-radius: var(--radius-sm);
@@ -178,6 +181,16 @@ const accountLoginUrl = buildAccountLoginUrl();
 }
 
 .nav-link {
+  /* Phone rules. Each link measured 30px -- 14px text at the global 1.6
+     line-height, plus 4px of padding top and bottom -- which is under the 44px
+     a finger needs. min-height raises the box; flex centres the label inside it
+     so the extra height is not all below the text; and because the link is the
+     flex item, the whole 44px is the tap target rather than just the text.
+     These three are undone in the 900px block: the same links sit inline in the
+     desktop header and must not grow. */
+  min-height: 44px;
+  display: flex;
+  align-items: center;
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-sm);
   font-size: 14px;
@@ -225,6 +238,11 @@ const accountLoginUrl = buildAccountLoginUrl();
   }
 
   .nav-link {
+    /* Undo the phone tap-target rules. A flex item is blockified, so `block` is
+       what these links already computed to here; min-height returns to nothing.
+       The desktop header is unchanged. */
+    min-height: 0;
+    display: block;
     font-size: 15px;
   }
 
