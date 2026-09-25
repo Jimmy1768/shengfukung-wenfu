@@ -5,12 +5,16 @@ import project from '@/app/project.js';
 import { useTempleContent } from '@/app/siteContent.js';
 import { submitTempleContactRequest } from '@/app/templeApi.js';
 import ContactDrawer from '@/components/ContactDrawer.vue';
-import placeholders from '@shared/app_constants/temple_profile_placeholders.json';
 
 const siteContent = useTempleContent();
 const route = useRoute();
-const contactPlaceholder = placeholders.contact || {};
-const contact = computed(() => siteContent.data?.contact || contactPlaceholder);
+// No placeholder fallback here. The contact object used to fall back to the
+// shared admin-facing defaults, which
+// meant every visitor saw "尚未設定地址（請至後台「Temple Profile」更新）" -- an
+// instruction addressed to an admin -- for as long as the fetch took, on every
+// page load, longer on a slow phone. An empty object renders nothing, and each
+// line below is hidden until it has a real value.
+const contact = computed(() => siteContent.data?.contact || {});
 const brandName = computed(() => siteContent.data?.name || project.name);
 const englishName = computed(() => siteContent.data?.englishName || project.englishName);
 const isContactOpen = ref(false);
@@ -118,7 +122,7 @@ async function submitContact(event) {
       <div class="cols">
         <div class="col">
           <div class="title">{{ brandName }}</div>
-          <div class="muted">地址：{{ contact.addressZh }}</div>
+          <div v-if="contact.addressZh" class="muted">地址：{{ contact.addressZh }}</div>
           <div v-if="contact.plusCode" class="muted">Plus Code：{{ contact.plusCode }}</div>
           <div class="link-stack info-links">
             <router-link class="link contact-link" to="/contact">
@@ -146,7 +150,7 @@ async function submitContact(event) {
 
         <div class="col">
           <div class="title">{{ footerCopy.contactTitle }}</div>
-          <div class="muted">{{ footerCopy.phoneLabel }}：{{ contact.phone }}</div>
+          <div v-if="contact.phone" class="muted">{{ footerCopy.phoneLabel }}：{{ contact.phone }}</div>
           <div class="link-stack contact-links">
             <button type="button" class="link email-us-link" @click="openContactModal">{{ footerCopy.emailUsLabel }}</button>
           </div>

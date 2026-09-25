@@ -30,20 +30,30 @@ started. Tested on a real Pixel 8 in Chrome, portrait:
 
 ## Phase 1 — Vue polish
 
-Small, and safe to do now.
+**Placeholder text — done, 2026-09-25** (assignment 032). The public footer
+showed "地址：尚未設定地址（請至後台「Temple Profile」更新）" — an instruction to
+an admin, shown to the public. It turned out not to be missing data: the demo
+temple's address, Plus Code and phone were already on production. The site fell
+back to a stand-in text file while a page loaded, so every visitor saw the admin
+text on every page until the real details arrived. The server did the same for
+any temple that had not filled a section in. Now nothing shows while loading, an
+empty field is hidden label and all, and a guard test fails if the text returns.
+
+**Still open:**
 
 - **Menu links are 30px tall.** Raise them to the 44px minimum for a
   comfortable tap.
-- **The public footer shows unset placeholders**: "地址：尚未設定地址（請至後台
-  「Temple Profile」更新）", "Plus Code 尚未設定", "電話：尚未設定電話". That
-  text is an instruction to an admin, shown to the public. Two ways to fix it,
-  and they are not the same fix:
-  - fill in the demo temple's address, Plus Code and phone in the admin Temple
-    Profile — content, and it fixes this temple only
-  - stop showing unset fields on the public site at all — code, and it fixes
-    every future temple too
+- **The Contact page subtitle.** Its fallback was
+  "地址、地圖、開放時間、停車與大眾運輸（{temple} Placeholder）". The marker had
+  to go; 032 dropped the whole line, so a temple with no service notes has no
+  subtitle there. **[DIRECTOR]** Keep the descriptive half as default copy, or
+  leave it out.
 
-  **[DIRECTOR]** Which one, or both.
+**Kept deliberately: the hidden demo showcase.** Every temple site carries the
+template's "Golden Template Demo" pages at `/demo` and `/marketing`, including a
+disabled nav item labelled "Custom Feature Placeholder". They are reachable by
+typing the path. The Director, 2026-09-25: keep them. The router already
+protects them in a comment. They are not a leftover to clean up.
 
 ## Phase 2 — Payment in the app
 
