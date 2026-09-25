@@ -64,32 +64,30 @@ class TempleSerializer
     end
   end
 
+  # These four returned AppConstants::TempleProfilePlaceholders when a temple had
+  # written nothing, which meant the public API served admin instructions --
+  # "尚未設定地址（請至後台「Temple Profile」更新）" and the rest -- to anyone who
+  # asked for a temple that had not filled a section in. Observed 2026-09-25 on
+  # the public footer, where those strings reached real visitors.
+  #
+  # An empty hash rather than nil: a consumer reading `contact.phone` gets
+  # nothing instead of raising, which is the same shape it already handled for a
+  # field a temple had left blank. The site hides what is empty; the API's job is
+  # to say there is nothing, not to invent something to say.
   def contact_payload
-    data = temple.contact_details
-    return data if data.present?
-
-    AppConstants::TempleProfilePlaceholders.contact
+    temple.contact_details.presence || {}
   end
 
   def service_times_payload
-    data = temple.service_schedule
-    return data if data.present?
-
-    AppConstants::TempleProfilePlaceholders.service_times
+    temple.service_schedule.presence || {}
   end
 
   def visit_info_payload
-    data = temple.visit_info
-    return data if data.present?
-
-    AppConstants::TempleProfilePlaceholders.visit_info
+    temple.visit_info.presence || {}
   end
 
   def about_payload
-    data = temple.about_content
-    return data if data.present?
-
-    AppConstants::TempleProfilePlaceholders.about
+    temple.about_content.presence || {}
   end
 
   def hero_images_payload

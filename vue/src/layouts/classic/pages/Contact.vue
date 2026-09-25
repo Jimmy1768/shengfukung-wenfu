@@ -3,26 +3,24 @@ import { computed, onMounted, ref } from 'vue';
 import PageHero from '@/components/site/PageHero.vue';
 import SectionTitle from '@/components/site/SectionTitle.vue';
 import SimpleCard from '@/components/site/SimpleCard.vue';
-import project from '@/app/project.js';
 import { useHeroImage, useTempleContent } from '@/app/siteContent.js';
-import placeholders from '@shared/app_constants/temple_profile_placeholders.json';
 
 const siteContent = useTempleContent();
-const contactPlaceholder = placeholders.contact || {};
-const servicePlaceholder = placeholders.service_times || {};
-const visitPlaceholder = placeholders.visit_info || {};
-const contact = computed(() => siteContent.data?.contact || contactPlaceholder);
-const serviceTimes = computed(
-  () => siteContent.data?.service_times || servicePlaceholder
+// No placeholder fallbacks. These used to resolve to the admin-facing strings
+// in the shared placeholder JSON, which meant a visitor was told to "至後台
+// 「Temple Profile」更新" while the fetch was in flight, and permanently for any
+// section a temple had left empty. Empty objects render nothing, and every line
+// below is guarded so a label never appears without its value.
+const contact = computed(() => siteContent.data?.contact || {});
+const serviceTimes = computed(() => siteContent.data?.service_times || {});
+const visitInfo = computed(() => siteContent.data?.visit_info || {});
+const heroSubtitle = computed(() => siteContent.data?.service_times?.notes || '');
+
+const hasContactDetails = computed(() =>
+  Boolean(contact.value.phone || contact.value.addressZh || contact.value.plusCode || contact.value.addressEn)
 );
-const visitInfo = computed(
-  () => siteContent.data?.visit_info || visitPlaceholder
-);
-const heroSubtitle = computed(
-  () =>
-    siteContent.data?.service_times?.notes ||
-    servicePlaceholder.notes ||
-    `地址、地圖、開放時間、停車與大眾運輸（${project.name} Placeholder）`
+const hasSchedule = computed(() =>
+  Boolean(serviceTimes.value.weekday || serviceTimes.value.weekend || serviceTimes.value.notes)
 );
 const heroImage = useHeroImage('contact');
 
@@ -67,16 +65,18 @@ const showDirectionsLink = computed(
     <section class="section">
       <div class="wrap">
         <div class="grid contact-grid">
-          <SimpleCard title="聯絡資訊">
+          <SimpleCard v-if="hasContactDetails" title="聯絡資訊">
             <div class="info">
-              <div>電話：{{ contact.phone }}</div>
-              <div>地址：{{ contact.addressZh }}</div>
+              <div v-if="contact.phone">電話：{{ contact.phone }}</div>
+              <div v-if="contact.addressZh">地址：{{ contact.addressZh }}</div>
               <div v-if="contact.plusCode">Plus Code：{{ contact.plusCode }}</div>
-              <div class="info-divider" aria-hidden="true" />
-              <div class="info-block">
-                <p class="info-label">英文地址</p>
-                <p>{{ contact.addressEn }}</p>
-              </div>
+              <template v-if="contact.addressEn">
+                <div class="info-divider" aria-hidden="true" />
+                <div class="info-block">
+                  <p class="info-label">英文地址</p>
+                  <p>{{ contact.addressEn }}</p>
+                </div>
+              </template>
               <div class="map-links" v-if="mapLink">
                 <a class="map-link" :href="mapLink" target="_blank" rel="noreferrer">
                   在 Google 地圖開啟
@@ -93,17 +93,17 @@ const showDirectionsLink = computed(
               </div>
             </div>
           </SimpleCard>
-          <SimpleCard title="開放時間">
+          <SimpleCard v-if="hasSchedule" title="開放時間">
             <div class="info schedule-info">
-              <div class="schedule-row">
+              <div v-if="serviceTimes.weekday" class="schedule-row">
                 <div class="schedule-label">平日</div>
                 <div class="schedule-value">{{ serviceTimes.weekday }}</div>
               </div>
-              <div class="schedule-row">
+              <div v-if="serviceTimes.weekend" class="schedule-row">
                 <div class="schedule-label">假日 / 特殊日</div>
                 <div class="schedule-value">{{ serviceTimes.weekend }}</div>
               </div>
-              <div class="schedule-row">
+              <div v-if="serviceTimes.notes" class="schedule-row">
                 <div class="schedule-label">備註</div>
                 <div class="schedule-value">{{ serviceTimes.notes }}</div>
               </div>
@@ -113,20 +113,22 @@ const showDirectionsLink = computed(
 
         <div class="sp" />
 
-        <SectionTitle title="交通 / 停車" subtitle="在後台可隨時更新資訊，方便信眾掌握動線。" />
-        <div class="grid">
-          <SimpleCard title="交通方式">
-            <div class="info">
-              <p>{{ visitInfo.transportation }}</p>
-            </div>
-          </SimpleCard>
+        <template v-if="visitInfo.transportation || visitInfo.parking">
+          <SectionTitle title="交通 / 停車" />
+          <div class="grid">
+            <SimpleCard v-if="visitInfo.transportation" title="交通方式">
+              <div class="info">
+                <p>{{ visitInfo.transportation }}</p>
+              </div>
+            </SimpleCard>
 
-          <SimpleCard title="停車 / 提醒">
-            <div class="info">
-              <p>{{ visitInfo.parking }}</p>
-            </div>
-          </SimpleCard>
-        </div>
+            <SimpleCard v-if="visitInfo.parking" title="停車 / 提醒">
+              <div class="info">
+                <p>{{ visitInfo.parking }}</p>
+              </div>
+            </SimpleCard>
+          </div>
+        </template>
       </div>
     </section>
   </div>

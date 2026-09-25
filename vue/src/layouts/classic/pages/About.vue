@@ -4,48 +4,38 @@ import PageHero from '@/components/site/PageHero.vue';
 import SectionTitle from '@/components/site/SectionTitle.vue';
 import SimpleCard from '@/components/site/SimpleCard.vue';
 import { useHeroImage, useTempleContent } from '@/app/siteContent.js';
-import placeholders from '@shared/app_constants/temple_profile_placeholders.json';
 
 const siteContent = useTempleContent();
 const heroImage = useHeroImage('about');
-const aboutPlaceholder = placeholders.about || {};
 
-const aboutContent = computed(
-  () => siteContent.data?.about || aboutPlaceholder
-);
+// Genuine default copy, kept as a literal rather than read from the shared
+// placeholder JSON. It describes the page to a visitor and says nothing to an
+// admin, so it is the one string here that is safe to show a temple that has
+// written nothing -- and holding it locally is what lets this file have no
+// fallback into the placeholder file at all.
+const DEFAULT_HERO_SUBTITLE = '認識本廟的歷史、信仰與參拜文化。';
+
+const aboutContent = computed(() => siteContent.data?.about || {});
 
 const heroSubtitle = computed(
-  () =>
-    aboutContent.value?.hero_subtitle ||
-    aboutPlaceholder.hero_subtitle ||
-    '把歷史、主祀神明、參拜禮儀，用清楚的段落呈現（Placeholder）。'
+  () => aboutContent.value?.hero_subtitle || DEFAULT_HERO_SUBTITLE
 );
 
 const sectionTitle = computed(
   () => aboutContent.value?.section_title || '本廟簡介'
 );
 
+// A card is its title and its body together. A title with no body is scaffolding
+// for an admin -- it tells a visitor a section exists and then shows them
+// nothing -- so an empty-bodied card is dropped rather than rendered hollow.
+// There is no invented card: a temple that has written no about content shows
+// no cards, and the section below hides with them.
 const aboutCards = computed(() => {
   const cards = aboutContent.value?.cards;
-  if (Array.isArray(cards) && cards.length > 0) {
-    return cards;
+  if (!Array.isArray(cards)) {
+    return [];
   }
-  return (
-    aboutPlaceholder.cards || [
-      {
-        title: '沿革（Placeholder）',
-        body: '例如：創建年代、地方故事、重要里程碑。'
-      },
-      {
-        title: '主祀 / 配祀（Placeholder）',
-        body: '例如：主神、陪祀神祇、簡短介紹與參拜重點。'
-      },
-      {
-        title: '參拜禮儀（Placeholder）',
-        body: '例如：入廟動線、禁忌提醒、拍照注意事項。'
-      }
-    ]
-  );
+  return cards.filter((card) => card && String(card.body || '').trim().length > 0);
 });
 </script>
 
@@ -59,15 +49,17 @@ const aboutCards = computed(() => {
 
     <section class="section">
       <div class="wrap">
-        <SectionTitle :title="sectionTitle" />
-        <div class="stack">
-          <SimpleCard
-            v-for="(card, index) in aboutCards"
-            :key="card.title || index"
-            :title="card.title"
-            :body="card.body"
-          />
-        </div>
+        <template v-if="aboutCards.length > 0">
+          <SectionTitle :title="sectionTitle" />
+          <div class="stack">
+            <SimpleCard
+              v-for="(card, index) in aboutCards"
+              :key="card.title || index"
+              :title="card.title"
+              :body="card.body"
+            />
+          </div>
+        </template>
       </div>
     </section>
   </div>
