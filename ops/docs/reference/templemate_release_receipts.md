@@ -5,6 +5,7 @@
 | 1.0.0 | 1 | 1 | uploaded, distributed, installed by staff | see the update table below |
 | 1.0.0 | 2 | 1 | **uploaded to App Store Connect 2026-08-20** | none recorded |
 | 1.0.0 | 3 | 1 | built, submitted, live on TestFlight, verified on device 2026-09-14 | none recorded |
+| 1.0.0 | 4 | 1 | built on Node 24.21.0, submitted 2026-09-25, processing at Apple | none recorded |
 
 Build 1 was uploaded to TestFlight, installed by Director's staff, and reported
 green (Director, 2026-08-31). `versioning.js` was bumped to iOS build 2
@@ -23,6 +24,52 @@ and nothing in `versioning.js` shows that.
 Apple-side state is not visible from this repository. Any claim about
 submission, review, or acceptance status must come from the Director or App
 Store Connect, never from inference off `versioning.js`.
+
+## iOS build 4 — 2026-09-25
+
+| | |
+| --- | --- |
+| EAS build | `e2044b6d-c7f8-4a75-ad10-06e519cb2f29` |
+| EAS submission | `0ef6a6d7-db82-4dfc-9386-cfcee69de116`, status finished |
+| Profile / channel | `production` / `production`, distribution store — the first production-profile build this project has made |
+| Version / runtime | 1.0.0 / 1.0.0 |
+| Node | **24.21.0**, pinned — the first build that is |
+| Source commit | `97a0bf4` on branch `node-24-migration`, not yet merged to `main` |
+| Built | 2026-09-24, started 21:07 |
+| Submitted | 2026-09-25, by Planning with the Director's go, via `eas submit` |
+| Verified | not yet — device verification is the Director's |
+
+**Built on Node 24, and the log proves it rather than the config.** Its
+`INSTALL_CUSTOM_TOOLS` phase reads `Installing node v24.21.0 … Checksums
+matched! … Now using node v24.21.0 (npm v11.19.0)`. Build 3's same phase held
+only start and end markers, so it took the VM image default — which is still
+`Node.js 20.19.4` on the image build 4 ran on. That absent line is how build 3
+was identified as unpinned, and its presence here is the proof the migration
+reached EAS.
+
+**Why 1.0.0 and not 1.0.1.** Runtime version is the app version, and runtime
+1.0.0 already carries three Node 20 builds and ten OTA updates on the
+`testflight` channel. The Director kept 1.0.0 and moved the build to the
+`production` channel instead, which had never existed — `eas channel:view
+production` returned "Could not find channel". So build 4 starts with no OTA
+history and cannot pull a Node 20 bundle, and the `testflight` population
+cannot receive anything published to `production`. The channel does what a
+version bump would have done. The one rule it leaves: **do not publish the same
+OTA to both channels** while the two Node majors coexist.
+
+**No Apple login was needed for either step.** Signing used the distribution
+certificate and provisioning profile stored on EAS. Submission used an App Store
+Connect API key also stored on EAS — Key ID `FUKYXV8BN7`, source "EAS servers".
+`mobile/eas.json` carries only the app id and no key path, so the key is not
+visible from the repository; an earlier note assumed a submit would therefore
+ask for the Director's Apple ID. It did not.
+
+**Reading EAS logs: the file order is not stable.** `eas build:view --json`
+returns two `logFiles`, and which one is the build log varies by build. For
+build 3 it was index 1; for build 4 it was index 0, with the Xcode log at
+index 1. Fetching the wrong one returns a valid log with no Node lines in it,
+which reads as "unpinned" when it is only "wrong file". Pick by filename, not by
+position.
 
 ## iOS build 3 — 2026-09-14
 
