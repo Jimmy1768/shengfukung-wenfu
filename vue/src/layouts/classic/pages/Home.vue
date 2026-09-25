@@ -12,14 +12,11 @@ import {
   useTempleNews
 } from '@/app/siteContent.js';
 import { formatEventCard } from '@/utils/events.js';
-import { buildRegistrationLink } from '@/utils/accountLinks.js';
-import placeholders from '@shared/app_constants/temple_profile_placeholders.json';
 
 const siteContent = useTempleContent();
 const heroImage = useHeroImage('home');
 const events = useTempleEvents();
 const newsFeed = useTempleNews();
-const contactPlaceholder = placeholders.contact || {};
 
 const heroTitle = computed(
   () => siteContent.data?.tagline || project.tagline || project.name
@@ -30,39 +27,21 @@ const heroSubtitle = computed(
     `用清楚的方式呈現 ${project.name} 的活動資訊、祈福服務與公告；讓長輩也能快速找到時間、地點、方式。`
 );
 
-const contactInfo = computed(
-  () => siteContent.data?.contact || contactPlaceholder
-);
+// No placeholder fallback: an empty object renders nothing while the fetch is
+// in flight, rather than the admin-facing defaults a visitor used to see.
+const contactInfo = computed(() => siteContent.data?.contact || {});
 const defaultLocation = computed(
   () => contactInfo.value.addressZh || '本廟'
 );
+// Real events only. This used to invent two -- a new year blessing on
+// 2026/01/05 and a lantern offering on 2026/02/12, each marked as a sample in
+// its title and each carrying a working registration link. A visitor could read
+// a date, a place and "可報名" for a service that did not exist, and the temple
+// would hear about it. A temple with no events now shows no events, and the
+// section hides with them.
 const upcoming = computed(() => {
   if (!events.value?.length) {
-    return [
-      {
-        slug: 'new-year-blessing',
-        month: 'JAN',
-        day: '05',
-        title: '新年祈福法會（Placeholder）',
-        when: '2026/01/05 09:00',
-        where: '本廟主殿',
-        summary: '簡短說明文字，之後改成來自 Rails API。',
-        badge: '可報名'
-      },
-      {
-        slug: 'lantern-offering',
-        month: 'FEB',
-        day: '12',
-        title: '點燈／祈福服務日（Placeholder）',
-        when: '2026/02/12 10:00',
-        where: '服務處',
-        summary: '用清楚的條列與流程頁面會更適合。',
-        badge: '名額有限'
-      }
-    ].map((item) => ({
-      ...item,
-      ctaHref: buildRegistrationLink('event', item.slug)
-    }));
+    return [];
   }
 
   return events.value.slice(0, 2).map((event) =>
@@ -97,7 +76,7 @@ const latestNews = computed(() =>
       ctaTo="/events"
     />
 
-    <section class="section">
+    <section v-if="upcoming.length > 0" class="section">
       <div class="wrap">
         <SectionTitle
           title="活動資訊速覽"
