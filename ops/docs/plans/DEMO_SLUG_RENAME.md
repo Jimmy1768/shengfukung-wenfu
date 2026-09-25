@@ -170,13 +170,50 @@ apply cleanly. Either `main` is promoted to `release/current` in full first, or
 the rename is implemented a second time on `release/current`. **[DIRECTOR]**
 decides which.
 
+**Phase B — done, 2026-09-25.** Promoted as `08fb844`. `db:migrate` renamed
+the production record ("renamed 1 temple from shengfukung-wenfu to
+shengfukung-demo", id 1 and its 3 registrations kept), and after the restart
+`https://shengfukung.com.tw/api/v1/temple` served `shengfukung-demo`.
+
+**But production's project slug did not move, and Phase B's check could not
+see it.** `AppConstants::Project.slug` reads `ENV["PROJECT_SLUG"]` before
+`project.json`, and the shared env file sets `PROJECT_SLUG=shengfukung-wenfu`.
+Observed on production after Phase B:
+
+    AppConstants::Project.slug     = "shengfukung-wenfu"   from the env file
+    Profile::Identity.app_codename = "shengfukung_demo"    reads project.json directly
+    temple found by the project slug: nil
+
+Two readers of one concept with different precedence, so the rename reached one
+and not the other. The public site still shows the right temple because the
+resolver falls back to the first temple by id, and the demo is id 1. The admin
+area uses the slug only as a brand label. Nothing a visitor sees is broken —
+but the site finds its temple by fallback, not by name.
+
+Phase B was verified by *what* the API served, not *how* it resolved. The
+fallback produced the right answer, so that check could not fail. Control A's
+criterion 6 test asserts the route (`:project_default`, not `:scope_fallback`),
+but tests do not load production's env file.
+
+**The rule that governs the fix — Director, 2026-09-25: an env file carries
+its own slug.** `/etc/default/shengfukung-wenfu-env` keeps
+`PROJECT_SLUG=shengfukung-wenfu` and is not edited. The demo deployment gets
+its own `/etc/default/shengfukung-demo-env` with
+`PROJECT_SLUG=shengfukung-demo`, and the demo's units load that. This is the
+shape the code already assumes: `AppConstants::Project.systemd_env_file` builds
+`/etc/default/#{SLUG}-env`. So Phase C is no longer cosmetic — loading the demo
+env file is what makes production's project slug correct.
+
 ### Phase C — infrastructure names. [DIRECTOR — sudo, downtime]
 
 One maintenance window, everything together, because each piece refers to the
 others by path:
 
 - The four units `shengfukung-wenfu-*` → `shengfukung-demo-*`.
-- `/etc/default/shengfukung-wenfu-env` → `/etc/default/shengfukung-demo-env`.
+- `/etc/default/shengfukung-demo-env` created as a copy of the wenfu file with
+  `PROJECT_SLUG=shengfukung-demo`. `shengfukung-wenfu-env` is **left in place,
+  unedited**, still carrying `PROJECT_SLUG=shengfukung-wenfu` — nothing loads it
+  after the switch.
 - `/var/www/shengfukung-wenfu` → `/var/www/shengfukung-demo`; `manifest.yml`'s
   `vue_dir` and `project.json`'s `marketingRoot` follow.
 - The nginx configs; `shengfukung.com.tw` keeps pointing at the demo, now at the

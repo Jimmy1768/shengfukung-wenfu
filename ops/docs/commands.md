@@ -13,18 +13,24 @@ ssh jimmy1768_user@174.138.18.211
 ## 📂 Project Directory & Logs
 
 ```bash
-cd Projects/shengfukung-wenfu
-# Puma
-tail -f log/production.log
-# Sidekiq
-tail -f log/sidekiq.log
-# Journal
-sudo journalctl -u puma.service -f
+cd ~/Projects/shengfukung-wenfu
 
-set -a
-source /etc/default/shengfukung-wenfu-env
-set +a
-RAILS_ENV=production rails console
+# Rails writes its own log; Sidekiq writes nothing to disk and goes to the
+# journal. Both corrected 2026-09-25 -- this block said log/production.log and
+# log/sidekiq.log at the repository root, neither of which exists.
+tail -f rails/log/production.log
+sudo journalctl -u shengfukung-wenfu-puma -f
+sudo journalctl -u shengfukung-wenfu-sidekiq -f
+
+# LOAD BOTH ENV FILES, shared first and then this checkout's instance.env --
+# the same order systemd uses. Since the environment partition (2026-09-14),
+# RAILS_ENV, RACK_ENV, PUMA_PORT, PGDATABASE and S3_OBJECT_PREFIX live only in
+# instance.env. The shared file alone leaves Rails with no database. No inline
+# RAILS_ENV=production either: instance.env supplies it, and a second source is
+# the precedence surface the partition removed.
+cd ~/Projects/shengfukung-wenfu/rails
+set -a && . /etc/default/shengfukung-wenfu-env && . ~/Projects/shengfukung-wenfu/instance.env && set +a
+~/.rbenv/bin/rbenv exec bundle exec rails console
 ```
 
 ## Production shell / restart
@@ -208,11 +214,20 @@ cd rails
 #        Could not find rails-7.1.6, puma-... in locally installed gems
 ~/.rbenv/bin/rbenv exec bundle install
 
-# Sourcing the env file is what an interactive shell needs and systemd gets for
-# free from EnvironmentFile=. Without it: "Missing JWT_SECRET_KEY in production".
-set -a && source /etc/default/shengfukung-wenfu-env && set +a
-RAILS_ENV=production ~/.rbenv/bin/rbenv exec bundle exec rails db:migrate   # when there are migrations
-RAILS_ENV=production ~/.rbenv/bin/rbenv exec bundle exec rails <task>       # any other rake task
+# Sourcing the env files is what an interactive shell needs and systemd gets
+# for free from its two EnvironmentFile= lines. Both, in that order: since the
+# environment partition, RAILS_ENV and PGDATABASE are only in instance.env, so
+# sourcing the shared file alone -- which is what this said until 2026-09-25 --
+# migrates against no database. Without the shared file: "Missing
+# JWT_SECRET_KEY in production".
+#
+# db:migrate, never db:schema:load, db:reset or db:setup on a live database. A
+# schema load records every migration up to schema.rb's version as applied
+# without running it, which silently skips data migrations such as the
+# 2026-09-25 demo temple rename.
+set -a && . /etc/default/shengfukung-wenfu-env && . ~/Projects/shengfukung-wenfu/instance.env && set +a
+~/.rbenv/bin/rbenv exec bundle exec rails db:migrate   # when there are migrations
+~/.rbenv/bin/rbenv exec bundle exec rails <task>       # any other rake task
 
 # Ad-hoc Ruby against production: put it in a file and scp it. Inlining Ruby in
 # `bin/rails runner "..."` through ssh has to survive both the local and remote
@@ -220,7 +235,7 @@ RAILS_ENV=production ~/.rbenv/bin/rbenv exec bundle exec rails <task>       # an
 # quotes, #{} or $ -- it fails as a Ruby syntax error that looks like a code
 # bug rather than a quoting one.
 #   scp check.rb jimmy1768_user@<host>:/tmp/check.rb
-#   ssh ... 'cd ~/Projects/shengfukung-wenfu/rails && set -a && source /etc/default/shengfukung-wenfu-env && set +a && RAILS_ENV=production ~/.rbenv/bin/rbenv exec bundle exec rails runner /tmp/check.rb; rm -f /tmp/check.rb'
+#   ssh ... 'cd ~/Projects/shengfukung-wenfu/rails && set -a && . /etc/default/shengfukung-wenfu-env && . ~/Projects/shengfukung-wenfu/instance.env && set +a && ~/.rbenv/bin/rbenv exec bundle exec rails runner /tmp/check.rb; rm -f /tmp/check.rb'
 
 # Frontend, when vue/ changed. No sudo -- /var/www is owned by the deploy user,
 # and building as root leaves files Puma's user cannot replace.
@@ -275,8 +290,8 @@ curl -sS -o /dev/null -w '%{http_code}\n' http://127.0.0.1:4002/up
 
 # Phase 0 media prefix migration (dry run by default; apply=1 writes)
 # See ops/docs/plans/MEDIA_ASSET_REMOVAL_AND_ORPHAN_RECLAMATION_PLAN.md
-RAILS_ENV=production ~/.rbenv/bin/rbenv exec bundle exec rails media:migrate_prefix
-RAILS_ENV=production ~/.rbenv/bin/rbenv exec bundle exec rails media:migrate_prefix apply=1
+~/.rbenv/bin/rbenv exec bundle exec rails media:migrate_prefix             # after loading both env files, as above
+~/.rbenv/bin/rbenv exec bundle exec rails media:migrate_prefix apply=1   # after loading both env files, as above
 
 # Registration period key governance (Phase B)
 # Audit invalid service/registration period keys and write a remediation report
