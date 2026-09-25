@@ -32,7 +32,7 @@ not its `encrypted_password` column. Every other account is unaffected --
 this is a narrow, email-scoped special case, not a change to how
 authentication works generally.
 
-Practical effect: the password lives only in `/etc/default/shengfukung-wenfu-env`
+Practical effect: the password lives only in `/etc/default/shengfukung-demo-env`
 in production (never in git), and removing that line makes the account
 unusable immediately, even though its database row and hash still exist.
 Rotating the password means updating that one env line -- the account

@@ -174,6 +174,11 @@ match (`monthly-collection` and `monthly-review` against an installed
 rather than installing the reviewed files, which is what took production down
 for five minutes on 2026-08-19.
 
+Since the 2026-09-25 rename these four still carry the old name, and any path
+inside them that named the checkout now names a folder that no longer exists —
+`~/Projects/shengfukung-wenfu` became `~/Projects/shengfukung-demo`. They are
+inactive with no timer scheduled, so nothing fails; they would, if started.
+
 Reverse drift is not built. Until it is, the answer to "what is running on that
 host" is the listing, not this check.
 
@@ -437,7 +442,7 @@ just that capability gates work. Local dev/test database work is unrelated
 
 ## shengfukung.com.tw Is a Demo Temple, Not a Real Client
 
-`shengfukung-wenfu` (public domain `shengfukung.com.tw`) is used to demo
+`shengfukung-demo` (public domain `shengfukung.com.tw`) is used to demo
 TempleMate to prospective clients and is deliberately unlocked to create
 registrations without paying the platform setup fee — but it is
 deliberately excluded from real platform-billing (no statement, delivery,
@@ -446,6 +451,41 @@ mechanisms, not one flag: `ops/docs/reference/shengfukung_demo_temple_status.md`
 Do not complete a real Stripe setup checkout for it to "fix" anything, and
 do not assume unlocked-for-registrations implies real-client, or vice
 versa.
+
+**Named `shengfukung-demo` since 2026-09-25.** It was `shengfukung-wenfu`,
+which is now reserved for a real temple should one onboard. The rename moved
+the temple's record — in place, id 1, registrations kept — its config files,
+and the demo deployment's infrastructure: units `shengfukung-demo-*`, checkouts
+`~/Projects/shengfukung-demo` and `-staging`, `/var/www/shengfukung-demo`, and
+the nginx configs. The repository keeps its own name, and so does the
+Director's Mac checkout.
+
+**An env file carries its own slug** (Director, 2026-09-25). The demo's units
+load `/etc/default/shengfukung-demo-env`, whose `PROJECT_SLUG` is
+`shengfukung-demo`. `/etc/default/shengfukung-wenfu-env` still exists with
+`PROJECT_SLUG=shengfukung-wenfu` and is loaded by nothing — reserved, not
+stale. Never edit one file's slug to name another temple.
+
+**The slug has two readers with different precedence, and that bit once.**
+`AppConstants::Project.slug` reads `ENV["PROJECT_SLUG"]` before `project.json`;
+`Profile::Identity.app_codename` reads `project.json` directly. After the record
+was renamed but before the demo env file existed, production resolved
+`shengfukung-wenfu` through the first and `shengfukung_demo` through the second,
+found no temple by name, and served the demo only because the resolver falls
+back to the first temple by id. The check at the time verified *what* the API
+served, not *how* it found the temple, so it could not fail. **Verify
+resolution by route, not by output:** `Temple.find_by(slug:
+AppConstants::Project.slug)` must return the temple.
+
+**Seeded accounts kept their emails.** The demo accounts log in as
+`@shengfukung-wenfu.local`, locally and on production; the rename changed a
+temple record, not user emails. The seeds build addresses from the slug, so
+running them again adds `@shengfukung-demo.local` accounts alongside.
+
+**Data migrations run only under `db:migrate`.** A schema load records every
+migration up to `schema.rb`'s version as applied without running it, so the
+rename migration would have done nothing on any database built from schema.
+Never `db:schema:load`, `db:reset` or `db:setup` a live database.
 
 ## OperatorKit Copying Boundary
 

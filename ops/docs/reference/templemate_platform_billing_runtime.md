@@ -60,7 +60,7 @@ NT$1,600.
 
 ## Protected runtime configuration
 
-`/etc/default/shengfukung-wenfu-env` holds the protected values:
+`/etc/default/shengfukung-demo-env` holds the protected values:
 
 ```dotenv
 STRIPE_SECRET_KEY=
@@ -169,7 +169,7 @@ inert for two independent reasons, not one:
 - No scheduler was ever active before the two-phase timers above were
   built (see "Deterministic enqueue schedule") -- and those timers are
   themselves still installed disabled, per the first-tenant gate below.
-- The `shengfukung-wenfu` demo temple has no `stripe_customer_id` or
+- The `shengfukung-demo` demo temple has no `stripe_customer_id` or
   `stripe_payment_method_id` saved in `billing_settings`. Even a manual
   invocation would raise `"Verified Stripe customer is required"` before
   reaching Stripe -- nothing would be charged regardless of the

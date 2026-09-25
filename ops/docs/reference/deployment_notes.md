@@ -96,35 +96,32 @@
   * install dependencies (`npm`, `yarn`, or `pnpm` depending on the lockfile or `PACKAGE_MANAGER`),
   * run the Vue `build` script, and
   * sync `vue/dist/` into `/var/www/<client-slug>` (override with `DEPLOY_DIR=/opt/www`) via `rsync --delete`.
-- Vite public-content calls are tenant-local, relative `/api/v1/temple` paths. Local Vite development proxies them to Rails on `4001`; live production uses `4003` behind Nginx; `4002` was live staging until staging was disabled 2026-09-05. Do not configure a public API-base URL, `localhost`, or a raw application port into a Vue build.
+- Vite public-content calls are tenant-local, relative `/api/v1/temple` paths. Local Vite development proxies them to Rails on `4001`; live production uses `4003` behind Nginx; staging runs on `4002`. Do not configure a public API-base URL, `localhost`, or a raw application port into a Vue build.
 - Branch promotion follows the same split: `main` is the verified integration
-  branch and is what staging ran, while `release/current` is the
-  isolated live branch. **Staging was disabled 2026-09-05**
-  (`systemctl disable --now` on both units); the infrastructure below is still
-  installed and the description still accurate, but nothing is listening on
-  `4002`. Staging was standing infrastructure -- a separate
-  systemd puma/sidekiq pair (`ops/systemd/shengfukung-wenfu-staging-*.service`),
-  a separate nginx vhost (`ops/nginx/shengfukung-wenfu-staging.conf`), and a
-  separate database (`templemate_data_staging` -- never production's
-  `templemate_data` or the local `templemate_dev`), all
-  running from their own checkout
-  (`/home/jimmy1768_user/Projects/shengfukung-wenfu-staging`), independent
-  of the production checkout.
-  Deliberately no separate staging env file -- Director's call: staging
-  exists to protect the production server, not to multiply file-management
-  surface. Staging's systemd units share production's own
-  `/etc/default/shengfukung-wenfu-env` (`EnvironmentFile=`) and override
-  exactly four values (`RAILS_ENV=staging`, `PUMA_PORT=4002`,
-  `PGDATABASE=templemate_data_staging`, `S3_OBJECT_PREFIX=staging` -- the last
-  added by the Phase 0 prefix work) as an `ExecStart` command prefix,
-  not an `Environment=` directive -- per `systemd.exec(7)`'s documented
-  source-precedence order, `EnvironmentFile=` is resolved after
-  `Environment=` and always wins, so an `Environment=` override here would
-  have been silently overwritten back to production's own values. Verified
-  directly against `man systemd.exec` on the host, not assumed.
-  `SECRET_KEY_BASE`/`JWT_SECRET_KEY` are intentionally reused as-is from
-  production's file (Director's call, given this is a non-sensitive demo
-  temple) rather than staging-specific.
+  branch and is what staging runs, while `release/current` is the isolated live
+  branch. Staging was disabled 2026-09-05 and re-enabled 2026-09-14; it listens
+  on `4002`. It is standing infrastructure -- a separate systemd puma/sidekiq
+  pair (`ops/systemd/shengfukung-demo-staging-*.service`), a separate nginx
+  vhost (`ops/nginx/shengfukung-demo-staging.conf`), and a separate database
+  (`templemate_data_staging` -- never production's `templemate_data` or the
+  local `templemate_dev`), all running from their own checkout
+  (`/home/jimmy1768_user/Projects/shengfukung-demo-staging`), independent of
+  the production checkout.
+  Environment, since the 2026-09-14 partition: every unit loads two files, the
+  shared `/etc/default/shengfukung-demo-env` first and then its own checkout's
+  `instance.env`. The instance file holds exactly the five values that differ
+  between the deployments -- `RAILS_ENV`, `RACK_ENV`, `PUMA_PORT`,
+  `PGDATABASE`, `S3_OBJECT_PREFIX` -- and the shared file holds none of them,
+  so no value is set in two places and there is nothing to override. Staging
+  used to share production's file and override four values through an
+  `ExecStart` command prefix; that prefix, and the precedence question that
+  justified it, are gone.
+  `/etc/default/shengfukung-wenfu-env` also exists, carries
+  `PROJECT_SLUG=shengfukung-wenfu`, and is loaded by nothing. An env file
+  carries its own slug (Director, 2026-09-25); that one is reserved.
+  `SECRET_KEY_BASE`/`JWT_SECRET_KEY` are intentionally reused as-is from the
+  shared file (Director's call, given this is a non-sensitive demo temple)
+  rather than staging-specific.
   Promote the exact accepted `main` commit to `release/current` only after
   confirmation, then deploy the live Rails/Vue release through the `4003`
   production path.

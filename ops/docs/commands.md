@@ -3,8 +3,12 @@
 ```bash
 
 # Droplet (DigitalOcean) taiwan-01-web -- same as its shell hostname.
-# Two checkouts live on it: shengfukung-wenfu (production, 4003) and
-# shengfukung-wenfu-staging (staging, 4002).
+# Two checkouts live on it: shengfukung-demo (production, 4003) and
+# shengfukung-demo-staging (staging, 4002). Both load
+# /etc/default/shengfukung-demo-env. /etc/default/shengfukung-wenfu-env also
+# exists, carries PROJECT_SLUG=shengfukung-wenfu, and is loaded by nothing: it
+# is reserved, not stale. An env file carries its own slug (Director,
+# 2026-09-25); do not edit it to say demo.
 ssh jimmy1768_user@174.138.18.211
 
 ```
@@ -13,14 +17,14 @@ ssh jimmy1768_user@174.138.18.211
 ## 📂 Project Directory & Logs
 
 ```bash
-cd ~/Projects/shengfukung-wenfu
+cd ~/Projects/shengfukung-demo
 
 # Rails writes its own log; Sidekiq writes nothing to disk and goes to the
 # journal. Both corrected 2026-09-25 -- this block said log/production.log and
 # log/sidekiq.log at the repository root, neither of which exists.
 tail -f rails/log/production.log
-sudo journalctl -u shengfukung-wenfu-puma -f
-sudo journalctl -u shengfukung-wenfu-sidekiq -f
+sudo journalctl -u shengfukung-demo-puma -f
+sudo journalctl -u shengfukung-demo-sidekiq -f
 
 # LOAD BOTH ENV FILES, shared first and then this checkout's instance.env --
 # the same order systemd uses. Since the environment partition (2026-09-14),
@@ -28,22 +32,22 @@ sudo journalctl -u shengfukung-wenfu-sidekiq -f
 # instance.env. The shared file alone leaves Rails with no database. No inline
 # RAILS_ENV=production either: instance.env supplies it, and a second source is
 # the precedence surface the partition removed.
-cd ~/Projects/shengfukung-wenfu/rails
-set -a && . /etc/default/shengfukung-wenfu-env && . ~/Projects/shengfukung-wenfu/instance.env && set +a
+cd ~/Projects/shengfukung-demo/rails
+set -a && . /etc/default/shengfukung-demo-env && . ~/Projects/shengfukung-demo/instance.env && set +a
 ~/.rbenv/bin/rbenv exec bundle exec rails console
 ```
 
 ## Production shell / restart
 
 ```bash
-cd ~/Projects/shengfukung-wenfu/rails
+cd ~/Projects/shengfukung-demo/rails
 
-sudo nano /etc/default/shengfukung-wenfu-env
+sudo nano /etc/default/shengfukung-demo-env
 
 # Restart services
 sudo systemctl daemon-reload
-sudo systemctl restart shengfukung-wenfu-puma
-sudo systemctl restart shengfukung-wenfu-sidekiq
+sudo systemctl restart shengfukung-demo-puma
+sudo systemctl restart shengfukung-demo-sidekiq
 ```
 
 ## Internal operator pages
@@ -134,8 +138,11 @@ sudo bin/capture_live_configs
 bin/update_conf_template_after_certbot
 
 # Create first-time production env file from template (per temple slug)
-SLUG=shengfukung-wenfu
-sudo install -m 600 -o root -g root ops/env/template.temple.env /etc/default/${SLUG}-env
+SLUG=shengfukung-demo
+# 640 root:jimmy1768_user, matching both live env files: the deploy user must
+# read it, because bin/staging sources it. This said -m 600 -o root -g root
+# until 2026-09-25, which produced a file nothing but root could read.
+sudo install -m 640 -o root -g jimmy1768_user ops/env/template.temple.env /etc/default/${SLUG}-env
 sudo nano /etc/default/${SLUG}-env
 
 # One-time Rails setup on a new droplet (bundle install + db:setup + Vue deps)
@@ -178,16 +185,18 @@ bin/run_smoke_tests
 # `sudo bin/apply_systemd_units` re-rendered the units from a template instead
 # of using the committed files, and took production down for five minutes.
 # Deploy is run by hand, in this order.
-cd ~/Projects/shengfukung-wenfu
+cd ~/Projects/shengfukung-demo
 git fetch origin && git reset --hard origin/release/current
 
 cd rails
 
-# NOTHING RUBY IS ON THE INTERACTIVE PATH ON THIS HOST. Not `bundle`, not
+# NOTHING RUBY IS ON THE INTERACTIVE PATH ON THIS HOST. (A non-interactive
+# `ssh host 'cmd'` does get rbenv's shims -- observed 2026-09-25 -- which is why
+# a command can work from a script and fail in a login shell.) Not `bundle`, not
 # `ruby`, and not `rbenv` itself. `bin/rails` and `bin/bundle` are
 # `#!/usr/bin/env ruby` binstubs and fail the same way. Every unit file calls
 # rbenv by absolute path for exactly this reason -- see
-# ops/systemd/shengfukung-wenfu-puma.service:18 -- so prefix every Ruby command
+# ops/systemd/shengfukung-demo-puma.service:26 -- so prefix every Ruby command
 # here with the same path:
 #
 #     ~/.rbenv/bin/rbenv exec <command>
@@ -225,7 +234,7 @@ cd rails
 # schema load records every migration up to schema.rb's version as applied
 # without running it, which silently skips data migrations such as the
 # 2026-09-25 demo temple rename.
-set -a && . /etc/default/shengfukung-wenfu-env && . ~/Projects/shengfukung-wenfu/instance.env && set +a
+set -a && . /etc/default/shengfukung-demo-env && . ~/Projects/shengfukung-demo/instance.env && set +a
 ~/.rbenv/bin/rbenv exec bundle exec rails db:migrate   # when there are migrations
 ~/.rbenv/bin/rbenv exec bundle exec rails <task>       # any other rake task
 
@@ -235,18 +244,18 @@ set -a && . /etc/default/shengfukung-wenfu-env && . ~/Projects/shengfukung-wenfu
 # quotes, #{} or $ -- it fails as a Ruby syntax error that looks like a code
 # bug rather than a quoting one.
 #   scp check.rb jimmy1768_user@<host>:/tmp/check.rb
-#   ssh ... 'cd ~/Projects/shengfukung-wenfu/rails && set -a && . /etc/default/shengfukung-wenfu-env && . ~/Projects/shengfukung-wenfu/instance.env && set +a && ~/.rbenv/bin/rbenv exec bundle exec rails runner /tmp/check.rb; rm -f /tmp/check.rb'
+#   ssh ... 'cd ~/Projects/shengfukung-demo/rails && set -a && . /etc/default/shengfukung-demo-env && . ~/Projects/shengfukung-demo/instance.env && set +a && ~/.rbenv/bin/rbenv exec bundle exec rails runner /tmp/check.rb; rm -f /tmp/check.rb'
 
 # Frontend, when vue/ changed. No sudo -- /var/www is owned by the deploy user,
 # and building as root leaves files Puma's user cannot replace.
-cd ~/Projects/shengfukung-wenfu && bin/deploy_vue shengfukung-wenfu
+cd ~/Projects/shengfukung-demo && bin/deploy_vue shengfukung-demo
 
-sudo systemctl restart shengfukung-wenfu-puma
-sudo systemctl restart shengfukung-wenfu-sidekiq
+sudo systemctl restart shengfukung-demo-puma
+sudo systemctl restart shengfukung-demo-sidekiq
 
 # Verify from the journal, not `systemctl status` -- during the 2026-08-19
 # outage status showed "active (running)" while Puma was crash-looping.
-sudo journalctl -u shengfukung-wenfu-puma -n 40 --no-pager
+sudo journalctl -u shengfukung-demo-puma -n 40 --no-pager
 
 # Staging bring-up (recorded 2026-09-14, the first time staging was started
 # after being disabled 2026-09-05).
@@ -256,7 +265,7 @@ sudo journalctl -u shengfukung-wenfu-puma -n 40 --no-pager
 # the verified integration branch and is what staging runs. Everything below
 # is the production sequence pointed at the other checkout -- there is no
 # separate procedure, and inventing one is how the two drift.
-cd ~/Projects/shengfukung-wenfu-staging
+cd ~/Projects/shengfukung-demo-staging
 git fetch origin && git reset --hard origin/main
 
 # Its gems are separate from production's. A staging checkout left down while
@@ -271,20 +280,20 @@ cd rails && ~/.rbenv/bin/rbenv exec bundle install
 # temple_gallery_photos table its gallery needs. db:migrate, never
 # db:schema:load -- a schema load marks pending data migrations as done
 # without running them.
-cd ~/Projects/shengfukung-wenfu-staging && bin/staging rails db:migrate
+cd ~/Projects/shengfukung-demo-staging && bin/staging rails db:migrate
 
-sudo systemctl enable --now shengfukung-wenfu-staging-puma shengfukung-wenfu-staging-sidekiq
-sudo systemctl restart shengfukung-wenfu-staging-puma shengfukung-wenfu-staging-sidekiq
-systemctl is-active shengfukung-wenfu-staging-puma shengfukung-wenfu-staging-sidekiq
+sudo systemctl enable --now shengfukung-demo-staging-puma shengfukung-demo-staging-sidekiq
+sudo systemctl restart shengfukung-demo-staging-puma shengfukung-demo-staging-sidekiq
+systemctl is-active shengfukung-demo-staging-puma shengfukung-demo-staging-sidekiq
 
 # `enable --now` reports the symlink even when the service then dies, so check
 # is-active, and read the journal rather than `systemctl status`.
-sudo journalctl -u shengfukung-wenfu-staging-puma -n 40 --no-pager
+sudo journalctl -u shengfukung-demo-staging-puma -n 40 --no-pager
 
 # What staging actually connected to. This is the check the whole environment
 # partition exists for: staging must resolve templemate_data_staging, never
 # production's templemate_data.
-cd ~/Projects/shengfukung-wenfu-staging/rails && RAILS_ENV=staging ~/.rbenv/bin/rbenv exec bundle exec rails runner 'puts ActiveRecord::Base.connection.execute(%q{SELECT current_database()}).first'
+cd ~/Projects/shengfukung-demo-staging/rails && RAILS_ENV=staging ~/.rbenv/bin/rbenv exec bundle exec rails runner 'puts ActiveRecord::Base.connection.execute(%q{SELECT current_database()}).first'
 
 curl -sS -o /dev/null -w '%{http_code}\n' http://127.0.0.1:4002/up
 
@@ -296,13 +305,13 @@ curl -sS -o /dev/null -w '%{http_code}\n' http://127.0.0.1:4002/up
 # Registration period key governance (Phase B)
 # Audit invalid service/registration period keys and write a remediation report
 cd rails && bin/rails registration_period_keys:audit OUTPUT=tmp/registration_period_key_audit.json
-cd rails && bin/rails registration_period_keys:audit SLUG=shengfukung-wenfu OUTPUT=tmp/registration_period_key_audit.json
+cd rails && bin/rails registration_period_keys:audit SLUG=shengfukung-demo OUTPUT=tmp/registration_period_key_audit.json
 
 # Dry-run fallback remap (no writes)
-cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shengfukung-wenfu FALLBACK_KEY=perennial
+cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shengfukung-demo FALLBACK_KEY=perennial
 
 # Apply fallback remap (writes)
-cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shengfukung-wenfu FALLBACK_KEY=perennial APPLY=true
+cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shengfukung-demo FALLBACK_KEY=perennial APPLY=true
 
 # Registration period support workflow (Phase C)
 # 1) Edit rails/db/temples/<slug>.yml registration_periods (keys + labels)
@@ -310,27 +319,27 @@ cd rails && bin/rails registration_period_keys:remap_invalid SLUG=shengfukung-we
 ruby ops/scripts/sync_offering_configs.rb
 
 # 3) Re-bootstrap temple identity + registration periods into DB for the target temple
-cd rails && bin/rails "temples:cleanup[shengfukung-wenfu]"
-cd rails && bin/rails "temples:bootstrap[shengfukung-wenfu]"
+cd rails && bin/rails "temples:cleanup[shengfukung-demo]"
+cd rails && bin/rails "temples:bootstrap[shengfukung-demo]"
 
 # 4) Validate no invalid period keys remain
-cd rails && bin/rails registration_period_keys:audit SLUG=shengfukung-wenfu OUTPUT=tmp/registration_period_key_audit.json
+cd rails && bin/rails registration_period_keys:audit SLUG=shengfukung-demo OUTPUT=tmp/registration_period_key_audit.json
 
 # 5) Deploy updated app artifacts
-bin/deploy_vue shengfukung-wenfu
+bin/deploy_vue shengfukung-demo
 
 # Registration period yearly rollover (Phase D)
 # Dry-run one temple (default: no writes)
-cd rails && bin/rails registration_period_keys:rollover_year SLUG=shengfukung-wenfu OUTPUT=tmp/registration_period_rollover.json
+cd rails && bin/rails registration_period_keys:rollover_year SLUG=shengfukung-demo OUTPUT=tmp/registration_period_rollover.json
 
 # Dry-run all temples
 cd rails && bin/rails registration_period_keys:rollover_year OUTPUT=tmp/registration_period_rollover.json
 
 # Apply YAML rollover for one temple
-cd rails && bin/rails registration_period_keys:rollover_year SLUG=shengfukung-wenfu WRITE=true OUTPUT=tmp/registration_period_rollover_apply.json
+cd rails && bin/rails registration_period_keys:rollover_year SLUG=shengfukung-demo WRITE=true OUTPUT=tmp/registration_period_rollover_apply.json
 
 # Apply YAML rollover + update existing services (explicit flag)
-cd rails && bin/rails registration_period_keys:rollover_year SLUG=shengfukung-wenfu WRITE=true UPDATE_SERVICES=true OUTPUT=tmp/registration_period_rollover_apply.json
+cd rails && bin/rails registration_period_keys:rollover_year SLUG=shengfukung-demo WRITE=true UPDATE_SERVICES=true OUTPUT=tmp/registration_period_rollover_apply.json
 
 # Registration lifecycle expiry automation
 # Runs expiring-soon notifications, cancels stale unpaid holds, then sends expired notifications.
@@ -401,7 +410,7 @@ bin/rails db:migrate
 
 - `bin/rails db:seed` now provisions a `Temple` record keyed by `AppConstants::Project.slug`, default pages/sections, and links the seeded owner admin to that temple. The temple-specific copy lives in `rails/db/temples/<slug>.yml`; add a file per client and run `bin/rails temples:seed[slug]` whenever you need to upsert another profile. Run that same command on the production droplet the first time you deploy a temple so the live DB matches the YAML baseline.
 - Marketing/demo console (`/marketing/admin`) still uses the `PROJECT_DEFAULT_ADMIN_*` env vars (`admin@<project-slug>.local` / `GoldenTemplate!123` by default).
-- The real temple admin console (`/admin`) now authenticates against the actual `User` records you seed (e.g., `bin/rails "admin_controls:seed_owner[shengfukung-wenfu,email@example.com,Password]"`). Use those seeded credentials when signing in.
+- The real temple admin console (`/admin`) now authenticates against the actual `User` records you seed (e.g., `bin/rails "admin_controls:seed_owner[shengfukung-demo,email@example.com,Password]"`). Use those seeded credentials when signing in.
 - Admin console → “Profile” lets you edit the copy/contact info surfaced on the Vue site. Form submissions append a `SystemAuditLog`.
 - The Vue app calls relative tenant-local `/api/v1/temple` paths. In local development, Vite proxies those paths to Rails on `http://localhost:4001`; there is no public API-base or temple-selector environment setting.
 - Expo builds now read `EXPO_PROJECT_SLUG`, `EXPO_PROJECT_SCHEME`, `EXPO_ANDROID_PACKAGE`, and `EXPO_IOS_BUNDLE_IDENTIFIER` (falling back to the shared keys when absent), so add those to `.env.*` alongside `MOBILE_API_BASE_URL`, `MOBILE_JWT_LOGIN_PATH`, and `MOBILE_JWT_REFRESH_PATH`.
@@ -503,6 +512,13 @@ adb install -r /Volumes/DevSSD/Projects/sourcegrid-labs/mobilebuild-176545495588
 ---
 
 # Dummy Logins
+
+These accounts exist under `@shengfukung-wenfu.local` on local development and on
+production, and those addresses are what log in. The 2026-09-25 rename changed
+the demo temple's record, not any user's email. The seeds build these addresses
+from the project slug, so running them again now *adds* `@shengfukung-demo.local`
+accounts beside these rather than renaming them.
+
 ```
 Owner Admin  – owner@shengfukung-wenfu.local  /  DemoPassword!23
 Staff Admin  – admin@shengfukung-wenfu.local  /  DemoPassword!23
