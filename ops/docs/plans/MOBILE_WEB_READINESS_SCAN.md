@@ -1,5 +1,11 @@
 # Mobile web readiness — a scan, not a plan
 
+> **Superseded as a decision record by `MOBILE_WEB_PLAN.md` (2026-09-25).** Read
+> this for the measurements. Its later sections describe the decision while it
+> was still being made — the fork, the acquisition model — and the plan is where
+> it landed: the Vue public site works on a phone, portrait only; the Rails
+> account area gets no mobile version and sends phones to the app.
+
 Wenfu Planning, 2026-09-14. **Nothing here is approved for implementation.**
 It records what was measured and what it implies, so the decision about scope
 can be made on evidence rather than on impression.
