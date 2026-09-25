@@ -1,9 +1,9 @@
-# ops/systemd/shengfukung-wenfu-staging-sidekiq.service
+# ops/systemd/shengfukung-demo-staging-sidekiq.service
 #
 # Systemd unit for the staging Sidekiq worker. Mirrors
-# shengfukung-wenfu-sidekiq.service except for the working directory and
+# shengfukung-demo-sidekiq.service except for the working directory and
 # the same three explicit runtime overrides as
-# shengfukung-wenfu-staging-puma.service (RAILS_ENV, PUMA_PORT,
+# shengfukung-demo-staging-puma.service (RAILS_ENV, PUMA_PORT,
 # PGDATABASE) -- see that unit's comments for why they're applied as an
 # ExecStart command prefix rather than an Environment= directive, and why
 # there is no separate staging env file.
@@ -15,8 +15,8 @@ After=network.target
 [Service]
 Type=simple
 User=jimmy1768_user
-WorkingDirectory=/home/jimmy1768_user/Projects/shengfukung-wenfu-staging/rails
-EnvironmentFile=/etc/default/shengfukung-wenfu-env
+WorkingDirectory=/home/jimmy1768_user/Projects/shengfukung-demo-staging/rails
+EnvironmentFile=/etc/default/shengfukung-demo-env
 # The instance file is named by the checkout path, so this deployment cannot
 # read the other's: which code and which data go together is a filesystem fact,
 # not a list entry. It is listed SECOND because where two EnvironmentFile= lines
@@ -24,7 +24,7 @@ EnvironmentFile=/etc/default/shengfukung-wenfu-env
 # the migration safe in stages -- it already wins before anything is removed from
 # the shared file. There is no `-` prefix: `EnvironmentFile=-/path` skips a
 # missing file silently and throws away that whole property.
-EnvironmentFile=/home/jimmy1768_user/Projects/shengfukung-wenfu-staging/instance.env
+EnvironmentFile=/home/jimmy1768_user/Projects/shengfukung-demo-staging/instance.env
 ExecStart=/usr/bin/bash -lc "/home/jimmy1768_user/.rbenv/bin/rbenv exec bundle exec sidekiq -r . -C config/sidekiq.yml"
 Restart=always
 

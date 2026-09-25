@@ -20,7 +20,7 @@
 # fails if one appears. Fixing drift is a deploy, which is a different act with
 # a different approval.
 #
-# DELIBERATELY OUT OF SCOPE: /etc/default/shengfukung-wenfu-env. Do not add it.
+# DELIBERATELY OUT OF SCOPE: /etc/default/shengfukung-demo-env. Do not add it.
 # That file is not a copy of ops/env/template.temple.env -- the template carries
 # placeholder values and the installed file carries real ones, so a content
 # comparison there reports drift on every line and means nothing. It also holds

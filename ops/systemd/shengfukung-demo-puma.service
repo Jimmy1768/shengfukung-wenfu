@@ -1,4 +1,4 @@
-# ops/systemd/shengfukung-wenfu.service
+# ops/systemd/shengfukung-demo.service
 #
 # Systemd unit template for the Puma web server.
 #
@@ -13,8 +13,8 @@ After=network.target
 [Service]
 Type=simple
 User=jimmy1768_user
-WorkingDirectory=/home/jimmy1768_user/Projects/shengfukung-wenfu/rails
-EnvironmentFile=/etc/default/shengfukung-wenfu-env
+WorkingDirectory=/home/jimmy1768_user/Projects/shengfukung-demo/rails
+EnvironmentFile=/etc/default/shengfukung-demo-env
 # The instance file is named by the checkout path, so this deployment cannot
 # read the other's: which code and which data go together is a filesystem fact,
 # not a list entry. It is listed SECOND because where two EnvironmentFile= lines
@@ -22,7 +22,7 @@ EnvironmentFile=/etc/default/shengfukung-wenfu-env
 # the migration safe in stages -- it already wins before anything is removed from
 # the shared file. There is no `-` prefix: `EnvironmentFile=-/path` skips a
 # missing file silently and throws away that whole property.
-EnvironmentFile=/home/jimmy1768_user/Projects/shengfukung-wenfu/instance.env
+EnvironmentFile=/home/jimmy1768_user/Projects/shengfukung-demo/instance.env
 ExecStart=/usr/bin/bash -lc "/home/jimmy1768_user/.rbenv/bin/rbenv exec bundle exec puma -C config/puma.rb"
 Restart=always
 
