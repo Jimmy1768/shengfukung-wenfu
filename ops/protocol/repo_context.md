@@ -270,8 +270,53 @@ caller's shell.
 
 Builds are npm scripts in `mobile/package.json`. There is no wrapper:
 
-    npm run build:testflight    ios, profile testflight    <- the live lane
-    npm run build:production    ios, profile production
+    npm run build:production    ios, profile production    <- the live lane, from build 4
+    npm run build:testflight    ios, profile testflight    <- builds 1-3; served its purpose
+
+The Director moved the live lane to `production` on 2026-09-24: "the testflight
+one served its purpose."
+
+**Node is pinned: 24.21.0.** In `mobile/.nvmrc`, and as `node` in every
+`mobile/eas.json` build profile. Before 2026-09-24 nothing pinned it, so EAS
+chose, invisibly — builds 1 to 3 took the VM image default, Node 20.19.4. Build
+4 is the first built on a pinned Node. Local work follows `.nvmrc`; for anything
+that must run on Node 20, set it per shell and never relink Homebrew
+machine-wide, because operator-kit requires Node 24:
+
+    export PATH="/opt/homebrew/opt/node@20/bin:$PATH" && node -v
+
+**Prove which Node a build used from its log, not from the config.** The
+`INSTALL_CUSTOM_TOOLS` phase of a pinned build reads `Installing node v24.21.0 …
+Now using node v24.21.0`. An unpinned build's same phase holds only its start and
+end markers, and the Node it actually ran is the `- Node.js` line under
+`SPIN_UP_BUILDER`. The log is brotli-compressed JSON lines from
+`eas build:view <id> --json`, which returns two `logFiles` — and **which index is
+the build log is not stable between builds**. Build 3's was index 1, build 4's
+was index 0. The wrong file is a valid log with no Node lines in it, which reads
+as "unpinned" when it only means "wrong file". Pick by filename: the build log is
+the one *without* `-xcode` in its name.
+
+**Runtime 1.0.0 now spans two Node majors, separated by channel.** Runtime
+version is the app version, and the Director kept 1.0.0 rather than bumping:
+
+    channel testflight    builds 1-3, Node 20.19.4, ten OTA updates published
+    channel production    build 4 onward, Node 24.21.0, no OTA history
+
+The channel is what routes updates, so the two populations cannot exchange them.
+**Do not publish the same OTA to both channels** while both Node majors are in
+use. That is the only path by which they could still mix, and nothing enforces
+it.
+
+**Submitting needs no Apple login.** `eas submit` uses an App Store Connect API
+key stored on EAS — Key ID `FUKYXV8BN7`, source "EAS servers". `eas.json`
+carries only the app id, so the key is invisible from the repository. It
+submits unattended, and it spends the build number the moment it uploads:
+
+    npx eas submit --platform ios --id <build-id> --profile testflight
+
+`--profile testflight` there is the *submit* profile, the only one defined, and
+it carries nothing but the app id — the same for both lanes. It does not make the
+build a TestFlight-profile build.
 
 `bin/expo_build` and `bin/expo_prebuild` were removed on 2026-09-13. Neither had
 ever run -- both used `ruby <<'RUBY' "$MANIFEST_FILE"`, which hands Ruby the
