@@ -1,7 +1,7 @@
-# ops/systemd/shengfukung-wenfu-staging-puma.service
+# ops/systemd/shengfukung-demo-staging-puma.service
 #
 # Systemd unit for the staging Puma web server. Mirrors
-# shengfukung-wenfu-puma.service except for the working directory (a
+# shengfukung-demo-puma.service except for the working directory (a
 # separate checkout, not shared with production) and three explicit
 # runtime overrides (RAILS_ENV, PUMA_PORT, PGDATABASE).
 #
@@ -30,7 +30,7 @@
 #
 # Staging runs from its own clone on its own branch (main), independent
 # of the production checkout (release/current) at
-# /home/jimmy1768_user/Projects/shengfukung-wenfu -- so promoting main
+# /home/jimmy1768_user/Projects/shengfukung-demo -- so promoting main
 # to release/current can never be blocked by, or interfere with, a
 # staging deploy in progress.
 
@@ -41,8 +41,8 @@ After=network.target
 [Service]
 Type=simple
 User=jimmy1768_user
-WorkingDirectory=/home/jimmy1768_user/Projects/shengfukung-wenfu-staging/rails
-EnvironmentFile=/etc/default/shengfukung-wenfu-env
+WorkingDirectory=/home/jimmy1768_user/Projects/shengfukung-demo-staging/rails
+EnvironmentFile=/etc/default/shengfukung-demo-env
 # The instance file is named by the checkout path, so this deployment cannot
 # read the other's: which code and which data go together is a filesystem fact,
 # not a list entry. It is listed SECOND because where two EnvironmentFile= lines
@@ -50,7 +50,7 @@ EnvironmentFile=/etc/default/shengfukung-wenfu-env
 # the migration safe in stages -- it already wins before anything is removed from
 # the shared file. There is no `-` prefix: `EnvironmentFile=-/path` skips a
 # missing file silently and throws away that whole property.
-EnvironmentFile=/home/jimmy1768_user/Projects/shengfukung-wenfu-staging/instance.env
+EnvironmentFile=/home/jimmy1768_user/Projects/shengfukung-demo-staging/instance.env
 ExecStart=/usr/bin/bash -lc "/home/jimmy1768_user/.rbenv/bin/rbenv exec bundle exec puma -C config/puma.rb"
 Restart=always
 
