@@ -47,7 +47,7 @@ class TemplesBootstrapTest < ActiveSupport::TestCase
 
   test "shengfukung bootstrap selects explicit cash-only checkout without overwriting payment credentials or billing data" do
     temple = create_temple(
-      slug: "shengfukung-wenfu",
+      slug: "shengfukung-demo",
       payment_provider_settings: {
         "ecpay" => { "merchant_id" => "keep-merchant", "hash_key" => "keep-key", "hash_iv" => "keep-iv" },
         "billing" => { "stripe_customer_id" => "cus_keep", "stripe_payment_method_id" => "pm_keep" },
@@ -56,9 +56,9 @@ class TemplesBootstrapTest < ActiveSupport::TestCase
       metadata: { "custom" => "keep" }
     )
 
-    Seeds::Temples.bootstrap(slug: "shengfukung-wenfu")
+    Seeds::Temples.bootstrap(slug: "shengfukung-demo")
     first_settings = temple.reload.payment_provider_settings.deep_dup
-    Seeds::Temples.bootstrap(slug: "shengfukung-wenfu")
+    Seeds::Temples.bootstrap(slug: "shengfukung-demo")
 
     assert_equal "cash_only", temple.reload.payment_provider_settings["patron_checkout_provider"]
     assert_equal first_settings, temple.payment_provider_settings

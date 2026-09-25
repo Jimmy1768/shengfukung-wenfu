@@ -8,8 +8,8 @@ require "test_helper"
 # its URL unsanitized while the map branch filtered placeholders.
 class TempleHeroImageFallbackTest < ActiveSupport::TestCase
   setup do
-    @temple = Temple.find_by(slug: "shengfukung-wenfu") ||
-              Temple.create!(slug: "shengfukung-wenfu", name: "示範宮廟")
+    @temple = Temple.find_by(slug: "shengfukung-demo") ||
+              Temple.create!(slug: "shengfukung-demo", name: "示範宮廟")
   end
 
   test "every tab inherits the home image when only home is uploaded" do

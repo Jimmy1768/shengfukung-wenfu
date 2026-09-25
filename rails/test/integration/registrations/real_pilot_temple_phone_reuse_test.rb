@@ -4,7 +4,7 @@ require "test_helper"
 
 module Registrations
   # Uses the real pilot-temple offering catalog (Offerings::TemplateSync
-  # against the actual shengfukung-wenfu.yml), not a synthetic offering --
+  # against the actual shengfukung-demo.yml), not a synthetic offering --
   # existing coverage (prefill_and_override_test.rb, offering_orders_registrant_flow_test.rb)
   # proves the mechanism against schema-equivalent fixtures; this proves it
   # against one of the 4 real, currently-configured offerings specifically,
@@ -12,7 +12,7 @@ module Registrations
   class RealPilotTemplePhoneReuseTest < ActionDispatch::IntegrationTest
     test "phone flows patron -> admin correction -> next registration prefill, cross surface, without ever touching the patron's own profile" do
       temple = create_temple(
-        slug: "shengfukung-wenfu",
+        slug: "shengfukung-demo",
         metadata: {
           "registration_periods" => [
             { "key" => "perennial", "label_zh" => "常年供燈", "label_en" => "Perennial" }

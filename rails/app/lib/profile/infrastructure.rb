@@ -66,7 +66,7 @@ module Profile
     # the same S3 bucket. Deployments still override the resolved values via ENV.
     #
     module Storage
-      # "shengfukung-wenfu" -> "shengfukung_wenfu" for Postgres, "shengfukung-wenfu" for S3.
+      # "shengfukung-demo" -> "shengfukung_demo" for Postgres, "shengfukung-demo" for S3.
       def self.db_base
         normalize(AppConstants::Project.slug, "_", fallback: "app")
       end

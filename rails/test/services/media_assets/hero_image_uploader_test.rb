@@ -4,7 +4,7 @@ require "test_helper"
 
 class MediaAssets::HeroImageUploaderTest < ActiveSupport::TestCase
   test "stores hero images under uploads namespace" do
-    temple = create_temple(slug: "shengfukung-wenfu")
+    temple = create_temple(slug: "shengfukung-demo")
     admin = create_admin_user(temple: temple, role: "owner")
     uploaded_file = Rack::Test::UploadedFile.new(
       Rails.root.join("public/backend/assets/admin/hero-placeholder.svg"),
@@ -34,7 +34,7 @@ class MediaAssets::HeroImageUploaderTest < ActiveSupport::TestCase
       end
     end
 
-    assert_match %r{\Auploads/hero-images/shengfukung-wenfu/home/[0-9a-f-]+\.svg\z}, captured_key
+    assert_match %r{\Auploads/hero-images/shengfukung-demo/home/[0-9a-f-]+\.svg\z}, captured_key
     assert_equal captured_key, temple.media_assets.hero.first.file_uid
     assert_equal "https://cdn.example.test/#{captured_key}", temple.reload.hero_images["home"]
   end

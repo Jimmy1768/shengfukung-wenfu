@@ -10,7 +10,7 @@ class OfferingsRakeTest < ActiveSupport::TestCase
   end
 
   test "creates all 4 real offering templates as published, and is idempotent on re-run" do
-    temple = create_temple(slug: "shengfukung-wenfu", metadata: {
+    temple = create_temple(slug: "shengfukung-demo", metadata: {
       "registration_periods" => [
         { "key" => "perennial", "label_zh" => "常年供燈", "label_en" => "Perennial" },
         { "key" => "2026-lantern", "label_zh" => "2026 點燈", "label_en" => "2026 Lantern" },

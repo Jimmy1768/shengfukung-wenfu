@@ -77,7 +77,7 @@ test('TestFlight and production source profiles are real, public, and isolated f
     // local-development passthrough must not leak into a release lane either.
     assert.equal(config.extra.tenantSlug, undefined, 'no tenant field reaches a release lane at all');
     assert.equal(config.extra.localTempleSlug, '', 'and the dev seed is empty there');
-    assert.equal(JSON.stringify(config.extra).includes('shengfukung-wenfu'), false);
+    assert.equal(JSON.stringify(config.extra).includes('shengfukung-demo'), false);
     assert.equal(config.extra.easUpdateChannel, profile);
     assert.equal(config.updates.url, 'https://u.expo.dev/c7b8523a-2fad-4123-bc96-0c0c85a23dec');
     // Real incident, 2026-08-20: this assertion used to check
@@ -103,7 +103,7 @@ test('no release lane carries a tenant slug in its build environment', () => {
     assert.equal(env.TEMPLEMATE_PUBLIC_API_ORIGIN, 'https://shengfukung.com.tw', 'the API origin stays pinned');
     assert.equal(env.TEMPLEMATE_PUBLIC_TENANT_SLUG, undefined, `${lane} must not name a tenant`);
   }
-  assert.equal(JSON.stringify(eas).includes('shengfukung-wenfu'), false, 'one build serves every temple');
+  assert.equal(JSON.stringify(eas).includes('shengfukung-demo'), false, 'one build serves every temple');
 });
 
 test('both public configs declare QR-only camera access without Android audio recording', () => {

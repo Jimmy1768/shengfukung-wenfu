@@ -33,7 +33,7 @@ class AdminOfferingsAuditTest < ActionDispatch::IntegrationTest
 
   test "creating a templated service persists metadata-backed form fields" do
     @temple.update!(
-      slug: "shengfukung-wenfu",
+      slug: "shengfukung-demo",
       metadata: {
         "registration_periods" => [
           { "key" => "perennial", "label_zh" => "常年供燈", "label_en" => "Perennial" }

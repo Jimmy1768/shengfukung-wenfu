@@ -4,7 +4,7 @@ require "test_helper"
 
 class Admin::TempleProfileUpdateTest < ActionDispatch::IntegrationTest
   test "profile update resolves current temple when temple params are form attributes" do
-    temple = create_temple(name: "Old Temple", slug: "shengfukung-wenfu")
+    temple = create_temple(name: "Old Temple", slug: "shengfukung-demo")
     owner = create_admin_user(
       temple: temple,
       role: "owner",
@@ -60,7 +60,7 @@ class Admin::TempleProfileUpdateTest < ActionDispatch::IntegrationTest
   end
 
   test "profile update uploads selected hero image files during save" do
-    temple = create_temple(name: "Old Temple", slug: "shengfukung-wenfu")
+    temple = create_temple(name: "Old Temple", slug: "shengfukung-demo")
     owner = create_admin_user(
       temple: temple,
       role: "owner",

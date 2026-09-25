@@ -4,7 +4,7 @@ require "test_helper"
 
 module Registrations
   # Director's follow-up: can a patron actually select each of the 4 real
-  # offering templates (db/temples/offerings/shengfukung-wenfu.yml) and
+  # offering templates (db/temples/offerings/shengfukung-demo.yml) and
   # create a registration from the account side -- not just the admin side?
   # Prior coverage (real_pilot_temple_phone_reuse_test.rb) only ever
   # exercised patron self-registration against "incense-donation". Unlike
@@ -27,7 +27,7 @@ module Registrations
     ].freeze
 
     setup do
-      @temple = create_temple(slug: "shengfukung-wenfu", metadata: { "registration_periods" => REGISTRATION_PERIODS })
+      @temple = create_temple(slug: "shengfukung-demo", metadata: { "registration_periods" => REGISTRATION_PERIODS })
     end
 
     test "incense-donation: patron can select it and self-register" do
