@@ -5,7 +5,7 @@
 | 1.0.0 | 1 | 1 | uploaded, distributed, installed by staff | see the update table below |
 | 1.0.0 | 2 | 1 | **uploaded to App Store Connect 2026-08-20** | none recorded |
 | 1.0.0 | 3 | 1 | built, submitted, live on TestFlight, verified on device 2026-09-14 | none recorded |
-| 1.0.0 | 4 | 1 | built on Node 24.21.0, submitted 2026-09-25, processing at Apple | none recorded |
+| 1.0.0 | 4 | 1 | built on Node 24.21.0, submitted, live on TestFlight, verified on device 2026-09-25 | none recorded |
 
 Build 1 was uploaded to TestFlight, installed by Director's staff, and reported
 green (Director, 2026-08-31). `versioning.js` was bumped to iOS build 2
@@ -37,7 +37,7 @@ Store Connect, never from inference off `versioning.js`.
 | Source commit | `97a0bf4` on branch `node-24-migration`, not yet merged to `main` |
 | Built | 2026-09-24, started 21:07 |
 | Submitted | 2026-09-25, by Planning with the Director's go, via `eas submit` |
-| Verified | not yet — device verification is the Director's |
+| Verified | Director, 2026-09-25: installed from TestFlight, works |
 
 **Built on Node 24, and the log proves it rather than the config.** Its
 `INSTALL_CUSTOM_TOOLS` phase reads `Installing node v24.21.0 … Checksums
