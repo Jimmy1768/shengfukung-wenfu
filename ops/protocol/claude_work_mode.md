@@ -319,3 +319,8 @@ returned success and did not move it, and git in the worktree stayed denied
 until the Director moved it by hand. The same call moved Wenfu Control B
 correctly on 2026-09-10, so the failure is intermittent and not reliably
 visible to the moving session or to an observer.
+
+The move itself waits for a turn boundary. The tool grants access at once and
+moves the working directory — Bash, relative paths, project settings — when the
+current turn ends. So the check belongs in a later turn: a `pwd` in the same
+turn still shows the old directory, and that is not the failure above.
