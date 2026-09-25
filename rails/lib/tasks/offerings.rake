@@ -83,8 +83,8 @@ namespace :offerings do
   #   single-value                     -> prefill
   #       short, visible, low risk, and it preserves "don't ask again".
   #
-  #   bin/rails "offerings:annotate_reuse[shengfukung-wenfu]"          # preview
-  #   bin/rails "offerings:annotate_reuse[shengfukung-wenfu,write]"    # apply
+  #   bin/rails "offerings:annotate_reuse[shengfukung-demo]"          # preview
+  #   bin/rails "offerings:annotate_reuse[shengfukung-demo,write]"    # apply
   desc "Propose reuse: policies for a temple's offering yml (preview unless 'write')"
   task :annotate_reuse, %i[slug mode] => :environment do |_task, args|
     slug = args[:slug].presence or abort("usage: offerings:annotate_reuse[<temple-slug>,(write)]")

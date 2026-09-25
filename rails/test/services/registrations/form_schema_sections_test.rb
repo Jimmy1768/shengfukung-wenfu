@@ -56,7 +56,7 @@ module Registrations
     end
 
     test "the real pilot-temple config renders exactly what it declares" do
-      config = YAML.safe_load_file(Rails.root.join("db/temples/offerings/shengfukung-wenfu.yml"))
+      config = YAML.safe_load_file(Rails.root.join("db/temples/offerings/shengfukung-demo.yml"))
       offerings = config["offerings"] || config.values.find { |value| value.is_a?(Array) }
 
       offerings.each do |offering|

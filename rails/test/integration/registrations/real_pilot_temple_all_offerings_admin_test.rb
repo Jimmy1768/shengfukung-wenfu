@@ -4,7 +4,7 @@ require "test_helper"
 
 module Registrations
   # Director's ask: confirm all 4 of the pilot temple's real offering
-  # templates (db/temples/offerings/shengfukung-wenfu.yml) actually work
+  # templates (db/temples/offerings/shengfukung-demo.yml) actually work
   # from the admin side -- bootstrap each as a real offering the way the
   # real onboarding flow would, then create a registration for it through
   # the real admin create-order flow. Prior coverage
@@ -20,7 +20,7 @@ module Registrations
     ].freeze
 
     setup do
-      @temple = create_temple(slug: "shengfukung-wenfu", metadata: { "registration_periods" => REGISTRATION_PERIODS })
+      @temple = create_temple(slug: "shengfukung-demo", metadata: { "registration_periods" => REGISTRATION_PERIODS })
       @admin = create_admin_user(temple: @temple, permission_overrides: { manage_registrations: true })
       @patron = User.create!(
         email: "all-offerings-patron@example.com",

@@ -128,6 +128,34 @@ anything lives.
 demo temple record. Reset it, run the migration, restart, and confirm the API
 serves the temple under its new slug.
 
+**Phase A — done, 2026-09-25** (assignment 034, merged). The migration is
+`20260925000000_rename_demo_temple_slug.rb`. It renames in place, keeps
+`temple_id`, refuses to rename onto a slug that already exists, does nothing
+when the old slug is absent, and reverses.
+
+**Rehearsed on a real database before merging.** `templemate_dev` was in the
+same state as production — migrations up to `20260907000000`, the rename not
+recorded, temples `shengfukung-wenfu` and `demo-lotus`. `db:migrate` printed
+"renamed 1 temple from shengfukung-wenfu to shengfukung-demo"; the record kept
+id 1 and both its registrations.
+
+**The finding that governs Phase B: the rename runs only under `db:migrate`,
+never after a schema load.** `db:schema:load` marks every migration up to
+`schema.rb`'s version as already applied — now including this one — so a
+database built from schema records the rename as done without doing it. That is
+harmless on a fresh database, which has no old slug. On staging or production it
+would leave the record at `shengfukung-wenfu` while `project.json` says
+`shengfukung-demo`, and the public site would find no temple. **So Phase B uses
+`db:migrate`, never `db:schema:load`, `db:reset` or `db:setup`.** Observed
+2026-09-25: neither production nor staging has recorded `20260925000000`, so
+`db:migrate` will run it on both.
+
+**Staging is also one migration behind.** Its highest applied migration is
+`20260831010000`; it never ran `20260907000000_create_temple_gallery_photos`,
+which production has. Staging's checkout was moved to `main` on 2026-09-14
+without a migrate, so its gallery has had no table since. Its `db:migrate` in
+Phase B runs both migrations.
+
 ### Phase B — production switch. [DIRECTOR — sudo]
 
 Code and the record must change in one short window, because the public site

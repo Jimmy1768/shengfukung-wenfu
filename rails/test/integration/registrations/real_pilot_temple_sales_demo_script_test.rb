@@ -17,7 +17,7 @@ module Registrations
   # follow-up admin edit).
   class RealPilotTempleSalesDemoScriptTest < ActionDispatch::IntegrationTest
     setup do
-      @temple = create_temple(slug: "shengfukung-wenfu", metadata: {
+      @temple = create_temple(slug: "shengfukung-demo", metadata: {
         "registration_periods" => [{ "key" => "perennial", "label_zh" => "常年供燈", "label_en" => "Perennial" }]
       })
       template = Offerings::TemplateLoader.new(@temple.slug).services.find { |entry| entry[:slug] == "incense-donation" }

@@ -74,7 +74,7 @@ class DatabaseConfigurationTest < ActiveSupport::TestCase
 
   test "two projects with different slugs and no databaseName never share a database" do
     a = render(project: { "slug" => "acme-clinic" })
-    b = render(project: { "slug" => "shengfukung-wenfu" })
+    b = render(project: { "slug" => "shengfukung-demo" })
 
     refute_equal a.dig("development", "database"), b.dig("development", "database")
     refute_equal a.dig("test", "database"), b.dig("test", "database")
@@ -105,7 +105,7 @@ class DatabaseConfigurationTest < ActiveSupport::TestCase
   test "databaseName cannot reach production or staging, whatever it is set to" do
     %w[templemate wildly_different ""].each do |candidate|
       config = render(
-        project: { "slug" => "shengfukung-wenfu", "databaseName" => candidate },
+        project: { "slug" => "shengfukung-demo", "databaseName" => candidate },
         "PGDATABASE" => "the_only_thing_deployments_read"
       )
 

@@ -2,7 +2,7 @@ require "test_helper"
 
 class AccountPasswordSettingsTest < ActionDispatch::IntegrationTest
   test "signup collision shows guidance for existing oauth-first account" do
-    temple = create_temple(slug: "shengfukung-wenfu")
+    temple = create_temple(slug: "shengfukung-demo")
     user = User.create!(
       email: "oauth-user@example.com",
       english_name: "OAuth User",
@@ -35,7 +35,7 @@ class AccountPasswordSettingsTest < ActionDispatch::IntegrationTest
   end
 
   test "signed-in oauth-first user can add password from settings" do
-    temple = create_temple(slug: "shengfukung-wenfu")
+    temple = create_temple(slug: "shengfukung-demo")
     user = User.create!(
       email: "oauth-settings@example.com",
       english_name: "OAuth Settings User",

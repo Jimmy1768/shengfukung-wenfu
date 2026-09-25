@@ -21,7 +21,7 @@ module PaymentGateway
             server_callback_url: "https://example.test/webhooks/ecpay",
             item_name: "Temple Registration",
             registration_reference: "REG-123",
-            temple_slug: "shengfukung-wenfu"
+            temple_slug: "shengfukung-demo"
           },
           idempotency_key: "idem-123"
         )

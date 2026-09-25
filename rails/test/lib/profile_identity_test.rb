@@ -9,7 +9,7 @@ require "test_helper"
 # nothing surfaced it as a placeholder.
 class ProfileIdentityTest < ActiveSupport::TestCase
   test "codename derives from the project slug rather than a hardcoded literal" do
-    assert_equal "shengfukung_wenfu", Profile::Identity.app_codename
+    assert_equal "shengfukung_demo", Profile::Identity.app_codename
     refute_equal "initial", Profile::Identity.app_codename
   end
 
@@ -28,10 +28,10 @@ class ProfileIdentityTest < ActiveSupport::TestCase
 
   test "two different slugs never resolve to the same codename" do
     a = Profile::Identity.normalize_codename("acme-clinic")
-    b = Profile::Identity.normalize_codename("shengfukung-wenfu")
+    b = Profile::Identity.normalize_codename("shengfukung-demo")
 
     assert_equal "acme_clinic", a
-    assert_equal "shengfukung_wenfu", b
+    assert_equal "shengfukung_demo", b
     refute_equal a, b
   end
 
@@ -54,7 +54,7 @@ class ProfileIdentityTest < ActiveSupport::TestCase
 
   test "a blank APP_CODENAME falls through to the project slug" do
     with_codename_env("   ") do
-      assert_equal "shengfukung_wenfu", Profile::Identity.app_codename
+      assert_equal "shengfukung_demo", Profile::Identity.app_codename
     end
   end
 

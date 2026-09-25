@@ -11,7 +11,7 @@ module Account
 
       sign_in_account(user, temple_slug: "missing-temple")
 
-      get account_login_path(temple_slug: "shengfukung-wenfu")
+      get account_login_path(temple_slug: "shengfukung-demo")
 
       assert_redirected_to account_dashboard_path
     end
@@ -22,7 +22,7 @@ module Account
     # the intent into a destination. Break this and signing in with Google
     # silently goes back to dumping patrons on the dashboard.
     test "a signed-in visitor carrying an entry intent lands on the offering they clicked" do
-      temple = create_temple(slug: "shengfukung-wenfu")
+      temple = create_temple(slug: "shengfukung-demo")
       gathering = temple.temple_gatherings.create!(
         slug: "fire-safety-drill",
         title: "消防救生活動",
@@ -51,7 +51,7 @@ module Account
     end
 
     test "a signed-in visitor with no entry intent still goes to the dashboard" do
-      temple = create_temple(slug: "shengfukung-wenfu")
+      temple = create_temple(slug: "shengfukung-demo")
       user = User.create!(
         email: "no-intent@example.com",
         english_name: "No Intent",
@@ -65,11 +65,11 @@ module Account
     end
 
     test "signup route creates account with temple slug param even when no active temple is in session" do
-      create_temple(slug: "shengfukung-wenfu")
+      create_temple(slug: "shengfukung-demo")
 
       assert_difference -> { User.count }, 1 do
         post account_register_path, params: {
-          temple_slug: "shengfukung-wenfu",
+          temple_slug: "shengfukung-demo",
           registration: {
             email: "new-signup@example.com",
             password: "Password123!",
@@ -82,7 +82,7 @@ module Account
     end
 
     test "login preserves temple context from login page form submission" do
-      temple = create_temple(slug: "shengfukung-wenfu")
+      temple = create_temple(slug: "shengfukung-demo")
       user = User.create!(
         email: "login-preserve@example.com",
         english_name: "Login Preserve",
@@ -106,7 +106,7 @@ module Account
     end
 
     test "signup preserves temple context from signup form submission" do
-      temple = create_temple(slug: "shengfukung-wenfu")
+      temple = create_temple(slug: "shengfukung-demo")
 
       get account_login_path(temple_slug: temple.slug)
       assert_response :success
@@ -126,7 +126,7 @@ module Account
     end
 
     test "legacy temple param is accepted only as an account context shim" do
-      temple = create_temple(slug: "shengfukung-wenfu")
+      temple = create_temple(slug: "shengfukung-demo")
 
       get account_login_path(temple: temple.slug)
 
@@ -135,7 +135,7 @@ module Account
     end
 
     test "login page includes responsive viewport metadata" do
-      temple = create_temple(slug: "shengfukung-wenfu")
+      temple = create_temple(slug: "shengfukung-demo")
 
       get account_login_path(temple_slug: temple.slug)
 

@@ -15,7 +15,7 @@
       "runtimeExecutable": "bash",
       "runtimeArgs": [
         "-lc",
-        "cd mobile && TEMPLEMATE_CLIENT_MODE=real TEMPLEMATE_LOCAL_API_BASE_URL=http://localhost:4001 TEMPLEMATE_LOCAL_TENANT_SLUG=shengfukung-wenfu npx expo start --dev-client --port 8081"
+        "cd mobile && TEMPLEMATE_CLIENT_MODE=real TEMPLEMATE_LOCAL_API_BASE_URL=http://localhost:4001 TEMPLEMATE_LOCAL_TENANT_SLUG=shengfukung-demo npx expo start --dev-client --port 8081"
       ],
       "port": 8081
     },

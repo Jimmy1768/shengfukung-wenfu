@@ -5,7 +5,7 @@ require "test_helper"
 module Offerings
   class TemplateParityTest < ActiveSupport::TestCase
     test "loader configuration contains only the approved TWD 50 services" do
-      loader = TemplateLoader.new("shengfukung-wenfu")
+      loader = TemplateLoader.new("shengfukung-demo")
       services = loader.services
       expected_slugs = %w[ghost-festival-table incense-donation lamp-service liberation-ritual]
 
@@ -78,7 +78,7 @@ module Offerings
 
     def shengfukung_temple
       create_temple(
-        slug: "shengfukung-wenfu",
+        slug: "shengfukung-demo",
         metadata: {
           "registration_periods" => [
             { "key" => "perennial", "label_zh" => "常年供燈", "label_en" => "Perennial" },

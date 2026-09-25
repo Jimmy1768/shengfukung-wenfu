@@ -26,7 +26,7 @@ class Admin::TempleProfileFormTest < ActiveSupport::TestCase
   end
 
   test "profile form round trips persisted page fields" do
-    temple = create_temple(slug: "shengfukung-wenfu", name: "Old Temple")
+    temple = create_temple(slug: "shengfukung-demo", name: "Old Temple")
     admin = create_admin_user(temple: temple, role: "owner")
 
     form = Admin::TempleProfileForm.new(
