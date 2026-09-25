@@ -4,7 +4,7 @@ require "test_helper"
 
 module Registrations
   # Director's actual scenario: sales creates a registration on a real
-  # prospective client's behalf (in front of them, live) for the shengfukung-wenfu
+  # prospective client's behalf (in front of them, live) for the shengfukung-demo
   # demo temple's real offerings (NT$50 fake fee, no ECPay), then records it
   # as paid via cash -- purely to show the accounting/ledger system working,
   # no real money moves. Confirms this needs no bespoke per-temple helper --
@@ -13,7 +13,7 @@ module Registrations
   class RealPilotTempleAdminCashPaymentTest < ActionDispatch::IntegrationTest
     test "admin creates a registration for a real demo-temple offering on a patron's behalf, then completes it with cash -- no ECPay, ledger reflects it" do
       temple = create_temple(
-        slug: "shengfukung-wenfu",
+        slug: "shengfukung-demo",
         metadata: {
           "registration_periods" => [
             { "key" => "perennial", "label_zh" => "常年供燈", "label_en" => "Perennial" }

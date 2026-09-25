@@ -2,7 +2,7 @@ require "test_helper"
 
 class AdminSessionsTest < ActionDispatch::IntegrationTest
   test "signs in with seeded admin credentials" do
-    temple = create_temple(slug: "shengfukung-wenfu")
+    temple = create_temple(slug: "shengfukung-demo")
     admin = create_admin_user(temple:)
 
     post admin_sessions_path, params: { session: { email: admin.email, password: "Password123!" } }
@@ -18,7 +18,7 @@ class AdminSessionsTest < ActionDispatch::IntegrationTest
   end
 
   test "new passwords are stored as bcrypt, not sha256" do
-    temple = create_temple(slug: "shengfukung-wenfu")
+    temple = create_temple(slug: "shengfukung-demo")
     admin = create_admin_user(temple:)
 
     assert admin.reload.bcrypt_password_hash?
@@ -26,7 +26,7 @@ class AdminSessionsTest < ActionDispatch::IntegrationTest
   end
 
   test "a legacy sha256 digest still signs in and is upgraded to bcrypt" do
-    temple = create_temple(slug: "shengfukung-wenfu")
+    temple = create_temple(slug: "shengfukung-demo")
     admin = create_admin_user(temple:)
     admin.update_column(:encrypted_password, User.legacy_password_hash("Password123!"))
     assert admin.reload.legacy_password_hash?
@@ -37,7 +37,7 @@ class AdminSessionsTest < ActionDispatch::IntegrationTest
   end
 
   test "a wrong password neither signs in nor rewrites the legacy digest" do
-    temple = create_temple(slug: "shengfukung-wenfu")
+    temple = create_temple(slug: "shengfukung-demo")
     admin = create_admin_user(temple:)
     legacy = User.legacy_password_hash("Password123!")
     admin.update_column(:encrypted_password, legacy)
@@ -48,7 +48,7 @@ class AdminSessionsTest < ActionDispatch::IntegrationTest
   end
 
   test "a malformed stored digest fails the login rather than raising" do
-    temple = create_temple(slug: "shengfukung-wenfu")
+    temple = create_temple(slug: "shengfukung-demo")
     admin = create_admin_user(temple:)
     admin.update_column(:encrypted_password, "not-a-digest")
 
@@ -64,7 +64,7 @@ class AdminSessionsTest < ActionDispatch::IntegrationTest
   end
 
   test "QA dummy admin authenticates against QA_DUMMY_ADMIN_PASSWORD directly, not its stored hash" do
-    temple = create_temple(slug: "shengfukung-wenfu")
+    temple = create_temple(slug: "shengfukung-demo")
     email = AppConstants::Emails.qa_dummy_admin_email
     user = User.create!(email:, english_name: "QA Dummy Admin", encrypted_password: User.password_hash("whatever-was-hashed-at-creation"))
     admin = AdminAccount.create!(user:, active: true, role: "admin")

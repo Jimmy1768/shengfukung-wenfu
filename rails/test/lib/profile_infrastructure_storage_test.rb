@@ -22,16 +22,16 @@ class ProfileInfrastructureStorageTest < ActiveSupport::TestCase
 
   test "two different slugs never resolve to the same database" do
     a = AppConstants::Project.stub(:slug, "acme-clinic") { Storage.db_name(env: :test) }
-    b = AppConstants::Project.stub(:slug, "shengfukung-wenfu") { Storage.db_name(env: :test) }
+    b = AppConstants::Project.stub(:slug, "shengfukung-demo") { Storage.db_name(env: :test) }
 
     assert_equal "acme_clinic_test", a
-    assert_equal "shengfukung_wenfu_test", b
+    assert_equal "shengfukung_demo_test", b
     refute_equal a, b
   end
 
   test "two different slugs never resolve to the same bucket" do
     a = AppConstants::Project.stub(:slug, "acme-clinic") { Storage.s3_bucket(env: :production) }
-    b = AppConstants::Project.stub(:slug, "shengfukung-wenfu") { Storage.s3_bucket(env: :production) }
+    b = AppConstants::Project.stub(:slug, "shengfukung-demo") { Storage.s3_bucket(env: :production) }
 
     refute_equal a, b
   end

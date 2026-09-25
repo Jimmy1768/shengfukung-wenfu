@@ -250,6 +250,14 @@ git fetch origin && git reset --hard origin/main
 # naming the STAGING Gemfile path. Same absolute rbenv path as everywhere else.
 cd rails && ~/.rbenv/bin/rbenv exec bundle install
 
+# Migrate before restarting. Staging's database moves only when this runs, and
+# skipping it leaves the code ahead of the schema: on 2026-09-14 the checkout
+# was moved to main without it, and staging ran for eleven days without the
+# temple_gallery_photos table its gallery needs. db:migrate, never
+# db:schema:load -- a schema load marks pending data migrations as done
+# without running them.
+cd ~/Projects/shengfukung-wenfu-staging && bin/staging rails db:migrate
+
 sudo systemctl enable --now shengfukung-wenfu-staging-puma shengfukung-wenfu-staging-sidekiq
 sudo systemctl restart shengfukung-wenfu-staging-puma shengfukung-wenfu-staging-sidekiq
 systemctl is-active shengfukung-wenfu-staging-puma shengfukung-wenfu-staging-sidekiq

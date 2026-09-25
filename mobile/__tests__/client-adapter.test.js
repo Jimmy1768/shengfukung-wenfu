@@ -31,7 +31,7 @@ const response = (body = {}, status = 200) => ({ ok: status >= 200 && status < 3
 // The routes a patron can reach with no temple loaded. Everything else is
 // temple-scoped and the server refuses it without one.
 const SESSION_PATHS = ['/login', '/signup', '/refresh', '/password/recovery', '/password/reset', '/oauth/start', '/oauth/exchange', '/oauth/resolution/existing', '/oauth/resolution/new'];
-const KNOWN_TEMPLES = new Set(['fixture-temple', 'first-temple', 'second-temple', 'shengfukung-wenfu']);
+const KNOWN_TEMPLES = new Set(['fixture-temple', 'first-temple', 'second-temple', 'shengfukung-demo']);
 
 function fixtureTransport(calls, failures = {}, overrides = {}) {
   return async request => {

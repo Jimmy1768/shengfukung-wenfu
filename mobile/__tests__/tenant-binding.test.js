@@ -14,9 +14,9 @@ const linkFor = slug => `${PLATFORM_CONNECT_ORIGIN}/templemate/connect/${slug}`;
 const templeTransport = (slug, name) => async () => ({ ok: true, status: 200, body: { temple: { slug, name } } });
 
 test('a connection link is accepted only in its exact production form', () => {
-  const accepted = parseProductionConnectionLink(linkFor('shengfukung-wenfu'));
+  const accepted = parseProductionConnectionLink(linkFor('shengfukung-demo'));
   assert.equal(accepted.ok, true);
-  assert.equal(accepted.slug, 'shengfukung-wenfu');
+  assert.equal(accepted.slug, 'shengfukung-demo');
 
   // The slug is read from the code rather than assumed, which is what lets one
   // build serve a temple it was never told about.
@@ -43,9 +43,9 @@ test('binding state is unbound until a scan produces one', () => {
   assert.deepEqual(activePresentationTenant({ tenant: { id: 'x', name: 'y' } }), { id: 'x', name: 'y' });
 
   // Per-temple data stays scoped by the temple it belongs to.
-  const scope = storageScope({ environment: 'testflight', tenantId: 'shengfukung-wenfu' });
-  assert.equal(storageKey(scope, 'session'), 'templemate.testflight.shengfukung-wenfu.session');
-  assert.notEqual(storageKey(scope, 'session'), storageKey(storageScope({ environment: 'development', tenantId: 'shengfukung-wenfu' }), 'session'));
+  const scope = storageScope({ environment: 'testflight', tenantId: 'shengfukung-demo' });
+  assert.equal(storageKey(scope, 'session'), 'templemate.testflight.shengfukung-demo.session');
+  assert.notEqual(storageKey(scope, 'session'), storageKey(storageScope({ environment: 'development', tenantId: 'shengfukung-demo' }), 'session'));
 
   // The record of WHICH temple is loaded cannot itself be filed under that
   // temple -- that was circular, and only worked while the tenant was compiled
@@ -56,8 +56,8 @@ test('binding state is unbound until a scan produces one', () => {
 
 test('a scan loads the temple the code names, and only once the server confirms it', async () => {
   assert.deepEqual(
-    await scanCameraPayload({ payload: linkFor('shengfukung-wenfu'), config, transport: templeTransport('shengfukung-wenfu', '聖福宮') }),
-    { state: 'bound', tenant: { id: 'shengfukung-wenfu', name: '聖福宮' }, error: null, source: 'qr' }
+    await scanCameraPayload({ payload: linkFor('shengfukung-demo'), config, transport: templeTransport('shengfukung-demo', '聖福宮') }),
+    { state: 'bound', tenant: { id: 'shengfukung-demo', name: '聖福宮' }, error: null, source: 'qr' }
   );
 
   // The temple the build was never told about. This is the whole change: the
@@ -67,12 +67,12 @@ test('a scan loads the temple the code names, and only once the server confirms 
     { state: 'bound', tenant: { id: 'second-temple', name: 'Second Temple' }, error: null, source: 'qr' }
   );
 
-  const wrongOrigin = await scanCameraPayload({ payload: 'https://other.example.test/templemate/connect/shengfukung-wenfu', config, transport: templeTransport('shengfukung-wenfu', '聖福宮') });
+  const wrongOrigin = await scanCameraPayload({ payload: 'https://other.example.test/templemate/connect/shengfukung-demo', config, transport: templeTransport('shengfukung-demo', '聖福宮') });
   assert.equal(wrongOrigin.state, 'binding_failed');
   assert.equal(wrongOrigin.error, 'invalid_connection_link', 'refused before the server is asked');
 
   // The QR code's claim about which temple it is never wins; the server does.
-  const wrongTemple = await scanCameraPayload({ payload: linkFor('shengfukung-wenfu'), config, transport: templeTransport('somewhere-else', 'Other') });
+  const wrongTemple = await scanCameraPayload({ payload: linkFor('shengfukung-demo'), config, transport: templeTransport('somewhere-else', 'Other') });
   assert.equal(wrongTemple.state, 'binding_failed');
   assert.equal(wrongTemple.error, 'temple_validation_failed');
 
@@ -95,7 +95,7 @@ test('a scan loads the temple the code names, and only once the server confirms 
     assert.equal(result.state, 'binding_failed', `status ${bad.status} must not count as confirmation`);
   }
 
-  const unreachable = await scanCameraPayload({ payload: linkFor('shengfukung-wenfu'), config, transport: async () => { throw new Error('offline'); } });
+  const unreachable = await scanCameraPayload({ payload: linkFor('shengfukung-demo'), config, transport: async () => { throw new Error('offline'); } });
   assert.equal(unreachable.state, 'binding_failed');
 });
 
@@ -103,7 +103,7 @@ test('release bindings persist only server-derived trusted data, for whichever t
   const values = new Map();
   const store = { getItem: async key => values.get(key) || null, setItem: async (key, value) => values.set(key, value), deleteItem: async key => values.delete(key) };
   const bindings = createTrustedBindingStorage({ store, config });
-  const binding = { state: 'bound', tenant: { id: 'shengfukung-wenfu', name: '聖福宮' }, error: null, source: 'qr' };
+  const binding = { state: 'bound', tenant: { id: 'shengfukung-demo', name: '聖福宮' }, error: null, source: 'qr' };
 
   await bindings.save(binding);
   assert.deepEqual(await bindings.load(), binding);

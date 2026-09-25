@@ -2,7 +2,7 @@ require "test_helper"
 
 class InternalTempleAccessTest < ActionDispatch::IntegrationTest
   test "configured operator can view temple access states" do
-    operator_temple = create_temple(slug: "shengfukung-wenfu", name: "Shengfukung")
+    operator_temple = create_temple(slug: "shengfukung-demo", name: "Shengfukung")
     other_temple = create_temple(slug: "demo-lotus", name: "Demo Lotus")
 
     operator = User.create!(
@@ -151,7 +151,7 @@ class InternalTempleAccessTest < ActionDispatch::IntegrationTest
   end
 
   test "non-operator admin is redirected away" do
-    temple = create_temple(slug: "shengfukung-wenfu")
+    temple = create_temple(slug: "shengfukung-demo")
     user = create_admin_user(temple: temple, password: "Password123!", role: "owner")
 
     with_env("INTERNAL_PLATFORM_OPERATOR_EMAIL" => "operator@example.com") do

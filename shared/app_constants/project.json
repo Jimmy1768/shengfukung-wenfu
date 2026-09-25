@@ -1,7 +1,7 @@
 {
   "companyName": "SourceGrid Labs",
   "name": "示範宮廟",
-  "slug": "shengfukung-wenfu",
+  "slug": "shengfukung-demo",
   "databaseName": "templemate",
   "defaultThemeKey": "temple-1",
   "scheme": "shengfukungwenfu",

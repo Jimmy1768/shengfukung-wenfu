@@ -1,6 +1,6 @@
 temples:
-  - slug: shengfukung-wenfu
-    label: "Shengfukung Wenfu"
+  - slug: shengfukung-demo
+    label: "Shengfukung Demo"
     domains:
       - "shengfukung.com.tw"
     public_url: "https://shengfukung.com.tw"

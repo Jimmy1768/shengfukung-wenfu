@@ -10,8 +10,8 @@ require Rails.root.join("db/seeds/temples")
 # also editable in the admin console (Admin::TempleProfileForm).
 class TempleSeedPreservesAdminContentTest < ActiveSupport::TestCase
   test "re-seeding applies the yml but never blanks admin-owned content" do
-    temple = Temple.find_by(slug: "shengfukung-wenfu") ||
-             Temple.create!(slug: "shengfukung-wenfu", name: "placeholder")
+    temple = Temple.find_by(slug: "shengfukung-demo") ||
+             Temple.create!(slug: "shengfukung-demo", name: "placeholder")
 
     temple.update!(
       name: "STALE NAME",
