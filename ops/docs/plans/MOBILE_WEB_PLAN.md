@@ -43,11 +43,19 @@ empty field is hidden label and all, and a guard test fails if the text returns.
 
 - **Menu links are 30px tall.** Raise them to the 44px minimum for a
   comfortable tap.
-- **The Contact page subtitle.** Its fallback was
-  "地址、地圖、開放時間、停車與大眾運輸（{temple} Placeholder）". The marker had
-  to go; 032 dropped the whole line, so a temple with no service notes has no
-  subtitle there. **[DIRECTOR]** Keep the descriptive half as default copy, or
-  leave it out.
+
+**Restored: the Director's Contact subtitles** (assignment 033). 032 removed
+two lines of his own copy because one carried a "（… Placeholder）" suffix and
+the other mentions "在後台". Both are back as he wrote them: the page subtitle
+"地址、地圖、開放時間、停車與大眾運輸", shown when a temple has written no service
+notes, and the 交通 / 停車 section's "在後台可隨時更新資訊，方便信眾掌握動線。".
+The first had never actually reached a visitor before: an admin note came first
+in the fallback chain and always won.
+
+The lesson for guards like 032's: they enforce a list of markers, not the
+sentence "no admin instruction reaches the public". A string scan cannot tell
+who owns a piece of copy. Product copy is the Director's, and removing any of it
+is a call to report, not to make.
 
 **Kept deliberately: the hidden demo showcase.** Every temple site carries the
 template's "Golden Template Demo" pages at `/demo` and `/marketing`, including a

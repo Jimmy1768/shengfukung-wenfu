@@ -14,7 +14,17 @@ const siteContent = useTempleContent();
 const contact = computed(() => siteContent.data?.contact || {});
 const serviceTimes = computed(() => siteContent.data?.service_times || {});
 const visitInfo = computed(() => siteContent.data?.visit_info || {});
-const heroSubtitle = computed(() => siteContent.data?.service_times?.notes || '');
+// The Director's copy, restored. 032 dropped it because the string it was
+// attached to carried a "（… Placeholder）" suffix, and removing the suffix
+// would have meant deciding that the half in front of it was real copy rather
+// than scaffolding. It was real copy: it describes the page to a visitor and
+// says nothing to an admin. The suffix and the ${project.name} interpolation
+// are what is gone, not the sentence.
+const DEFAULT_HERO_SUBTITLE = '地址、地圖、開放時間、停車與大眾運輸';
+
+const heroSubtitle = computed(
+  () => siteContent.data?.service_times?.notes || DEFAULT_HERO_SUBTITLE
+);
 
 const hasContactDetails = computed(() =>
   Boolean(contact.value.phone || contact.value.addressZh || contact.value.plusCode || contact.value.addressEn)
@@ -114,7 +124,7 @@ const showDirectionsLink = computed(
         <div class="sp" />
 
         <template v-if="visitInfo.transportation || visitInfo.parking">
-          <SectionTitle title="交通 / 停車" />
+          <SectionTitle title="交通 / 停車" subtitle="在後台可隨時更新資訊，方便信眾掌握動線。" />
           <div class="grid">
             <SimpleCard v-if="visitInfo.transportation" title="交通方式">
               <div class="info">
