@@ -24,14 +24,14 @@ module Registrations
       # workflow) -- bootstrap the base record here, then let the real sync
       # service layer on the actual registration_form metadata from the
       # real YAML, same as it would in production.
-      template = Offerings::TemplateLoader.new(temple.slug).services.find { |entry| entry[:slug] == "incense-donation" }
+      template = Offerings::TemplateLoader.new(temple.slug).services.find { |entry| entry[:slug] == "incense-oil" }
       temple.temple_services.create!(
         slug: template[:slug], title: template[:label], status: "published",
         registration_period_key: template[:registration_period_key],
         price_cents: template.dig(:attributes, :price_cents), currency: template.dig(:attributes, :currency)
       )
       Offerings::TemplateSync.call(temple)
-      offering = temple.temple_services.find_by!(slug: "incense-donation")
+      offering = temple.temple_services.find_by!(slug: "incense-oil")
       assert_includes offering.metadata.dig("registration_form", "sections", "contact", "fields"), "phone",
         "sanity check: the real YAML must still declare phone as a contact field for this offering"
 

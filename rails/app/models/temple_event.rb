@@ -10,7 +10,7 @@ class TempleEvent < ApplicationRecord
     general: "general",
     lamp: "lamp",
     ritual: "ritual",
-    donation: "donation",
+    incense: "incense",
     table: "table"
   }.freeze
 

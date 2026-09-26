@@ -44,7 +44,7 @@ temple.
 
 - **One thing is paid for: a registration.** The price is the offering's fixed
   `price_cents` times a quantity of 1 to 10. The patron never chooses an
-  amount, donations included. Offering types: general, lamp, ritual, donation,
+  amount, donations included. Offering types: general, lamp, ritual, incense,
   table. Free registrations never reach payment.
 - **One online provider: ECPay**, a hosted page. The provider registry holds
   `fake` and `ecpay` only (`provider_resolver.rb:8-11`); a temple can be set to
@@ -85,8 +85,9 @@ Payments policy, paraphrased from source.
 - **香油錢 is a physical product, not a digital one** — the Director,
   2026-09-26. It is fulfilled at the temple: 廟方代辦, the temple carrying out
   the incense rite, or 信眾親領, the patron receiving it in person. The code
-  gave it the wrong name — offering type `donation`, and the demo's
-  `incense-donation` shown as 香油捐獻 — and that name is being changed.
+  had named it a donation — offering type `donation`, and the demo's
+  `incense-donation` shown as 香油捐獻. Renamed 2026-09-26 (assignment 038):
+  type `incense`, and `incense-oil` shown as 香油錢.
 - **Anything delivered inside the app** — a virtual lamp, a livestream, an
   e-certificate — would fall under Apple 3.1.1 and need in-app purchase.
   Nothing sold today is.

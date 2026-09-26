@@ -46,9 +46,9 @@ class AdminOfferingsAuditTest < ActionDispatch::IntegrationTest
     assert_difference -> { @temple.reload.temple_services.count }, 1 do
       post admin_offerings_path, params: {
         offering_kind: "service",
-        template_slug: "incense-donation",
+        template_slug: "incense-oil",
         temple_service: {
-          title: "香油捐獻",
+          title: "香油錢",
           description: "敬獻香油以支持廟務運作，廟方依祈願安排上香儀程。",
           price_cents: 100,
           currency: "TWD",

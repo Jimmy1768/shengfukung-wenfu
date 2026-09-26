@@ -5,7 +5,7 @@ require "test_helper"
 module Registrations
   # Proves the exact sequence the Director's sales team will perform live,
   # laptop (admin console) + iPhone (patron), against a real offering
-  # (incense-donation, already live on production via
+  # (incense-oil, already live on production via
   # offerings:apply_templates): patron self-registers -> admin completes
   # the registration with the details the patron-side form can't capture ->
   # admin accepts cash (fake) -> the payments/accounting screen reflects it.
@@ -20,14 +20,14 @@ module Registrations
       @temple = create_temple(slug: "shengfukung-demo", metadata: {
         "registration_periods" => [{ "key" => "perennial", "label_zh" => "常年供燈", "label_en" => "Perennial" }]
       })
-      template = Offerings::TemplateLoader.new(@temple.slug).services.find { |entry| entry[:slug] == "incense-donation" }
+      template = Offerings::TemplateLoader.new(@temple.slug).services.find { |entry| entry[:slug] == "incense-oil" }
       @temple.temple_services.create!(
         slug: template[:slug], title: template[:label], status: "published",
         registration_period_key: template[:registration_period_key],
         price_cents: template.dig(:attributes, :price_cents), currency: template.dig(:attributes, :currency)
       )
       Offerings::TemplateSync.call(@temple)
-      @offering = @temple.temple_services.find_by!(slug: "incense-donation")
+      @offering = @temple.temple_services.find_by!(slug: "incense-oil")
 
       @patron = User.create!(email: "sales-demo-patron@example.com", english_name: "Sales Demo Patron",
         encrypted_password: User.password_hash("Password123!"))

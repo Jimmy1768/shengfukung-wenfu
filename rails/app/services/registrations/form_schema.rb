@@ -18,7 +18,7 @@ module Registrations
     #
     # Declared per (offering, field) in the offering's own yml, because the
     # same canonical field legitimately differs across offerings and temples:
-    # dedication_message is a temple-authored donation-item picker on one
+    # dedication_message is a temple-authored incense-item picker on one
     # Shengfukung offering and freeform blessing text on three others, under
     # one shared label.
     REUSE_POLICIES = %i[prefill offer_as_options never].freeze
