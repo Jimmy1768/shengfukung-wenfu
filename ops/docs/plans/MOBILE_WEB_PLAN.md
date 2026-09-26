@@ -1,8 +1,7 @@
 # Mobile web — plan
 
-Wenfu Planning, 2026-09-25. **Phase 1's two named items are done; Phases 2 and
-3 are not started.** The measurements this rests on are in
-`MOBILE_WEB_READINESS_SCAN.md`.
+Wenfu Planning, 2026-09-25. **Phase 1 is done; Phases 2 and 3 are not
+started.** The measurements this rests on are in `MOBILE_WEB_READINESS_SCAN.md`.
 
 ## The decision
 
@@ -48,14 +47,18 @@ the words. The desktop header is unchanged, measured before and after at
 1280px. The open menu grew from 246px to 341px against a 400px cap: an eighth
 link still fits; a ninth needs the cap raised.
 
-**Not scheduled: nine smaller targets.** The scan counted 17 targets under 44px
-on the homepage, and the menu was eight of them. Phase 1 never named the other
-nine. Measured on the live homepage at 375px, 2026-09-25:
+**In-page links — done, 2026-09-26** (assignment 037). The scan counted 17
+targets under 44px on the homepage; the menu was eight of them. Of the rest,
+the arrow links in the page body were the worst: only as tall as their line of
+text, 19px on the homepage. The Director approved fixing that pair. The same
+style carries the arrow links on Services and event pages at 23.8px, including
+the six "登入並報名 →" a patron uses to start registering, so the fix went to
+the style's owner rather than to two links: one rule in `layout.css`, where
+three pages had each kept an identical copy. On a phone they are now 44px, and
+the desktop is unchanged, measured before and after.
 
-- two text links in the page body, "查看全部活動 →" and "前往最新消息 →", at
-  19px — the smallest on the page
-- five footer links at 28px, and the footer's "Email 聯絡" button at 33.6px
-- the brand link in the header, at 40px
+**Left as they are, the Director's call:** the footer's five links (28px) and
+its "Email 聯絡" button (33.6px), and the brand link in the header (40px).
 
 **Restored: the Director's Contact subtitles** (assignment 033). 032 removed
 them because one carried a "（… Placeholder）" suffix and the other mentions
