@@ -21,8 +21,17 @@ an app version it was never built for.
   deleted when the next one ships. Users on old builds still receive OTAs from
   their own branch.
 
-At the time of writing iOS is at build 1 of `1.0.0`; no Android AAB has been
-produced, so Android is version 1 with nothing distributed.
+**While the app is in beta, the branch lags the build** (Director, 2026-09-26).
+Nothing has been uploaded to Google Play, and Apple issues new builds without
+consuming a version number, so every fix so far has shipped as another build of
+`1.0.0`: build 4 (2026-09-25) was built from `main` at `97a0bf4`, which
+`release-1.0.0` does not contain. Before any OTA is published to 1.0.0 builds,
+`release-1.0.0` must first be brought to the commit the current build was made
+from. Once versions increment (1.0.1, 1.0.2, ...), each version's release branch
+is cut from its build's source and the gap does not arise.
+
+iOS is at build 4 of `1.0.0` (2026-09-25); no Android AAB has been produced, so
+Android is version 1 with nothing distributed.
 
 **Not to be confused with `release/current`**, which is the droplet's web deploy
 ref and has nothing to do with the app. Different artefact, different lifecycle.
