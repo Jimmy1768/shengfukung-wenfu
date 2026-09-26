@@ -6,7 +6,7 @@ namespace :temple_financial do
     loader = Offerings::TemplateLoader.new(slug)
 
     offerings = [
-      { slug: "incense-donation", title: "香油捐獻", offering_type: "donation", price_cents: 500, kind: :service, registration_period_key: "perennial" },
+      { slug: "incense-oil", title: "香油錢", offering_type: "incense", price_cents: 500, kind: :service, registration_period_key: "perennial" },
       { slug: "family-peace", title: "平安戲丁口捐", offering_type: "ritual", price_cents: 800 },
       { slug: "lantern-lighting", title: "點燈作業", offering_type: "lamp", price_cents: 1200, available_slots: 50 },
       { slug: "ancestor-ritual", title: "祖先拔薦", offering_type: "ritual", price_cents: 1500 },

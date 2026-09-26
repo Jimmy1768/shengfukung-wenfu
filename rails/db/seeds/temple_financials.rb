@@ -75,7 +75,7 @@ module Seeds
         {
           slug: "year-round-blessing",
           kind: :service,
-          offering_type: TempleOffering::OFFERING_TYPES[:donation],
+          offering_type: TempleOffering::OFFERING_TYPES[:incense],
           title: "全年祈福服務",
           description: "祈福服務採全年受理，依祈願內容安排祭解與迴向。",
           price_cents: 1200,

@@ -35,9 +35,9 @@ catalogs:
   - 拔薦冤親債主
   - 拔薦嬰靈
 services:
-- slug: incense-donation
-  label: 香油捐獻
-  type: donation
+- slug: incense-oil
+  label: 香油錢
+  type: incense
   registration_period: perennial
   fields:
     amount:
@@ -188,8 +188,8 @@ services:
   registration_period: event_specific
   base_fields:
   - year
-  - donation_date
-  - donation_amount
+  - offering_date
+  - offering_amount
   - donor_name
   - donor_phone
   - secondary_contact_name

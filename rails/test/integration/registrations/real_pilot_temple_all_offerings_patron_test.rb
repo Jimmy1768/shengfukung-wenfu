@@ -7,7 +7,7 @@ module Registrations
   # offering templates (db/temples/offerings/shengfukung-demo.yml) and
   # create a registration from the account side -- not just the admin side?
   # Prior coverage (real_pilot_temple_phone_reuse_test.rb) only ever
-  # exercised patron self-registration against "incense-donation". Unlike
+  # exercised patron self-registration against "incense-oil". Unlike
   # the admin create-order flow, Account::RegistrationIntakeForm and its
   # view are entirely generic -- they don't branch on the offering's
   # registration_form metadata at all, so the same fixed field set
@@ -30,8 +30,8 @@ module Registrations
       @temple = create_temple(slug: "shengfukung-demo", metadata: { "registration_periods" => REGISTRATION_PERIODS })
     end
 
-    test "incense-donation: patron can select it and self-register" do
-      assert_patron_can_register!("incense-donation")
+    test "incense-oil: patron can select it and self-register" do
+      assert_patron_can_register!("incense-oil")
     end
 
     test "lamp-service: patron can select it and self-register" do
