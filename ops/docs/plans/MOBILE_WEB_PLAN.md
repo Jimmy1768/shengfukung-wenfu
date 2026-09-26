@@ -81,28 +81,36 @@ protects them in a comment. They are not a leftover to clean up.
 
 ## Phase 2 — Payment in the app
 
-**This is the real work, and Phase 3 cannot happen without it.**
+**Corrected 2026-09-26, after tracing the code: this does not block Phase 3.**
+An earlier version of this section said it did, and that the Rails app had
+Stripe and LINE Pay for patrons. It has neither.
 
-The app cannot take a payment. It displays payment state — a registration can
-show as awaiting payment — but it has no checkout, no Stripe or LINE Pay, and
-the native API has no payment route. Verified 2026-09-25.
+- **ECPay is the only online payment provider in the code.** LINE Pay does not
+  exist beyond a label and unused env vars; Stripe bills temples for the
+  platform and never takes a patron's money.
+- **No temple takes online payment.** The demo temple is cash-only on
+  production, with no ECPay credentials, and live ECPay needs a real temple's
+  merchant account. Patrons pay at the temple and staff record it.
+- **So blocking the account area on phones removes no way to pay.** The app
+  already creates registrations and shows "待完成付款。", and the patron pays at
+  the temple as they would from the website. The app states the status and
+  nothing more, by the Director's principle that the patron is not a messenger
+  for the temple (commit fda6678), so no cash instructions are added.
 
-So if phones are blocked from the account area before this lands, a patron who
-needs to pay from their phone is stuck at "awaiting payment" with no way to pay.
-
-It needs its own plan: which payment providers (the Rails app already has
-Stripe and LINE Pay), what the native API must expose, and what the app screens
-look like.
+Payment in the app becomes real work when a temple brings an ECPay merchant
+account. It already has a plan, `EXPO_PAYMENT_PHASE_PLAN.md` (2026-08-11): no
+Apple in-app purchase, checkout in the phone's browser, then back to the app.
+The inventory it asked for, the store rules, and the web-side defects to fix
+first are recorded there.
 
 ## Phase 3 — Block the account area on phones
 
 Detect a phone, and show a page linking to the app instead of the account area.
 
-Blocked on:
-
-- **Phase 2**, above.
-- **Something to link to.** There is no App Store listing yet — build 4 is in
-  TestFlight — and Android has no release lane at all.
+Blocked on **something to link to.** There is no App Store listing yet — build
+4 is in TestFlight — and Android has no release lane at all. Payment no longer
+blocks it (Phase 2, above). What else the account area does that the app does
+not has not been checked for this phase.
 
 ## Not in this plan
 
