@@ -288,13 +288,23 @@ paths and project settings together. It takes no session id, so nothing can
 move a session from outside.
 
 **10.10** *Policy, not harness behaviour — the Director's, and a lane may
-reason against it where the work argues otherwise.* Planning runs on Opus 5.5
-at maximum effort, Control on Opus 5 at extra. A Control chooses the model and
-effort for each ephemeral implementer it dispatches, including none at all: work
-that is reading and grepping needs no implementer, and answering "implementer:
-none" is exercising that judgement rather than breaching a rule. There is no
-standing default for implementers to fall back to. The choice is made per
-assignment, by the session that has read the code.
+reason against it where the work argues otherwise.* There are three kinds of
+session, and the model follows the kind rather than the lane.
+
+Discussion — Planning, and in the workspace Strategy and Recovery — runs on
+Fable 5.1 at maximum effort. Implementation — Control — runs on Opus 5.5 at
+extra. Handler runs on Sonnet 5 at extra: it carries a message and must not
+read or decide, and a less capable model is the safer one in the lane whose
+purpose is not to interpret what it holds. It is also the one lane where "this
+needs a bigger model" should never arise; if it does, the message being carried
+has become something Handler is reading.
+
+A Control chooses the model and effort for each ephemeral implementer it
+dispatches, including none at all: work that is reading and grepping needs no
+implementer, and answering "implementer: none" is exercising that judgement
+rather than breaching a rule. There is no standing default for implementers to
+fall back to. The choice is made per assignment, by the session that has read
+the code.
 
 Choosing down, or to none, is the Control's alone. Choosing up is asked for
 rather than taken: when a Control concludes an implementer needs a larger model,
