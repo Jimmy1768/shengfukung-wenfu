@@ -47,10 +47,16 @@
   margin-top: var(--spacing-sm);
 }
 
+/* The one owner of an in-page link. Home, Services and EventShow each carried
+   an identical scoped copy of this that set color: var(--primary), so the
+   var(--text) that used to be here reached no page link at all -- it was
+   overridden everywhere it applied. The colour moves here and the three copies
+   are gone; the footer keeps its own .link, which is a different design and
+   overrides colour itself. */
 .link {
   text-decoration: none;
   font-weight: 700;
-  color: var(--text);
+  color: var(--primary);
   opacity: 0.85;
   transition: opacity 120ms ease, text-decoration-color 120ms ease;
 }
@@ -58,6 +64,27 @@
 .link:hover {
   opacity: 1;
   text-decoration: underline;
+}
+
+/* Phone tap targets. An in-page link is otherwise only as tall as its line of
+   text -- 19px on Home, 23.8px on Services and an event page -- against the
+   44px a finger needs. min-height raises the box, align-items centres the
+   label, and because the box is the anchor the whole of it takes the tap.
+   Scoped to .site-main so it cannot reach the footer, whose links render
+   outside <main> and are a separate design at 28px.
+   inline-flex rather than flex on purpose: where the link sits in normal flow
+   it keeps hugging its text, and where it is a grid or flex item it is
+   blockified to flex and keeps filling its column, so neither width moves.
+   A max-width query rather than a rule undone at 900px, because the display
+   these links compute to differs by context -- inline on Home, block where the
+   parent is a grid -- and one reset value cannot restore both. Above 900px
+   nothing here applies at all. */
+@media (max-width: 899.98px) {
+  .site-main .link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
 }
 
 .article {

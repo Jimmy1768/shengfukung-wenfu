@@ -124,12 +124,6 @@ const latestNews = computed(() =>
 </template>
 
 <style scoped>
-.link {
-  color: var(--primary);
-  font-weight: 700;
-  text-decoration: none;
-}
-
 .meta {
   margin-top: var(--spacing-xs);
   font-size: 13px;
