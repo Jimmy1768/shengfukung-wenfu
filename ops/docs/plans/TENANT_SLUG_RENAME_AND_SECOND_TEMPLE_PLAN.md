@@ -97,7 +97,7 @@ Expo tenant work; treat it as a check, not a blocker.
 
 ## Ordering — this waits on the Expo tenant fix
 
-**The rename must come after `EXPO_RUNTIME_TENANT_BINDING_PLAN.md` ships.**
+**The rename must come after `EXPO_RUNTIME_TENANT_BINDING_PLAN.md` (deleted 2026-09-26; distilled into `reference/templemate_native_account_api.md`, Temple binding) ships.**
 
 Today the release app pins `tenantSlug: 'shengfukung-wenfu'`. Renaming the
 tenant before that fix breaks every installed TestFlight build: they would fail
@@ -167,7 +167,7 @@ Director plans many more apps on the same auth service. `templemate` names what
 the value actually identifies.
 
 Already recorded, and not a new idea.
-`ops/docs/plans/CENTRAL_AUTH_TENANT_REGISTRATION_PLAN.md:15-18` logged it on
+`ops/docs/plans/CENTRAL_AUTH_TENANT_REGISTRATION_PLAN.md:15-18` (deleted 2026-09-26) logged it on
 2026-08-19 as "cleaner/more robust tenant organization in the central auth
 service itself, since the Director plans many more apps to register there over
 time. This is `sourcegrid-labs`'s own system — out of this repo's authority to

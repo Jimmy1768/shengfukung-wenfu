@@ -64,7 +64,6 @@ assign equal priority or implementation readiness.
 - `ops/docs/plans/PATRON_REQUEST_ASSISTANCE_ALERTS.md`
 - `ops/docs/plans/PAYMENTS_CORE_SUBSYSTEM_PLAN.md`
 - `ops/docs/plans/PAYMENT_FOUNDATION_PARALLEL_TRACK_INTEGRATION_PLAN.md`
-- `ops/docs/plans/PLATFORM_BILLING_QUALIFYING_REGISTRATION_ACCOUNTING_PLAN.md`
 - `ops/docs/plans/SHENGFUKUNG_PAYMENT_AND_OFFERING_PHASE_ROADMAP.md`
 - `ops/docs/plans/REGISTRATION_LIFECYCLE_EDIT_POLICY.md`
 - `ops/docs/plans/SHENGFUKUNG_OFFERINGS_CONFIG_PLAN.md`

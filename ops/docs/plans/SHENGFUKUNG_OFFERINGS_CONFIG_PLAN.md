@@ -2,7 +2,7 @@
 
 ## Purpose
 
-- Replace the current dummy / placeholder offerings config for `shengfukung-wenfu` with the real temple offering definitions.
+- Replace the current dummy / placeholder offerings config for `shengfukung-demo` with the real temple offering definitions.
 - Preserve YAML as the single source of truth for offering templates.
 - Make the admin onboarding flow low-friction: prefill as much as possible, prefer selectors over free text, and keep repeated patron data flowing through user metadata.
 - Follow the canonical model in `ops/docs/plans/TEMPLE_OFFERING_SYSTEM_SPEC.md` when translating temple-filled worksheets into YAML/runtime structures.
@@ -10,14 +10,14 @@
 ## Current V1 Source Truth
 
 - Current V1 exit path: the real temple admin/staff rehearsal packet at
-  `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/workflows/2026-06-14-real-temple-admin-staff-rehearsal-packet.md`
+  `/Users/jimmy1768/Projects/shengfukung-demo/docs/operator/workflows/2026-06-14-real-temple-admin-staff-rehearsal-packet.md`
   is the single remaining external acceptance gate.
 - Accepted local implementation evidence already exists for the offering setup
   and adjacent admin flows:
-  - `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/acceptances/2026-06-12-admin-onboarding-qa-sweep-acceptance.md`
-  - `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/acceptances/2026-06-13-ecpay-default-path-local-verification-acceptance.md`
-  - `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/acceptances/2026-06-14-local-admin-agent-qa-sweep-acceptance.md`
-  - `/Users/jimmy1768/Projects/shengfukung-wenfu/docs/operator/acceptances/2026-06-14-real-temple-admin-staff-rehearsal-readiness-acceptance.md`
+  - `/Users/jimmy1768/Projects/shengfukung-demo/docs/operator/acceptances/2026-06-12-admin-onboarding-qa-sweep-acceptance.md`
+  - `/Users/jimmy1768/Projects/shengfukung-demo/docs/operator/acceptances/2026-06-13-ecpay-default-path-local-verification-acceptance.md`
+  - `/Users/jimmy1768/Projects/shengfukung-demo/docs/operator/acceptances/2026-06-14-local-admin-agent-qa-sweep-acceptance.md`
+  - `/Users/jimmy1768/Projects/shengfukung-demo/docs/operator/acceptances/2026-06-14-real-temple-admin-staff-rehearsal-readiness-acceptance.md`
 - Those acceptances prove local prototype/admin readiness only. They do not
   claim production acceptance or production promotion.
 
@@ -53,14 +53,14 @@
 
 ## Current Repo Reality
 
-- The active loader contract is `events:` + `services:` in [`Offerings::TemplateLoader`](/Users/jimmy1768/Projects/shengfukung-wenfu/rails/app/services/offerings/template_loader.rb:31).
+- The active loader contract is `events:` + `services:` in [`Offerings::TemplateLoader`](/Users/jimmy1768/Projects/shengfukung-demo/rails/app/services/offerings/template_loader.rb:31).
 - Legacy `offerings:` still parses only as a fallback and should not be the long-term format.
 - `rails/db/temples/offerings/working-draft.yml` is now the persistent staging draft file for new temple onboarding.
-- The current temple-specific file is misnamed as `rails/db/temples/offerings/shenfukung-wenfu.yml`; the real slug is `shengfukung-wenfu`, so the finalized source-of-truth file must become `rails/db/temples/offerings/shengfukung-wenfu.yml`.
+- The current temple-specific file is misnamed as `rails/db/temples/offerings/shengfukung-demo.yml`; the real slug is `shengfukung-demo`, so the finalized source-of-truth file must become `rails/db/temples/offerings/shengfukung-demo.yml`.
 
 ## Goal State
 
-Deliver a finalized `rails/db/temples/offerings/shengfukung-wenfu.yml` that:
+Deliver a finalized `rails/db/temples/offerings/shengfukung-demo.yml` that:
 
 - uses `events:` and `services:` top-level sections
 - encodes the real Shengfukung offerings from `working-draft.yml`
@@ -100,7 +100,7 @@ And do so without breaking the long-term separation between:
 - [x] Classify each offering into:
   - `events:` for scheduled/in-person participation
   - `services:` for proxy ritual / temple-handled fulfillment
-- [x] Translate draft `registration_period` values into real `registration_period_key` values that exist in `rails/db/temples/shengfukung-wenfu.yml`.
+- [x] Translate draft `registration_period` values into real `registration_period_key` values that exist in `rails/db/temples/shengfukung-demo.yml`.
 - [x] Decide which draft catalogs become reusable selector lists in YAML `field_settings.options`.
 
 ### Known Mapping Notes
@@ -144,7 +144,7 @@ These are canonical templates. Year/season labels belong on offering instances, 
 
 - The current `working-draft.yml` is a domain-spec draft, not a loader-ready template file.
 - The app currently consumes `events:` and `services:` via `Offerings::TemplateLoader`.
-- The existing real temple template file is misnamed as `shenfukung-wenfu.yml`; this must be replaced by `shengfukung-wenfu.yml`.
+- The existing real temple template file is misnamed as `shengfukung-demo.yml`; this must be replaced by `shengfukung-demo.yml`.
 - All five reviewed Shengfukung draft entries are better modeled as `services:` under the current product rules.
 
 ### Draft Entry Mapping
@@ -167,7 +167,7 @@ These should become selector-backed field settings in the finalized YAML rather 
 
 ## Phase 2: YAML Contract Conversion
 
-- [x] Create `rails/db/temples/offerings/shengfukung-wenfu.yml`.
+- [x] Create `rails/db/temples/offerings/shengfukung-demo.yml`.
 - [x] Convert draft entries from the current custom `catalogs:` / `offerings:` shape into the app-supported template shape:
   - `events:`
   - `services:`
@@ -179,7 +179,7 @@ These should become selector-backed field settings in the finalized YAML rather 
   - `registration_form`
   - `field_settings`
 - [x] Keep `working-draft.yml` intact as the reusable scratch file.
-- [x] Remove dependency on the misspelled `shenfukung-wenfu.yml` once the real file is in place.
+- [x] Remove dependency on the misspelled `shengfukung-demo.yml` once the real file is in place.
 
 ### Conversion Guidance
 
@@ -404,7 +404,7 @@ Phase 3 decision:
 
 ## Acceptance Criteria
 
-- [x] `rails/db/temples/offerings/shengfukung-wenfu.yml` exists and matches the real slug.
+- [x] `rails/db/temples/offerings/shengfukung-demo.yml` exists and matches the real slug.
 - [x] YAML uses the current loader contract (`events:` / `services:`), not the legacy fallback shape.
 - [x] Admin forms are largely prefilled and selector-driven.
 - [ ] Patron registration reuses saved profile data and persists reusable inputs back to user metadata.

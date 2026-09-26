@@ -18,7 +18,7 @@ few defects. dummy vs real client, and slug became hardcoded. we need to fix
 these 2 defects."
 
 Defect 2 (the hardcoded slug) is assigned —
-`EXPO_RUNTIME_TENANT_BINDING_PLAN.md`,
+`EXPO_RUNTIME_TENANT_BINDING_PLAN.md` (deleted 2026-09-26; distilled into `reference/templemate_native_account_api.md`, Temple binding),
 assignment 012. Defect 1 is not. This file holds defect 1's residue and
 everything found downline of both that assignment 012 does not cover.
 

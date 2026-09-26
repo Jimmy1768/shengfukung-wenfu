@@ -14,8 +14,7 @@ Docs:
 Core provider boundary:
 - `rails/app/services/payment_gateway/adapter.rb`
 - `rails/app/services/payment_gateway/fake_adapter.rb`
-- `rails/app/services/payment_gateway/stripe_adapter.rb`
-- `rails/app/services/payment_gateway/line_pay_adapter.rb`
+- `rails/app/services/payment_gateway/ecpay_adapter.rb`
 
 Core orchestration:
 - `rails/app/services/payments/provider_resolver.rb`

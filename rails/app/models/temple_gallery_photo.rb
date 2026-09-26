@@ -29,7 +29,8 @@ class TempleGalleryPhoto < ApplicationRecord
   # Reversible, and the gate that makes deletion safe: a photo has to be
   # archived before it can be destroyed, so an operator always passes through a
   # step they can undo. See the archive-gates-delete ruling in
-  # ops/docs/plans/GALLERY_AS_MEDIA_ASSETS_PLAN.md.
+  # ops/docs/reference/admin_portal.md (the plan that first recorded it was
+  # deleted 2026-09-26).
   def archive!
     update!(status: "archived")
   end

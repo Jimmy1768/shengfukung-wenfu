@@ -100,7 +100,7 @@ Gated by the separate `oauth_account_consolidation` feature flag.
 
 - The historical "user 22" Apple account-recovery case remains open. It is
   tracked in the live (non-archived) `ops/docs/plans/OAUTH_APPLE_USER_22_RECOVERY_ROADMAP.md`
-  and `ops/docs/plans/OAUTH_ACCOUNT_RESOLUTION_PRODUCTION_ROLLOUT_READINESS_PLAN.md`,
+  (the production-rollout readiness plan was deleted as terminal in 238e34b),
   not here — this document describes the shipped mechanism, not that specific
   case's disposition.
 - Production rollout readiness for this resolver was, as of the same roadmap,

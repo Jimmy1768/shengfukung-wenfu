@@ -1,6 +1,9 @@
 # ENVIRONMENT PARTITION BY MUTABILITY
 
-Plan only. Nothing implemented. The decisions in §6 are the Director's.
+Shipped 2026-09-14: both env files, the units loading them, `bin/staging` and the
+`DeploymentIdentity` guard are live (durable facts: `ops/protocol/repo_context.md`).
+Not done: Phase 2a, the split of the shared file, and the deliberate-failure proof
+of the guard, which the Director declined. The decisions in §6 are the Director's.
 
 ## What this is
 

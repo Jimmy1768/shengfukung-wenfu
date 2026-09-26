@@ -132,6 +132,37 @@ and `.db_name` derive their own database names from the slug, independently of
 Found and left alone on 2026-09-14: delete or align them deliberately, not
 incidentally while doing something else.
 
+## The Environment Is Partitioned By Mutability, And Boot Refuses The Wrong Database
+
+Live since 2026-09-14. Each deployment on the droplet reads two files, in this
+order, and nothing else:
+
+- `/etc/default/shengfukung-demo-env` (root-owned, mode 640, group
+  `jimmy1768_user`) holds what every checkout of the deployment shares: the
+  project slug and origins, secrets, provider keys, and the Postgres host, port
+  and user. It carries no per-checkout value, so the shared file alone leaves
+  Rails with no database.
+- `instance.env` beside each checkout holds only what differs between
+  checkouts: `RAILS_ENV`, `RACK_ENV`, `PUMA_PORT`, `PGDATABASE` and
+  `S3_OBJECT_PREFIX`. The staging checkout's file is what makes it staging.
+
+The units (`ops/systemd/*.service`) name both files with `EnvironmentFile=`,
+shared first, and carry no `Environment=` line and no `ExecStart` prefix, so
+there is no precedence to reason about: a forgotten value is absent rather than
+silently production's, and absent cannot serve traffic. `bin/staging` carries
+no value either; it sources the same two files in the same order and execs.
+
+`DeploymentIdentity` (`rails/lib/deployment_identity.rb`, loaded from
+`config/initializers`) refuses to boot production or staging when the database
+name resolved by `config/database.yml` is blank or is not the one that
+environment expects, and says which file to look in. It reads the name before
+anything connects. `bin/staging` states the environment it believes it is
+running, and is held to that. The design is recorded in §4a of
+`ops/docs/plans/ENV_PARTITION_BY_MUTABILITY_PLAN.md`; the step that proves the
+guard by removing a key from staging's `instance.env` was declined by the
+Director on 2026-09-14, so the guard has been exercised by every boot since,
+not by a deliberate failure.
+
 ## Installed Ops Artefacts Drift, In Two Directions
 
 `ops/systemd/*.service` and `ops/nginx/*.conf` are authored here and are inert
