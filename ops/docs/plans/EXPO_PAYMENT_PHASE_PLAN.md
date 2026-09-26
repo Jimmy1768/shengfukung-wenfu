@@ -74,27 +74,19 @@ temple.
 ## What The Store Rules Allow — Researched 2026-09-26
 
 From Apple's App Review Guidelines (last updated 2026-06-08) and Google Play's
-Payments policy. The rules are paraphrased from source; which category an
-offering falls in is interpretation.
+Payments policy, paraphrased from source.
 
-- **Services and events at the temple** — lamp, ritual, table, gatherings.
-  Apple 3.1.3(e): goods and services used outside the app must be paid by a
-  method other than in-app purchase. Google Play's Payments policy §3 keeps
-  Play billing out of payments for physical services. ECPay's hosted page is
-  allowed on both, which is what criterion 1 already requires.
-- **Donations** — the `donation` offering type (香油錢). Apple 3.2.2(iv): an app
-  may collect donations only outside the app, in Safari or by SMS, unless the
-  charity is an Apple-approved nonprofit (3.2.1(vi)), which must then also
-  offer Apple Pay. For a Taiwan temple, approval goes through Benevity. So on
-  iOS a donation opens Safari itself — not a browser sheet inside the app,
-  which Apple does not clearly count as outside — unless that temple is
-  approved. Android: Play billing is excluded for tax-exempt donations; the
-  policy is silent on gifts that are not.
-- **This reaches the website too.** Apple's rules for Apple Pay on the web bar
-  it from collecting nonprofit donations without Apple's approval. ECPay's
-  `ChoosePayment` is ALL, which may include Apple Pay (not checked), so a
-  donation checkout must leave it out — in Safari from the app, and on the
-  temple's website.
+- **Every offering is a physical good or service, used at the temple** — lamp,
+  ritual, table, gatherings, and 香油錢. Apple 3.1.3(e): goods and services used
+  outside the app must be paid by a method other than in-app purchase. Google
+  Play's Payments policy §3 keeps Play billing out of payments for physical
+  goods and services. So ECPay's hosted page is allowed in the app on both,
+  which is what criterion 1 already requires.
+- **香油錢 is a physical product, not a digital one** — the Director,
+  2026-09-26. It is fulfilled at the temple: 廟方代辦, the temple carrying out
+  the incense rite, or 信眾親領, the patron receiving it in person. The code
+  gave it the wrong name — offering type `donation`, and the demo's
+  `incense-donation` shown as 香油捐獻 — and that name is being changed.
 - **Anything delivered inside the app** — a virtual lamp, a livestream, an
   e-certificate — would fall under Apple 3.1.1 and need in-app purchase.
   Nothing sold today is.
@@ -138,8 +130,6 @@ acceptance when the work starts:
 - **Checkout in the phone's browser.** The app opens ECPay's hosted page in the
   system browser; the site's return page hands back to the app through
   `templemate://`. No universal links are configured.
-- **Donations on iOS open Safari itself**, unless the temple is an
-  Apple-approved nonprofit.
 - **The native API tells the app what it cannot know today:** whether its
   temple takes online payment, and a payment's status over a bearer-token
   route.
