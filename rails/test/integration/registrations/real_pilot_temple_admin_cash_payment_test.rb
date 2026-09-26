@@ -20,14 +20,14 @@ module Registrations
           ]
         }
       )
-      template = Offerings::TemplateLoader.new(temple.slug).services.find { |entry| entry[:slug] == "incense-donation" }
+      template = Offerings::TemplateLoader.new(temple.slug).services.find { |entry| entry[:slug] == "incense-oil" }
       temple.temple_services.create!(
         slug: template[:slug], title: template[:label], status: "published",
         registration_period_key: template[:registration_period_key],
         price_cents: template.dig(:attributes, :price_cents), currency: template.dig(:attributes, :currency)
       )
       Offerings::TemplateSync.call(temple)
-      offering = temple.temple_services.find_by!(slug: "incense-donation")
+      offering = temple.temple_services.find_by!(slug: "incense-oil")
       assert_equal 5000, offering.price_cents
       assert_equal "TWD", offering.currency
 

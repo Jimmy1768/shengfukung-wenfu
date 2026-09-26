@@ -661,8 +661,8 @@ class RegistrationPaymentFlowTest < ActionDispatch::IntegrationTest
       }
     )
     offering = temple.temple_services.create!(
-      slug: "incense-donation",
-      title: "香油捐獻",
+      slug: "incense-oil",
+      title: "香油錢",
       description: "敬獻香油",
       currency: "TWD",
       price_cents: 300,

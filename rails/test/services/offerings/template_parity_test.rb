@@ -7,7 +7,7 @@ module Offerings
     test "loader configuration contains only the approved TWD 50 services" do
       loader = TemplateLoader.new("shengfukung-demo")
       services = loader.services
-      expected_slugs = %w[ghost-festival-table incense-donation lamp-service liberation-ritual]
+      expected_slugs = %w[ghost-festival-table incense-oil lamp-service liberation-ritual]
 
       assert_empty loader.events
       assert_equal expected_slugs, services.map { |service| service.fetch(:slug) }.sort
@@ -34,7 +34,7 @@ module Offerings
 
       result = TemplateParity.report(temple)
 
-      assert_includes result.missing_services, "incense-donation"
+      assert_includes result.missing_services, "incense-oil"
       refute_includes result.missing_services, "peace-opera-household"
       refute_includes result.missing_services, "ritual-bucket-ceremony"
       assert_includes result.orphaned_services, "peace-opera-household"
@@ -42,7 +42,7 @@ module Offerings
 
       result = TemplateParity.ensure_missing!(temple, kinds: [:services])
 
-      assert_equal %w[ghost-festival-table incense-donation lamp-service liberation-ritual], result.created_services.sort
+      assert_equal %w[ghost-festival-table incense-oil lamp-service liberation-ritual], result.created_services.sort
       assert_equal 5, temple.temple_services.count
       assert_equal 1500, inferred_service.reload.price_cents
       assert_equal "draft", inferred_service.status
@@ -54,7 +54,7 @@ module Offerings
 
       result = TemplateParity.ensure_missing!(temple, kinds: [:services])
 
-      expected_slugs = %w[ghost-festival-table incense-donation lamp-service liberation-ritual]
+      expected_slugs = %w[ghost-festival-table incense-oil lamp-service liberation-ritual]
       assert_equal expected_slugs, result.created_services.sort
       assert_equal expected_slugs, temple.temple_services.order(:slug).pluck(:slug)
 

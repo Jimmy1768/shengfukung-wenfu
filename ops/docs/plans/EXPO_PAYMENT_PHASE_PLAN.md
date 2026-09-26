@@ -1,9 +1,10 @@
 # Expo Payment Phase Plan
 
-Status: separately deferred payment surface and lifecycle; not part of core V1
-and not current implementation authority
+Status: deferred until a temple has a live ECPay merchant account. The provider
+inventory this plan required before acceptance was done 2026-09-26 (below). Not
+current implementation authority.
 
-Created: 2026-08-11
+Created: 2026-08-11. Inventory, store rules and web defects added 2026-09-26.
 
 Owner: Wenfu Planning
 
@@ -35,6 +36,106 @@ app merely because Stripe exists elsewhere in Wenfu. Before this phase is
 accepted for implementation, Planning must inventory the exact provider and
 account-route mapping rather than assuming both providers belong in every
 registration flow.
+
+## What Exists Today — Inventory, 2026-09-26
+
+Read from the code on `main` at ca37b38, and from production for the demo
+temple.
+
+- **One thing is paid for: a registration.** The price is the offering's fixed
+  `price_cents` times a quantity of 1 to 10. The patron never chooses an
+  amount, donations included. Offering types: general, lamp, ritual, incense,
+  table. Free registrations never reach payment.
+- **One online provider: ECPay**, a hosted page. The provider registry holds
+  `fake` and `ecpay` only (`provider_resolver.rb:8-11`); a temple can be set to
+  `cash_only` instead.
+- **LINE Pay does not exist** — a `line_pay` payment-method value, locale labels
+  and unused `LINE_PAY_*` env vars, but no adapter, route or resolver entry.
+- **Stripe is platform billing only**: the temple paying for TempleMate. No
+  patron flow uses it.
+- **Cash is recorded by staff** (`Payments::CashPaymentRecorder`), the only
+  path that writes a ledger entry.
+- **The web flow.** After an admin marks the registration complete
+  (`checkout_ready?`), `start_checkout` writes a pending `TemplePayment` and
+  sends the browser to an unauthenticated handoff page that posts to ECPay.
+  ECPay's server callback (`/api/v1/payments/webhooks/ecpay`) settles it,
+  checking signature and amount; the browser returns to `checkout_return`.
+  A registration's payment status is pending, paid, refunded or failed.
+- **No temple takes online payment.** On production the demo temple is
+  `cash_only` with no ECPay credentials (checked 2026-09-26). Live ECPay needs a
+  real temple's merchant account (`reference/platform_payments.md`).
+- **The app** creates and edits registrations and shows "待完成付款。" — the
+  status and nothing more, by the Director's principle that the patron is not a
+  messenger for the temple (commit fda6678). No native route starts, completes
+  or polls a payment; the web's status route is cookie-only; and the native API
+  never tells the app whether its temple takes online payment. The app's lint
+  forbids "checkout" and "ECPay" in `mobile/app`.
+
+## What The Store Rules Allow — Researched 2026-09-26
+
+From Apple's App Review Guidelines (last updated 2026-06-08) and Google Play's
+Payments policy, paraphrased from source.
+
+- **Every offering is a physical good or service, used at the temple** — lamp,
+  ritual, table, gatherings, and 香油錢. Apple 3.1.3(e): goods and services used
+  outside the app must be paid by a method other than in-app purchase. Google
+  Play's Payments policy §3 keeps Play billing out of payments for physical
+  goods and services. So ECPay's hosted page is allowed in the app on both,
+  which is what criterion 1 already requires.
+- **香油錢 is a physical product, not a digital one** — the Director,
+  2026-09-26. It is fulfilled at the temple: 廟方代辦, the temple carrying out
+  the incense rite, or 信眾親領, the patron receiving it in person. The code
+  had named it a donation — offering type `donation`, and the demo's
+  `incense-donation` shown as 香油捐獻. Renamed 2026-09-26 (assignment 038):
+  type `incense`, and `incense-oil` shown as 香油錢.
+- **Anything delivered inside the app** — a virtual lamp, a livestream, an
+  e-certificate — would fall under Apple 3.1.1 and need in-app purchase.
+  Nothing sold today is.
+- The 2025 changes to Apple's rules on payment links apply to the US storefront
+  only, not Taiwan.
+
+## Before Any Temple Goes Live: Defects In The Web ECPay Path
+
+Found in the code; none has been exercised against real ECPay, which no temple
+has. The app would inherit each one, so they are fixed on the web first.
+
+1. **The trade number repeats within an hour.** `default_trade_no` cuts to 20
+   characters, dropping the minutes, seconds and random suffix
+   (`ecpay_adapter.rb:168-171`). A second attempt on the same registration in
+   the same hour sends ECPay a number it has already seen.
+2. **A failed or invalid callback can block the real one** (effect inferred).
+   The webhook event is recorded before its signature is checked
+   (`webhook_ingest_service.rb`), and events are deduplicated by ECPay's trade
+   number, so a retried genuine callback can be taken for a duplicate.
+3. **A cancelled registration can still be paid.** `start_checkout` checks the
+   freeze, admin completion and online availability, not cancellation.
+4. **ATM and convenience-store payments probably end as failed** (inferred).
+   `ChoosePayment` is ALL, no `PaymentInfoURL` is set, any return code but 1
+   maps to failed, and failed is terminal, so the later real payment is refused.
+5. **The browser return probably loses the login** (inferred). The session
+   cookie is SameSite=Lax and ECPay returns by cross-site POST. The server
+   callback still settles the payment.
+6. **Two open attempts can both complete** (inferred): nothing stops a second
+   pending payment while the first is open.
+7. **ECPay refunds do not exist.** The adapter raises NotImplementedError, and
+   nothing calls the refund service.
+
+## When A Temple Goes Live — The Shape To Accept
+
+What this plan's deferred list and EA-4 in
+`EXPO_ACCOUNT_APP_READINESS_AND_PARITY_PLAN.md` point to, gathered for
+acceptance when the work starts:
+
+- **Web first.** The defects above are fixed and tested, and the temple's ECPay
+  merchant account works on the website, before the app takes a payment.
+- **Checkout in the phone's browser.** The app opens ECPay's hosted page in the
+  system browser; the site's return page hands back to the app through
+  `templemate://`. No universal links are configured.
+- **The native API tells the app what it cannot know today:** whether its
+  temple takes online payment, and a payment's status over a bearer-token
+  route.
+- **The app's lint changes with it**, since `mobile/app` forbids "checkout" and
+  "ECPay" today.
 
 ## Relationship To Core V1
 
@@ -76,3 +177,8 @@ Before later payment implementation can be accepted:
 The entire payment surface/lifecycle is deferred. It does not block the dummy
 development client, native email session, core account CRUD, or V1 UI
 refinement.
+
+Added 2026-09-26: nor does it block Phase 3 of `MOBILE_WEB_PLAN.md`. No temple
+takes online payment, so a phone sent to the app loses no way to pay. The gate
+opens when a temple has a live ECPay merchant account, and then the web defects
+above come first.

@@ -9,7 +9,7 @@ module Registrations
   # real onboarding flow would, then create a registration for it through
   # the real admin create-order flow. Prior coverage
   # (real_pilot_temple_phone_reuse_test.rb, real_pilot_temple_admin_cash_payment_test.rb)
-  # only ever exercised "incense-donation" -- the other 3
+  # only ever exercised "incense-oil" -- the other 3
   # (lamp-service, ghost-festival-table, liberation-ritual) had never been
   # proven this way. This is that proof, for all 4.
   class RealPilotTempleAllOfferingsAdminTest < ActionDispatch::IntegrationTest
@@ -29,8 +29,8 @@ module Registrations
       )
     end
 
-    test "incense-donation: admin creates a registration from the real template" do
-      offering = bootstrap_offering!("incense-donation")
+    test "incense-oil: admin creates a registration from the real template" do
+      offering = bootstrap_offering!("incense-oil")
       assert_includes offering.metadata.dig("registration_form", "sections", "ritual_metadata", "fields"), "dedication_message"
 
       sign_in_admin(@admin)

@@ -69,12 +69,6 @@ const hasOfferings = computed(() => offerings.value.length > 0);
   line-height: 1.7;
 }
 
-.link {
-  color: var(--primary);
-  font-weight: 700;
-  text-decoration: none;
-}
-
 .empty {
   padding: var(--spacing-lg);
   text-align: center;

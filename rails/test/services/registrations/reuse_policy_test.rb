@@ -77,7 +77,7 @@ module Registrations
 
     test "the same field name carries opposite policies on two offerings" do
       # The case that makes per-(offering, field) granularity necessary:
-      # dedication_message is a temple-authored donation-item picker on one
+      # dedication_message is a temple-authored incense-item picker on one
       # Shengfukung offering and freeform blessing text on the others, under
       # one shared label.
       picker = offering_with({

@@ -1,13 +1,13 @@
 services:
-  - slug: incense-donation
-    label: "香油捐獻"
+  - slug: incense-oil
+    label: "香油錢"
     registration_period_key: "perennial"
     allow_repeat_registrations: true
     ui:
       show_availability_window: false
       lock_registration_period_key: true
     defaults:
-      offering_type: "donation"
+      offering_type: "incense"
       currency: "TWD"
       fulfillment_method: "廟方代辦"
     attributes:
@@ -27,7 +27,7 @@ services:
           - currency
           - description
       fulfillment:
-        title: "捐獻用途"
+        title: "辦理方式"
         fields:
           - fulfillment_method
           - logistics_notes

@@ -20,7 +20,7 @@ class OfferingsRakeTest < ActiveSupport::TestCase
 
     Rake::Task["offerings:apply_templates"].invoke(temple.slug)
 
-    slugs = %w[incense-donation lamp-service ghost-festival-table liberation-ritual]
+    slugs = %w[incense-oil lamp-service ghost-festival-table liberation-ritual]
     assert_equal slugs.sort, temple.temple_services.reload.pluck(:slug).sort
     temple.temple_services.each do |service|
       assert_equal "published", service.status

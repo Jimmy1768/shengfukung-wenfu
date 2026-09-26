@@ -240,12 +240,6 @@ watch(
   line-height: 1.7;
 }
 
-.link {
-  color: var(--primary);
-  font-weight: 700;
-  text-decoration: none;
-}
-
 .event-state {
   padding: var(--spacing-lg);
   text-align: center;
