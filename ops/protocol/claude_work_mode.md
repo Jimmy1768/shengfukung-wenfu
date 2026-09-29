@@ -216,7 +216,8 @@ Planning.
 **8.1** A Control with an open assignment receives nothing except an `ANSWER`
 to its own `QUESTION`. A second `ASSIGNMENT` is `BLOCKED busy`.
 
-**8.2** Nobody polls a Control for status, and nobody reads its transcript.
+**8.2** Nobody polls a Control for status. Its transcript is not evidence —
+the `TERMINAL` and the commit are.
 
 **8.3** Strategy initiates, and is sent nothing but a reply to its own request
 or a cross-repository question. Handler expects arbitrary interruption.
