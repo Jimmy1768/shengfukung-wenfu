@@ -26,8 +26,8 @@ matter which file points at it; what binds is the check, not the pointer.
 | **Strategy** | thinks about the portfolio: priorities, sequencing, decisions touching more than one repository | approve, route, dispatch |
 | **Handler** | carries a spec to a Control in another repository and the reply back | read either, decide, file anything |
 | **Recovery** | second opinion, review, rescue | approve, route, dispatch, mutate |
-| **Planning** | supplies the spec for one repository, sequences its two Controls, owns its checkout and worktrees | reach into another repository |
-| **Control** | executes bounded assignments, reports done or blocked | write outside its own worktree |
+| **Planning** | discusses the plan with the Director, writes the spec for one repository, reviews what its Controls return, sequences them, owns its checkout and worktrees | implement |
+| **Control** | the working session: executes bounded assignments, monitoring the implementer it dispatches, reports done or blocked | write outside its own worktree |
 
 Planning is the usual door into a repository, not a mandatory one. The Director
 may work directly in any session, including a Control.
@@ -291,13 +291,15 @@ move a session from outside.
 reason against it where the work argues otherwise.* There are three kinds of
 session, and the model follows the kind rather than the lane.
 
-Discussion — Planning, and in the workspace Strategy and Recovery — runs on
-Fable 5.1 at maximum effort. Implementation — Control — runs on Opus 5.5 at
-extra. Handler runs on Sonnet 5 at extra: it carries a message and must not
-read or decide, and a less capable model is the safer one in the lane whose
-purpose is not to interpret what it holds. It is also the one lane where "this
-needs a bigger model" should never arise; if it does, the message being carried
-has become something Handler is reading.
+Discussion — Planning — runs on Opus 5.5 at maximum effort. Strategy and
+Recovery, in the workspace, run on Fable 5.1 at maximum, and Planning takes a
+hard question to Recovery under 2.3 — a spec for a new layer, anything that
+changes a contract — rather than reasoning past it alone. Implementation —
+Control — runs on Opus 5.5 at extra. Handler runs on Sonnet 5.5 at extra: it
+carries a message and must not read or decide, and a less capable model is the
+safer one in the lane whose purpose is not to interpret what it holds. It is
+also the one lane where "this needs a bigger model" should never arise; if it
+does, the message being carried has become something Handler is reading.
 
 A Control chooses the model and effort for each ephemeral implementer it
 dispatches, including none at all: work that is reading and grepping needs no
