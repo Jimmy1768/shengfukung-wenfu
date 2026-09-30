@@ -68,7 +68,7 @@ coverage, not missing screens:
 
 | Surface | API accepts / returns | UI exposes |
 | --- | --- | --- |
-| Profile | `english_name`, `native_name`, `phone`, `city`, `notes` (5) | `native_name` only (1) |
+| Profile | `english_name`, `native_name`, `phone`, `city` (4) | all four (4) |
 | Dependents | `english_name`, `native_name`, `relationship_label`, `birthdate`, `phone`, `email`, `notes` (7) | name, relationship (2) |
 
 `NativeProfileController` uses the same `Account::ProfileForm` as the web, so
@@ -101,6 +101,26 @@ temple's offering YAML: `quantity`, `registrant_scope`, `dependent_id`,
 `contact_name`, `contact_phone`, `contact_email`, `household_notes`,
 `arrival_window`, `ceremony_notes`. This is why the Expo app does **not**
 depend on per-temple offering configuration — it consumes a stable contract.
+
+## Temple binding
+
+A device loads a temple only by scanning its code, and the code names a temple
+without proving one.
+
+- The code is a link at the platform origin with the path
+  `/templemate/connect/<slug>` (`Templemate::ConnectionLink`). The app accepts
+  it only when the origin equals its `PLATFORM_CONNECT_ORIGIN` exactly, the
+  scheme is https, and there is no userinfo, query or fragment
+  (`mobile/app/tenant/binding.js`). The origin is the platform's, not the
+  temple's and not the API's, so no client host is compiled into a build.
+- Before anything loads, the scanner confirms the slug with an unauthenticated
+  `GET /api/v1/account/native/bootstrap?temple_slug=<slug>`
+  (`mobile/app/tenant/scanner.js`). A slug the server rejects does not load.
+- Every later request carries `?temple_slug=` from the stored binding; the
+  session token names no temple.
+- Unloading returns to the scanner, and a different temple can then be loaded.
+  When a slug is renamed on the server, stored bindings stop resolving and every
+  device rescans once (the demo rename, 2026-09-25).
 
 ## What is genuinely absent
 

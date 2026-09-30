@@ -100,7 +100,7 @@ Current interpretation after production Google OAuth validation and shared-DB cl
 ## 2. Nginx Template Finalization
 
 - [x] Owner: Ops
-- [x] Ensure `ops/nginx/shengfukung-wenfu.conf` contains:
+- [x] Ensure `ops/nginx/shengfukung-demo.conf` contains:
   - staging `server_name shengfukung.com.tw`
   - future production placeholder block/comments
   - upstream/socket references aligned with rendered systemd service names

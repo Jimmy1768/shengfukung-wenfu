@@ -15,6 +15,11 @@ response. The client verifies that exact scheme/host/path before it exchanges a
 returned code. It does not invent a production domain, universal link, or
 provider callback.
 
+Central auth must allowlist that return URI. On 2026-08-19 it answered
+`422 invalid_return_url`, the last blocker on native OAuth; the blocker has
+since cleared, and Google sign-in on the phone was verified 2026-09-25 on
+build 3 (plan `CENTRAL_AUTH_TENANT_REGISTRATION_PLAN.md`, deleted 2026-09-26).
+
 ## Reusable mechanism
 
 `mobile/app/oauth/transaction.js` is provider-independent. Each attempt:

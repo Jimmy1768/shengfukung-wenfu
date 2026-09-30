@@ -13,6 +13,7 @@ Owner: Wenfu Planning
 - Phase 2 checkpoint: `f1049789079c93ebfe31a579ed68d6d27453f1fc`
 - Phase 1 plan:
   `ops/docs/plans/PLATFORM_BILLING_QUALIFYING_REGISTRATION_ACCOUNTING_PLAN.md`
+  (deleted 2026-09-26: implemented; see `ops/docs/reference/templemate_platform_billing_runtime.md`)
 - Phase 2 plan:
   TENANT_SCOPED_PATRON_PAYMENT_PROVIDER_PLAN.md (deleted 2026-08-22 in the
   plans/archive cleanup; recoverable via `git log --grep`)

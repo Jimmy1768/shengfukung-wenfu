@@ -1,5 +1,7 @@
 # Expo OAuth Phase Roadmap
 
+> The `ops/docs/handoffs/` files linked below were deleted in 102ecda; recover them from git history.
+
 Status: active roadmap; implementation authority lives only in the bounded
 phase plans named below
 

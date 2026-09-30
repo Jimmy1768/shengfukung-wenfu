@@ -22,6 +22,8 @@ module Notifications
 
         if job
           log_and_alert_job_failure(exception:, job:, timestamp:, environment_label:)
+        elsif redis_connection_error?(exception)
+          log_and_track_redis_outage(exception:, context:, timestamp:, environment_label:)
         else
           log_and_alert_infra_error(exception:, context:, timestamp:, environment_label:)
         end
@@ -108,14 +110,19 @@ module Notifications
         )
       end
 
-      def self.log_and_alert_infra_error(exception:, context:, timestamp:, environment_label:)
-        # context[:context] is Sidekiq's own human-readable description
-        # for this failure site (e.g. "Invalid JSON for job", "Exception
-        # during Sidekiq lifecycle event"). It's absent for the bare
-        # fetch-loop case (handle_exception(ex), no context at all) --
-        # the exact shape of the incident that prompted this fix.
-        description = context_description(context) || 'no job was being processed'
+      # A Redis connection error with no job in flight is a fetch-loop failure:
+      # a thread blocked in BRPOP found Redis gone. It is expected during any
+      # restart and resolves itself, so it is counted rather than mailed -- see
+      # RedisOutageTracker. Every subclass qualifies: CannotConnectError and
+      # ReadTimeoutError, the two seen on 2026-09-30, both descend from
+      # RedisClient::ConnectionError.
+      def self.redis_connection_error?(exception)
+        defined?(RedisClient::ConnectionError) && exception.is_a?(RedisClient::ConnectionError)
+      end
 
+      # The log line is written for every error on every path, unchanged. Only
+      # the decision to email differs.
+      def self.log_infra_error(exception:, description:, timestamp:, environment_label:)
         Notifications::Logging::EventLogger.log(
           event: 'notifications.sidekiq.failure',
           details: {
@@ -127,6 +134,44 @@ module Notifications
             timestamp: timestamp
           }
         )
+      end
+
+      def self.infra_description(context)
+        # context[:context] is Sidekiq's own human-readable description
+        # for this failure site (e.g. "Invalid JSON for job", "Exception
+        # during Sidekiq lifecycle event"). It's absent for the bare
+        # fetch-loop case (handle_exception(ex), no context at all) --
+        # the exact shape of the incident that prompted this fix.
+        context_description(context) || 'no job was being processed'
+      end
+
+      def self.log_and_track_redis_outage(exception:, context:, timestamp:, environment_label:)
+        log_infra_error(exception:, description: infra_description(context), timestamp:, environment_label:)
+
+        alert = RedisOutageTracker.shared.record_error
+        return unless alert
+
+        seconds = alert.unreachable_for.round
+        AlertSender.call(
+          alert_key: "sidekiq_failure:redis_outage",
+          # Unique per outage. AlertThrottler keys live in Redis and fail open
+          # while it is down, so they cannot be what limits this to one email --
+          # the tracker is. This key only stops the throttle, once Redis is back,
+          # from suppressing a later outage's single alert behind an earlier one.
+          throttle_key: "sidekiq_failure:redis_outage:#{Process.pid}:#{alert.outage_id}",
+          subject: '[Alert] Sidekiq cannot reach Redis',
+          body: <<~HTML
+            <p>Sidekiq has been unable to reach Redis for at least #{seconds} seconds, as of #{CGI.escapeHTML(timestamp)} (#{CGI.escapeHTML(environment_label)}).</p>
+            <p>No job was in flight -- nothing was dequeued or lost. Sidekiq resumes on its own when Redis returns; no restart is needed for that.</p>
+            <p>A restart of Redis that lasts a few seconds does not send this. It is sent once per outage, after #{RedisOutageTracker::ALERT_AFTER_SECONDS} seconds without a connection.</p>
+            <p>Last error: #{CGI.escapeHTML(exception.class.to_s)} – #{CGI.escapeHTML(exception.message)}</p>
+          HTML
+        )
+      end
+
+      def self.log_and_alert_infra_error(exception:, context:, timestamp:, environment_label:)
+        description = infra_description(context)
+        log_infra_error(exception:, description:, timestamp:, environment_label:)
 
         AlertSender.call(
           # Keyed on exception class, not collapsed to one shared bucket:
@@ -145,7 +190,9 @@ module Notifications
       end
 
       private_class_method :extract_job, :job_field, :context_description,
-        :log_and_alert_job_failure, :log_and_alert_infra_error
+        :log_and_alert_job_failure, :log_and_alert_infra_error,
+        :redis_connection_error?, :log_infra_error, :infra_description,
+        :log_and_track_redis_outage
     end
   end
 end

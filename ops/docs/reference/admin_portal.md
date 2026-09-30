@@ -5,7 +5,7 @@ This document captures what exists in the admin portal today so future work can 
 ## Temple Content & Media Management
 
 - `/admin/temple/profile` persists hero copy, per-tab hero images, contact/service/visit metadata, and validates map links. Hero uploads use the AJAX uploader with fallback URL inputs, and a floating save CTA appears when media sections are in view.
-- News (`TempleNewsPost`) and gallery (`TempleGalleryEntry`) entries live under `/admin/news_posts` and `/admin/gallery_entries`. Each supports localized copy, publish toggles, and optional recap uploads via the shared MediaAsset/S3 pipeline.
+- News (`TempleNewsPost`) and gallery (`TempleGalleryEntry`) entries live under `/admin/news_posts` and `/admin/gallery_entries`. Each supports localized copy, publish toggles, and optional recap uploads via the shared MediaAsset/S3 pipeline. Gallery photos can be removed, restored, reordered and permanently deleted, and a permanent delete reclaims the S3 object (shipped 2026-09-07/08). The Director's archive-gates-delete ruling: a photo must be archived before it can be destroyed, so an operator always passes through a step they can undo (`TempleGalleryPhoto#archive!`; plan `GALLERY_AS_MEDIA_ASSETS_PLAN.md` deleted 2026-09-26).
 - Event/service/gathering CRUD screens share the same card layout, localized labels, and datetime pickers; slugs auto-generate per temple so admins never manage URL tokens manually.
 - Gatherings cover non-offering meetups but still flow through the unified registrations/payments stack so reporting stays consistent.
 

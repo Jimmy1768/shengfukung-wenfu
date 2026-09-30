@@ -1,5 +1,7 @@
 # TEMPLEMATE REFINE LEDGER
 
+> The `ops/docs/handoffs/` files linked below were deleted in 102ecda; recover them from git history.
+
 ## Purpose
 
 - Running ledger for TempleMate (mobile) refinements discovered during
@@ -67,7 +69,8 @@ is **build 2**.
       tenant — confirmed live via a direct probe (`422
       invalid_return_url`), fixed 2026-08-19 by Codex SourceGrid
       Planning (additive, independently re-verified). Full record:
-      `ops/docs/plans/CENTRAL_AUTH_TENANT_REGISTRATION_PLAN.md`.
+      `ops/docs/plans/CENTRAL_AUTH_TENANT_REGISTRATION_PLAN.md` (deleted 2026-09-26; the
+      blocker cleared, recorded in `reference/templemate_native_oauth.md`).
 
 - [ ] **New finding, 2026-08-19 — first real sign-in succeeded (Apple:
       dialogue, account selection, FaceID, all successful) but the app
