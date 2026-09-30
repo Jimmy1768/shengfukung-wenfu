@@ -30,16 +30,54 @@ Top-level alerting helpers live under `services/notifications/alerts/`. These fi
    - **Throttle keys must not collapse.** Job failures key on
      `job_class + exception_class`; keying on job class alone means a new
      failure mode hides behind an already-alerted one. Infra failures (no job)
-     key on exception class, so a blip and a sustained outage throttle
-     together — which is the suppression you want — without hiding an
-     unrelated infra failure behind them.
+     key on exception class, so an unrelated infra failure is not hidden behind
+     another. This used to claim that a Redis blip and a sustained outage
+     "throttle together". They never did: the throttle's keys are in Redis, so
+     during a Redis outage it could not throttle at all. See below.
+
+   **A Redis connection error does not email until Redis has been unreachable
+   for 60 seconds** — settled 2026-09-30. With no job in flight, any
+   `RedisClient::ConnectionError` (that includes `CannotConnectError` and
+   `ReadTimeoutError`) is logged as always and then counted by
+   `Notifications::Alerts::RedisOutageTracker` instead of mailed:
+
+   - Nothing is sent until connection errors have persisted for 60 seconds.
+   - Then exactly **one** email for that outage, saying how long Redis has been
+     unreachable and that Sidekiq resumes on its own when it returns. Further
+     errors in the same outage send nothing more.
+   - An outage ends when 30 seconds pass with no connection error. The next one
+     starts a new outage, which has to last 60 seconds to alert.
+
+   Why: every Sidekiq processor thread blocks in `BRPOP` on Redis and retries a
+   failed fetch after a one-second sleep, so any gap in Redis reaches the error
+   handler at once and then about once a second per thread. On 2026-09-30 a
+   two-second Redis restart — `needrestart` after an unattended OpenSSL upgrade —
+   emailed from production and staging, and a nine-second read timeout emailed
+   again. Neither needed anyone.
+
+   **Why the tracker is in memory and not the throttle.** `AlertThrottler` keeps
+   its keys in `Rails.cache`, which is Redis, and fails *open*: when it cannot
+   reach its store it allows the alert. So during a Redis outage — exactly when
+   this matters — the throttle does not throttle, and a key written before the
+   outage cannot be read to suppress anything either. The tracker's state is
+   per process, in memory, behind a `Mutex`, on a monotonic clock, and touches
+   neither `Rails.cache` nor Redis. Each process decides for itself, so
+   production and staging each send their own one email, which is correct:
+   they are separate deployments. The one email still goes through
+   `AlertSender`, whose Brevo call is synchronous HTTP and does not need Redis,
+   with a throttle key unique to the outage, so that once Redis is back an
+   earlier outage's key cannot swallow a later outage's only email.
+
+   Unchanged: a job failure (a job in flight) and any infra error that is not a
+   Redis connection error alert immediately through the throttle, as before.
 
    The handler is registered in Sidekiq's **3-argument** form. `Sidekiq::Config#handle_exception`
    inspects the arity of the registered proc itself, so a 2-arg proc logs a
    deprecation on every single invocation even if what it calls accepts three.
 
 4. **Extending throttling**  
-   `AlertThrottler` stores keys in `Rails.cache` with a 5-minute TTL. Provide a custom `throttle_key` to `AlertSender` when the default (derived from `alert_key`) is too generic.
+   `AlertThrottler` stores keys in `Rails.cache` with a 5-minute TTL. Provide a custom `throttle_key` to `AlertSender` when the default (derived from `alert_key`) is too generic.  
+   `Rails.cache` is Redis, and the throttler fails open when it cannot reach it. Do not rely on it to limit any alert that fires *because* Redis is unreachable — it cannot, and will allow every one.
 
 ## Inspecting logged alerts
 
