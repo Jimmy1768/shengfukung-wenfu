@@ -5,6 +5,8 @@ require "test_helper"
 module Notifications
   module Alerts
     class SidekiqFailureHandlerTest < ActiveSupport::TestCase
+      setup { RedisOutageTracker.shared.reset! }
+
       def call_and_capture(exception, context)
         calls = []
         AlertSender.stub(:call, ->(**kwargs) { calls << kwargs; true }) do
@@ -41,21 +43,25 @@ module Notifications
         assert_includes call[:body], "reference_time"
       end
 
+      # Uses an infra error that still alerts at once. It used a Redis
+      # connection error until 2026-09-30, when those stopped mailing
+      # immediately; the subject of this case is truthful no-job reporting,
+      # which is unchanged for every other infra error.
       test "an infra-level error with no job in flight is reported truthfully, not as a phantom job named unknown" do
-        exception = RedisClient::CannotConnectError.new("Connection refused - connect(2) for 127.0.0.1:6379")
+        exception = IOError.new("closed stream")
         context = {}
 
         calls = call_and_capture(exception, context)
 
         assert_equal 1, calls.length
         call = calls.first
-        assert_equal "sidekiq_failure:infra:RedisClient::CannotConnectError", call[:alert_key]
+        assert_equal "sidekiq_failure:infra:IOError", call[:alert_key]
         assert_equal "[Alert] Sidekiq internal error (no job)", call[:subject]
         refute_includes call[:subject], "unknown"
         refute_includes call[:body], "job <strong>unknown</strong>"
         assert_includes call[:body], "No job was in flight -- nothing was dequeued or lost."
-        assert_includes call[:body], "RedisClient::CannotConnectError"
-        assert_includes call[:body], "Connection refused"
+        assert_includes call[:body], "IOError"
+        assert_includes call[:body], "closed stream"
       end
 
       test "an infra-level error uses Sidekiq's own context description when present" do
@@ -69,12 +75,12 @@ module Notifications
       end
 
       test "job failure and infra error alert keys never collide even for the same exception class" do
-        exception_class_name = "RedisClient::CannotConnectError"
+        exception_class_name = "IOError"
         job_context = { job: { "class" => "SomeJob", "args" => [] } }
         infra_context = {}
 
-        job_calls = call_and_capture(RedisClient::CannotConnectError.new("x"), job_context)
-        infra_calls = call_and_capture(RedisClient::CannotConnectError.new("x"), infra_context)
+        job_calls = call_and_capture(IOError.new("x"), job_context)
+        infra_calls = call_and_capture(IOError.new("x"), infra_context)
 
         refute_equal job_calls.first[:alert_key], infra_calls.first[:alert_key]
         assert_includes infra_calls.first[:alert_key], exception_class_name
